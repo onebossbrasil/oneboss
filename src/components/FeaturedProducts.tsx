@@ -1,4 +1,3 @@
-
 import { useState, useRef, useEffect } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -54,7 +53,8 @@ const FeaturedProducts = () => {
   const scrollRef = useRef<HTMLDivElement>(null);
   const [canScrollLeft, setCanScrollLeft] = useState(false);
   const [canScrollRight, setCanScrollRight] = useState(true);
-
+  const [isPaused, setIsPaused] = useState(false);
+  
   const checkScrollButtons = () => {
     if (!scrollRef.current) return;
     
@@ -63,18 +63,56 @@ const FeaturedProducts = () => {
     setCanScrollRight(scrollLeft < scrollWidth - clientWidth - 10);
   };
 
+  // Auto scroll functionality
   useEffect(() => {
     const scrollElement = scrollRef.current;
+    if (!scrollElement) return;
     
-    if (scrollElement) {
-      scrollElement.addEventListener("scroll", checkScrollButtons);
-      checkScrollButtons();
+    const autoScrollInterval = 5000; // 5 seconds between scrolls
+    const scrollAmount = 320; // Adjusted to show partial view of third product
+    
+    // Auto scroll function
+    const autoScroll = () => {
+      if (isPaused) return;
       
-      return () => {
-        scrollElement.removeEventListener("scroll", checkScrollButtons);
-      };
-    }
-  }, []);
+      const { scrollLeft, scrollWidth, clientWidth } = scrollElement;
+      
+      // If we're at the end, scroll back to the beginning
+      if (scrollLeft >= scrollWidth - clientWidth - 5) {
+        scrollElement.scrollTo({
+          left: 0,
+          behavior: "smooth",
+        });
+      } else {
+        // Otherwise, scroll forward
+        scrollElement.scrollTo({
+          left: scrollLeft + scrollAmount,
+          behavior: "smooth",
+        });
+      }
+      checkScrollButtons();
+    };
+    
+    // Set up auto scroll timer
+    const timer = setInterval(autoScroll, autoScrollInterval);
+    
+    // Pause auto scroll on mouse enter
+    const handleMouseEnter = () => setIsPaused(true);
+    const handleMouseLeave = () => setIsPaused(false);
+    
+    scrollElement.addEventListener("mouseenter", handleMouseEnter);
+    scrollElement.addEventListener("mouseleave", handleMouseLeave);
+    scrollElement.addEventListener("scroll", checkScrollButtons);
+    
+    checkScrollButtons();
+    
+    return () => {
+      clearInterval(timer);
+      scrollElement.removeEventListener("mouseenter", handleMouseEnter);
+      scrollElement.removeEventListener("mouseleave", handleMouseLeave);
+      scrollElement.removeEventListener("scroll", checkScrollButtons);
+    };
+  }, [isPaused]);
 
   const scroll = (direction: "left" | "right") => {
     if (!scrollRef.current) return;
@@ -125,13 +163,18 @@ const FeaturedProducts = () => {
         <div
           ref={scrollRef}
           className="flex overflow-x-auto gap-6 pb-4 scrollbar-none"
-          style={{ scrollbarWidth: "none" }}
+          style={{ 
+            scrollbarWidth: "none", 
+            scrollSnapType: "x mandatory",  // Smooth snap effect
+            paddingRight: "80px" // Extra padding to ensure third item is visible
+          }}
         >
           {productsData.map((product) => (
             <Link
               key={product.id}
               to={`/product/${product.id}`}
               className="product-card min-w-[280px] md:min-w-[320px] flex-shrink-0"
+              style={{ scrollSnapAlign: "start" }}
             >
               <div className="relative aspect-[4/3] rounded-t-lg overflow-hidden">
                 <img
