@@ -65,39 +65,41 @@ const CategoryBanners = () => {
           </p>
         </div>
         
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-5 md:gap-8">
           {categoryData.map((category) => (
             <Link
               key={category.id}
               to={`/loja?categoria=${category.slug}`}
-              className={`group ${category.size === "full" ? "md:col-span-2" : ""} overflow-hidden rounded-lg transition-all duration-500`}
+              className={`${category.size === "full" ? "md:col-span-2" : ""} group rounded-xl overflow-hidden transition-all duration-500 hover:shadow-xl hover:shadow-gold/20 block`}
             >
-              <div className="relative overflow-hidden h-full">
-                <AspectRatio ratio={category.size === "full" ? 21/9 : isMobile ? 16/9 : 16/10}>
-                  <div className="w-full h-full">
-                    <img 
-                      src={category.image} 
-                      alt={category.title}
-                      className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
-                    />
-                    
-                    {/* Overlay */}
-                    <div className="absolute inset-0 bg-black/40"></div>
-                    
-                    {/* Glassmorphism container */}
-                    <div className="absolute inset-0 flex items-center justify-center">
-                      <div className="glassmorphism text-center py-6 px-8 transform transition-all duration-500 group-hover:scale-105 backdrop-blur-md bg-white/10 border border-white/20 rounded-xl shadow-2xl">
-                        <h3 className="text-white font-playfair text-2xl md:text-3xl font-bold mb-3">
-                          {category.title}
-                        </h3>
-                        <div className="inline-block bg-transparent border border-white/30 hover:border-gold text-white hover:text-gold rounded-full px-5 py-1 text-sm transition-all duration-300">
-                          VER MAIS
-                        </div>
+              <AspectRatio ratio={category.size === "full" ? 21/9 : isMobile ? 16/9 : 16/10} className="w-full h-full">
+                <div className="relative w-full h-full overflow-hidden">
+                  {/* Background Image */}
+                  <img 
+                    src={category.image} 
+                    alt={category.title}
+                    className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                  />
+                  
+                  {/* Gradient Overlay */}
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
+                  
+                  {/* Content */}
+                  <div className="absolute inset-0 flex flex-col justify-end p-5 md:p-8">
+                    <div className="glassmorphism rounded-xl p-4 md:p-6 transform transition-all duration-500 backdrop-blur-sm bg-white/10 border border-white/20 shadow-lg group-hover:scale-[1.02] w-fit mx-auto">
+                      <h3 className="text-white font-playfair text-xl md:text-3xl font-bold text-center">
+                        {category.title}
+                      </h3>
+                      
+                      <div className="mt-3 flex justify-center">
+                        <span className="inline-block px-4 py-1.5 rounded-full border border-white/30 text-white text-sm md:text-base transition-colors duration-300 group-hover:border-gold group-hover:text-gold">
+                          Ver Coleção
+                        </span>
                       </div>
                     </div>
                   </div>
-                </AspectRatio>
-              </div>
+                </div>
+              </AspectRatio>
             </Link>
           ))}
         </div>
