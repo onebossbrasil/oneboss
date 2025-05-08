@@ -3,64 +3,19 @@ import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
 import { ChevronRight } from "lucide-react";
 import { useIsMobile } from "@/hooks/use-mobile";
-import { 
-  Carousel, 
-  CarouselContent, 
-  CarouselItem, 
-  CarouselNext, 
-  CarouselPrevious 
-} from "@/components/ui/carousel";
-import { useEffect, useState } from "react";
 
 const Hero = () => {
   const isMobile = useIsMobile();
-  const [autoPlay, setAutoPlay] = useState(true);
-  const [currentSlide, setCurrentSlide] = useState(0);
-  
-  const carouselImages = [
-    'url(/lovable-uploads/b5183090-ac85-4c8b-b250-2cd368f49a4c.png)',
-    'url(/lovable-uploads/3602c2f3-d103-44c1-9798-c2f135541e04.png)'
-  ];
-
-  useEffect(() => {
-    if (!autoPlay) return;
-    
-    const interval = setInterval(() => {
-      setCurrentSlide((prev) => (prev === carouselImages.length - 1 ? 0 : prev + 1));
-    }, 5000);
-    
-    return () => clearInterval(interval);
-  }, [autoPlay, carouselImages.length]);
   
   return (
     <section className="relative h-[70vh] md:h-[85vh] min-h-[550px] md:min-h-[650px] w-full overflow-hidden">
-      {/* Carousel Background Images */}
-      <Carousel 
-        className="h-full w-full absolute inset-0"
-        setApi={(api) => {
-          if (api) {
-            api.scrollTo(currentSlide);
-            api.on('select', () => {
-              setCurrentSlide(api.selectedScrollSnap());
-            });
-          }
-        }}
+      {/* Background Image */}
+      <div 
+        className="absolute inset-0 bg-cover bg-center bg-no-repeat"
+        style={{ backgroundImage: 'url(https://images.unsplash.com/photo-1496307653780-42ee777d4833?auto=format&fit=crop&q=80&w=2070)' }}
       >
-        <CarouselContent className="h-full">
-          {carouselImages.map((image, index) => (
-            <CarouselItem key={index} className="h-full">
-              <div 
-                className="absolute inset-0 bg-cover bg-center bg-no-repeat h-full w-full transition-opacity duration-500"
-                style={{ backgroundImage: image }}
-              >
-                <div className="absolute inset-0 bg-gradient-to-r from-black/90 to-black/50"></div>
-              </div>
-            </CarouselItem>
-          ))}
-        </CarouselContent>
-        <CarouselPrevious className="left-4 z-20 bg-black/30 text-white border-gold hover:bg-black/50 hover:text-gold" />
-        <CarouselNext className="right-4 z-20 bg-black/30 text-white border-gold hover:bg-black/50 hover:text-gold" />
-      </Carousel>
+        <div className="absolute inset-0 bg-gradient-to-r from-black/90 to-black/50"></div>
+      </div>
       
       {/* Content */}
       <div className="relative z-10 container mx-auto h-full flex flex-col justify-center items-center text-center px-4 md:px-6 lg:px-12">
