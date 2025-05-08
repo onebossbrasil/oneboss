@@ -1,6 +1,7 @@
 
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 // Dados simulados dos patrocinadores
 const sponsors = [
@@ -38,46 +39,47 @@ const sponsors = [
 
 const SponsorsBanner = () => {
   const [isHovered, setIsHovered] = useState(false);
+  const isMobile = useIsMobile();
   
   return (
-    <section className="py-16 bg-background border-t border-gold/10">
+    <section className="py-10 md:py-16 bg-background border-t border-gold/10">
       <div className="container mx-auto px-4">
-        <div className="text-center mb-10">
-          <h2 className="font-playfair text-3xl font-bold mb-4">
+        <div className="text-center mb-6 md:mb-10">
+          <h2 className="font-playfair text-2xl md:text-3xl font-bold mb-3 md:mb-4">
             Parceiros <span className="text-gold">Premium</span>
           </h2>
-          <p className="max-w-2xl mx-auto text-muted-foreground">
+          <p className="max-w-2xl mx-auto text-sm md:text-base text-muted-foreground">
             Marcas de excelência que compartilham nossa paixão por qualidade e exclusividade
           </p>
         </div>
         
         <div 
-          className="relative overflow-hidden rounded-xl glassmorphism py-12 px-8"
+          className="relative overflow-hidden rounded-xl glassmorphism py-8 md:py-12 px-4 md:px-8"
           onMouseEnter={() => setIsHovered(true)}
           onMouseLeave={() => setIsHovered(false)}
         >
           <div 
-            className={`flex items-center justify-between space-x-10 transition-transform duration-15000 ease-linear ${isHovered ? 'animate-none' : 'animate-[scroll_30s_linear_infinite]'}`}
+            className={`flex items-center justify-between space-x-6 md:space-x-10 transition-transform duration-15000 ease-linear ${isHovered || isMobile ? 'animate-none' : 'animate-[scroll_30s_linear_infinite]'}`}
           >
             {[...sponsors, ...sponsors].map((sponsor, index) => (
               <div 
                 key={`${sponsor.id}-${index}`}
-                className="flex-shrink-0 flex items-center justify-center h-24 w-40 p-4 glassmorphism rounded-lg hover:shadow-lg hover:shadow-gold/10 transition-all duration-300"
+                className="flex-shrink-0 flex items-center justify-center h-16 md:h-24 w-28 md:w-40 p-3 md:p-4 glassmorphism rounded-lg hover:shadow-lg hover:shadow-gold/10 transition-all duration-300"
               >
                 <img 
                   src={sponsor.logo} 
                   alt={sponsor.name} 
-                  className="max-h-12 max-w-full object-contain filter grayscale hover:grayscale-0 transition-all duration-300"
+                  className="max-h-8 md:max-h-12 max-w-full object-contain filter grayscale hover:grayscale-0 transition-all duration-300"
                 />
               </div>
             ))}
           </div>
           
-          <div className="absolute inset-y-0 left-0 w-20 bg-gradient-to-r from-background to-transparent z-10"></div>
-          <div className="absolute inset-y-0 right-0 w-20 bg-gradient-to-l from-background to-transparent z-10"></div>
+          <div className="absolute inset-y-0 left-0 w-12 md:w-20 bg-gradient-to-r from-background to-transparent z-10"></div>
+          <div className="absolute inset-y-0 right-0 w-12 md:w-20 bg-gradient-to-l from-background to-transparent z-10"></div>
         </div>
         
-        <div className="mt-8 text-center">
+        <div className="mt-6 md:mt-8 text-center">
           <Button 
             variant="outline" 
             className="border border-gold/30 hover:border-gold text-gold hover:bg-gold hover:text-white transition-all duration-300"

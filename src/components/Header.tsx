@@ -8,11 +8,11 @@ const Header = () => {
 
   return (
     <header className="sticky top-0 z-50 w-full">
-      <div className="glassmorphism px-4 md:px-8 py-4">
+      <div className="glassmorphism px-4 py-3 md:px-8 md:py-4">
         <div className="container mx-auto flex justify-between items-center">
           {/* Logo */}
           <Link to="/" className="flex items-center">
-            <div className="text-gold font-playfair font-bold text-2xl md:text-3xl">
+            <div className="text-gold font-playfair font-bold text-xl md:text-2xl lg:text-3xl">
               <span className="tracking-wider">ONE</span>
               <span className="text-gold mx-1">✦</span>
               <span className="tracking-wider">BOSS</span>
@@ -20,15 +20,15 @@ const Header = () => {
           </Link>
 
           {/* Desktop Navigation */}
-          <nav className="hidden md:flex items-center space-x-8">
-            <Link to="/" className="font-medium hover:text-gold transition-colors">Home</Link>
-            <Link to="/categories" className="font-medium hover:text-gold transition-colors">Categorias</Link>
-            <Link to="/about" className="font-medium hover:text-gold transition-colors">Sobre</Link>
-            <Link to="/contact" className="font-medium hover:text-gold transition-colors">Contato</Link>
+          <nav className="hidden md:flex items-center space-x-6 lg:space-x-8">
+            <Link to="/" className="font-medium hover:text-gold transition-colors text-sm lg:text-base">Home</Link>
+            <Link to="/loja" className="font-medium hover:text-gold transition-colors text-sm lg:text-base">Categorias</Link>
+            <Link to="/about" className="font-medium hover:text-gold transition-colors text-sm lg:text-base">Sobre</Link>
+            <Link to="/contact" className="font-medium hover:text-gold transition-colors text-sm lg:text-base">Contato</Link>
           </nav>
 
           {/* Action Buttons */}
-          <div className="hidden md:flex items-center space-x-6">
+          <div className="hidden md:flex items-center space-x-5 lg:space-x-6">
             <button className="text-foreground hover:text-gold transition-colors">
               <Search size={20} />
             </button>
@@ -42,19 +42,25 @@ const Header = () => {
           </div>
 
           {/* Mobile Menu Button */}
-          <button 
-            className="md:hidden text-foreground hover:text-gold transition-colors"
-            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-          >
-            {mobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
-          </button>
+          <div className="flex items-center space-x-3 md:hidden">
+            <Link to="/cart" className="text-foreground hover:text-gold transition-colors relative">
+              <ShoppingCart size={20} />
+              <span className="absolute -top-2 -right-2 bg-gold text-white text-xs rounded-full w-4 h-4 flex items-center justify-center">0</span>
+            </Link>
+            <button 
+              className="text-foreground hover:text-gold transition-colors"
+              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+            >
+              {mobileMenuOpen ? <X size={22} /> : <Menu size={22} />}
+            </button>
+          </div>
         </div>
       </div>
 
       {/* Mobile Menu */}
       {mobileMenuOpen && (
-        <div className="md:hidden glassmorphism absolute top-full left-0 w-full py-4 px-6 shadow-lg">
-          <nav className="flex flex-col space-y-4">
+        <div className="md:hidden glassmorphism absolute top-full left-0 w-full py-4 px-6 shadow-lg z-50">
+          <nav className="flex flex-col space-y-3">
             <Link 
               to="/" 
               className="font-medium py-2 hover:text-gold transition-colors"
@@ -63,7 +69,7 @@ const Header = () => {
               Home
             </Link>
             <Link 
-              to="/categories" 
+              to="/loja" 
               className="font-medium py-2 hover:text-gold transition-colors"
               onClick={() => setMobileMenuOpen(false)}
             >
@@ -83,14 +89,10 @@ const Header = () => {
             >
               Contato
             </Link>
-            <div className="flex items-center space-x-6 pt-2">
+            <div className="flex items-center space-x-4 pt-2">
               <button className="text-foreground hover:text-gold transition-colors">
                 <Search size={20} />
               </button>
-              <Link to="/cart" className="text-foreground hover:text-gold transition-colors relative">
-                <ShoppingCart size={20} />
-                <span className="absolute -top-2 -right-2 bg-gold text-white text-xs rounded-full w-4 h-4 flex items-center justify-center">0</span>
-              </Link>
               <Link to="/profile" className="text-foreground hover:text-gold transition-colors">
                 <User size={20} />
               </Link>

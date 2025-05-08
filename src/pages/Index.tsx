@@ -7,36 +7,37 @@ import FeaturedProducts from "@/components/FeaturedProducts";
 import SponsorsBanner from "@/components/SponsorsBanner";
 import WhyChooseUs from "@/components/WhyChooseUs";
 import Footer from "@/components/Footer";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 const categories = [
   {
     title: "Automóveis",
-    icon: <Car size={32} />,
+    icon: <Car size={24} className="md:w-8 md:h-8" />,
     slug: "automoveis",
   },
   {
     title: "Imóveis",
-    icon: <HomeIcon size={32} />,
+    icon: <HomeIcon size={24} className="md:w-8 md:h-8" />,
     slug: "imoveis",
   },
   {
     title: "Embarcações",
-    icon: <Anchor size={32} />,
+    icon: <Anchor size={24} className="md:w-8 md:h-8" />,
     slug: "embarcacoes",
   },
   {
     title: "Aeronaves",
-    icon: <Plane size={32} />,
+    icon: <Plane size={24} className="md:w-8 md:h-8" />,
     slug: "aeronaves",
   },
   {
     title: "Relógios",
-    icon: <Watch size={32} />,
+    icon: <Watch size={24} className="md:w-8 md:h-8" />,
     slug: "relogios",
   },
   {
     title: "Decoração",
-    icon: <Paintbrush size={32} />,
+    icon: <Paintbrush size={24} className="md:w-8 md:h-8" />,
     slug: "decoracao",
   },
 ];
