@@ -10,7 +10,7 @@ type CategoryCardProps = {
 const CategoryCard = ({ title, icon, slug }: CategoryCardProps) => {
   return (
     <Link 
-      to={`/categories/${slug}`}
+      to={`/loja?categoria=${slug}`}
       className="group animate-scale-in"
     >
       <div className="glassmorphism rounded-xl p-6 flex flex-col items-center transition-all duration-300 group-hover:shadow-lg group-hover:shadow-gold/20 group-hover:-translate-y-1">

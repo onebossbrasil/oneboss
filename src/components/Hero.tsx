@@ -1,45 +1,46 @@
 
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
+import { ChevronRight } from "lucide-react";
 
 const Hero = () => {
   return (
-    <section className="relative h-[70vh] min-h-[500px] w-full overflow-hidden">
+    <section className="relative h-[85vh] min-h-[650px] w-full overflow-hidden">
       {/* Background Image */}
       <div 
         className="absolute inset-0 bg-cover bg-center bg-no-repeat"
-        style={{ backgroundImage: 'url(https://images.unsplash.com/photo-1488590528505-98d2b5aba04b?auto=format&fit=crop&q=80&w=1920&h=800)' }}
+        style={{ backgroundImage: 'url(https://images.unsplash.com/photo-1496307653780-42ee777d4833?auto=format&fit=crop&q=80&w=2070)' }}
       >
-        <div className="absolute inset-0 hero-gradient"></div>
+        <div className="absolute inset-0 bg-gradient-to-r from-black/80 to-black/40"></div>
       </div>
       
       {/* Content */}
       <div className="relative z-10 container mx-auto h-full flex flex-col justify-center px-6 md:px-12">
         <div className="max-w-xl animate-fade-in">
-          <div className="mb-2 inline-block">
+          <div className="mb-4 inline-block">
             <div className="glassmorphism px-4 py-1 rounded-full text-sm uppercase tracking-wider text-gold">
-              Marketplace de Elite
+              Experiência Ultra Premium
             </div>
           </div>
           
-          <h1 className="font-playfair text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-4">
-            ONE<span className="text-gold mx-1">✦</span>BOSS
+          <h1 className="font-playfair text-5xl md:text-6xl lg:text-7xl font-bold text-white mb-6 leading-tight">
+            O melhor do <span className="text-gold">luxo</span> em um só lugar
           </h1>
           
-          <p className="text-white/90 text-lg md:text-xl mb-8 max-w-md">
-            Seu marketplace de itens exclusivos e ultra premium para quem busca o extraordinário.
+          <p className="text-white/90 text-lg md:text-xl mb-10 max-w-md leading-relaxed">
+            Acesso exclusivo aos produtos mais sofisticados e experiências extraordinárias para quem valoriza o excepcional.
           </p>
           
-          <div className="flex flex-wrap gap-4">
-            <Button asChild className="bg-gold hover:bg-gold-light text-white border-none btn-hover-effect">
-              <Link to="/categories">
-                Explorar categorias
+          <div className="flex flex-wrap gap-5">
+            <Button asChild className="bg-gold hover:bg-gold-light text-white border-none btn-hover-effect text-base px-8 py-6 h-auto">
+              <Link to="/loja">
+                Explorar coleção <ChevronRight className="ml-2 h-5 w-5" />
               </Link>
             </Button>
             
-            <Button asChild variant="outline" className="bg-transparent border-white text-white hover:bg-white/10 btn-hover-effect">
-              <Link to="/featured">
-                Produtos em destaque
+            <Button asChild variant="outline" className="bg-transparent border-white/30 text-white hover:bg-white/10 btn-hover-effect text-base px-8 py-6 h-auto">
+              <Link to="/sobre">
+                Conheça a One Boss
               </Link>
             </Button>
           </div>
