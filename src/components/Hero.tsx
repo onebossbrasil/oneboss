@@ -62,17 +62,21 @@ const Hero = () => {
         <Carousel className="w-full h-full" setApi={setApi}>
           <CarouselContent className="h-full">
             {bannerImages.map((image, index) => (
-              <CarouselItem key={index} className="h-full">
+              <CarouselItem key={index} className="h-full w-full">
                 <div 
                   className="w-full h-full bg-cover bg-center bg-no-repeat"
-                  style={{ backgroundImage: `url(${image})` }}
+                  style={{ 
+                    backgroundImage: `url(${image})`,
+                    width: '100%',
+                    height: '100%'
+                  }}
                 >
                   <div className="absolute inset-0 bg-gradient-to-r from-black/90 to-black/50"></div>
                 </div>
               </CarouselItem>
             ))}
           </CarouselContent>
-          <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex gap-2">
+          <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex gap-2 z-10">
             {bannerImages.map((_, index) => (
               <button
                 key={index}
@@ -84,8 +88,8 @@ const Hero = () => {
               />
             ))}
           </div>
-          <CarouselPrevious className="absolute left-4 top-1/2 -translate-y-1/2 bg-black/30 hover:bg-black/50 border-none text-white" />
-          <CarouselNext className="absolute right-4 top-1/2 -translate-y-1/2 bg-black/30 hover:bg-black/50 border-none text-white" />
+          <CarouselPrevious className="absolute left-4 top-1/2 -translate-y-1/2 bg-black/30 hover:bg-black/50 border-none text-white z-10" />
+          <CarouselNext className="absolute right-4 top-1/2 -translate-y-1/2 bg-black/30 hover:bg-black/50 border-none text-white z-10" />
         </Carousel>
       </div>
       
