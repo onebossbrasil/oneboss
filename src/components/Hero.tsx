@@ -3,19 +3,65 @@ import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
 import { ChevronRight } from "lucide-react";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { 
+  Carousel, 
+  CarouselContent, 
+  CarouselItem, 
+  CarouselNext, 
+  CarouselPrevious 
+} from "@/components/ui/carousel";
+import { useEffect, useState } from "react";
 
 const Hero = () => {
   const isMobile = useIsMobile();
+  const [autoPlay, setAutoPlay] = useState(true);
+  const [currentSlide, setCurrentSlide] = useState(0);
+  
+  const carouselImages = [
+    'url(https://images.unsplash.com/photo-1496307653780-42ee777d4833?auto=format&fit=crop&q=80&w=2070)',
+    'url(https://images.unsplash.com/photo-1488590528505-98d2b5aba04b?auto=format&fit=crop&q=80)',
+    'url(https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?auto=format&fit=crop&q=80)'
+  ];
+
+  useEffect(() => {
+    if (!autoPlay) return;
+    
+    const interval = setInterval(() => {
+      setCurrentSlide((prev) => (prev === carouselImages.length - 1 ? 0 : prev + 1));
+    }, 5000);
+    
+    return () => clearInterval(interval);
+  }, [autoPlay, carouselImages.length]);
   
   return (
     <section className="relative h-[70vh] md:h-[85vh] min-h-[550px] md:min-h-[650px] w-full overflow-hidden">
-      {/* Background Image */}
-      <div 
-        className="absolute inset-0 bg-cover bg-center bg-no-repeat"
-        style={{ backgroundImage: 'url(https://images.unsplash.com/photo-1496307653780-42ee777d4833?auto=format&fit=crop&q=80&w=2070)' }}
+      {/* Carousel Background Images */}
+      <Carousel 
+        className="h-full w-full absolute inset-0"
+        setApi={(api) => {
+          if (api) {
+            api.scrollTo(currentSlide);
+            api.on('select', () => {
+              setCurrentSlide(api.selectedScrollSnap());
+            });
+          }
+        }}
       >
-        <div className="absolute inset-0 bg-gradient-to-r from-black/90 to-black/50"></div>
-      </div>
+        <CarouselContent className="h-full">
+          {carouselImages.map((image, index) => (
+            <CarouselItem key={index} className="h-full">
+              <div 
+                className="absolute inset-0 bg-cover bg-center bg-no-repeat h-full w-full transition-opacity duration-500"
+                style={{ backgroundImage: image }}
+              >
+                <div className="absolute inset-0 bg-gradient-to-r from-black/90 to-black/50"></div>
+              </div>
+            </CarouselItem>
+          ))}
+        </CarouselContent>
+        <CarouselPrevious className="left-4 z-20 bg-black/30 text-white border-gold hover:bg-black/50 hover:text-gold" />
+        <CarouselNext className="right-4 z-20 bg-black/30 text-white border-gold hover:bg-black/50 hover:text-gold" />
+      </Carousel>
       
       {/* Content */}
       <div className="relative z-10 container mx-auto h-full flex flex-col justify-center items-center text-center px-4 md:px-6 lg:px-12">
