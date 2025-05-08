@@ -60,15 +60,15 @@ const Hero = () => {
       {/* Background Carousel */}
       <div className="absolute inset-0 z-0">
         <Carousel className="w-full h-full" setApi={setApi} opts={{ loop: true }}>
-          <CarouselContent className="h-full m-0">
+          <CarouselContent className="h-full w-full m-0 p-0">
             {bannerImages.map((image, index) => (
-              <CarouselItem key={index} className="h-full w-full p-0">
-                <div 
-                  className="w-full h-full bg-cover bg-center bg-no-repeat"
-                  style={{ 
-                    backgroundImage: `url(${image})`,
-                  }}
-                >
+              <CarouselItem key={index} className="h-full w-full p-0 overflow-hidden">
+                <div className="relative w-full h-full">
+                  <img 
+                    src={image} 
+                    alt={`Banner slide ${index + 1}`}
+                    className="absolute inset-0 w-full h-full object-cover"
+                  />
                   <div className="absolute inset-0 bg-gradient-to-r from-black/90 to-black/50"></div>
                 </div>
               </CarouselItem>

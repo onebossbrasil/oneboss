@@ -1,6 +1,5 @@
 
 import { Link } from "react-router-dom";
-import { ChevronRight } from "lucide-react";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { AspectRatio } from "@/components/ui/aspect-ratio";
 import { Card } from "@/components/ui/card";
@@ -75,23 +74,25 @@ const CategoryBanners = () => {
             >
               <div className="relative overflow-hidden h-full">
                 <AspectRatio ratio={category.size === "full" ? 21/9 : isMobile ? 16/9 : 16/10}>
-                  <img 
-                    src={category.image} 
-                    alt={category.title}
-                    className="object-cover w-full h-full transition-transform duration-700 group-hover:scale-110"
-                  />
-                  
-                  {/* Overlay */}
-                  <div className="absolute inset-0 bg-black/40"></div>
-                  
-                  {/* Glassmorphism container */}
-                  <div className="absolute inset-0 flex items-center justify-center">
-                    <div className="glassmorphism text-center py-6 px-8 transform transition-all duration-500 group-hover:scale-105 backdrop-blur-md bg-white/10 border border-white/20 rounded-xl shadow-2xl">
-                      <h3 className="text-white font-playfair text-2xl md:text-3xl font-bold mb-3">
-                        {category.title}
-                      </h3>
-                      <div className="inline-block bg-transparent border border-white/30 hover:border-gold text-white hover:text-gold rounded-full px-5 py-1 text-sm transition-all duration-300">
-                        VER MAIS
+                  <div className="w-full h-full">
+                    <img 
+                      src={category.image} 
+                      alt={category.title}
+                      className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                    />
+                    
+                    {/* Overlay */}
+                    <div className="absolute inset-0 bg-black/40"></div>
+                    
+                    {/* Glassmorphism container */}
+                    <div className="absolute inset-0 flex items-center justify-center">
+                      <div className="glassmorphism text-center py-6 px-8 transform transition-all duration-500 group-hover:scale-105 backdrop-blur-md bg-white/10 border border-white/20 rounded-xl shadow-2xl">
+                        <h3 className="text-white font-playfair text-2xl md:text-3xl font-bold mb-3">
+                          {category.title}
+                        </h3>
+                        <div className="inline-block bg-transparent border border-white/30 hover:border-gold text-white hover:text-gold rounded-full px-5 py-1 text-sm transition-all duration-300">
+                          VER MAIS
+                        </div>
                       </div>
                     </div>
                   </div>
