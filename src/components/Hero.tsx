@@ -8,32 +8,58 @@ import {
   CarouselItem,
   CarouselNext,
   CarouselPrevious,
+  type CarouselApi
 } from "@/components/ui/carousel";
 import { useEffect, useState } from "react";
 
 const Hero = () => {
   const isMobile = useIsMobile();
   const [activeIndex, setActiveIndex] = useState(0);
+  const [api, setApi] = useState<CarouselApi>();
   
   const bannerImages = [
     "/lovable-uploads/40f99e02-b623-47ee-8391-639c0a0bf19c.jpg",
     "/lovable-uploads/ef631caa-bf65-4a45-b554-8cf212d6dff8.jpg"
   ];
   
+  // Update current slide index when the carousel changes
+  useEffect(() => {
+    if (!api) return;
+    
+    const onChange = () => {
+      setActiveIndex(api.selectedScrollSnap());
+    };
+    
+    api.on("select", onChange);
+    
+    // Initial update
+    onChange();
+    
+    return () => {
+      api.off("select", onChange);
+    };
+  }, [api]);
+  
   // Auto-rotate carousel
   useEffect(() => {
+    if (!api) return;
+    
     const interval = setInterval(() => {
-      setActiveIndex((current) => (current + 1) % bannerImages.length);
+      if (activeIndex < bannerImages.length - 1) {
+        api.scrollNext();
+      } else {
+        api.scrollTo(0);
+      }
     }, 5000);
     
     return () => clearInterval(interval);
-  }, [bannerImages.length]);
+  }, [api, activeIndex, bannerImages.length]);
   
   return (
     <section className="relative h-[70vh] md:h-[85vh] min-h-[550px] md:min-h-[650px] w-full overflow-hidden">
       {/* Background Carousel */}
       <div className="absolute inset-0">
-        <Carousel className="w-full h-full" selectedIndex={activeIndex} setSelectedIndex={setActiveIndex}>
+        <Carousel className="w-full h-full" setApi={setApi}>
           <CarouselContent className="h-full">
             {bannerImages.map((image, index) => (
               <CarouselItem key={index} className="h-full">
@@ -50,7 +76,7 @@ const Hero = () => {
             {bannerImages.map((_, index) => (
               <button
                 key={index}
-                onClick={() => setActiveIndex(index)}
+                onClick={() => api?.scrollTo(index)}
                 className={`w-3 h-3 rounded-full ${
                   activeIndex === index ? "bg-gold" : "bg-white/40"
                 }`}
