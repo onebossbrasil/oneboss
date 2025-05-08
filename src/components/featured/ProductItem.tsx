@@ -18,10 +18,7 @@ const ProductItem = ({ product }: ProductItemProps) => {
     <Link
       key={product.id}
       to={`/product/${product.id}`}
-      className="product-card flex-shrink-0"
-      style={{ 
-        scrollSnapAlign: "start",
-      }}
+      className="product-card h-full block"
     >
       <div className="relative aspect-[4/3] rounded-t-lg overflow-hidden">
         <img

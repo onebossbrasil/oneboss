@@ -1,7 +1,0 @@
-
-@media (min-width: 768px) {
-  .product-slide {
-    width: calc((100% - 64px) / 3) !important;
-    max-width: calc((100% - 64px) / 3) !important;
-  }
-}

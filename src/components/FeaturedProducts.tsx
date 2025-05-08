@@ -1,7 +1,6 @@
 
 import { featuredProducts } from "@/data/featuredProducts";
 import ProductSlider from "./featured/ProductSlider";
-import "./featured/productSlider.css";
 
 const FeaturedProducts = () => {
   return (

@@ -1,92 +1,72 @@
-import { useState, useRef, useEffect } from "react";
+import { useEffect, useState } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import {
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+  CarouselNext,
+  CarouselPrevious,
+} from "@/components/ui/carousel";
 import ProductItem from "./ProductItem";
 import { type Product } from "@/data/featuredProducts";
-import "./productSlider.css";
+import useEmblaCarousel from "embla-carousel-react";
+import { cn } from "@/lib/utils";
 
 type ProductSliderProps = {
   products: Product[];
 };
 
 const ProductSlider = ({ products }: ProductSliderProps) => {
-  const scrollRef = useRef<HTMLDivElement>(null);
-  const [canScrollLeft, setCanScrollLeft] = useState(false);
-  const [canScrollRight, setCanScrollRight] = useState(true);
+  const [api, setApi] = useState<ReturnType<typeof useEmblaCarousel>[1]>();
+  const [canScrollPrev, setCanScrollPrev] = useState(false);
+  const [canScrollNext, setCanScrollNext] = useState(true);
   const [isPaused, setIsPaused] = useState(false);
   
-  const checkScrollButtons = () => {
-    if (!scrollRef.current) return;
-    
-    const { scrollLeft, scrollWidth, clientWidth } = scrollRef.current;
-    setCanScrollLeft(scrollLeft > 0);
-    setCanScrollRight(scrollLeft < scrollWidth - clientWidth - 10);
-  };
+  // Handle scroll button state based on carousel position
+  useEffect(() => {
+    if (!api) return;
+
+    const onSelect = () => {
+      setCanScrollPrev(api.canScrollPrev());
+      setCanScrollNext(api.canScrollNext());
+    };
+
+    api.on("select", onSelect);
+    api.on("reInit", onSelect);
+
+    // Initial check
+    onSelect();
+
+    return () => {
+      api.off("select", onSelect);
+      api.off("reInit", onSelect);
+    };
+  }, [api]);
 
   // Auto scroll functionality with infinite loop
   useEffect(() => {
-    const scrollElement = scrollRef.current;
-    if (!scrollElement) return;
+    if (!api || isPaused) return;
     
-    const autoScrollInterval = 5000; // 5 seconds between scrolls
-    const scrollAmount = 320; // Adjusted to show partial view of next product
-    
-    // Auto scroll function with infinite loop
-    const autoScroll = () => {
-      if (isPaused) return;
-      
-      const { scrollLeft, scrollWidth, clientWidth } = scrollElement;
-      
-      // If we're at the end, scroll back to the beginning
-      if (scrollLeft >= scrollWidth - clientWidth - 5) {
-        scrollElement.scrollTo({
-          left: 0,
-          behavior: "smooth",
-        });
+    const interval = setInterval(() => {
+      if (!api.canScrollNext()) {
+        // If we're at the end, scroll back to the beginning
+        api.scrollTo(0);
       } else {
-        // Otherwise, scroll forward
-        scrollElement.scrollTo({
-          left: scrollLeft + scrollAmount,
-          behavior: "smooth",
-        });
+        // Otherwise, scroll to next
+        api.scrollNext();
       }
-      checkScrollButtons();
-    };
+    }, 5000);
     
-    // Set up auto scroll timer
-    const timer = setInterval(autoScroll, autoScrollInterval);
-    
-    // Pause auto scroll on mouse enter
-    const handleMouseEnter = () => setIsPaused(true);
-    const handleMouseLeave = () => setIsPaused(false);
-    
-    scrollElement.addEventListener("mouseenter", handleMouseEnter);
-    scrollElement.addEventListener("mouseleave", handleMouseLeave);
-    scrollElement.addEventListener("scroll", checkScrollButtons);
-    
-    checkScrollButtons();
-    
-    return () => {
-      clearInterval(timer);
-      scrollElement.removeEventListener("mouseenter", handleMouseEnter);
-      scrollElement.removeEventListener("mouseleave", handleMouseLeave);
-      scrollElement.removeEventListener("scroll", checkScrollButtons);
-    };
-  }, [isPaused]);
-
-  const scroll = (direction: "left" | "right") => {
-    if (!scrollRef.current) return;
-    
-    const scrollAmount = 400;
-    const newScrollLeft =
-      direction === "left"
-        ? scrollRef.current.scrollLeft - scrollAmount
-        : scrollRef.current.scrollLeft + scrollAmount;
-    
-    scrollRef.current.scrollTo({
-      left: newScrollLeft,
-      behavior: "smooth",
-    });
+    return () => clearInterval(interval);
+  }, [api, isPaused]);
+  
+  // Custom carousel options for product display
+  const carouselOptions = {
+    align: "start",
+    loop: true,
+    skipSnaps: false,
+    dragFree: false,
   };
 
   return (
@@ -97,49 +77,54 @@ const ProductSlider = ({ products }: ProductSliderProps) => {
           <Button
             variant="outline"
             size="icon"
-            disabled={!canScrollLeft}
-            onClick={() => scroll("left")}
-            className={`rounded-full ${
-              canScrollLeft ? "hover:text-gold hover:border-gold" : "opacity-50"
-            }`}
+            disabled={!canScrollPrev}
+            onClick={() => api?.scrollPrev()}
+            className={cn(
+              "rounded-full",
+              canScrollPrev ? "hover:text-gold hover:border-gold" : "opacity-50"
+            )}
           >
             <ChevronLeft className="h-5 w-5" />
           </Button>
           <Button
             variant="outline"
             size="icon"
-            disabled={!canScrollRight}
-            onClick={() => scroll("right")}
-            className={`rounded-full ${
-              canScrollRight ? "hover:text-gold hover:border-gold" : "opacity-50"
-            }`}
+            disabled={!canScrollNext}
+            onClick={() => api?.scrollNext()}
+            className={cn(
+              "rounded-full",
+              canScrollNext ? "hover:text-gold hover:border-gold" : "opacity-50"
+            )}
           >
             <ChevronRight className="h-5 w-5" />
           </Button>
         </div>
       </div>
       
-      <div
-        ref={scrollRef}
-        className="flex overflow-x-auto gap-6 pb-4 scrollbar-none"
-        style={{ 
-          scrollbarWidth: "none", 
-          scrollSnapType: "x mandatory"  // Smooth snap effect
-        }}
+      <Carousel
+        setApi={setApi}
+        opts={carouselOptions}
+        className="w-full"
+        onMouseEnter={() => setIsPaused(true)}
+        onMouseLeave={() => setIsPaused(false)}
       >
-        {products.map((product) => (
-          <div 
-            key={product.id}
-            className="flex-shrink-0 product-slide" 
-            style={{
-              width: "calc((100% - 32px) / 2)", // 2 cards on mobile with gap
-              maxWidth: "calc((100% - 32px) / 2)" // 2 cards on mobile with gap
-            }}
-          >
-            <ProductItem product={product} />
-          </div>
-        ))}
-      </div>
+        <CarouselContent className="-ml-6">
+          {products.map((product) => (
+            <CarouselItem 
+              key={product.id}
+              className="pl-6 basis-full md:basis-1/2 lg:basis-1/3"
+            >
+              <ProductItem product={product} />
+            </CarouselItem>
+          ))}
+        </CarouselContent>
+        
+        {/* We're using custom controls above, so we'll hide these */}
+        <div className="hidden">
+          <CarouselPrevious />
+          <CarouselNext />
+        </div>
+      </Carousel>
     </div>
   );
 };
