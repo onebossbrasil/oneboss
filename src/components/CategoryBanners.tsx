@@ -2,32 +2,52 @@
 import { Link } from "react-router-dom";
 import { ChevronRight } from "lucide-react";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { AspectRatio } from "@/components/ui/aspect-ratio";
+import { Card } from "@/components/ui/card";
 
 const categoryData = [
   {
     id: 1,
-    title: "Imóveis de Luxo",
-    description: "Mansões, coberturas e propriedades exclusivas ao redor do mundo",
-    image: "https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?auto=format&fit=crop&q=80&w=1200&h=600",
-    slug: "imoveis",
-    position: "right" as const,
+    title: "AUTOMÓVEIS",
+    image: "https://images.unsplash.com/photo-1503376780353-7e6692767b70?auto=format&fit=crop&q=80&w=1200&h=600",
+    slug: "automoveis",
+    size: "full" as const,
   },
   {
     id: 2,
-    title: "Automóveis Premium",
-    description: "Veículos de alto desempenho e design inigualável",
-    image: "https://images.unsplash.com/photo-1503376780353-7e6692767b70?auto=format&fit=crop&q=80&w=1200&h=600",
-    slug: "automoveis",
-    position: "left" as const,
+    title: "EMBARCAÇÕES",
+    image: "https://images.unsplash.com/photo-1567899378494-47b22a2ae96a?auto=format&fit=crop&q=80&w=1200&h=600",
+    slug: "embarcacoes",
+    size: "half" as const,
   },
   {
     id: 3,
-    title: "Embarcações Exclusivas",
-    description: "Iates e lanchas para experiências marítimas incomparáveis",
-    image: "https://images.unsplash.com/photo-1567899378494-47b22a2ae96a?auto=format&fit=crop&q=80&w=1200&h=600",
-    slug: "embarcacoes",
-    position: "right" as const,
-  }
+    title: "AERONAVES",
+    image: "https://images.unsplash.com/photo-1543291322-8a5da9bea7b4?auto=format&fit=crop&q=80&w=1200&h=600",
+    slug: "aeronaves",
+    size: "half" as const,
+  },
+  {
+    id: 4,
+    title: "IMÓVEIS",
+    image: "https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?auto=format&fit=crop&q=80&w=1200&h=600",
+    slug: "imoveis",
+    size: "full" as const,
+  },
+  {
+    id: 5,
+    title: "RELÓGIOS",
+    image: "https://images.unsplash.com/photo-1587836374828-4dbafa94cf0e?auto=format&fit=crop&q=80&w=1200&h=600",
+    slug: "relogios",
+    size: "half" as const,
+  },
+  {
+    id: 6,
+    title: "DECORAÇÃO",
+    image: "https://images.unsplash.com/photo-1493809842364-78817add7ffb?auto=format&fit=crop&q=80&w=1200&h=600",
+    slug: "decoracao",
+    size: "half" as const,
+  },
 ];
 
 const CategoryBanners = () => {
@@ -46,36 +66,38 @@ const CategoryBanners = () => {
           </p>
         </div>
         
-        <div className="space-y-12 md:space-y-24">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
           {categoryData.map((category) => (
-            <div key={category.id} className="group relative overflow-hidden rounded-xl bg-background shadow-lg transform transition-all duration-500 hover:shadow-2xl">
-              <div className="aspect-[16/9] md:aspect-[2/1] w-full overflow-hidden">
-                <img 
-                  src={category.image} 
-                  alt={category.title} 
-                  className="w-full h-full object-cover object-center transition-transform duration-700 group-hover:scale-105"
-                />
-                <div className={`absolute inset-0 bg-gradient-to-${isMobile ? 'b' : category.position} from-black/80 to-transparent`}></div>
+            <Link
+              key={category.id}
+              to={`/loja?categoria=${category.slug}`}
+              className={`group ${category.size === "full" ? "md:col-span-2" : ""} overflow-hidden rounded-lg transition-all duration-500`}
+            >
+              <div className="relative overflow-hidden h-full">
+                <AspectRatio ratio={category.size === "full" ? 21/9 : isMobile ? 16/9 : 16/10}>
+                  <img 
+                    src={category.image} 
+                    alt={category.title}
+                    className="object-cover w-full h-full transition-transform duration-700 group-hover:scale-110"
+                  />
+                  
+                  {/* Overlay */}
+                  <div className="absolute inset-0 bg-black/40"></div>
+                  
+                  {/* Glassmorphism container */}
+                  <div className="absolute inset-0 flex items-center justify-center">
+                    <div className="glassmorphism text-center py-6 px-8 transform transition-all duration-500 group-hover:scale-105 backdrop-blur-md bg-white/10 border border-white/20 rounded-xl shadow-2xl">
+                      <h3 className="text-white font-playfair text-2xl md:text-3xl font-bold mb-3">
+                        {category.title}
+                      </h3>
+                      <div className="inline-block bg-transparent border border-white/30 hover:border-gold text-white hover:text-gold rounded-full px-5 py-1 text-sm transition-all duration-300">
+                        VER MAIS
+                      </div>
+                    </div>
+                  </div>
+                </AspectRatio>
               </div>
-              
-              <div className={`absolute inset-0 flex ${isMobile ? 'items-end pb-8' : `items-center ${category.position === "right" ? "justify-end pr-8 md:pr-16" : "justify-start pl-8 md:pl-16"}`}`}>
-                <div className={`max-w-full md:max-w-md p-4 md:p-6 text-${isMobile ? 'center px-4' : (category.position === "right" ? "right" : "left")}`}>
-                  <h3 className="font-playfair text-2xl md:text-3xl lg:text-4xl font-bold text-white mb-2 md:mb-4">
-                    {category.title}
-                  </h3>
-                  <p className="text-white/80 mb-4 md:mb-6 text-sm md:text-lg">
-                    {category.description}
-                  </p>
-                  <Link 
-                    to={`/loja?categoria=${category.slug}`} 
-                    className="inline-flex items-center text-gold hover:text-gold-light font-medium transition-colors group"
-                  >
-                    Explorar coleção
-                    <ChevronRight className="ml-1 h-4 w-4 md:h-5 md:w-5 transition-transform duration-300 group-hover:translate-x-1" />
-                  </Link>
-                </div>
-              </div>
-            </div>
+            </Link>
           ))}
         </div>
         

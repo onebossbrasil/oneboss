@@ -9,39 +9,8 @@ import WhyChooseUs from "@/components/WhyChooseUs";
 import Footer from "@/components/Footer";
 import { useIsMobile } from "@/hooks/use-mobile";
 
-const categories = [
-  {
-    title: "Automóveis",
-    icon: <Car size={24} className="md:w-8 md:h-8" />,
-    slug: "automoveis",
-  },
-  {
-    title: "Imóveis",
-    icon: <HomeIcon size={24} className="md:w-8 md:h-8" />,
-    slug: "imoveis",
-  },
-  {
-    title: "Embarcações",
-    icon: <Anchor size={24} className="md:w-8 md:h-8" />,
-    slug: "embarcacoes",
-  },
-  {
-    title: "Aeronaves",
-    icon: <Plane size={24} className="md:w-8 md:h-8" />,
-    slug: "aeronaves",
-  },
-  {
-    title: "Relógios",
-    icon: <Watch size={24} className="md:w-8 md:h-8" />,
-    slug: "relogios",
-  },
-  {
-    title: "Decoração",
-    icon: <Paintbrush size={24} className="md:w-8 md:h-8" />,
-    slug: "decoracao",
-  },
-];
-
+// This file doesn't need to pass categories to CategoryBanners anymore
+// since we've moved the data directly into the CategoryBanners component
 const Index = () => {
   return (
     <div className="min-h-screen flex flex-col">
