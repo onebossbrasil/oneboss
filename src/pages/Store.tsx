@@ -1,15 +1,12 @@
 import { useState, useEffect } from "react";
 import { useSearchParams } from "react-router-dom";
-import { ChevronDown, Search, Filter, Sliders } from "lucide-react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
-import { Card, CardContent } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Separator } from "@/components/ui/separator";
-import { Badge } from "@/components/ui/badge";
-import { Checkbox } from "@/components/ui/checkbox";
-import ProductCard from "@/components/ProductCard";
+import StoreBanner from "@/components/store/StoreBanner";
+import SearchBar from "@/components/store/SearchBar";
+import FilterSidebar from "@/components/store/FilterSidebar";
+import ResultsHeader from "@/components/store/ResultsHeader";
+import ProductGrid from "@/components/store/ProductGrid";
 
 // Dados simulados
 const categories = [
@@ -147,13 +144,6 @@ const Store = () => {
     setFilteredProducts(result);
   }, [selectedCategory, selectedSubcategories, searchQuery]);
   
-  // Obter subcategorias para a categoria selecionada
-  const getSubcategories = () => {
-    if (!selectedCategory) return [];
-    const category = categories.find(cat => cat.id === selectedCategory);
-    return category ? category.subcategories : [];
-  };
-  
   // Alternar subcategoria
   const toggleSubcategory = (subcategory: string) => {
     if (selectedSubcategories.includes(subcategory)) {
@@ -177,188 +167,55 @@ const Store = () => {
     }
     setSearchParams(searchParams);
   };
+
+  // Reset all filters
+  const resetFilters = () => {
+    setSelectedCategory(null);
+    setSelectedSubcategories([]);
+    setSearchQuery("");
+    searchParams.delete("categoria");
+    setSearchParams(searchParams);
+  };
   
   return (
     <div className="min-h-screen flex flex-col">
       <Header />
       <main className="flex-grow">
         {/* Banner da Loja */}
-        <div className="relative bg-black/90 py-10 md:py-16">
-          <div className="container mx-auto px-4 text-center">
-            <h1 className="font-playfair text-3xl md:text-5xl font-bold text-white mb-3 md:mb-4">
-              Loja <span className="text-gold">Premium</span>
-            </h1>
-            <p className="text-white/80 max-w-xl mx-auto text-sm md:text-base">
-              Descubra produtos exclusivos selecionados para uma experiência extraordinária
-            </p>
-          </div>
-        </div>
+        <StoreBanner />
         
         {/* Conteúdo principal e filtros */}
         <div className="container mx-auto px-4 py-8 md:py-12">
           {/* Barra de pesquisa e botão de filtro móvel */}
-          <div className="flex items-center justify-between mb-6 md:mb-8 gap-2 md:gap-4">
-            <div className="relative flex-grow max-w-full md:max-w-md">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 md:h-5 w-4 md:w-5" />
-              <Input
-                type="text"
-                placeholder="Buscar produtos..."
-                className="pl-10 border-gold/20 focus-visible:ring-gold/30 text-sm md:text-base"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-              />
-            </div>
-            <Button
-              variant="outline"
-              className="md:hidden border-gold/30 text-gold"
-              onClick={() => setIsMobileFiltersOpen(!isMobileFiltersOpen)}
-            >
-              <Filter className="h-4 w-4 mr-1 md:mr-2" />
-              Filtros
-            </Button>
-          </div>
+          <SearchBar 
+            searchQuery={searchQuery}
+            setSearchQuery={setSearchQuery}
+            toggleMobileFilters={() => setIsMobileFiltersOpen(!isMobileFiltersOpen)}
+          />
           
           {/* Layout principal */}
           <div className="flex flex-col md:flex-row gap-6 md:gap-8">
             {/* Sidebar de filtros */}
-            <aside 
-              className={`fixed md:static inset-0 z-40 bg-background/95 md:bg-transparent backdrop-blur-md md:backdrop-blur-none md:w-64 flex-shrink-0 md:glassmorphism p-6 rounded-lg self-start md:sticky md:top-24 transition-all duration-300 transform ${isMobileFiltersOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'} overflow-auto max-h-screen md:max-h-[calc(100vh-120px)] md:block`}
-            >
-              <div className="flex items-center justify-between mb-6">
-                <h2 className="font-semibold text-lg">Filtros</h2>
-                <Button 
-                  variant="ghost" 
-                  size="sm"
-                  className="md:hidden text-muted-foreground"
-                  onClick={() => setIsMobileFiltersOpen(false)}
-                >
-                  ✕
-                </Button>
-              </div>
-              
-              {/* Filtro por categoria */}
-              <div className="space-y-4 mb-6">
-                <h3 className="font-medium">Categorias</h3>
-                <div className="space-y-2">
-                  {categories.map((category) => (
-                    <div key={category.id} className="flex flex-col">
-                      <Button
-                        variant="ghost"
-                        className={`justify-start font-normal ${selectedCategory === category.id ? 'bg-gold/10 text-gold' : ''}`}
-                        onClick={() => handleCategorySelect(category.id)}
-                      >
-                        {category.name}
-                      </Button>
-                    </div>
-                  ))}
-                </div>
-              </div>
-              
-              <Separator className="my-6" />
-              
-              {/* Filtro por subcategoria */}
-              {selectedCategory && (
-                <div className="space-y-4">
-                  <h3 className="font-medium">Subcategorias</h3>
-                  <div className="space-y-3">
-                    {getSubcategories().map((subcategory) => (
-                      <div key={subcategory} className="flex items-center space-x-2">
-                        <Checkbox 
-                          id={subcategory} 
-                          checked={selectedSubcategories.includes(subcategory)}
-                          onCheckedChange={() => toggleSubcategory(subcategory)}
-                          className="border-gold/40 data-[state=checked]:bg-gold data-[state=checked]:border-gold"
-                        />
-                        <label 
-                          htmlFor={subcategory}
-                          className="text-sm cursor-pointer"
-                        >
-                          {subcategory}
-                        </label>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
-              
-              {/* Botão para aplicar filtros (apenas mobile) */}
-              <div className="fixed bottom-0 left-0 right-0 p-4 bg-background border-t border-border md:hidden">
-                <Button 
-                  className="w-full bg-gold hover:bg-gold-light text-white"
-                  onClick={() => setIsMobileFiltersOpen(false)}
-                >
-                  Aplicar Filtros
-                </Button>
-              </div>
-            </aside>
-            
-            {/* Overlay for mobile filters */}
-            {isMobileFiltersOpen && (
-              <div 
-                className="fixed inset-0 bg-black/30 z-30 md:hidden"
-                onClick={() => setIsMobileFiltersOpen(false)}
-              />
-            )}
+            <FilterSidebar 
+              categories={categories}
+              selectedCategory={selectedCategory}
+              selectedSubcategories={selectedSubcategories}
+              onCategorySelect={handleCategorySelect}
+              onSubcategoryToggle={toggleSubcategory}
+              isMobileFiltersOpen={isMobileFiltersOpen}
+              setIsMobileFiltersOpen={setIsMobileFiltersOpen}
+            />
             
             {/* Grid de produtos */}
             <div className="flex-grow">
               {/* Contador de resultados e ordenação */}
-              <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 md:mb-8 gap-4 sm:gap-0">
-                <p className="text-xs md:text-sm text-muted-foreground">
-                  {filteredProducts.length} produtos encontrados
-                </p>
-                <div className="flex items-center space-x-2">
-                  <span className="text-xs md:text-sm text-muted-foreground">Ordenar por:</span>
-                  <select className="text-xs md:text-sm border-gold/20 rounded p-1 bg-transparent">
-                    <option value="relevance">Relevância</option>
-                    <option value="price-asc">Menor preço</option>
-                    <option value="price-desc">Maior preço</option>
-                    <option value="newest">Mais recentes</option>
-                  </select>
-                </div>
-              </div>
+              <ResultsHeader productCount={filteredProducts.length} />
               
               {/* Exibição dos produtos filtrados */}
-              {filteredProducts.length > 0 ? (
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
-                  {filteredProducts.map((product) => (
-                    <ProductCard key={product.id} product={product} />
-                  ))}
-                </div>
-              ) : (
-                <div className="text-center py-12 md:py-16">
-                  <p className="text-md md:text-lg text-muted-foreground">Nenhum produto encontrado</p>
-                  <Button 
-                    variant="outline" 
-                    className="mt-4 border-gold/30 text-gold"
-                    onClick={() => {
-                      setSelectedCategory(null);
-                      setSelectedSubcategories([]);
-                      setSearchQuery("");
-                      searchParams.delete("categoria");
-                      setSearchParams(searchParams);
-                    }}
-                  >
-                    Limpar filtros
-                  </Button>
-                </div>
-              )}
-              
-              {/* Paginação */}
-              {filteredProducts.length > 0 && (
-                <div className="mt-10 md:mt-12 flex justify-center">
-                  <div className="flex space-x-2">
-                    <Button variant="outline" disabled className="text-muted-foreground text-sm h-8 w-8 p-0">
-                      1
-                    </Button>
-                    <Button variant="ghost" className="text-sm h-8 w-8 p-0">2</Button>
-                    <Button variant="ghost" className="text-sm h-8 w-8 p-0">3</Button>
-                    <Button variant="ghost" className="text-sm h-8 w-8 p-0">
-                      <ChevronDown className="h-4 w-4" />
-                    </Button>
-                  </div>
-                </div>
-              )}
+              <ProductGrid 
+                products={filteredProducts} 
+                resetFilters={resetFilters}
+              />
             </div>
           </div>
         </div>
