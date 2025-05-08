@@ -1,44 +1,59 @@
 
-import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { useIsMobile } from "@/hooks/use-mobile";
+import {
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+  CarouselNext,
+  CarouselPrevious,
+} from "@/components/ui/carousel";
 
 // Dados simulados dos patrocinadores
 const sponsors = [
   {
     id: 1,
     name: "Luxury Motors",
+    description: "Experiência premium em veículos de alto padrão",
     logo: "https://images.unsplash.com/photo-1622711443907-b27a8222f838?auto=format&fit=crop&q=80&w=200&h=100",
+    banner: "https://images.unsplash.com/photo-1610647752706-3bb12002b0e3?auto=format&fit=crop&q=80&w=1200&h=400",
     url: "/parceiros/luxury-motors"
   },
   {
     id: 2,
     name: "Elite Properties",
+    description: "Imóveis exclusivos para clientes exigentes",
     logo: "https://images.unsplash.com/photo-1503376780353-7e6692767b70?auto=format&fit=crop&q=80&w=200&h=100",
+    banner: "https://images.unsplash.com/photo-1600607687920-4e2a09cf159d?auto=format&fit=crop&q=80&w=1200&h=400",
     url: "/parceiros/elite-properties"
   },
   {
     id: 3,
     name: "Royal Watches",
+    description: "Relógios de luxo e peças colecionáveis",
     logo: "https://images.unsplash.com/photo-1523170335258-f5ed11844a49?auto=format&fit=crop&q=80&w=200&h=100",
+    banner: "https://images.unsplash.com/photo-1619946794135-5bc917a27793?auto=format&fit=crop&q=80&w=1200&h=400",
     url: "/parceiros/royal-watches"
   },
   {
     id: 4,
     name: "Exclusive Yachts",
+    description: "Navegue com estilo em nossos iates de luxo",
     logo: "https://images.unsplash.com/photo-1567899378494-47b22a2ae96a?auto=format&fit=crop&q=80&w=200&h=100",
+    banner: "https://images.unsplash.com/photo-1588345921523-c2dcdb7f1dcd?auto=format&fit=crop&q=80&w=1200&h=400",
     url: "/parceiros/exclusive-yachts"
   },
   {
     id: 5,
     name: "Premium Jets",
+    description: "Voe pelo mundo com privacidade e conforto",
     logo: "https://images.unsplash.com/photo-1540962351504-03099e0a754b?auto=format&fit=crop&q=80&w=200&h=100",
+    banner: "https://images.unsplash.com/photo-1608023136037-d442091ec7e5?auto=format&fit=crop&q=80&w=1200&h=400",
     url: "/parceiros/premium-jets"
   },
 ];
 
 const SponsorsBanner = () => {
-  const [isHovered, setIsHovered] = useState(false);
   const isMobile = useIsMobile();
   
   return (
@@ -53,31 +68,66 @@ const SponsorsBanner = () => {
           </p>
         </div>
         
-        <div 
-          className="relative overflow-hidden rounded-xl glassmorphism py-8 md:py-12 px-4 md:px-8"
-          onMouseEnter={() => setIsHovered(true)}
-          onMouseLeave={() => setIsHovered(false)}
+        <Carousel
+          opts={{
+            loop: true,
+            align: "start",
+          }}
+          className="w-full"
         >
-          <div 
-            className={`flex items-center justify-between space-x-6 md:space-x-10 transition-transform duration-15000 ease-linear ${isHovered || isMobile ? 'animate-none' : 'animate-[scroll_30s_linear_infinite]'}`}
-          >
-            {[...sponsors, ...sponsors].map((sponsor, index) => (
-              <div 
-                key={`${sponsor.id}-${index}`}
-                className="flex-shrink-0 flex items-center justify-center h-16 md:h-24 w-28 md:w-40 p-3 md:p-4 glassmorphism rounded-lg hover:shadow-lg hover:shadow-gold/10 transition-all duration-300"
-              >
-                <img 
-                  src={sponsor.logo} 
-                  alt={sponsor.name} 
-                  className="max-h-8 md:max-h-12 max-w-full object-contain filter grayscale hover:grayscale-0 transition-all duration-300"
-                />
-              </div>
+          <CarouselContent>
+            {sponsors.map((sponsor) => (
+              <CarouselItem key={sponsor.id} className="md:basis-full">
+                <div className="relative h-64 md:h-80 w-full rounded-xl overflow-hidden">
+                  {/* Banner image */}
+                  <img 
+                    src={sponsor.banner} 
+                    alt={`${sponsor.name} banner`} 
+                    className="w-full h-full object-cover"
+                  />
+                  
+                  {/* Overlay gradient */}
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-black/30"></div>
+                  
+                  {/* Content overlay */}
+                  <div className="absolute inset-0 flex flex-col items-center justify-center p-6 text-white">
+                    {/* Logo */}
+                    <div className="bg-white/90 p-3 rounded-lg shadow-lg mb-4">
+                      <img 
+                        src={sponsor.logo} 
+                        alt={sponsor.name} 
+                        className="h-12 md:h-16 max-w-[120px] md:max-w-[160px] object-contain"
+                      />
+                    </div>
+                    
+                    {/* Name */}
+                    <h3 className="text-xl md:text-2xl font-playfair font-bold mb-2 text-center">
+                      {sponsor.name}
+                    </h3>
+                    
+                    {/* Description */}
+                    <p className="text-sm md:text-base text-center mb-4 max-w-md">
+                      {sponsor.description}
+                    </p>
+                    
+                    {/* CTA Button */}
+                    <Button 
+                      size="sm" 
+                      className="border border-gold bg-black/50 hover:bg-gold text-gold hover:text-white transition-all duration-300"
+                    >
+                      Saiba mais
+                    </Button>
+                  </div>
+                </div>
+              </CarouselItem>
             ))}
-          </div>
+          </CarouselContent>
           
-          <div className="absolute inset-y-0 left-0 w-12 md:w-20 bg-gradient-to-r from-background to-transparent z-10"></div>
-          <div className="absolute inset-y-0 right-0 w-12 md:w-20 bg-gradient-to-l from-background to-transparent z-10"></div>
-        </div>
+          <div className="flex justify-center mt-4">
+            <CarouselPrevious className="relative static translate-y-0 -left-0 mr-2" />
+            <CarouselNext className="relative static translate-y-0 -right-0 ml-2" />
+          </div>
+        </Carousel>
         
         <div className="mt-6 md:mt-8 text-center">
           <Button 
