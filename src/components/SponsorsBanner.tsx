@@ -28,7 +28,7 @@ const SponsorsBanner = () => {
           {/* Content overlay - centered */}
           <div className="absolute inset-0 flex flex-col items-center justify-center p-6 text-white">
             {/* Logo */}
-            <div className="mb-4 w-40 md:w-48">
+            <div className="mb-5 w-48 md:w-56">
               <img
                 src="/lovable-uploads/1048c280-9081-420f-a0a1-899e5e5ce851.png"
                 alt="EUROFIX Logo"
@@ -37,16 +37,16 @@ const SponsorsBanner = () => {
             </div>
             
             {/* Description */}
-            <p className="text-sm md:text-base text-center mb-6 max-w-md">
+            <p className="text-base md:text-lg text-center mb-7 max-w-md font-medium">
               Oficina mecânica especializada, preparação e performance
             </p>
             
-            {/* Improved CTA Button */}
+            {/* Glassmorphism CTA Button */}
             <Button 
               size="sm" 
-              className="bg-gold hover:bg-gold/80 text-black font-medium px-6 py-2 rounded-md transition-all duration-300 shadow-md hover:shadow-lg"
+              className="bg-white/30 backdrop-blur-md border border-white/20 text-white font-medium px-8 py-2.5 rounded-md transition-all duration-300 shadow-lg hover:bg-white/40"
             >
-              Saiba mais
+              Saiba Mais
             </Button>
           </div>
         </div>
