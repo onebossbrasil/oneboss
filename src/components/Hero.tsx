@@ -18,9 +18,8 @@ const Hero = () => {
   const [currentSlide, setCurrentSlide] = useState(0);
   
   const carouselImages = [
-    'url(https://images.unsplash.com/photo-1496307653780-42ee777d4833?auto=format&fit=crop&q=80&w=2070)',
-    'url(https://images.unsplash.com/photo-1488590528505-98d2b5aba04b?auto=format&fit=crop&q=80)',
-    'url(https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?auto=format&fit=crop&q=80)'
+    'url(/lovable-uploads/b5183090-ac85-4c8b-b250-2cd368f49a4c.png)',
+    'url(/lovable-uploads/3602c2f3-d103-44c1-9798-c2f135541e04.png)'
   ];
 
   useEffect(() => {
