@@ -15,14 +15,14 @@ const categoryData = [
   {
     id: 2,
     title: "EMBARCAÇÕES",
-    image: "https://images.unsplash.com/photo-1567899378494-47b22a2ae96a?auto=format&fit=crop&q=80&w=1200&h=600",
+    image: "public/lovable-uploads/0117fa13-5bd6-4cff-9624-3f067a1761a6.png",
     slug: "embarcacoes",
     size: "half" as const,
   },
   {
     id: 3,
     title: "AERONAVES",
-    image: "https://images.unsplash.com/photo-1543291322-8a5da9bea7b4?auto=format&fit=crop&q=80&w=1200&h=600",
+    image: "public/lovable-uploads/3b5c8e74-80cb-4b62-b27a-2ac9cbc286ab.png",
     slug: "aeronaves",
     size: "half" as const,
   },
@@ -43,7 +43,7 @@ const categoryData = [
   {
     id: 6,
     title: "DECORAÇÃO",
-    image: "https://images.unsplash.com/photo-1493809842364-78817add7ffb?auto=format&fit=crop&q=80&w=1200&h=600",
+    image: "public/lovable-uploads/9f54a112-58fa-494d-bea2-08df57c01fec.png",
     slug: "decoracao",
     size: "half" as const,
   },

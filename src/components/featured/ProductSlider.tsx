@@ -1,3 +1,4 @@
+
 import { useEffect, useState } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -63,7 +64,7 @@ const ProductSlider = ({ products }: ProductSliderProps) => {
   
   // Custom carousel options for product display
   const carouselOptions = {
-    align: "start",
+    align: "start" as const,
     loop: true,
     skipSnaps: false,
     dragFree: false,
