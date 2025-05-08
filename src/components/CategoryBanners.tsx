@@ -70,9 +70,9 @@ const CategoryBanners = () => {
             <Link
               key={category.id}
               to={`/loja?categoria=${category.slug}`}
-              className={`${category.size === "full" ? "md:col-span-2" : ""} group rounded-xl overflow-hidden transition-all duration-500 hover:shadow-xl hover:shadow-gold/20 block`}
+              className={`${isMobile ? "" : category.size === "full" ? "md:col-span-2" : ""} group rounded-xl overflow-hidden transition-all duration-500 hover:shadow-xl hover:shadow-gold/20 block`}
             >
-              <AspectRatio ratio={category.size === "full" ? 21/9 : isMobile ? 16/9 : 16/10} className="w-full h-full">
+              <AspectRatio ratio={isMobile ? 16/9 : category.size === "full" ? 21/9 : 16/10} className="w-full h-full">
                 <div className="relative w-full h-full overflow-hidden">
                   {/* Background Image */}
                   <img 
@@ -85,14 +85,14 @@ const CategoryBanners = () => {
                   <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
                   
                   {/* Content */}
-                  <div className="absolute inset-0 flex flex-col justify-end p-5 md:p-8">
-                    <div className="glassmorphism rounded-xl p-4 md:p-6 transform transition-all duration-500 backdrop-blur-sm bg-white/10 border border-white/20 shadow-lg group-hover:scale-[1.02] w-fit mx-auto">
-                      <h3 className="text-white font-playfair text-xl md:text-3xl font-bold text-center">
+                  <div className="absolute inset-0 flex flex-col justify-end p-4 md:p-8">
+                    <div className={`glassmorphism rounded-lg ${isMobile ? 'p-2.5 max-w-[85%]' : 'p-4 md:p-6'} transform transition-all duration-500 backdrop-blur-sm bg-white/10 border border-white/20 shadow-lg group-hover:scale-[1.02] w-fit mx-auto`}>
+                      <h3 className={`text-white font-playfair ${isMobile ? 'text-lg' : 'text-xl md:text-3xl'} font-bold text-center`}>
                         {category.title}
                       </h3>
                       
-                      <div className="mt-3 flex justify-center">
-                        <span className="inline-block px-4 py-1.5 rounded-full border border-white/30 text-white text-sm md:text-base transition-colors duration-300 group-hover:border-gold group-hover:text-gold">
+                      <div className="mt-2 md:mt-3 flex justify-center">
+                        <span className={`inline-block ${isMobile ? 'px-3 py-1 text-xs' : 'px-4 py-1.5 text-sm md:text-base'} rounded-full border border-white/30 text-white transition-colors duration-300 group-hover:border-gold group-hover:text-gold`}>
                           Ver Coleção
                         </span>
                       </div>
