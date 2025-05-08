@@ -18,9 +18,9 @@ const Hero = () => {
       </div>
       
       {/* Content */}
-      <div className="relative z-10 container mx-auto h-full flex flex-col justify-center px-4 md:px-6 lg:px-12">
+      <div className="relative z-10 container mx-auto h-full flex flex-col justify-center items-center text-center px-4 md:px-6 lg:px-12">
         <div className="max-w-xl animate-fade-in">
-          <div className="mb-3 md:mb-4 inline-block">
+          <div className="mb-3 md:mb-4">
             <div className="glassmorphism px-3 py-1 md:px-4 md:py-1 rounded-full text-xs md:text-sm uppercase tracking-wider text-gold">
               Experiência Ultra Premium
             </div>
@@ -30,11 +30,11 @@ const Hero = () => {
             O melhor do <span className="text-gold">luxo</span> em um só lugar
           </h1>
           
-          <p className="text-white/90 text-sm md:text-lg lg:text-xl mb-6 md:mb-10 max-w-md leading-relaxed">
+          <p className="text-white/90 text-sm md:text-lg lg:text-xl mb-6 md:mb-10 leading-relaxed mx-auto">
             Acesso exclusivo aos produtos mais sofisticados e experiências extraordinárias para quem valoriza o excepcional.
           </p>
           
-          <div className="flex flex-wrap gap-3 md:gap-5">
+          <div className="flex flex-wrap gap-3 md:gap-5 justify-center">
             <Button asChild className="bg-gold hover:bg-gold-light text-white border-none btn-hover-effect text-sm md:text-base px-6 py-2 md:px-8 md:py-6 h-auto">
               <Link to="/loja">
                 Explorar coleção <ChevronRight className="ml-1 md:ml-2 h-4 w-4 md:h-5 md:w-5" />
