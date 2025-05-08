@@ -4,13 +4,9 @@ import { Filter } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { Checkbox } from "@/components/ui/checkbox";
+import { useCategories } from "@/contexts/CategoryContext";
 
 type FilterSidebarProps = {
-  categories: {
-    id: string;
-    name: string;
-    subcategories: string[];
-  }[];
   selectedCategory: string | null;
   selectedSubcategories: string[];
   onCategorySelect: (categoryId: string) => void;
@@ -20,7 +16,6 @@ type FilterSidebarProps = {
 };
 
 const FilterSidebar = ({
-  categories,
   selectedCategory,
   selectedSubcategories,
   onCategorySelect,
@@ -28,11 +23,18 @@ const FilterSidebar = ({
   isMobileFiltersOpen,
   setIsMobileFiltersOpen,
 }: FilterSidebarProps) => {
+  const { categories } = useCategories();
+  
   // Helper function to get subcategories for selected category
   const getSubcategories = () => {
     if (!selectedCategory) return [];
-    const category = categories.find(cat => cat.id === selectedCategory);
-    return category ? category.subcategories : [];
+    const category = categories.find(cat => cat.value === selectedCategory);
+    if (!category) return [];
+    
+    // Flatten subcategory values for display in the filter
+    return category.subcategories.flatMap(subcat => 
+      subcat.values.map(val => val)
+    );
   };
   
   return (
@@ -60,8 +62,8 @@ const FilterSidebar = ({
               <div key={category.id} className="flex flex-col">
                 <Button
                   variant="ghost"
-                  className={`justify-start font-normal ${selectedCategory === category.id ? 'bg-gold/10 text-gold' : ''}`}
-                  onClick={() => onCategorySelect(category.id)}
+                  className={`justify-start font-normal ${selectedCategory === category.value ? 'bg-gold/10 text-gold' : ''}`}
+                  onClick={() => onCategorySelect(category.value)}
                 >
                   {category.name}
                 </Button>

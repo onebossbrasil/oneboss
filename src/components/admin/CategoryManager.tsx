@@ -8,74 +8,29 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { useToast } from "@/hooks/use-toast";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Edit, Folder, List, Plus, Trash2 } from "lucide-react";
-
-// Mock data for categories and subcategories
-const initialCategories = [
-  { 
-    id: 1,
-    name: "Automóveis", 
-    value: "automoveis",
-    subcategories: [
-      { id: 1, name: "Marca do Veículo", type: "marca", values: ["BMW", "Mercedes", "Audi", "Ferrari"] },
-      { id: 2, name: "Modelo", type: "modelo", values: ["Sedan", "SUV", "Conversível"] }
-    ]
-  },
-  { 
-    id: 2,
-    name: "Imóveis", 
-    value: "imoveis",
-    subcategories: [
-      { id: 3, name: "Localização", type: "localizacao", values: ["São Paulo", "Rio de Janeiro", "Belo Horizonte"] },
-      { id: 4, name: "Tipo", type: "tipo", values: ["Residencial", "Comercial"] },
-      { id: 5, name: "Modelo", type: "modelo", values: ["Casa", "Apartamento", "Cobertura"] }
-    ]
-  },
-  { 
-    id: 3,
-    name: "Relógios", 
-    value: "relogios",
-    subcategories: [
-      { id: 6, name: "Marcas", type: "marca", values: ["Rolex", "Omega", "Tag Heuer", "Patek Philippe"] }
-    ]
-  },
-  { 
-    id: 4,
-    name: "Decoração", 
-    value: "decoracao",
-    subcategories: [
-      { id: 7, name: "Tipo", type: "tipo", values: ["Quadros", "Esculturas", "Itens de Decoração"] }
-    ]
-  },
-  { 
-    id: 5,
-    name: "Aeronaves", 
-    value: "aeronaves",
-    subcategories: [
-      { id: 8, name: "Marcas", type: "marca", values: ["Cessna", "Embraer", "Bombardier"] },
-      { id: 9, name: "Modelos", type: "modelo", values: ["Bimotor", "Turbo Hélice", "Jato"] }
-    ]
-  },
-  { 
-    id: 6,
-    name: "Embarcações", 
-    value: "embarcacoes",
-    subcategories: [
-      { id: 10, name: "Marcas", type: "marca", values: ["Azimut", "Ferretti", "Intermarine"] },
-      { id: 11, name: "Pés", type: "pes", values: ["30 pés", "40 pés", "50 pés", "60+ pés"] },
-      { id: 12, name: "Modelo", type: "modelo", values: ["Iate", "Lancha", "Barco"] }
-    ]
-  }
-];
+import { useCategories } from "@/contexts/CategoryContext";
 
 const CategoryManager = () => {
   const { toast } = useToast();
-  const [categories, setCategories] = useState(initialCategories);
+  const { 
+    categories, 
+    addCategory, 
+    removeCategory, 
+    addSubcategory, 
+    removeSubcategory, 
+    addSubcategoryValue, 
+    removeSubcategoryValue 
+  } = useCategories();
+
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [selectedSubcategory, setSelectedSubcategory] = useState<number | null>(null);
+  const [newCategoryName, setNewCategoryName] = useState("");
+  const [newCategorySlug, setNewCategorySlug] = useState("");
   const [newSubcategoryName, setNewSubcategoryName] = useState("");
   const [newSubcategoryType, setNewSubcategoryType] = useState("");
   const [newValueName, setNewValueName] = useState("");
   const [dialogOpen, setDialogOpen] = useState(false);
+  const [categoryDialogOpen, setCategoryDialogOpen] = useState(false);
   
   const getCurrentCategory = () => {
     return categories.find(cat => cat.value === selectedCategory) || null;
@@ -87,26 +42,70 @@ const CategoryManager = () => {
     return category.subcategories.find(subcat => subcat.id === selectedSubcategory) || null;
   };
   
+  const handleAddCategory = () => {
+    if (!newCategoryName || !newCategorySlug) return;
+    
+    // Verifica se já existe uma categoria com esse slug
+    if (categories.some(cat => cat.value === newCategorySlug)) {
+      toast({
+        title: "Erro ao adicionar categoria",
+        description: "Já existe uma categoria com esse identificador.",
+        variant: "destructive",
+      });
+      return;
+    }
+    
+    addCategory(newCategoryName, newCategorySlug);
+    
+    setNewCategoryName("");
+    setNewCategorySlug("");
+    setCategoryDialogOpen(false);
+    
+    toast({
+      title: "Categoria adicionada",
+      description: `${newCategoryName} foi adicionada com sucesso.`,
+    });
+  };
+
+  const handleRemoveCategory = (categoryId: number) => {
+    if (window.confirm("Tem certeza que deseja remover esta categoria? Todos os produtos associados a ela ficarão sem categoria.")) {
+      // Se a categoria que estamos removendo é a selecionada atualmente, limpa a seleção
+      const categoryToRemove = categories.find(cat => cat.id === categoryId);
+      if (categoryToRemove && categoryToRemove.value === selectedCategory) {
+        setSelectedCategory(null);
+        setSelectedSubcategory(null);
+      }
+      
+      removeCategory(categoryId);
+      
+      toast({
+        title: "Categoria removida",
+        description: "A categoria foi removida com sucesso.",
+      });
+    }
+  };
+  
   const handleAddSubcategory = () => {
     if (!selectedCategory || !newSubcategoryName || !newSubcategoryType) return;
     
-    const updatedCategories = [...categories];
-    const categoryIndex = updatedCategories.findIndex(cat => cat.value === selectedCategory);
+    const category = getCurrentCategory();
+    if (!category) return;
     
-    if (categoryIndex === -1) return;
+    // Verifica se já existe uma subcategoria com esse tipo na categoria atual
+    if (category.subcategories.some(sc => sc.type === newSubcategoryType)) {
+      toast({
+        title: "Erro ao adicionar subcategoria",
+        description: "Já existe uma subcategoria com esse identificador nesta categoria.",
+        variant: "destructive",
+      });
+      return;
+    }
     
-    const newId = Math.max(0, ...categories.flatMap(c => c.subcategories.map(sc => sc.id))) + 1;
+    addSubcategory(category.id, newSubcategoryName, newSubcategoryType);
     
-    updatedCategories[categoryIndex].subcategories.push({
-      id: newId,
-      name: newSubcategoryName,
-      type: newSubcategoryType,
-      values: []
-    });
-    
-    setCategories(updatedCategories);
     setNewSubcategoryName("");
     setNewSubcategoryType("");
+    setDialogOpen(false);
     
     toast({
       title: "Subcategoria adicionada",
@@ -117,54 +116,39 @@ const CategoryManager = () => {
   const handleAddValue = () => {
     if (!selectedCategory || selectedSubcategory === null || !newValueName) return;
     
-    const updatedCategories = [...categories];
-    const categoryIndex = updatedCategories.findIndex(cat => cat.value === selectedCategory);
+    const category = getCurrentCategory();
+    const subcategory = getCurrentSubcategory();
     
-    if (categoryIndex === -1) return;
+    if (!category || !subcategory) return;
     
-    const subcategoryIndex = updatedCategories[categoryIndex].subcategories.findIndex(
-      sc => sc.id === selectedSubcategory
-    );
-    
-    if (subcategoryIndex === -1) return;
-    
-    if (!updatedCategories[categoryIndex].subcategories[subcategoryIndex].values.includes(newValueName)) {
-      updatedCategories[categoryIndex].subcategories[subcategoryIndex].values.push(newValueName);
-      
-      setCategories(updatedCategories);
-      setNewValueName("");
-      
-      toast({
-        title: "Valor adicionado",
-        description: `${newValueName} foi adicionado com sucesso.`,
-      });
-    } else {
+    // Verifica se o valor já existe
+    if (subcategory.values.includes(newValueName)) {
       toast({
         title: "Valor duplicado",
         description: "Este valor já existe nesta subcategoria.",
         variant: "destructive",
       });
+      return;
     }
+    
+    addSubcategoryValue(category.id, subcategory.id, newValueName);
+    setNewValueName("");
+    
+    toast({
+      title: "Valor adicionado",
+      description: `${newValueName} foi adicionado com sucesso.`,
+    });
   };
   
   const handleRemoveValue = (value: string) => {
     if (!selectedCategory || selectedSubcategory === null) return;
     
-    const updatedCategories = [...categories];
-    const categoryIndex = updatedCategories.findIndex(cat => cat.value === selectedCategory);
+    const category = getCurrentCategory();
+    const subcategory = getCurrentSubcategory();
     
-    if (categoryIndex === -1) return;
+    if (!category || !subcategory) return;
     
-    const subcategoryIndex = updatedCategories[categoryIndex].subcategories.findIndex(
-      sc => sc.id === selectedSubcategory
-    );
-    
-    if (subcategoryIndex === -1) return;
-    
-    updatedCategories[categoryIndex].subcategories[subcategoryIndex].values = 
-      updatedCategories[categoryIndex].subcategories[subcategoryIndex].values.filter(v => v !== value);
-    
-    setCategories(updatedCategories);
+    removeSubcategoryValue(category.id, subcategory.id, value);
     
     toast({
       title: "Valor removido",
@@ -175,21 +159,21 @@ const CategoryManager = () => {
   const handleRemoveSubcategory = (subcategoryId: number) => {
     if (!selectedCategory) return;
     
-    const updatedCategories = [...categories];
-    const categoryIndex = updatedCategories.findIndex(cat => cat.value === selectedCategory);
+    const category = getCurrentCategory();
+    if (!category) return;
     
-    if (categoryIndex === -1) return;
-    
-    updatedCategories[categoryIndex].subcategories = 
-      updatedCategories[categoryIndex].subcategories.filter(sc => sc.id !== subcategoryId);
-    
-    setCategories(updatedCategories);
-    setSelectedSubcategory(null);
-    
-    toast({
-      title: "Subcategoria removida",
-      description: "A subcategoria foi removida com sucesso.",
-    });
+    if (window.confirm("Tem certeza que deseja remover esta subcategoria?")) {
+      removeSubcategory(category.id, subcategoryId);
+      
+      if (selectedSubcategory === subcategoryId) {
+        setSelectedSubcategory(null);
+      }
+      
+      toast({
+        title: "Subcategoria removida",
+        description: "A subcategoria foi removida com sucesso.",
+      });
+    }
   };
   
   const category = getCurrentCategory();
@@ -203,7 +187,7 @@ const CategoryManager = () => {
           <div className="space-y-4">
             <div className="flex justify-between items-center">
               <h3 className="text-lg font-medium">Categorias</h3>
-              <Dialog>
+              <Dialog open={categoryDialogOpen} onOpenChange={setCategoryDialogOpen}>
                 <DialogTrigger asChild>
                   <Button variant="outline" size="sm">
                     <Plus className="h-4 w-4 mr-1" /> Nova
@@ -219,15 +203,31 @@ const CategoryManager = () => {
                   <div className="grid gap-4 py-4">
                     <div className="space-y-2">
                       <Label htmlFor="new-category">Nome da Categoria</Label>
-                      <Input id="new-category" placeholder="Ex: Jóias" />
+                      <Input 
+                        id="new-category" 
+                        placeholder="Ex: Jóias" 
+                        value={newCategoryName}
+                        onChange={(e) => setNewCategoryName(e.target.value)}
+                      />
                     </div>
                     <div className="space-y-2">
                       <Label htmlFor="new-category-slug">Identificador (slug)</Label>
-                      <Input id="new-category-slug" placeholder="Ex: joias" />
+                      <Input 
+                        id="new-category-slug" 
+                        placeholder="Ex: joias" 
+                        value={newCategorySlug}
+                        onChange={(e) => setNewCategorySlug(e.target.value)}
+                      />
                     </div>
                   </div>
                   <DialogFooter>
-                    <Button type="submit">Adicionar Categoria</Button>
+                    <Button 
+                      type="button" 
+                      onClick={handleAddCategory}
+                      disabled={!newCategoryName || !newCategorySlug}
+                    >
+                      Adicionar Categoria
+                    </Button>
                   </DialogFooter>
                 </DialogContent>
               </Dialog>
@@ -235,22 +235,36 @@ const CategoryManager = () => {
             
             <div className="space-y-2">
               {categories.map((cat) => (
-                <button
+                <div
                   key={cat.id}
-                  className={`flex items-center w-full p-2 rounded-md hover:bg-accent ${
-                    selectedCategory === cat.value ? 'bg-accent' : ''
-                  }`}
-                  onClick={() => {
-                    setSelectedCategory(cat.value);
-                    setSelectedSubcategory(null);
-                  }}
+                  className="flex items-center justify-between w-full"
                 >
-                  <Folder className="h-4 w-4 mr-2" />
-                  <span className="text-sm">{cat.name}</span>
-                  <span className="ml-auto text-xs text-muted-foreground">
-                    {cat.subcategories.length} subcategorias
-                  </span>
-                </button>
+                  <button
+                    className={`flex items-center flex-1 p-2 rounded-md hover:bg-accent ${
+                      selectedCategory === cat.value ? 'bg-accent' : ''
+                    }`}
+                    onClick={() => {
+                      setSelectedCategory(cat.value);
+                      setSelectedSubcategory(null);
+                    }}
+                  >
+                    <Folder className="h-4 w-4 mr-2" />
+                    <span className="text-sm">{cat.name}</span>
+                    <span className="ml-auto text-xs text-muted-foreground">
+                      {cat.subcategories.length} subcategorias
+                    </span>
+                  </button>
+                  <Button 
+                    variant="ghost" 
+                    size="icon"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleRemoveCategory(cat.id);
+                    }}
+                  >
+                    <Trash2 className="h-4 w-4 text-red-500" />
+                  </Button>
+                </div>
               ))}
             </div>
           </div>
@@ -301,10 +315,8 @@ const CategoryManager = () => {
                     </div>
                     <DialogFooter>
                       <Button 
-                        onClick={() => {
-                          handleAddSubcategory();
-                          setDialogOpen(false);
-                        }}
+                        onClick={handleAddSubcategory}
+                        disabled={!newSubcategoryName || !newSubcategoryType}
                       >
                         Adicionar Subcategoria
                       </Button>
@@ -337,7 +349,10 @@ const CategoryManager = () => {
                       <Button 
                         variant="ghost" 
                         size="icon" 
-                        onClick={() => handleRemoveSubcategory(subcat.id)}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleRemoveSubcategory(subcat.id);
+                        }}
                       >
                         <Trash2 className="h-4 w-4 text-red-500" />
                       </Button>

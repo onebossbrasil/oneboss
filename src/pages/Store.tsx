@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { useSearchParams } from "react-router-dom";
 import Header from "@/components/Header";
@@ -7,16 +8,6 @@ import SearchBar from "@/components/store/SearchBar";
 import FilterSidebar from "@/components/store/FilterSidebar";
 import ResultsHeader from "@/components/store/ResultsHeader";
 import ProductGrid from "@/components/store/ProductGrid";
-
-// Dados simulados
-const categories = [
-  { id: "automoveis", name: "Automóveis", subcategories: ["Esportivos", "Sedans", "SUVs", "Clássicos", "Luxo"] },
-  { id: "imoveis", name: "Imóveis", subcategories: ["Mansões", "Coberturas", "Casas de Praia", "Apartamentos", "Terrenos"] },
-  { id: "embarcacoes", name: "Embarcações", subcategories: ["Iates", "Veleiros", "Lanchas", "Jet Skis"] },
-  { id: "aeronaves", name: "Aeronaves", subcategories: ["Jatos", "Helicópteros", "Monomotores", "Bimotores"] },
-  { id: "relogios", name: "Relógios", subcategories: ["Esportivos", "Clássicos", "Edição Limitada", "Vintage"] },
-  { id: "decoracao", name: "Decoração", subcategories: ["Arte", "Esculturas", "Móveis", "Itens Decorativos"] },
-];
 
 // Produtos simulados
 const productsData = [
@@ -197,7 +188,6 @@ const Store = () => {
           <div className="flex flex-col md:flex-row gap-6 md:gap-8">
             {/* Sidebar de filtros */}
             <FilterSidebar 
-              categories={categories}
               selectedCategory={selectedCategory}
               selectedSubcategories={selectedSubcategories}
               onCategorySelect={handleCategorySelect}

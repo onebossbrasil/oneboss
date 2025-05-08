@@ -8,49 +8,11 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
 import { Upload, Image } from "lucide-react";
-
-// This would normally come from a database
-const mockCategories = [
-  { value: "automoveis", label: "Automóveis", 
-    subcategories: {
-      "marca": ["BMW", "Mercedes", "Audi", "Ferrari"],
-      "modelo": ["Sedan", "SUV", "Conversível"]
-    }
-  },
-  { value: "imoveis", label: "Imóveis", 
-    subcategories: {
-      "localizacao": ["São Paulo", "Rio de Janeiro", "Belo Horizonte"],
-      "tipo": ["Residencial", "Comercial"],
-      "modelo": ["Casa", "Apartamento", "Cobertura"]
-    }
-  },
-  { value: "relogios", label: "Relógios", 
-    subcategories: {
-      "marca": ["Rolex", "Omega", "Tag Heuer", "Patek Philippe"]
-    }
-  },
-  { value: "decoracao", label: "Decoração", 
-    subcategories: {
-      "tipo": ["Quadros", "Esculturas", "Itens de Decoração"]
-    }
-  },
-  { value: "aeronaves", label: "Aeronaves", 
-    subcategories: {
-      "marca": ["Cessna", "Embraer", "Bombardier"],
-      "modelo": ["Bimotor", "Turbo Hélice", "Jato"]
-    }
-  },
-  { value: "embarcacoes", label: "Embarcações", 
-    subcategories: {
-      "marca": ["Azimut", "Ferretti", "Intermarine"],
-      "pes": ["30 pés", "40 pés", "50 pés", "60+ pés"],
-      "modelo": ["Iate", "Lancha", "Barco"]
-    }
-  }
-];
+import { useCategories } from "@/contexts/CategoryContext";
 
 const ProductForm = () => {
   const { toast } = useToast();
+  const { categories } = useCategories();
   const [images, setImages] = useState<File[]>([]);
   const [imagePreviewUrls, setImagePreviewUrls] = useState<string[]>([]);
   const [selectedCategory, setSelectedCategory] = useState("");
@@ -58,14 +20,26 @@ const ProductForm = () => {
   
   // Get available subcategory types for the selected category
   const getSubcategoryTypes = () => {
-    const category = mockCategories.find(cat => cat.value === selectedCategory);
-    return category ? Object.keys(category.subcategories) : [];
+    const category = categories.find(cat => cat.value === selectedCategory);
+    return category ? category.subcategories.map(sc => sc.type) : [];
   };
   
   // Get available values for a specific subcategory type
   const getSubcategoryOptions = (subcatType: string) => {
-    const category = mockCategories.find(cat => cat.value === selectedCategory);
-    return category ? category.subcategories[subcatType] || [] : [];
+    const category = categories.find(cat => cat.value === selectedCategory);
+    if (!category) return [];
+    
+    const subcategory = category.subcategories.find(sc => sc.type === subcatType);
+    return subcategory ? subcategory.values : [];
+  };
+  
+  // Get the label of a subcategory type
+  const getSubcategoryLabel = (subcatType: string) => {
+    const category = categories.find(cat => cat.value === selectedCategory);
+    if (!category) return subcatType.charAt(0).toUpperCase() + subcatType.slice(1);
+    
+    const subcategory = category.subcategories.find(sc => sc.type === subcatType);
+    return subcategory ? subcategory.name : subcatType.charAt(0).toUpperCase() + subcatType.slice(1);
   };
   
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -150,9 +124,9 @@ const ProductForm = () => {
                     <SelectValue placeholder="Selecione uma categoria" />
                   </SelectTrigger>
                   <SelectContent>
-                    {mockCategories.map((category) => (
+                    {categories.map((category) => (
                       <SelectItem key={category.value} value={category.value}>
-                        {category.label}
+                        {category.name}
                       </SelectItem>
                     ))}
                   </SelectContent>
@@ -161,13 +135,13 @@ const ProductForm = () => {
               
               {selectedCategory && getSubcategoryTypes().map((subcatType) => (
                 <div key={subcatType}>
-                  <Label htmlFor={subcatType}>{subcatType.charAt(0).toUpperCase() + subcatType.slice(1)}</Label>
+                  <Label htmlFor={subcatType}>{getSubcategoryLabel(subcatType)}</Label>
                   <Select 
                     onValueChange={(value) => handleSubcategoryChange(subcatType, value)}
                     value={subcategoryValues[subcatType] || ""}
                   >
                     <SelectTrigger>
-                      <SelectValue placeholder={`Selecione ${subcatType}`} />
+                      <SelectValue placeholder={`Selecione ${getSubcategoryLabel(subcatType)}`} />
                     </SelectTrigger>
                     <SelectContent>
                       {getSubcategoryOptions(subcatType).map((option) => (

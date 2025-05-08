@@ -8,6 +8,7 @@ import Index from "./pages/Index";
 import Store from "./pages/Store";
 import Admin from "./pages/Admin";
 import NotFound from "./pages/NotFound";
+import { CategoryProvider } from "./contexts/CategoryContext";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -21,17 +22,19 @@ const queryClient = new QueryClient({
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>
-      <Toaster />
-      <Sonner />
-      <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<Index />} />
-          <Route path="/loja" element={<Store />} />
-          <Route path="/admin" element={<Admin />} />
-          {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-          <Route path="*" element={<NotFound />} />
-        </Routes>
-      </BrowserRouter>
+      <CategoryProvider>
+        <Toaster />
+        <Sonner />
+        <BrowserRouter>
+          <Routes>
+            <Route path="/" element={<Index />} />
+            <Route path="/loja" element={<Store />} />
+            <Route path="/admin" element={<Admin />} />
+            {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+            <Route path="*" element={<NotFound />} />
+          </Routes>
+        </BrowserRouter>
+      </CategoryProvider>
     </TooltipProvider>
   </QueryClientProvider>
 );
