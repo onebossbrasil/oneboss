@@ -12,11 +12,11 @@ const Header = () => {
         <div className="container mx-auto flex justify-between items-center">
           {/* Logo */}
           <Link to="/" className="flex items-center">
-            <div className="text-gold font-playfair font-bold text-xl md:text-2xl lg:text-3xl">
-              <span className="tracking-wider">ONE</span>
-              <span className="text-gold mx-1">✦</span>
-              <span className="tracking-wider">BOSS</span>
-            </div>
+            <img 
+              src="/lovable-uploads/cc202675-942c-4f4f-9e0c-0ba81e060e33.png" 
+              alt="ONE BOSS Luxury Marketplace" 
+              className="h-8 md:h-10 lg:h-12"
+            />
           </Link>
 
           {/* Desktop Navigation */}

@@ -28,11 +28,11 @@ const Footer = () => {
           {/* Logo and About */}
           <div>
             <Link to="/" className="inline-block mb-4">
-              <div className="text-gold font-playfair font-bold text-2xl md:text-3xl">
-                <span className="tracking-wider">ONE</span>
-                <span className="text-gold mx-1">✦</span>
-                <span className="tracking-wider">BOSS</span>
-              </div>
+              <img 
+                src="/lovable-uploads/cc202675-942c-4f4f-9e0c-0ba81e060e33.png" 
+                alt="ONE BOSS Luxury Marketplace" 
+                className="h-10 md:h-12"
+              />
             </Link>
             <p className="text-white/70 mb-4">
               Seu marketplace de itens exclusivos e ultra premium para quem busca o extraordinário.
