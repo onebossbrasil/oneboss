@@ -1,3 +1,4 @@
+
 import { useState, useRef, useEffect } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -63,15 +64,15 @@ const FeaturedProducts = () => {
     setCanScrollRight(scrollLeft < scrollWidth - clientWidth - 10);
   };
 
-  // Auto scroll functionality
+  // Auto scroll functionality with infinite loop
   useEffect(() => {
     const scrollElement = scrollRef.current;
     if (!scrollElement) return;
     
     const autoScrollInterval = 5000; // 5 seconds between scrolls
-    const scrollAmount = 320; // Adjusted to show partial view of third product
+    const scrollAmount = 320; // Adjusted to show partial view of next product
     
-    // Auto scroll function
+    // Auto scroll function with infinite loop
     const autoScroll = () => {
       if (isPaused) return;
       
@@ -165,16 +166,23 @@ const FeaturedProducts = () => {
           className="flex overflow-x-auto gap-6 pb-4 scrollbar-none"
           style={{ 
             scrollbarWidth: "none", 
-            scrollSnapType: "x mandatory",  // Smooth snap effect
-            paddingRight: "80px" // Extra padding to ensure third item is visible
+            scrollSnapType: "x mandatory"  // Smooth snap effect
           }}
         >
           {productsData.map((product) => (
             <Link
               key={product.id}
               to={`/product/${product.id}`}
-              className="product-card min-w-[280px] md:min-w-[320px] flex-shrink-0"
-              style={{ scrollSnapAlign: "start" }}
+              className="product-card flex-shrink-0"
+              style={{ 
+                scrollSnapAlign: "start",
+                minWidth: "calc((100% - 32px) / 2)", // 2 cards on mobile with gap
+                maxWidth: "calc((100% - 32px) / 2)", // 2 cards on mobile with gap
+                "@media (min-width: 768px)": {
+                  minWidth: "calc((100% - 64px) / 3)", // 3 cards on desktop with gaps
+                  maxWidth: "calc((100% - 64px) / 3)" // 3 cards on desktop with gaps
+                }
+              }}
             >
               <div className="relative aspect-[4/3] rounded-t-lg overflow-hidden">
                 <img
