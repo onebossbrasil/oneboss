@@ -7,83 +7,83 @@
 
 @layer base {
   :root {
-    --background: 47 33% 98%; /* Cream background */
-    --foreground: 215 25% 27%; /* Soft navy text */
+    --background: 210 20% 98%; /* Light gray background */
+    --foreground: 215 30% 22%; /* Dark gray text for contrast */
     
     --card: 0 0% 100%;
-    --card-foreground: 215 25% 27%;
+    --card-foreground: 215 30% 22%;
     
     --popover: 0 0% 100%;
-    --popover-foreground: 215 25% 27%;
+    --popover-foreground: 215 30% 22%;
     
-    --primary: 43 65% 52%; /* Gold */
+    --primary: 220 13% 46%; /* Medium gray as primary */
     --primary-foreground: 0 0% 100%;
     
-    --secondary: 215 33% 96%; /* Soft blue-gray */
-    --secondary-foreground: 215 25% 27%;
+    --secondary: 210 20% 96%; /* Lighter gray for secondary */
+    --secondary-foreground: 215 30% 22%;
     
-    --muted: 215 33% 96%;
-    --muted-foreground: 215 10% 50%;
+    --muted: 210 20% 96%;
+    --muted-foreground: 215 15% 45%;
     
-    --accent: 25 70% 94%; /* Soft peach */
-    --accent-foreground: 215 25% 27%;
+    --accent: 210 15% 90%; /* Very light gray accent */
+    --accent-foreground: 215 30% 22%;
     
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 0 0% 98%;
     
-    --border: 215 20% 90%;
-    --input: 215 20% 90%;
-    --ring: 43 65% 52%; /* Gold */
+    --border: 220 13% 91%;
+    --input: 220 13% 91%;
+    --ring: 220 13% 46%; /* Medium gray for ring */
     
     --radius: 0.75rem;
 
-    --sidebar-background: 215 33% 96%;
-    --sidebar-foreground: 215 25% 27%;
-    --sidebar-primary: 43 65% 52%;
+    --sidebar-background: 210 20% 96%;
+    --sidebar-foreground: 215 30% 22%;
+    --sidebar-primary: 220 13% 46%;
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 215 33% 96%;
-    --sidebar-accent-foreground: 215 25% 27%;
-    --sidebar-border: 215 20% 90%;
-    --sidebar-ring: 43 65% 52%;
+    --sidebar-accent: 210 20% 96%;
+    --sidebar-accent-foreground: 215 30% 22%;
+    --sidebar-border: 220 13% 91%;
+    --sidebar-ring: 220 13% 46%;
   }
 
   .dark {
-    --background: 215 25% 27%;
-    --foreground: 0 0% 98%;
+    --background: 215 25% 18%;
+    --foreground: 210 15% 92%;
     
-    --card: 215 28% 17%;
-    --card-foreground: 0 0% 98%;
+    --card: 215 28% 15%;
+    --card-foreground: 210 15% 92%;
     
-    --popover: 215 28% 17%;
-    --popover-foreground: 0 0% 98%;
+    --popover: 215 28% 15%;
+    --popover-foreground: 210 15% 92%;
     
-    --primary: 43 65% 52%; /* Gold */
+    --primary: 220 10% 50%;
     --primary-foreground: 0 0% 100%;
     
-    --secondary: 215 25% 35%;
-    --secondary-foreground: 0 0% 98%;
+    --secondary: 215 25% 25%;
+    --secondary-foreground: 210 15% 92%;
     
-    --muted: 215 25% 35%;
-    --muted-foreground: 215 5% 65%;
+    --muted: 215 25% 25%;
+    --muted-foreground: 215 10% 70%;
     
-    --accent: 215 25% 35%;
-    --accent-foreground: 0 0% 98%;
+    --accent: 215 25% 25%;
+    --accent-foreground: 210 15% 92%;
     
     --destructive: 0 62.8% 30.6%;
     --destructive-foreground: 0 0% 98%;
     
-    --border: 215 25% 35%;
-    --input: 215 25% 35%;
-    --ring: 43 65% 52%; /* Gold */
+    --border: 215 25% 25%;
+    --input: 215 25% 25%;
+    --ring: 220 10% 50%;
     
-    --sidebar-background: 215 28% 17%;
-    --sidebar-foreground: 0 0% 98%;
-    --sidebar-primary: 43 65% 52%;
+    --sidebar-background: 215 28% 15%;
+    --sidebar-foreground: 210 15% 92%;
+    --sidebar-primary: 220 10% 50%;
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 215 25% 35%;
-    --sidebar-accent-foreground: 0 0% 98%;
-    --sidebar-border: 215 25% 35%;
-    --sidebar-ring: 43 65% 52%;
+    --sidebar-accent: 215 25% 25%;
+    --sidebar-accent-foreground: 210 15% 92%;
+    --sidebar-border: 215 25% 25%;
+    --sidebar-ring: 220 10% 50%;
   }
 }
 
@@ -109,7 +109,7 @@
 }
 
 .gold-gradient {
-  background: linear-gradient(135deg, #D4AF37 0%, #F2D675 50%, #D4AF37 100%);
+  background: linear-gradient(135deg, #8E9196 0%, #C8C8C9 50%, #8E9196 100%);
 }
 
 .btn-hover-effect {
