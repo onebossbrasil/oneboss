@@ -18,8 +18,8 @@ const Hero = () => {
   const [api, setApi] = useState<CarouselApi>();
   
   const bannerImages = [
-    "/lovable-uploads/1317d0cd-50c8-46fd-b1d3-d8307912434c.png",
-    "/lovable-uploads/0b199b95-6c69-430c-91bf-0a8cbad9e71a.png"
+    "/lovable-uploads/d31ae657-c225-4f14-b8b8-39eade59dd48.png",
+    "/lovable-uploads/c0b49897-08c2-4312-88cf-df7567ba1def.png"
   ];
   
   // Update current slide index when the carousel changes
