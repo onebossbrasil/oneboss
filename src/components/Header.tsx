@@ -1,0 +1,105 @@
+
+import { useState } from 'react';
+import { Link } from 'react-router-dom';
+import { Search, ShoppingCart, User, Menu, X } from 'lucide-react';
+
+const Header = () => {
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+
+  return (
+    <header className="sticky top-0 z-50 w-full">
+      <div className="glassmorphism px-4 md:px-8 py-4">
+        <div className="container mx-auto flex justify-between items-center">
+          {/* Logo */}
+          <Link to="/" className="flex items-center">
+            <div className="text-gold font-playfair font-bold text-2xl md:text-3xl">
+              <span className="tracking-wider">ONE</span>
+              <span className="text-gold mx-1">✦</span>
+              <span className="tracking-wider">BOSS</span>
+            </div>
+          </Link>
+
+          {/* Desktop Navigation */}
+          <nav className="hidden md:flex items-center space-x-8">
+            <Link to="/" className="font-medium hover:text-gold transition-colors">Home</Link>
+            <Link to="/categories" className="font-medium hover:text-gold transition-colors">Categorias</Link>
+            <Link to="/about" className="font-medium hover:text-gold transition-colors">Sobre</Link>
+            <Link to="/contact" className="font-medium hover:text-gold transition-colors">Contato</Link>
+          </nav>
+
+          {/* Action Buttons */}
+          <div className="hidden md:flex items-center space-x-6">
+            <button className="text-foreground hover:text-gold transition-colors">
+              <Search size={20} />
+            </button>
+            <Link to="/cart" className="text-foreground hover:text-gold transition-colors relative">
+              <ShoppingCart size={20} />
+              <span className="absolute -top-2 -right-2 bg-gold text-white text-xs rounded-full w-4 h-4 flex items-center justify-center">0</span>
+            </Link>
+            <Link to="/profile" className="text-foreground hover:text-gold transition-colors">
+              <User size={20} />
+            </Link>
+          </div>
+
+          {/* Mobile Menu Button */}
+          <button 
+            className="md:hidden text-foreground hover:text-gold transition-colors"
+            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+          >
+            {mobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
+          </button>
+        </div>
+      </div>
+
+      {/* Mobile Menu */}
+      {mobileMenuOpen && (
+        <div className="md:hidden glassmorphism absolute top-full left-0 w-full py-4 px-6 shadow-lg">
+          <nav className="flex flex-col space-y-4">
+            <Link 
+              to="/" 
+              className="font-medium py-2 hover:text-gold transition-colors"
+              onClick={() => setMobileMenuOpen(false)}
+            >
+              Home
+            </Link>
+            <Link 
+              to="/categories" 
+              className="font-medium py-2 hover:text-gold transition-colors"
+              onClick={() => setMobileMenuOpen(false)}
+            >
+              Categorias
+            </Link>
+            <Link 
+              to="/about" 
+              className="font-medium py-2 hover:text-gold transition-colors"
+              onClick={() => setMobileMenuOpen(false)}
+            >
+              Sobre
+            </Link>
+            <Link 
+              to="/contact" 
+              className="font-medium py-2 hover:text-gold transition-colors"
+              onClick={() => setMobileMenuOpen(false)}
+            >
+              Contato
+            </Link>
+            <div className="flex items-center space-x-6 pt-2">
+              <button className="text-foreground hover:text-gold transition-colors">
+                <Search size={20} />
+              </button>
+              <Link to="/cart" className="text-foreground hover:text-gold transition-colors relative">
+                <ShoppingCart size={20} />
+                <span className="absolute -top-2 -right-2 bg-gold text-white text-xs rounded-full w-4 h-4 flex items-center justify-center">0</span>
+              </Link>
+              <Link to="/profile" className="text-foreground hover:text-gold transition-colors">
+                <User size={20} />
+              </Link>
+            </div>
+          </nav>
+        </div>
+      )}
+    </header>
+  );
+};
+
+export default Header;
