@@ -1,27 +1,45 @@
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Navigate } from "react-router-dom";
 import AdminLogin from "@/components/admin/AdminLogin";
 import AdminDashboard from "@/components/admin/AdminDashboard";
+import { supabase } from "@/integrations/supabase/client";
 
 const Admin = () => {
-  // In a real application, this would be validated with a proper auth system
-  const [isAuthenticated, setIsAuthenticated] = useState(() => {
-    const authStatus = localStorage.getItem("adminAuthenticated");
-    return authStatus === "true";
-  });
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    // Check if user is authenticated with Supabase
+    const checkAuth = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      setIsAuthenticated(!!session);
+      setIsLoading(false);
+    };
+
+    checkAuth();
+
+    // Set up auth state listener
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      setIsAuthenticated(!!session);
+      setIsLoading(false);
+    });
+
+    return () => subscription.unsubscribe();
+  }, []);
 
   const handleLogin = (success: boolean) => {
     setIsAuthenticated(success);
-    if (success) {
-      localStorage.setItem("adminAuthenticated", "true");
-    }
   };
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
+    await supabase.auth.signOut();
     setIsAuthenticated(false);
-    localStorage.removeItem("adminAuthenticated");
   };
+
+  if (isLoading) {
+    return <div className="flex items-center justify-center min-h-screen">Carregando...</div>;
+  }
 
   if (!isAuthenticated) {
     return <AdminLogin onLogin={handleLogin} />;

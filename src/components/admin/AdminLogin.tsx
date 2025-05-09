@@ -6,33 +6,56 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { Key, LogIn, User } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 
 interface AdminLoginProps {
   onLogin: (success: boolean) => void;
 }
 
 const AdminLogin = ({ onLogin }: AdminLoginProps) => {
-  const [username, setUsername] = useState("");
+  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const { toast } = useToast();
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setError(null);
+    setIsSubmitting(true);
     
-    // In a real application, this would be a proper authentication check against a backend
-    // For this demo, we're using the specific credentials as requested
-    if (username === "admin" && password === "Isa251212") {
+    try {
+      // Check if email matches the admin email
+      if (email !== "mar.medeiros2015@gmail.com") {
+        throw new Error("Acesso não autorizado");
+      }
+      
+      // Authenticate with Supabase
+      const { data, error: authError } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
+
+      if (authError) {
+        throw authError;
+      }
+
       onLogin(true);
       toast({
         title: "Login realizado com sucesso",
         description: "Bem-vindo ao painel administrativo.",
       });
-    } else {
+    } catch (error: any) {
+      console.error("Login error:", error);
+      setError(error.message || "Falha na autenticação. Verifique suas credenciais.");
       toast({
         title: "Falha na autenticação",
         description: "Usuário ou senha incorretos.",
         variant: "destructive",
       });
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -49,17 +72,22 @@ const AdminLogin = ({ onLogin }: AdminLoginProps) => {
         </CardHeader>
         <form onSubmit={handleSubmit}>
           <CardContent className="space-y-4">
+            {error && (
+              <Alert variant="destructive">
+                <AlertDescription>{error}</AlertDescription>
+              </Alert>
+            )}
             <div className="space-y-2">
-              <Label htmlFor="username">Usuário</Label>
+              <Label htmlFor="email">Email</Label>
               <div className="relative">
                 <User className="absolute left-3 top-2.5 h-5 w-5 text-muted-foreground" />
                 <Input
-                  id="username"
-                  type="text"
-                  placeholder="Seu usuário"
+                  id="email"
+                  type="email"
+                  placeholder="seu.email@exemplo.com"
                   className="pl-10"
-                  value={username}
-                  onChange={(e) => setUsername(e.target.value)}
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
                   required
                 />
               </div>
@@ -81,9 +109,9 @@ const AdminLogin = ({ onLogin }: AdminLoginProps) => {
             </div>
           </CardContent>
           <CardFooter>
-            <Button type="submit" className="w-full">
+            <Button type="submit" className="w-full" disabled={isSubmitting}>
               <LogIn className="mr-2 h-4 w-4" />
-              Entrar
+              {isSubmitting ? "Entrando..." : "Entrar"}
             </Button>
           </CardFooter>
         </form>
