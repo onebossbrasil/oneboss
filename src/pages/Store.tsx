@@ -34,14 +34,16 @@ const Store = () => {
   
   // Filter products when the filters change
   useEffect(() => {
-    let result = products;
+    // First, only include published products
+    let result = products.filter(product => product.published !== false);
     
     // Filter by search
     if (searchQuery) {
       const query = searchQuery.toLowerCase();
       result = result.filter(product => 
         product.name.toLowerCase().includes(query) ||
-        product.description.toLowerCase().includes(query)
+        (product.description && product.description.toLowerCase().includes(query)) ||
+        (product.shortDescription && product.shortDescription.toLowerCase().includes(query))
       );
     }
     
@@ -105,10 +107,13 @@ const Store = () => {
   const formattedProducts: FormattedProduct[] = filteredProducts.map(product => ({
     id: product.id,
     name: product.name,
-    description: product.description,
+    description: product.shortDescription || product.description,
     price: typeof product.price === 'number' 
       ? new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(product.price)
       : product.price + "",
+    salePrice: product.salePrice 
+      ? new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(product.salePrice)
+      : undefined,
     category: categories.find(cat => cat.id.toString() === product.categoryId)?.name || '',
     subcategory: Object.values(product.subcategoryValues || {}).join(', '),
     imageUrl: product.images.length > 0 ? product.images[0].url : 'https://images.unsplash.com/photo-1567899378494-47b22a2ae96a?auto=format&fit=crop&q=80&w=600&h=400',

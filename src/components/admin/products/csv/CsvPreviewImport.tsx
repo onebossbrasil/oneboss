@@ -61,9 +61,10 @@ const CsvPreviewImport: React.FC<CsvPreviewImportProps> = ({
                 <TableRow>
                   <TableHead>Nome</TableHead>
                   <TableHead>Preço</TableHead>
+                  <TableHead>Preço Promo</TableHead>
                   <TableHead>Categoria</TableHead>
+                  <TableHead>Publicado</TableHead>
                   <TableHead>Destaque</TableHead>
-                  <TableHead>Imagens</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -71,14 +72,15 @@ const CsvPreviewImport: React.FC<CsvPreviewImportProps> = ({
                   <TableRow key={index}>
                     <TableCell>{product.name}</TableCell>
                     <TableCell>{product.price}</TableCell>
+                    <TableCell>{product.salePrice || '-'}</TableCell>
                     <TableCell>{product.category}</TableCell>
+                    <TableCell>{product.published ? "Sim" : "Não"}</TableCell>
                     <TableCell>{product.featured ? "Sim" : "Não"}</TableCell>
-                    <TableCell>{product.images.length} imagens</TableCell>
                   </TableRow>
                 ))}
                 {importedProducts.length > 5 && (
                   <TableRow>
-                    <TableCell colSpan={5} className="text-center text-sm text-muted-foreground">
+                    <TableCell colSpan={6} className="text-center text-sm text-muted-foreground">
                       ...e mais {importedProducts.length - 5} produtos
                     </TableCell>
                   </TableRow>

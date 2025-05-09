@@ -30,16 +30,29 @@ export const importProductToSupabase = async (
       });
     }
     
+    // Parse sale price if present
+    let salePrice = null;
+    if (product.salePrice) {
+      const salePriceStr = product.salePrice.replace(/[^\d.,]/g, '').replace(',', '.');
+      salePrice = parseFloat(salePriceStr);
+      if (isNaN(salePrice)) {
+        salePrice = null;
+      }
+    }
+    
     // Insert product into Supabase
     const { data: newProduct, error } = await supabase
       .from('products')
       .insert({
         name: product.name,
+        short_description: product.shortDescription || null,
         description: product.description,
         price,
+        sale_price: salePrice,
         category_id: categoryObj.id.toString(),
         subcategory_values: subcategoryValues,
         featured: product.featured,
+        published: product.published,
         stock_quantity: product.stockQuantity
       })
       .select()

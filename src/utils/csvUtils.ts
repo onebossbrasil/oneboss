@@ -42,10 +42,13 @@ export const createInitialMapping = (headers: string[]): Record<string, string> 
     const lowerHeader = header.toLowerCase();
     if (lowerHeader.includes('nome') || lowerHeader.includes('name')) initialMapping[header] = 'name';
     else if (lowerHeader.includes('preço') || lowerHeader.includes('price')) initialMapping[header] = 'price';
+    else if (lowerHeader.includes('desc') && lowerHeader.includes('curta')) initialMapping[header] = 'shortDescription';
     else if (lowerHeader.includes('desc')) initialMapping[header] = 'description';
     else if (lowerHeader.includes('categ')) initialMapping[header] = 'category';
     else if (lowerHeader.includes('subcateg')) initialMapping[header] = 'subcategories';
     else if (lowerHeader.includes('destaque') || lowerHeader.includes('featured')) initialMapping[header] = 'featured';
+    else if (lowerHeader.includes('publicado') || lowerHeader.includes('published')) initialMapping[header] = 'published';
+    else if (lowerHeader.includes('promocional') || lowerHeader.includes('sale')) initialMapping[header] = 'salePrice';
     else if (lowerHeader.includes('imag') || lowerHeader.includes('image')) initialMapping[header] = 'images';
     else if (lowerHeader.includes('estoque') || lowerHeader.includes('stock')) initialMapping[header] = 'stockQuantity';
   });
@@ -65,9 +68,12 @@ export const mapRowsToProducts = (parsedData: ParsedCsvRow[], mapping: Record<st
         name: '',
         price: '',
         description: '',
+        shortDescription: '',
+        salePrice: '',
         category: '',
         subcategories: '',
         featured: false,
+        published: true,
         images: [],
         stockQuantity: 0
       };
@@ -76,10 +82,13 @@ export const mapRowsToProducts = (parsedData: ParsedCsvRow[], mapping: Record<st
       Object.entries(mapping).forEach(([csvHeader, productField]) => {
         if (productField === 'name') product.name = row[csvHeader];
         else if (productField === 'price') product.price = row[csvHeader];
+        else if (productField === 'shortDescription') product.shortDescription = row[csvHeader];
         else if (productField === 'description') product.description = row[csvHeader];
+        else if (productField === 'salePrice') product.salePrice = row[csvHeader];
         else if (productField === 'category') product.category = row[csvHeader];
         else if (productField === 'subcategories') product.subcategories = row[csvHeader];
         else if (productField === 'featured') product.featured = row[csvHeader]?.toLowerCase() === 'sim' || row[csvHeader]?.toLowerCase() === 'true';
+        else if (productField === 'published') product.published = row[csvHeader]?.toLowerCase() !== 'não' && row[csvHeader]?.toLowerCase() !== 'false';
         else if (productField === 'images') {
           const imageUrls = row[csvHeader]?.split('|').filter(url => url.trim() !== '');
           product.images = imageUrls || [];

@@ -26,6 +26,7 @@ export type FormattedProduct = {
   id: string;
   name: string;
   price: string;
+  salePrice?: string;
   category: string;
   subcategory?: string;
   imageUrl: string;

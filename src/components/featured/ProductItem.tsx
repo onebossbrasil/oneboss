@@ -25,7 +25,16 @@ const ProductItem = ({ product }: ProductItemProps) => {
       </div>
       <div className="glassmorphism rounded-b-lg p-4">
         <h3 className="font-playfair font-medium text-lg">{product.name}</h3>
-        <p className="text-gold font-semibold mt-1">{product.price}</p>
+        <div className="mt-1">
+          {product.salePrice ? (
+            <>
+              <span className="text-gold font-semibold">{product.salePrice}</span>
+              <span className="text-sm text-muted-foreground line-through ml-2">{product.price}</span>
+            </>
+          ) : (
+            <span className="text-gold font-semibold">{product.price}</span>
+          )}
+        </div>
       </div>
     </Link>
   );

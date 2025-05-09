@@ -17,11 +17,15 @@ const CsvColumnMapper = ({
   const productFields = [
     { id: 'name', label: 'Nome do Produto' },
     { id: 'price', label: 'Preço' },
-    { id: 'description', label: 'Descrição' },
+    { id: 'shortDescription', label: 'Descrição Curta' },
+    { id: 'description', label: 'Descrição Longa' },
+    { id: 'salePrice', label: 'Preço Promocional' },
     { id: 'category', label: 'Categoria' },
     { id: 'subcategories', label: 'Subcategorias' },
     { id: 'featured', label: 'Destaque' },
+    { id: 'published', label: 'Publicado' },
     { id: 'images', label: 'Imagens' },
+    { id: 'stockQuantity', label: 'Estoque' },
     { id: 'none', label: 'Ignorar Coluna' }
   ];
 

@@ -127,6 +127,9 @@ export type Database = {
           id: string
           name: string
           price: number
+          published: boolean | null
+          sale_price: number | null
+          short_description: string | null
           stock_quantity: number | null
           subcategory_values: Json | null
           updated_at: string | null
@@ -139,6 +142,9 @@ export type Database = {
           id?: string
           name: string
           price: number
+          published?: boolean | null
+          sale_price?: number | null
+          short_description?: string | null
           stock_quantity?: number | null
           subcategory_values?: Json | null
           updated_at?: string | null
@@ -151,6 +157,9 @@ export type Database = {
           id?: string
           name?: string
           price?: number
+          published?: boolean | null
+          sale_price?: number | null
+          short_description?: string | null
           stock_quantity?: number | null
           subcategory_values?: Json | null
           updated_at?: string | null

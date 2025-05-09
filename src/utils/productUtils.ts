@@ -50,7 +50,7 @@ export const fetchProductsFromSupabase = async (): Promise<{ products: Product[]
       categoryId: product.category_id,
       subcategoryValues: product.subcategory_values || {},
       featured: product.featured || false,
-      published: product.published !== undefined ? product.published : true, // Add published field with default true
+      published: product.published !== undefined ? product.published : true,
       stockQuantity: product.stock_quantity || 0,
       images: imagesByProduct[product.id] || [],
       createdAt: product.created_at,
