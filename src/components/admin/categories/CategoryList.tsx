@@ -46,6 +46,7 @@ const CategoryList = ({
     setFormError(null);
     
     try {
+      console.log("Tentando adicionar categoria:", { name: newCategoryName, slug: newCategorySlug });
       await addCategory(newCategoryName, newCategorySlug);
       
       setNewCategoryName("");
@@ -59,6 +60,11 @@ const CategoryList = ({
     } catch (error: any) {
       console.error("Error adding category:", error);
       setFormError(error?.message || "Erro ao adicionar categoria. Tente novamente.");
+      toast({
+        title: "Erro ao adicionar categoria",
+        description: error?.message || "Verifique suas permissões de administrador e tente novamente.",
+        variant: "destructive",
+      });
     } finally {
       setIsSubmitting(false);
     }

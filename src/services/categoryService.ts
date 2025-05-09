@@ -4,35 +4,73 @@ import { CategoryType } from "@/types/category";
 
 // Fetch all categories and their subcategories
 export const fetchCategoriesData = async () => {
-  // Fetch categories
-  const { data: categoriesData, error: categoriesError } = await supabase
-    .from('categories')
-    .select('*')
-    .order('name');
+  try {
+    console.log("Buscando dados das categorias...");
+    
+    // Fetch categories
+    const { data: categoriesData, error: categoriesError } = await supabase
+      .from('categories')
+      .select('*')
+      .order('name');
 
-  if (categoriesError) throw categoriesError;
+    if (categoriesError) {
+      console.error("Erro ao buscar categorias:", categoriesError);
+      throw categoriesError;
+    }
 
-  // Fetch subcategories
-  const { data: subcategoriesData, error: subcategoriesError } = await supabase
-    .from('subcategories')
-    .select('*')
-    .order('name');
+    // Fetch subcategories
+    const { data: subcategoriesData, error: subcategoriesError } = await supabase
+      .from('subcategories')
+      .select('*')
+      .order('name');
 
-  if (subcategoriesError) throw subcategoriesError;
+    if (subcategoriesError) {
+      console.error("Erro ao buscar subcategorias:", subcategoriesError);
+      throw subcategoriesError;
+    }
 
-  // Fetch subcategory values
-  const { data: valuesData, error: valuesError } = await supabase
-    .from('subcategory_values')
-    .select('*');
+    // Fetch subcategory values
+    const { data: valuesData, error: valuesError } = await supabase
+      .from('subcategory_values')
+      .select('*');
 
-  if (valuesError) throw valuesError;
+    if (valuesError) {
+      console.error("Erro ao buscar valores de subcategorias:", valuesError);
+      throw valuesError;
+    }
 
-  return { categoriesData, subcategoriesData, valuesData };
+    console.log("Dados carregados com sucesso:", {
+      categorias: categoriesData.length,
+      subcategorias: subcategoriesData.length,
+      valores: valuesData.length
+    });
+
+    return { categoriesData, subcategoriesData, valuesData };
+  } catch (err) {
+    console.error("Exceção ao buscar dados das categorias:", err);
+    throw err;
+  }
 };
 
 // Create a new category
 export const createCategory = async (name: string, value: string) => {
   try {
+    console.log("Criando categoria:", { name, value });
+    
+    // Verificar a sessão do usuário atual
+    const { data: sessionData, error: sessionError } = await supabase.auth.getSession();
+    if (sessionError) {
+      console.error("Erro ao verificar sessão:", sessionError);
+      throw new Error("Erro ao verificar autenticação. Por favor, faça login novamente.");
+    }
+    
+    if (!sessionData.session) {
+      console.error("Usuário não autenticado");
+      throw new Error("Usuário não está autenticado. Por favor, faça login.");
+    }
+    
+    console.log("Usuário autenticado:", sessionData.session.user.email);
+    
     const { data, error } = await supabase
       .from('categories')
       .insert({ name, value })
@@ -40,82 +78,153 @@ export const createCategory = async (name: string, value: string) => {
       .single();
       
     if (error) {
-      console.error("Error creating category:", error);
+      console.error("Erro ao criar categoria:", error);
       throw error;
     }
+    
+    console.log("Categoria criada com sucesso:", data);
     return data;
   } catch (err) {
-    console.error("Exception creating category:", err);
+    console.error("Exceção ao criar categoria:", err);
     throw err;
   }
 };
 
 // Delete a category
 export const deleteCategory = async (categoryId: number) => {
-  const { error } = await supabase
-    .from('categories')
-    .delete()
-    .eq('id', categoryId.toString());
+  try {
+    console.log("Deletando categoria:", categoryId);
     
-  if (error) throw error;
+    const { error } = await supabase
+      .from('categories')
+      .delete()
+      .eq('id', categoryId.toString());
+      
+    if (error) {
+      console.error("Erro ao deletar categoria:", error);
+      throw error;
+    }
+    
+    console.log("Categoria deletada com sucesso");
+  } catch (err) {
+    console.error("Exceção ao deletar categoria:", err);
+    throw err;
+  }
 };
 
 // Create a subcategory
 export const createSubcategory = async (categoryId: number, name: string, type: string) => {
-  const { data, error } = await supabase
-    .from('subcategories')
-    .insert({ 
-      category_id: categoryId.toString(),
-      name,
-      type
-    })
-    .select()
-    .single();
+  try {
+    console.log("Criando subcategoria:", { categoryId, name, type });
     
-  if (error) throw error;
-  return data;
+    const { data, error } = await supabase
+      .from('subcategories')
+      .insert({ 
+        category_id: categoryId.toString(),
+        name,
+        type
+      })
+      .select()
+      .single();
+      
+    if (error) {
+      console.error("Erro ao criar subcategoria:", error);
+      throw error;
+    }
+    
+    console.log("Subcategoria criada com sucesso:", data);
+    return data;
+  } catch (err) {
+    console.error("Exceção ao criar subcategoria:", err);
+    throw err;
+  }
 };
 
 // Delete a subcategory
 export const deleteSubcategory = async (subcategoryId: number) => {
-  const { error } = await supabase
-    .from('subcategories')
-    .delete()
-    .eq('id', subcategoryId.toString());
+  try {
+    console.log("Deletando subcategoria:", subcategoryId);
     
-  if (error) throw error;
+    const { error } = await supabase
+      .from('subcategories')
+      .delete()
+      .eq('id', subcategoryId.toString());
+      
+    if (error) {
+      console.error("Erro ao deletar subcategoria:", error);
+      throw error;
+    }
+    
+    console.log("Subcategoria deletada com sucesso");
+  } catch (err) {
+    console.error("Exceção ao deletar subcategoria:", err);
+    throw err;
+  }
 };
 
 // Add a value to a subcategory
 export const addSubcategoryValue = async (subcategoryId: number | string, value: string, categoryId: number | string) => {
-  const { error } = await supabase
-    .from('subcategory_values')
-    .insert({ 
-      subcategory_id: subcategoryId.toString(),
-      value
-    });
+  try {
+    console.log("Adicionando valor à subcategoria:", { subcategoryId, value, categoryId });
     
-  if (error) throw error;
+    const { error } = await supabase
+      .from('subcategory_values')
+      .insert({ 
+        subcategory_id: subcategoryId.toString(),
+        value
+      });
+      
+    if (error) {
+      console.error("Erro ao adicionar valor à subcategoria:", error);
+      throw error;
+    }
+    
+    console.log("Valor adicionado com sucesso à subcategoria");
+  } catch (err) {
+    console.error("Exceção ao adicionar valor à subcategoria:", err);
+    throw err;
+  }
 };
 
 // Remove a value from a subcategory
 export const removeSubcategoryValue = async (subcategoryId: number | string, value: string, categoryId: number | string) => {
-  // Find the value first
-  const { data: valueData, error: findError } = await supabase
-    .from('subcategory_values')
-    .select('id')
-    .eq('subcategory_id', subcategoryId.toString())
-    .eq('value', value)
-    .single();
+  try {
+    console.log("Removendo valor da subcategoria:", { subcategoryId, value });
     
-  if (findError) throw findError;
-  if (!valueData) throw new Error('Valor não encontrado');
-  
-  // Delete the value
-  const { error } = await supabase
-    .from('subcategory_values')
-    .delete()
-    .eq('id', valueData.id);
+    // Find the value first
+    const { data: valueData, error: findError } = await supabase
+      .from('subcategory_values')
+      .select('id')
+      .eq('subcategory_id', subcategoryId.toString())
+      .eq('value', value)
+      .single();
+      
+    if (findError) {
+      console.error("Erro ao buscar valor da subcategoria:", findError);
+      throw findError;
+    }
     
-  if (error) throw error;
+    if (!valueData) {
+      console.error("Valor não encontrado");
+      throw new Error('Valor não encontrado');
+    }
+    
+    console.log("Valor encontrado, ID:", valueData.id);
+    
+    // Delete the value
+    const { error } = await supabase
+      .from('subcategory_values')
+      .delete()
+      .eq('id', valueData.id);
+      
+    if (error) {
+      console.error("Erro ao deletar valor da subcategoria:", error);
+      throw error;
+    }
+    
+    console.log("Valor removido com sucesso da subcategoria");
+  } catch (err) {
+    console.error("Exceção ao remover valor da subcategoria:", err);
+    throw err;
+  }
 };

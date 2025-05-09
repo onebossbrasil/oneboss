@@ -35,37 +35,50 @@ const AdminLogin = ({ onLogin }: AdminLoginProps) => {
       });
 
       if (authError) {
+        console.error("Erro de autenticação:", authError);
         throw authError;
       }
 
       if (!data.user || !data.user.email) {
+        console.error("Dados do usuário não disponíveis");
         throw new Error("Não foi possível obter os dados do usuário.");
       }
 
-      console.log("Autenticação bem-sucedida, verificando permissões de admin");
+      console.log("Autenticação bem-sucedida para:", data.user.email);
       
-      // Verificar se o e-mail está na tabela de permissões
-      const { data: adminData, error: adminError } = await supabase
-        .from('admin_permissions')
-        .select('*')
-        .eq('email', email)
-        .single();
-
-      console.log("Resultado da verificação de admin:", { adminData, adminError });
+      // Verificar se o e-mail está na tabela de permissões usando a função is_admin
+      const { data: adminCheck, error: adminError } = await supabase
+        .rpc('current_user_is_admin');
+      
+      console.log("Verificação de admin:", { adminCheck, adminError });
 
       if (adminError) {
         console.error("Erro ao verificar permissões:", adminError);
         throw new Error("Erro ao verificar permissões de administrador.");
       }
 
-      if (!adminData) {
+      if (!adminCheck) {
+        console.error("Usuário não é administrador");
         throw new Error("Acesso não autorizado. Você não tem permissões de administrador.");
       }
+      
+      // Se chegou aqui, buscar o papel do administrador
+      const { data: adminData, error: roleError } = await supabase
+        .from('admin_permissions')
+        .select('role')
+        .eq('email', data.user.email)
+        .single();
+        
+      if (roleError) {
+        console.warn("Erro ao buscar papel do administrador:", roleError);
+      }
+      
+      const adminRole = adminData?.role || "admin";
 
       onLogin(true);
       toast({
         title: "Login realizado com sucesso",
-        description: `Bem-vindo ao painel administrativo, ${adminData.role}.`,
+        description: `Bem-vindo ao painel administrativo, ${adminRole}.`,
       });
     } catch (error: any) {
       console.error("Login error:", error);
