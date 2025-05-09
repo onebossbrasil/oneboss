@@ -35,31 +35,21 @@ const CsvImporter = () => {
         <div className="space-y-6">
           <h2 className="text-2xl font-playfair font-semibold">Importação em massa de produtos</h2>
           
-          {!previewMode && !success ? (
-            <div className="space-y-6">
-              <CsvStep1Upload 
-                handleCsvUpload={handleCsvUpload} 
-                file={file} 
-              />
-              
-              {headers.length > 0 && (
-                <CsvStep2Mapping 
-                  headers={headers} 
-                  mapping={mapping} 
-                  setMapping={setMapping} 
-                />
-              )}
-              
-              {parsedData.length > 0 && (
-                <CsvStep3Images 
-                  handleImageUpload={handleImageUpload} 
-                  imageFile={imageFile}
-                  previewImport={previewImport}
-                  showButton={parsedData.length > 0}
-                />
-              )}
-            </div>
-          ) : previewMode ? (
+          {!previewMode && !success && (
+            <ImportSteps 
+              file={file}
+              imageFile={imageFile}
+              headers={headers}
+              mapping={mapping}
+              setMapping={setMapping}
+              parsedData={parsedData}
+              handleCsvUpload={handleCsvUpload}
+              handleImageUpload={handleImageUpload}
+              previewImport={previewImport}
+            />
+          )}
+          
+          {previewMode && (
             <CsvPreviewImport 
               errors={errors} 
               importedProducts={importedProducts}
@@ -67,14 +57,61 @@ const CsvImporter = () => {
               setPreviewMode={setPreviewMode}
               isImporting={isImporting}
             />
-          ) : (
-            <CsvSuccessMessage resetForm={resetForm} />
           )}
+          
+          {success && <CsvSuccessMessage resetForm={resetForm} />}
           
           {errors.length > 0 && !previewMode && <CsvErrorAlert errors={errors} />}
         </div>
       </CardContent>
     </Card>
+  );
+};
+
+interface ImportStepsProps {
+  file: File | null;
+  imageFile: File | null;
+  headers: string[];
+  mapping: Record<string, string>;
+  setMapping: React.Dispatch<React.SetStateAction<Record<string, string>>>;
+  parsedData: any[];
+  handleCsvUpload: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  handleImageUpload: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  previewImport: () => void;
+}
+
+const ImportSteps = ({
+  file,
+  imageFile,
+  headers,
+  mapping,
+  setMapping,
+  parsedData,
+  handleCsvUpload,
+  handleImageUpload,
+  previewImport
+}: ImportStepsProps) => {
+  return (
+    <div className="space-y-6">
+      <CsvStep1Upload handleCsvUpload={handleCsvUpload} file={file} />
+      
+      {headers.length > 0 && (
+        <CsvStep2Mapping 
+          headers={headers} 
+          mapping={mapping} 
+          setMapping={setMapping} 
+        />
+      )}
+      
+      {parsedData.length > 0 && (
+        <CsvStep3Images 
+          handleImageUpload={handleImageUpload} 
+          imageFile={imageFile}
+          previewImport={previewImport}
+          showButton={parsedData.length > 0}
+        />
+      )}
+    </div>
   );
 };
 

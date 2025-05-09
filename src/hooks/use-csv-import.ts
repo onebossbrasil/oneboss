@@ -1,8 +1,10 @@
+
 import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { useCategories } from "@/contexts/CategoryContext";
 import { ImportedProduct, ParsedCsvRow } from "@/types/csv";
+import { parseCSVData, createInitialMapping, mapRowsToProducts, validateProducts } from "@/utils/csvUtils";
 
 export const useCsvImport = () => {
   const { toast } = useToast();
@@ -32,38 +34,10 @@ export const useCsvImport = () => {
       reader.onload = (event) => {
         if (event.target && typeof event.target.result === 'string') {
           try {
-            const csvData = event.target.result;
-            const lines = csvData.split('\n');
-            const headers = lines[0].split(',').map(h => h.trim());
+            const { headers, rows } = parseCSVData(event.target.result);
             setHeaders(headers);
-            
-            // Initialize mapping to suggested defaults
-            const initialMapping: Record<string, string> = {};
-            headers.forEach(header => {
-              const lowerHeader = header.toLowerCase();
-              if (lowerHeader.includes('nome') || lowerHeader.includes('name')) initialMapping[header] = 'name';
-              else if (lowerHeader.includes('preço') || lowerHeader.includes('price')) initialMapping[header] = 'price';
-              else if (lowerHeader.includes('desc')) initialMapping[header] = 'description';
-              else if (lowerHeader.includes('categ')) initialMapping[header] = 'category';
-              else if (lowerHeader.includes('subcateg')) initialMapping[header] = 'subcategories';
-              else if (lowerHeader.includes('destaque') || lowerHeader.includes('featured')) initialMapping[header] = 'featured';
-              else if (lowerHeader.includes('imag') || lowerHeader.includes('image')) initialMapping[header] = 'images';
-              else if (lowerHeader.includes('estoque') || lowerHeader.includes('stock')) initialMapping[header] = 'stockQuantity';
-            });
-            setMapping(initialMapping);
-            
-            // Parse rows
-            const rows = lines.slice(1).filter(line => line.trim() !== '').map(line => {
-              const values = line.split(',').map(v => v.trim());
-              const row: Record<string, string> = {};
-              headers.forEach((header, index) => {
-                row[header] = values[index] || '';
-              });
-              return row;
-            });
-            
             setParsedData(rows);
-            
+            setMapping(createInitialMapping(headers));
           } catch (error) {
             setErrors(['Erro ao analisar o arquivo CSV. Verifique o formato.']);
           }
@@ -79,66 +53,10 @@ export const useCsvImport = () => {
     }
   };
   
-  const validateProducts = (products: ImportedProduct[]): string[] => {
-    const validationErrors: string[] = [];
-    
-    products.forEach((product, index) => {
-      if (!product.name) {
-        validationErrors.push(`Linha ${index + 2}: Nome do produto é obrigatório`);
-      }
-      
-      if (!product.price) {
-        validationErrors.push(`Linha ${index + 2}: Preço do produto é obrigatório`);
-      }
-      
-      if (product.category && !categories.some(c => c.name.toLowerCase() === product.category.toLowerCase())) {
-        validationErrors.push(`Linha ${index + 2}: Categoria "${product.category}" não encontrada`);
-      }
-    });
-    
-    return validationErrors;
-  };
-  
   const previewImport = () => {
-    const products: ImportedProduct[] = [];
+    const products = mapRowsToProducts(parsedData, mapping);
+    const validationErrors = validateProducts(products, categories);
     
-    parsedData.forEach(row => {
-      try {
-        const product: ImportedProduct = {
-          name: '',
-          price: '',
-          description: '',
-          category: '',
-          subcategories: '',
-          featured: false,
-          images: [],
-          stockQuantity: 0
-        };
-        
-        // Map fields according to user's mapping
-        Object.entries(mapping).forEach(([csvHeader, productField]) => {
-          if (productField === 'name') product.name = row[csvHeader];
-          else if (productField === 'price') product.price = row[csvHeader];
-          else if (productField === 'description') product.description = row[csvHeader];
-          else if (productField === 'category') product.category = row[csvHeader];
-          else if (productField === 'subcategories') product.subcategories = row[csvHeader];
-          else if (productField === 'featured') product.featured = row[csvHeader]?.toLowerCase() === 'sim' || row[csvHeader]?.toLowerCase() === 'true';
-          else if (productField === 'images') {
-            const imageUrls = row[csvHeader]?.split('|').filter(url => url.trim() !== '');
-            product.images = imageUrls || [];
-          }
-          else if (productField === 'stockQuantity') {
-            product.stockQuantity = parseInt(row[csvHeader], 10) || 0;
-          }
-        });
-        
-        products.push(product);
-      } catch (error) {
-        console.error("Error processing row:", error);
-      }
-    });
-    
-    const validationErrors = validateProducts(products);
     setErrors(validationErrors);
     setImportedProducts(products.filter((_, index) => {
       return !validationErrors.some(error => error.includes(`Linha ${index + 2}:`));
