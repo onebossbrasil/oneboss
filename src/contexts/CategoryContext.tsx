@@ -166,7 +166,7 @@ export const CategoryProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   const addSubcategoryValue = async (categoryId: number, subcategoryId: number, value: string) => {
     try {
       setIsLoading(true);
-      await addSubcategoryValue(subcategoryId, value);
+      await addSubcategoryValue(subcategoryId, value, categoryId); // Fixed: passing all three arguments
       await fetchCategories();
       
       toast({
@@ -188,7 +188,7 @@ export const CategoryProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   const removeSubcategoryValue = async (categoryId: number, subcategoryId: number, value: string) => {
     try {
       setIsLoading(true);
-      await removeSubcategoryValue(subcategoryId, value);
+      await removeSubcategoryValue(subcategoryId, value, categoryId); // Fixed: passing all three arguments
       await fetchCategories();
       
       toast({

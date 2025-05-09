@@ -79,7 +79,7 @@ export const deleteSubcategory = async (subcategoryId: number) => {
 };
 
 // Add a value to a subcategory
-export const addSubcategoryValue = async (subcategoryId: number, value: string) => {
+export const addSubcategoryValue = async (subcategoryId: number, value: string, categoryId: number) => {
   const { error } = await supabase
     .from('subcategory_values')
     .insert({ 
@@ -91,7 +91,7 @@ export const addSubcategoryValue = async (subcategoryId: number, value: string) 
 };
 
 // Remove a value from a subcategory
-export const removeSubcategoryValue = async (subcategoryId: number, value: string) => {
+export const removeSubcategoryValue = async (subcategoryId: number, value: string, categoryId: number) => {
   // Find the value first
   const { data: valueData, error: findError } = await supabase
     .from('subcategory_values')
