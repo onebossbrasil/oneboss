@@ -5,54 +5,83 @@ import AdminDashboard from "@/components/admin/AdminDashboard";
 import { supabase } from "@/integrations/supabase/client";
 import { Loader2, LogOut } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useToast } from "@/hooks/use-toast";
 
 const Admin = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [isAdmin, setIsAdmin] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const { toast } = useToast();
 
   useEffect(() => {
     // Verificar se o usuário está autenticado com Supabase
     const checkAuth = async () => {
-      const { data: { session } } = await supabase.auth.getSession();
-      
-      if (!session) {
-        setIsAuthenticated(false);
-        setIsAdmin(false);
-        setIsLoading(false);
-        return;
-      }
-      
-      setIsAuthenticated(!!session);
-      
-      // Verificar se o usuário tem permissões de administrador
-      if (session?.user) {
-        const { data: adminData } = await supabase
-          .from('admin_permissions')
-          .select('*')
-          .eq('email', session.user.email)
-          .single();
+      try {
+        // Recuperar a sessão atual
+        const { data: { session } } = await supabase.auth.getSession();
+        
+        if (!session) {
+          setIsAuthenticated(false);
+          setIsAdmin(false);
+          setIsLoading(false);
+          return;
+        }
+        
+        setIsAuthenticated(!!session);
+        
+        // Verificar se o usuário tem permissões de administrador
+        if (session?.user?.email) {
+          const { data: adminData, error: adminError } = await supabase
+            .from('admin_permissions')
+            .select('*')
+            .eq('email', session.user.email)
+            .single();
           
-        setIsAdmin(!!adminData);
+          console.log("Verificação de admin:", { adminData, adminError, userEmail: session.user.email });
+          
+          if (adminError) {
+            console.error("Erro ao verificar permissões de admin:", adminError);
+            setError("Erro ao verificar permissões. Por favor, tente novamente.");
+            setIsAdmin(false);
+          } else {
+            setIsAdmin(!!adminData);
+          }
+        }
+        
+        setIsLoading(false);
+      } catch (error) {
+        console.error("Erro ao verificar autenticação:", error);
+        setError("Erro ao verificar autenticação. Por favor, tente novamente.");
+        setIsLoading(false);
       }
-      
-      setIsLoading(false);
     };
 
     checkAuth();
 
     // Configurar listener para alterações no estado de autenticação
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
+      console.log("Auth state changed:", event, session?.user?.email);
       setIsAuthenticated(!!session);
       
-      if (session?.user) {
-        const { data: adminData } = await supabase
-          .from('admin_permissions')
-          .select('*')
-          .eq('email', session.user.email)
-          .single();
+      if (session?.user?.email) {
+        try {
+          const { data: adminData, error: adminError } = await supabase
+            .from('admin_permissions')
+            .select('*')
+            .eq('email', session.user.email)
+            .single();
           
-        setIsAdmin(!!adminData);
+          if (adminError) {
+            console.error("Erro ao verificar permissões de admin:", adminError);
+            setIsAdmin(false);
+          } else {
+            setIsAdmin(!!adminData);
+          }
+        } catch (error) {
+          console.error("Erro ao verificar permissões:", error);
+          setIsAdmin(false);
+        }
       } else {
         setIsAdmin(false);
       }
@@ -65,26 +94,56 @@ const Admin = () => {
 
   const handleLogin = async (success: boolean) => {
     if (success) {
+      setIsAuthenticated(true);
       const { data: { session } } = await supabase.auth.getSession();
       
-      if (session?.user) {
-        const { data: adminData } = await supabase
-          .from('admin_permissions')
-          .select('*')
-          .eq('email', session.user.email)
-          .single();
-          
-        setIsAdmin(!!adminData);
+      if (session?.user?.email) {
+        try {
+          const { data: adminData, error: adminError } = await supabase
+            .from('admin_permissions')
+            .select('*')
+            .eq('email', session.user.email)
+            .single();
+            
+          if (adminError) {
+            console.error("Erro ao verificar permissões de admin após login:", adminError);
+            toast({
+              title: "Erro de permissão",
+              description: "Não foi possível verificar suas permissões de administrador.",
+              variant: "destructive",
+            });
+            setIsAdmin(false);
+          } else {
+            setIsAdmin(!!adminData);
+          }
+        } catch (error) {
+          console.error("Erro ao verificar permissões após login:", error);
+          setIsAdmin(false);
+        }
       }
+    } else {
+      setIsAuthenticated(false);
+      setIsAdmin(false);
     }
-    
-    setIsAuthenticated(success);
   };
 
   const handleLogout = async () => {
-    await supabase.auth.signOut();
-    setIsAuthenticated(false);
-    setIsAdmin(false);
+    try {
+      await supabase.auth.signOut();
+      setIsAuthenticated(false);
+      setIsAdmin(false);
+      toast({
+        title: "Logout realizado com sucesso",
+        description: "Você saiu da área administrativa.",
+      });
+    } catch (error) {
+      console.error("Erro ao realizar logout:", error);
+      toast({
+        title: "Erro ao sair",
+        description: "Não foi possível realizar o logout. Tente novamente.",
+        variant: "destructive",
+      });
+    }
   };
 
   if (isLoading) {
@@ -92,6 +151,26 @@ const Admin = () => {
       <div className="flex flex-col items-center justify-center min-h-screen">
         <Loader2 className="h-8 w-8 animate-spin mb-4" />
         <p>Carregando...</p>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-screen p-4">
+        <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-6 max-w-md w-full text-center">
+          <h2 className="text-xl font-bold text-red-800 dark:text-red-300 mb-3">Erro</h2>
+          <p className="text-red-700 dark:text-red-200 mb-4">
+            {error}
+          </p>
+          <Button 
+            variant="outline" 
+            onClick={() => window.location.reload()} 
+            className="border-red-300 dark:border-red-700 text-red-700 dark:text-red-300 hover:bg-red-100 dark:hover:bg-red-900/40"
+          >
+            Tentar novamente
+          </Button>
+        </div>
       </div>
     );
   }

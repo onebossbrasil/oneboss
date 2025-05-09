@@ -26,6 +26,8 @@ const AdminLogin = ({ onLogin }: AdminLoginProps) => {
     setIsSubmitting(true);
     
     try {
+      console.log("Tentando autenticar com:", { email });
+      
       // Autenticar com Supabase
       const { data, error: authError } = await supabase.auth.signInWithPassword({
         email,
@@ -36,6 +38,12 @@ const AdminLogin = ({ onLogin }: AdminLoginProps) => {
         throw authError;
       }
 
+      if (!data.user || !data.user.email) {
+        throw new Error("Não foi possível obter os dados do usuário.");
+      }
+
+      console.log("Autenticação bem-sucedida, verificando permissões de admin");
+      
       // Verificar se o e-mail está na tabela de permissões
       const { data: adminData, error: adminError } = await supabase
         .from('admin_permissions')
@@ -43,7 +51,14 @@ const AdminLogin = ({ onLogin }: AdminLoginProps) => {
         .eq('email', email)
         .single();
 
-      if (adminError || !adminData) {
+      console.log("Resultado da verificação de admin:", { adminData, adminError });
+
+      if (adminError) {
+        console.error("Erro ao verificar permissões:", adminError);
+        throw new Error("Erro ao verificar permissões de administrador.");
+      }
+
+      if (!adminData) {
         throw new Error("Acesso não autorizado. Você não tem permissões de administrador.");
       }
 
