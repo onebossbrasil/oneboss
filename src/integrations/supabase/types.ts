@@ -9,7 +9,215 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
-      [_ in never]: never
+      categories: {
+        Row: {
+          created_at: string | null
+          id: string
+          name: string
+          value: string
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          name: string
+          value: string
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          name?: string
+          value?: string
+        }
+        Relationships: []
+      }
+      leads: {
+        Row: {
+          created_at: string | null
+          email: string
+          id: string
+          message: string | null
+          name: string
+          phone: string | null
+          product_id: string | null
+          status: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          email: string
+          id?: string
+          message?: string | null
+          name: string
+          phone?: string | null
+          product_id?: string | null
+          status?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          email?: string
+          id?: string
+          message?: string | null
+          name?: string
+          phone?: string | null
+          product_id?: string | null
+          status?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "leads_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      newsletter_subscribers: {
+        Row: {
+          email: string
+          id: string
+          subscribed_at: string | null
+        }
+        Insert: {
+          email: string
+          id?: string
+          subscribed_at?: string | null
+        }
+        Update: {
+          email?: string
+          id?: string
+          subscribed_at?: string | null
+        }
+        Relationships: []
+      }
+      product_images: {
+        Row: {
+          id: string
+          product_id: string | null
+          sort_order: number | null
+          url: string
+        }
+        Insert: {
+          id?: string
+          product_id?: string | null
+          sort_order?: number | null
+          url: string
+        }
+        Update: {
+          id?: string
+          product_id?: string | null
+          sort_order?: number | null
+          url?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "product_images_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      products: {
+        Row: {
+          category_id: string | null
+          created_at: string | null
+          description: string | null
+          featured: boolean | null
+          id: string
+          name: string
+          price: number
+          stock_quantity: number | null
+          subcategory_values: Json | null
+          updated_at: string | null
+        }
+        Insert: {
+          category_id?: string | null
+          created_at?: string | null
+          description?: string | null
+          featured?: boolean | null
+          id?: string
+          name: string
+          price: number
+          stock_quantity?: number | null
+          subcategory_values?: Json | null
+          updated_at?: string | null
+        }
+        Update: {
+          category_id?: string | null
+          created_at?: string | null
+          description?: string | null
+          featured?: boolean | null
+          id?: string
+          name?: string
+          price?: number
+          stock_quantity?: number | null
+          subcategory_values?: Json | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      subcategories: {
+        Row: {
+          category_id: string | null
+          created_at: string | null
+          id: string
+          name: string
+          type: string
+        }
+        Insert: {
+          category_id?: string | null
+          created_at?: string | null
+          id?: string
+          name: string
+          type: string
+        }
+        Update: {
+          category_id?: string | null
+          created_at?: string | null
+          id?: string
+          name?: string
+          type?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "subcategories_category_id_fkey"
+            columns: ["category_id"]
+            isOneToOne: false
+            referencedRelation: "categories"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      subcategory_values: {
+        Row: {
+          created_at: string | null
+          id: string
+          subcategory_id: string | null
+          value: string
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          subcategory_id?: string | null
+          value: string
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          subcategory_id?: string | null
+          value?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "subcategory_values_subcategory_id_fkey"
+            columns: ["subcategory_id"]
+            isOneToOne: false
+            referencedRelation: "subcategories"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never

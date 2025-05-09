@@ -1,5 +1,7 @@
 
 import React, { createContext, useContext, useState, useEffect } from "react";
+import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/hooks/use-toast";
 
 export type SubcategoryType = {
   id: number;
@@ -17,193 +19,353 @@ export type CategoryType = {
 
 type CategoryContextType = {
   categories: CategoryType[];
-  addCategory: (name: string, value: string) => void;
-  removeCategory: (categoryId: number) => void;
-  addSubcategory: (categoryId: number, name: string, type: string) => void;
-  removeSubcategory: (categoryId: number, subcategoryId: number) => void;
-  addSubcategoryValue: (categoryId: number, subcategoryId: number, value: string) => void;
-  removeSubcategoryValue: (categoryId: number, subcategoryId: number, value: string) => void;
+  isLoading: boolean;
+  error: string | null;
+  addCategory: (name: string, value: string) => Promise<void>;
+  removeCategory: (categoryId: number) => Promise<void>;
+  addSubcategory: (categoryId: number, name: string, type: string) => Promise<void>;
+  removeSubcategory: (categoryId: number, subcategoryId: number) => Promise<void>;
+  addSubcategoryValue: (categoryId: number, subcategoryId: number, value: string) => Promise<void>;
+  removeSubcategoryValue: (categoryId: number, subcategoryId: number, value: string) => Promise<void>;
+  refreshCategories: () => Promise<void>;
 };
-
-// Mock data inicial
-const initialCategories: CategoryType[] = [
-  { 
-    id: 1,
-    name: "Automóveis", 
-    value: "automoveis",
-    subcategories: [
-      { id: 1, name: "Marca do Veículo", type: "marca", values: ["BMW", "Mercedes", "Audi", "Ferrari"] },
-      { id: 2, name: "Modelo", type: "modelo", values: ["Sedan", "SUV", "Conversível"] }
-    ]
-  },
-  { 
-    id: 2,
-    name: "Imóveis", 
-    value: "imoveis",
-    subcategories: [
-      { id: 3, name: "Localização", type: "localizacao", values: ["São Paulo", "Rio de Janeiro", "Belo Horizonte"] },
-      { id: 4, name: "Tipo", type: "tipo", values: ["Residencial", "Comercial"] },
-      { id: 5, name: "Modelo", type: "modelo", values: ["Casa", "Apartamento", "Cobertura"] }
-    ]
-  },
-  { 
-    id: 3,
-    name: "Relógios", 
-    value: "relogios",
-    subcategories: [
-      { id: 6, name: "Marcas", type: "marca", values: ["Rolex", "Omega", "Tag Heuer", "Patek Philippe"] }
-    ]
-  },
-  { 
-    id: 4,
-    name: "Decoração", 
-    value: "decoracao",
-    subcategories: [
-      { id: 7, name: "Tipo", type: "tipo", values: ["Quadros", "Esculturas", "Itens de Decoração"] }
-    ]
-  },
-  { 
-    id: 5,
-    name: "Aeronaves", 
-    value: "aeronaves",
-    subcategories: [
-      { id: 8, name: "Marcas", type: "marca", values: ["Cessna", "Embraer", "Bombardier"] },
-      { id: 9, name: "Modelos", type: "modelo", values: ["Bimotor", "Turbo Hélice", "Jato"] }
-    ]
-  },
-  { 
-    id: 6,
-    name: "Embarcações", 
-    value: "embarcacoes",
-    subcategories: [
-      { id: 10, name: "Marcas", type: "marca", values: ["Azimut", "Ferretti", "Intermarine"] },
-      { id: 11, name: "Pés", type: "pes", values: ["30 pés", "40 pés", "50 pés", "60+ pés"] },
-      { id: 12, name: "Modelo", type: "modelo", values: ["Iate", "Lancha", "Barco"] }
-    ]
-  }
-];
 
 const CategoryContext = createContext<CategoryContextType | undefined>(undefined);
 
 export const CategoryProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [categories, setCategories] = useState<CategoryType[]>(() => {
-    // Tenta recuperar do localStorage, se existir
-    const savedCategories = localStorage.getItem("categories");
-    return savedCategories ? JSON.parse(savedCategories) : initialCategories;
-  });
+  const { toast } = useToast();
+  const [categories, setCategories] = useState<CategoryType[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  // Salva qualquer alteração no localStorage
   useEffect(() => {
-    localStorage.setItem("categories", JSON.stringify(categories));
-  }, [categories]);
+    fetchCategories();
+  }, []);
 
-  // Encontra o próximo ID disponível para novas categorias
-  const getNextCategoryId = () => {
-    return Math.max(0, ...categories.map(c => c.id)) + 1;
-  };
+  const fetchCategories = async () => {
+    try {
+      setIsLoading(true);
+      setError(null);
 
-  // Encontra o próximo ID disponível para novas subcategorias
-  const getNextSubcategoryId = () => {
-    return Math.max(0, ...categories.flatMap(c => c.subcategories.map(sc => sc.id))) + 1;
-  };
+      // Fetch categories
+      const { data: categoriesData, error: categoriesError } = await supabase
+        .from('categories')
+        .select('*')
+        .order('name');
 
-  // Adiciona uma nova categoria
-  const addCategory = (name: string, value: string) => {
-    const newCategory: CategoryType = {
-      id: getNextCategoryId(),
-      name,
-      value,
-      subcategories: []
-    };
-    
-    setCategories([...categories, newCategory]);
-  };
+      if (categoriesError) throw categoriesError;
 
-  // Remove uma categoria
-  const removeCategory = (categoryId: number) => {
-    setCategories(categories.filter(cat => cat.id !== categoryId));
-  };
+      // Fetch subcategories
+      const { data: subcategoriesData, error: subcategoriesError } = await supabase
+        .from('subcategories')
+        .select('*')
+        .order('name');
 
-  // Adiciona uma nova subcategoria
-  const addSubcategory = (categoryId: number, name: string, type: string) => {
-    setCategories(categories.map(cat => {
-      if (cat.id === categoryId) {
+      if (subcategoriesError) throw subcategoriesError;
+
+      // Fetch subcategory values
+      const { data: valuesData, error: valuesError } = await supabase
+        .from('subcategory_values')
+        .select('*');
+
+      if (valuesError) throw valuesError;
+
+      // Group subcategories by category
+      const subcategoriesByCategory: Record<string, any[]> = {};
+      subcategoriesData.forEach((subcategory: any) => {
+        if (!subcategoriesByCategory[subcategory.category_id]) {
+          subcategoriesByCategory[subcategory.category_id] = [];
+        }
+        subcategoriesByCategory[subcategory.category_id].push(subcategory);
+      });
+
+      // Group values by subcategory
+      const valuesBySubcategory: Record<string, string[]> = {};
+      valuesData.forEach((value: any) => {
+        if (!valuesBySubcategory[value.subcategory_id]) {
+          valuesBySubcategory[value.subcategory_id] = [];
+        }
+        valuesBySubcategory[value.subcategory_id].push(value.value);
+      });
+
+      // Build complete category objects
+      const formattedCategories: CategoryType[] = categoriesData.map((category: any) => {
+        const categorySubcategories = subcategoriesByCategory[category.id] || [];
+        
         return {
-          ...cat,
-          subcategories: [
-            ...cat.subcategories,
-            { id: getNextSubcategoryId(), name, type, values: [] }
-          ]
+          id: parseInt(category.id.toString(), 10), // Convert UUID to number for compatibility
+          name: category.name,
+          value: category.value,
+          subcategories: categorySubcategories.map((subcategory: any) => ({
+            id: parseInt(subcategory.id.toString(), 10),
+            name: subcategory.name,
+            type: subcategory.type,
+            values: valuesBySubcategory[subcategory.id] || []
+          }))
         };
-      }
-      return cat;
-    }));
+      });
+
+      setCategories(formattedCategories);
+    } catch (err: any) {
+      console.error('Error fetching categories:', err);
+      setError(err.message);
+      toast({
+        title: 'Erro ao carregar categorias',
+        description: err.message,
+        variant: 'destructive',
+      });
+    } finally {
+      setIsLoading(false);
+    }
   };
 
-  // Remove uma subcategoria
-  const removeSubcategory = (categoryId: number, subcategoryId: number) => {
-    setCategories(categories.map(cat => {
-      if (cat.id === categoryId) {
-        return {
-          ...cat,
-          subcategories: cat.subcategories.filter(sc => sc.id !== subcategoryId)
-        };
-      }
-      return cat;
-    }));
+  const addCategory = async (name: string, value: string) => {
+    try {
+      setIsLoading(true);
+      
+      // Insert new category
+      const { data, error } = await supabase
+        .from('categories')
+        .insert({ name, value })
+        .select()
+        .single();
+        
+      if (error) throw error;
+      
+      // Refresh categories
+      await fetchCategories();
+      
+      toast({
+        title: 'Categoria adicionada',
+        description: `${name} foi adicionada com sucesso.`,
+      });
+    } catch (err: any) {
+      console.error('Error adding category:', err);
+      toast({
+        title: 'Erro ao adicionar categoria',
+        description: err.message,
+        variant: 'destructive',
+      });
+    } finally {
+      setIsLoading(false);
+    }
   };
 
-  // Adiciona um valor a uma subcategoria
-  const addSubcategoryValue = (categoryId: number, subcategoryId: number, value: string) => {
-    setCategories(categories.map(cat => {
-      if (cat.id === categoryId) {
-        return {
-          ...cat,
-          subcategories: cat.subcategories.map(sc => {
-            if (sc.id === subcategoryId && !sc.values.includes(value)) {
-              return {
-                ...sc,
-                values: [...sc.values, value]
-              };
-            }
-            return sc;
-          })
-        };
-      }
-      return cat;
-    }));
+  const removeCategory = async (categoryId: number) => {
+    try {
+      setIsLoading(true);
+      
+      // Find the category in our state to get its real UUID
+      const category = categories.find(cat => cat.id === categoryId);
+      if (!category) throw new Error('Categoria não encontrada');
+      
+      // Delete from Supabase (subcategories will be deleted by CASCADE)
+      const { error } = await supabase
+        .from('categories')
+        .delete()
+        .eq('id', category.id.toString());
+        
+      if (error) throw error;
+      
+      // Refresh categories
+      await fetchCategories();
+      
+      toast({
+        title: 'Categoria removida',
+        description: 'A categoria foi removida com sucesso.',
+      });
+    } catch (err: any) {
+      console.error('Error removing category:', err);
+      toast({
+        title: 'Erro ao remover categoria',
+        description: err.message,
+        variant: 'destructive',
+      });
+    } finally {
+      setIsLoading(false);
+    }
   };
 
-  // Remove um valor de uma subcategoria
-  const removeSubcategoryValue = (categoryId: number, subcategoryId: number, value: string) => {
-    setCategories(categories.map(cat => {
-      if (cat.id === categoryId) {
-        return {
-          ...cat,
-          subcategories: cat.subcategories.map(sc => {
-            if (sc.id === subcategoryId) {
-              return {
-                ...sc,
-                values: sc.values.filter(v => v !== value)
-              };
-            }
-            return sc;
-          })
-        };
-      }
-      return cat;
-    }));
+  const addSubcategory = async (categoryId: number, name: string, type: string) => {
+    try {
+      setIsLoading(true);
+      
+      // Find the category in our state to get its real UUID
+      const category = categories.find(cat => cat.id === categoryId);
+      if (!category) throw new Error('Categoria não encontrada');
+      
+      // Insert subcategory
+      const { data, error } = await supabase
+        .from('subcategories')
+        .insert({ 
+          category_id: category.id.toString(),
+          name,
+          type
+        })
+        .select()
+        .single();
+        
+      if (error) throw error;
+      
+      // Refresh categories
+      await fetchCategories();
+      
+      toast({
+        title: 'Subcategoria adicionada',
+        description: `${name} foi adicionada com sucesso.`,
+      });
+    } catch (err: any) {
+      console.error('Error adding subcategory:', err);
+      toast({
+        title: 'Erro ao adicionar subcategoria',
+        description: err.message,
+        variant: 'destructive',
+      });
+    } finally {
+      setIsLoading(false);
+    }
   };
+
+  const removeSubcategory = async (categoryId: number, subcategoryId: number) => {
+    try {
+      setIsLoading(true);
+      
+      // Find the subcategory to get its real UUID
+      const category = categories.find(cat => cat.id === categoryId);
+      if (!category) throw new Error('Categoria não encontrada');
+      
+      const subcategory = category.subcategories.find(sub => sub.id === subcategoryId);
+      if (!subcategory) throw new Error('Subcategoria não encontrada');
+      
+      // Delete from Supabase (values will be deleted by CASCADE)
+      const { error } = await supabase
+        .from('subcategories')
+        .delete()
+        .eq('id', subcategory.id.toString());
+        
+      if (error) throw error;
+      
+      // Refresh categories
+      await fetchCategories();
+      
+      toast({
+        title: 'Subcategoria removida',
+        description: 'A subcategoria foi removida com sucesso.',
+      });
+    } catch (err: any) {
+      console.error('Error removing subcategory:', err);
+      toast({
+        title: 'Erro ao remover subcategoria',
+        description: err.message,
+        variant: 'destructive',
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const addSubcategoryValue = async (categoryId: number, subcategoryId: number, value: string) => {
+    try {
+      setIsLoading(true);
+      
+      // Find the subcategory to get its real UUID
+      const category = categories.find(cat => cat.id === categoryId);
+      if (!category) throw new Error('Categoria não encontrada');
+      
+      const subcategory = category.subcategories.find(sub => sub.id === subcategoryId);
+      if (!subcategory) throw new Error('Subcategoria não encontrada');
+      
+      // Insert value
+      const { error } = await supabase
+        .from('subcategory_values')
+        .insert({ 
+          subcategory_id: subcategory.id.toString(),
+          value
+        });
+        
+      if (error) throw error;
+      
+      // Refresh categories
+      await fetchCategories();
+      
+      toast({
+        title: 'Valor adicionado',
+        description: `${value} foi adicionado com sucesso.`,
+      });
+    } catch (err: any) {
+      console.error('Error adding subcategory value:', err);
+      toast({
+        title: 'Erro ao adicionar valor',
+        description: err.message,
+        variant: 'destructive',
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const removeSubcategoryValue = async (categoryId: number, subcategoryId: number, value: string) => {
+    try {
+      setIsLoading(true);
+      
+      // Find the subcategory to get its real UUID
+      const category = categories.find(cat => cat.id === categoryId);
+      if (!category) throw new Error('Categoria não encontrada');
+      
+      const subcategory = category.subcategories.find(sub => sub.id === subcategoryId);
+      if (!subcategory) throw new Error('Subcategoria não encontrada');
+      
+      // Delete value - we need to find it first by querying
+      const { data: valueData, error: findError } = await supabase
+        .from('subcategory_values')
+        .select('id')
+        .eq('subcategory_id', subcategory.id.toString())
+        .eq('value', value)
+        .single();
+        
+      if (findError) throw findError;
+      if (!valueData) throw new Error('Valor não encontrado');
+      
+      const { error } = await supabase
+        .from('subcategory_values')
+        .delete()
+        .eq('id', valueData.id);
+        
+      if (error) throw error;
+      
+      // Refresh categories
+      await fetchCategories();
+      
+      toast({
+        title: 'Valor removido',
+        description: `${value} foi removido com sucesso.`,
+      });
+    } catch (err: any) {
+      console.error('Error removing subcategory value:', err);
+      toast({
+        title: 'Erro ao remover valor',
+        description: err.message,
+        variant: 'destructive',
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const refreshCategories = () => fetchCategories();
 
   return (
     <CategoryContext.Provider value={{
       categories,
+      isLoading,
+      error,
       addCategory,
       removeCategory,
       addSubcategory,
       removeSubcategory,
       addSubcategoryValue,
-      removeSubcategoryValue
+      removeSubcategoryValue,
+      refreshCategories
     }}>
       {children}
     </CategoryContext.Provider>

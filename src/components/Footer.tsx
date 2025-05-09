@@ -1,131 +1,90 @@
 
 import { Link } from "react-router-dom";
-import { Facebook, Twitter, Instagram, Mail } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { toast } from "sonner";
+import { Phone, Mail, Instagram, Facebook, Twitter } from "lucide-react";
+import NewsletterSignup from "./NewsletterSignup";
 
 const Footer = () => {
-  const handleNewsletterSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    const form = e.target as HTMLFormElement;
-    const email = (form.elements.namedItem("email") as HTMLInputElement).value;
-    
-    // Validate email
-    if (!email || !email.includes('@')) {
-      toast.error("Por favor, informe um email válido.");
-      return;
-    }
-    
-    toast.success("Obrigado por se inscrever em nossa newsletter!");
-    form.reset();
-  };
-
   return (
-    <footer className="bg-secondary text-white">
-      <div className="container mx-auto px-4 py-12 md:py-16">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10">
-          {/* Logo and About */}
+    <footer className="bg-zinc-900 text-white">
+      {/* Newsletter Section */}
+      <div className="bg-gold/80 py-12">
+        <div className="container mx-auto px-4 text-center">
+          <h3 className="font-playfair text-2xl md:text-3xl font-semibold mb-4">
+            Junte-se à Nossa Newsletter
+          </h3>
+          <p className="text-zinc-800 mb-6 max-w-2xl mx-auto">
+            Receba ofertas exclusivas, lançamentos antecipados e acesso a produtos limitados diretamente no seu email.
+          </p>
+          <div className="flex justify-center">
+            <NewsletterSignup />
+          </div>
+        </div>
+      </div>
+
+      {/* Main Footer */}
+      <div className="container mx-auto px-4 py-12">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+          {/* Brand Section */}
           <div>
-            <Link to="/" className="inline-block mb-4">
-              <img 
-                src="/lovable-uploads/cc202675-942c-4f4f-9e0c-0ba81e060e33.png" 
-                alt="ONE BOSS Luxury Marketplace" 
-                className="h-10 md:h-12"
-              />
-            </Link>
-            <p className="text-white/70 mb-4">
-              Seu marketplace de itens exclusivos e ultra premium para quem busca o extraordinário.
+            <h4 className="font-playfair text-xl font-semibold text-gold mb-4">One Boss</h4>
+            <p className="text-zinc-400 mb-6">
+              O marketplace para quem busca exclusividade e excelência em produtos premium.
             </p>
             <div className="flex space-x-4">
-              <a href="#" className="text-white/60 hover:text-gold transition-colors">
-                <Facebook size={20} />
-              </a>
-              <a href="#" className="text-white/60 hover:text-gold transition-colors">
-                <Twitter size={20} />
-              </a>
-              <a href="#" className="text-white/60 hover:text-gold transition-colors">
+              <a href="#" className="text-zinc-400 hover:text-gold">
                 <Instagram size={20} />
               </a>
-              <a href="#" className="text-white/60 hover:text-gold transition-colors">
-                <Mail size={20} />
+              <a href="#" className="text-zinc-400 hover:text-gold">
+                <Facebook size={20} />
+              </a>
+              <a href="#" className="text-zinc-400 hover:text-gold">
+                <Twitter size={20} />
               </a>
             </div>
           </div>
 
-          {/* Links */}
+          {/* Quick Links */}
           <div>
-            <h3 className="font-playfair font-semibold text-lg mb-4">Links Rápidos</h3>
+            <h4 className="font-playfair text-lg font-semibold text-gold mb-4">Links Rápidos</h4>
             <ul className="space-y-2">
-              <li>
-                <Link to="/" className="text-white/70 hover:text-gold transition-colors">Home</Link>
-              </li>
-              <li>
-                <Link to="/categories" className="text-white/70 hover:text-gold transition-colors">Categorias</Link>
-              </li>
-              <li>
-                <Link to="/about" className="text-white/70 hover:text-gold transition-colors">Sobre Nós</Link>
-              </li>
-              <li>
-                <Link to="/contact" className="text-white/70 hover:text-gold transition-colors">Contato</Link>
-              </li>
+              <li><Link to="/" className="text-zinc-400 hover:text-white">Home</Link></li>
+              <li><Link to="/loja" className="text-zinc-400 hover:text-white">Produtos</Link></li>
+              <li><Link to="/sobre" className="text-zinc-400 hover:text-white">Sobre Nós</Link></li>
+              <li><Link to="/contato" className="text-zinc-400 hover:text-white">Contato</Link></li>
             </ul>
           </div>
 
           {/* Categories */}
           <div>
-            <h3 className="font-playfair font-semibold text-lg mb-4">Categorias</h3>
+            <h4 className="font-playfair text-lg font-semibold text-gold mb-4">Categorias</h4>
             <ul className="space-y-2">
-              <li>
-                <Link to="/categories/automoveis" className="text-white/70 hover:text-gold transition-colors">Automóveis</Link>
-              </li>
-              <li>
-                <Link to="/categories/imoveis" className="text-white/70 hover:text-gold transition-colors">Imóveis</Link>
-              </li>
-              <li>
-                <Link to="/categories/embarcacoes" className="text-white/70 hover:text-gold transition-colors">Embarcações</Link>
-              </li>
-              <li>
-                <Link to="/categories/relogios" className="text-white/70 hover:text-gold transition-colors">Relógios</Link>
-              </li>
-              <li>
-                <Link to="/categories/decoracao" className="text-white/70 hover:text-gold transition-colors">Decoração</Link>
-              </li>
+              <li><Link to="/loja?categoria=imoveis" className="text-zinc-400 hover:text-white">Imóveis</Link></li>
+              <li><Link to="/loja?categoria=automoveis" className="text-zinc-400 hover:text-white">Automóveis</Link></li>
+              <li><Link to="/loja?categoria=embarcacoes" className="text-zinc-400 hover:text-white">Embarcações</Link></li>
+              <li><Link to="/loja?categoria=relogios" className="text-zinc-400 hover:text-white">Relógios</Link></li>
+              <li><Link to="/loja?categoria=decoracao" className="text-zinc-400 hover:text-white">Decoração</Link></li>
             </ul>
           </div>
 
-          {/* Newsletter */}
+          {/* Contact */}
           <div>
-            <h3 className="font-playfair font-semibold text-lg mb-4">Newsletter</h3>
-            <p className="text-white/70 mb-4">
-              Receba lançamentos exclusivos e novidades em primeira mão.
-            </p>
-            <form onSubmit={handleNewsletterSubmit} className="space-y-3">
-              <Input 
-                type="email" 
-                name="email"
-                placeholder="Seu email" 
-                className="bg-secondary-foreground/10 border-secondary-foreground/20 text-white placeholder:text-white/40"
-                required
-              />
-              <Button 
-                type="submit" 
-                className="w-full bg-gold hover:bg-gold-light text-white"
-              >
-                Inscrever-se
-              </Button>
-            </form>
+            <h4 className="font-playfair text-lg font-semibold text-gold mb-4">Entre em Contato</h4>
+            <div className="space-y-3">
+              <div className="flex items-center">
+                <Phone size={18} className="text-gold mr-3" />
+                <span className="text-zinc-400">+55 (11) 99999-9999</span>
+              </div>
+              <div className="flex items-center">
+                <Mail size={18} className="text-gold mr-3" />
+                <span className="text-zinc-400">contato@oneboss.com</span>
+              </div>
+            </div>
           </div>
         </div>
 
-        <div className="border-t border-white/10 mt-10 pt-6 flex flex-col md:flex-row justify-between items-center">
-          <p className="text-white/60 text-sm">
-            &copy; {new Date().getFullYear()} ONE✦BOSS Luxury Marketplace. Todos os direitos reservados.
-          </p>
-          <div className="mt-4 md:mt-0 flex space-x-4 text-sm text-white/60">
-            <Link to="/terms" className="hover:text-gold transition-colors">Termos de Uso</Link>
-            <Link to="/privacy" className="hover:text-gold transition-colors">Política de Privacidade</Link>
-          </div>
+        {/* Copyright */}
+        <div className="border-t border-zinc-800 mt-12 pt-6 text-center text-zinc-500 text-sm">
+          <p>© 2025 One Boss. Todos os direitos reservados.</p>
         </div>
       </div>
     </footer>

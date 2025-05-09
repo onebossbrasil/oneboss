@@ -10,6 +10,7 @@ import CsvPreviewTable from "./CsvPreviewTable";
 import CsvColumnMapper from "./CsvColumnMapper";
 import { useCategories } from "@/contexts/CategoryContext";
 import { Table, TableHeader, TableRow, TableHead, TableBody, TableCell } from "@/components/ui/table";
+import { supabase } from "@/integrations/supabase/client";
 
 interface ImportedProduct {
   name: string;
@@ -19,6 +20,7 @@ interface ImportedProduct {
   subcategories?: string;
   featured: boolean;
   images: string[];
+  stockQuantity: number;
 }
 
 interface ParsedCsvRow {
@@ -38,6 +40,7 @@ const CsvImporter = () => {
   const [importedProducts, setImportedProducts] = useState<ImportedProduct[]>([]);
   const [errors, setErrors] = useState<string[]>([]);
   const [success, setSuccess] = useState(false);
+  const [isImporting, setIsImporting] = useState(false);
 
   const handleCsvUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     setPreviewMode(false);
@@ -68,6 +71,7 @@ const CsvImporter = () => {
               else if (lowerHeader.includes('subcateg')) initialMapping[header] = 'subcategories';
               else if (lowerHeader.includes('destaque') || lowerHeader.includes('featured')) initialMapping[header] = 'featured';
               else if (lowerHeader.includes('imag') || lowerHeader.includes('image')) initialMapping[header] = 'images';
+              else if (lowerHeader.includes('estoque') || lowerHeader.includes('stock')) initialMapping[header] = 'stockQuantity';
             });
             setMapping(initialMapping);
             
@@ -111,7 +115,8 @@ const CsvImporter = () => {
           category: '',
           subcategories: '',
           featured: false,
-          images: []
+          images: [],
+          stockQuantity: 0
         };
         
         // Map fields according to user's mapping
@@ -125,6 +130,9 @@ const CsvImporter = () => {
           else if (productField === 'images') {
             const imageUrls = row[csvHeader]?.split('|').filter(url => url.trim() !== '');
             product.images = imageUrls || [];
+          }
+          else if (productField === 'stockQuantity') {
+            product.stockQuantity = parseInt(row[csvHeader], 10) || 0;
           }
         });
         
@@ -156,29 +164,109 @@ const CsvImporter = () => {
     setPreviewMode(true);
   };
   
-  const processImport = () => {
-    // In a real application, this would save to a database
-    // For now, we'll just show a success message
-    
+  const processImport = async () => {
     if (importedProducts.length === 0) {
       setErrors(['Nenhum produto válido para importar']);
       return;
     }
     
-    // Simulate successful import
-    toast({
-      title: `${importedProducts.length} produtos importados com sucesso`,
-      description: "Os produtos foram cadastrados e já estão disponíveis na loja.",
-    });
+    setIsImporting(true);
     
-    setSuccess(true);
-    setFile(null);
-    setImageFile(null);
-    setParsedData([]);
-    setHeaders([]);
-    setMapping({});
-    setPreviewMode(false);
-    setImportedProducts([]);
+    try {
+      // Process each product
+      let successCount = 0;
+      let errorCount = 0;
+      
+      for (const product of importedProducts) {
+        try {
+          // Find category ID
+          const categoryObj = categories.find(c => 
+            c.name.toLowerCase() === product.category.toLowerCase()
+          );
+          
+          // Parse price - convert string to number
+          const priceStr = product.price.replace(/[^\d.,]/g, '').replace(',', '.');
+          const price = parseFloat(priceStr);
+          
+          if (!categoryObj || isNaN(price)) {
+            errorCount++;
+            continue;
+          }
+          
+          // Parse subcategories if present
+          const subcategoryValues: Record<string, string> = {};
+          if (product.subcategories) {
+            const subcatEntries = product.subcategories.split(';');
+            subcatEntries.forEach(entry => {
+              const [type, value] = entry.split(':');
+              if (type && value) {
+                subcategoryValues[type.trim()] = value.trim();
+              }
+            });
+          }
+          
+          // Insert product into Supabase
+          const { data: newProduct, error } = await supabase
+            .from('products')
+            .insert({
+              name: product.name,
+              description: product.description,
+              price,
+              category_id: categoryObj.id.toString(),
+              subcategory_values: subcategoryValues,
+              featured: product.featured,
+              stock_quantity: product.stockQuantity
+            })
+            .select()
+            .single();
+            
+          if (error) throw error;
+          
+          // Insert images if any
+          if (product.images.length > 0) {
+            const imageInserts = product.images.map((imageUrl, index) => ({
+              product_id: newProduct.id,
+              url: imageUrl,
+              sort_order: index
+            }));
+            
+            const { error: imageError } = await supabase
+              .from('product_images')
+              .insert(imageInserts);
+              
+            if (imageError) throw imageError;
+          }
+          
+          successCount++;
+        } catch (err) {
+          console.error(`Error importing product ${product.name}:`, err);
+          errorCount++;
+        }
+      }
+      
+      toast({
+        title: `Importação concluída`,
+        description: `${successCount} produtos importados com sucesso. ${errorCount} falhas.`,
+      });
+      
+      setSuccess(true);
+    } catch (error) {
+      console.error("Import error:", error);
+      toast({
+        title: "Erro na importação",
+        description: "Ocorreu um erro ao importar os produtos.",
+        variant: "destructive"
+      });
+    } finally {
+      setIsImporting(false);
+      setFile(null);
+      setImageFile(null);
+      setParsedData([]);
+      setHeaders([]);
+      setMapping({});
+      setPreviewMode(false);
+      setImportedProducts([]);
+    }
   };
   
   return (

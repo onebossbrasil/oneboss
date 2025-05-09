@@ -9,6 +9,9 @@ import Store from "./pages/Store";
 import Admin from "./pages/Admin";
 import NotFound from "./pages/NotFound";
 import { CategoryProvider } from "./contexts/CategoryContext";
+import { ProductProvider } from "./contexts/ProductContext";
+import { LeadProvider } from "./contexts/LeadContext";
+import { NewsletterProvider } from "./contexts/NewsletterContext";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -23,17 +26,23 @@ const App = () => (
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>
       <CategoryProvider>
-        <Toaster />
-        <Sonner />
-        <BrowserRouter>
-          <Routes>
-            <Route path="/" element={<Index />} />
-            <Route path="/loja" element={<Store />} />
-            <Route path="/admin" element={<Admin />} />
-            {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-            <Route path="*" element={<NotFound />} />
-          </Routes>
-        </BrowserRouter>
+        <ProductProvider>
+          <LeadProvider>
+            <NewsletterProvider>
+              <Toaster />
+              <Sonner />
+              <BrowserRouter>
+                <Routes>
+                  <Route path="/" element={<Index />} />
+                  <Route path="/loja" element={<Store />} />
+                  <Route path="/admin" element={<Admin />} />
+                  {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+                  <Route path="*" element={<NotFound />} />
+                </Routes>
+              </BrowserRouter>
+            </NewsletterProvider>
+          </LeadProvider>
+        </ProductProvider>
       </CategoryProvider>
     </TooltipProvider>
   </QueryClientProvider>

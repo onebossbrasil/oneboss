@@ -8,100 +8,22 @@ import SearchBar from "@/components/store/SearchBar";
 import FilterSidebar from "@/components/store/FilterSidebar";
 import ResultsHeader from "@/components/store/ResultsHeader";
 import ProductGrid from "@/components/store/ProductGrid";
-
-// Produtos simulados
-const productsData = [
-  {
-    id: 1,
-    name: "Mansão Beira-Mar",
-    description: "Propriedade exclusiva com vista panorâmica para o mar",
-    price: "R$ 12.500.000",
-    category: "imoveis",
-    subcategory: "Mansões",
-    imageUrl: "https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?auto=format&fit=crop&q=80&w=600&h=400",
-    featured: true,
-  },
-  {
-    id: 2,
-    name: "Porsche 911 Turbo S",
-    description: "Motor 3.8, 650cv, 0-100 em 2.7s",
-    price: "R$ 1.850.000",
-    category: "automoveis",
-    subcategory: "Esportivos",
-    imageUrl: "https://images.unsplash.com/photo-1503376780353-7e6692767b70?auto=format&fit=crop&q=80&w=600&h=400",
-    featured: true,
-  },
-  {
-    id: 3,
-    name: "Iate Azimut 80",
-    description: "Embarcação de luxo com 25 metros, 4 cabines",
-    price: "R$ 8.200.000",
-    category: "embarcacoes",
-    subcategory: "Iates",
-    imageUrl: "https://images.unsplash.com/photo-1567899378494-47b22a2ae96a?auto=format&fit=crop&q=80&w=600&h=400",
-    featured: false,
-  },
-  {
-    id: 4,
-    name: "Rolex Daytona",
-    description: "Relógio automático em ouro branco, edição limitada",
-    price: "R$ 180.000",
-    category: "relogios",
-    subcategory: "Edição Limitada",
-    imageUrl: "https://images.unsplash.com/photo-1523170335258-f5ed11844a49?auto=format&fit=crop&q=80&w=600&h=400",
-    featured: true,
-  },
-  {
-    id: 5,
-    name: "Escultura Exclusiva",
-    description: "Peça única em bronze assinada por artista renomado",
-    price: "R$ 95.000",
-    category: "decoracao",
-    subcategory: "Esculturas",
-    imageUrl: "https://images.unsplash.com/photo-1513519245088-0e12902d1aae?auto=format&fit=crop&q=80&w=600&h=400",
-    featured: false,
-  },
-  {
-    id: 6,
-    name: "Helicóptero Bell 429",
-    description: "Aeronave executiva para 7 passageiros",
-    price: "R$ 5.700.000",
-    category: "aeronaves",
-    subcategory: "Helicópteros",
-    imageUrl: "https://images.unsplash.com/photo-1540962351504-03099e0a754b?auto=format&fit=crop&q=80&w=600&h=400",
-    featured: false,
-  },
-  {
-    id: 7,
-    name: "Cobertura Duplex",
-    description: "400m², 4 suítes, piscina e vista panorâmica",
-    price: "R$ 7.200.000",
-    category: "imoveis",
-    subcategory: "Coberturas",
-    imageUrl: "https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?auto=format&fit=crop&q=80&w=600&h=400",
-    featured: false,
-  },
-  {
-    id: 8,
-    name: "Ferrari 812 Superfast",
-    description: "V12, 800cv, versão exclusiva",
-    price: "R$ 4.500.000",
-    category: "automoveis",
-    subcategory: "Esportivos",
-    imageUrl: "https://images.unsplash.com/photo-1592198084033-aade902d1aae?auto=format&fit=crop&q=80&w=600&h=400",
-    featured: true,
-  },
-];
+import { useProducts } from "@/contexts/ProductContext";
+import { useCategories } from "@/contexts/CategoryContext";
 
 const Store = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [selectedSubcategories, setSelectedSubcategories] = useState<string[]>([]);
-  const [filteredProducts, setFilteredProducts] = useState(productsData);
   const [searchQuery, setSearchQuery] = useState("");
   const [isMobileFiltersOpen, setIsMobileFiltersOpen] = useState(false);
   
-  // Inicializar o filtro com a categoria da URL, se houver
+  const { products, isLoading } = useProducts();
+  const { categories } = useCategories();
+  
+  const [filteredProducts, setFilteredProducts] = useState(products);
+  
+  // Initialize the filter with the category from the URL, if any
   useEffect(() => {
     const categoryFromUrl = searchParams.get("categoria");
     if (categoryFromUrl) {
@@ -109,11 +31,11 @@ const Store = () => {
     }
   }, [searchParams]);
   
-  // Filtrar produtos quando os filtros mudarem
+  // Filter products when the filters change
   useEffect(() => {
-    let result = productsData;
+    let result = products;
     
-    // Filtrar por pesquisa
+    // Filter by search
     if (searchQuery) {
       const query = searchQuery.toLowerCase();
       result = result.filter(product => 
@@ -122,20 +44,30 @@ const Store = () => {
       );
     }
     
-    // Filtrar por categoria
+    // Filter by category
     if (selectedCategory) {
-      result = result.filter(product => product.category === selectedCategory);
+      const category = categories.find(cat => cat.value === selectedCategory);
+      if (category) {
+        result = result.filter(product => product.categoryId === category.id.toString());
+      }
     }
     
-    // Filtrar por subcategorias
+    // Filter by subcategories
     if (selectedSubcategories.length > 0) {
-      result = result.filter(product => selectedSubcategories.includes(product.subcategory));
+      result = result.filter(product => {
+        if (!product.subcategoryValues) return false;
+        
+        // Check if any of the product's subcategory values match the selected subcategories
+        return Object.values(product.subcategoryValues).some(value => 
+          selectedSubcategories.includes(value)
+        );
+      });
     }
     
     setFilteredProducts(result);
-  }, [selectedCategory, selectedSubcategories, searchQuery]);
+  }, [selectedCategory, selectedSubcategories, searchQuery, products, categories]);
   
-  // Alternar subcategoria
+  // Toggle subcategory
   const toggleSubcategory = (subcategory: string) => {
     if (selectedSubcategories.includes(subcategory)) {
       setSelectedSubcategories(selectedSubcategories.filter(s => s !== subcategory));
@@ -144,13 +76,13 @@ const Store = () => {
     }
   };
   
-  // Selecionar categoria
+  // Select category
   const handleCategorySelect = (categoryId: string) => {
     const newCategory = categoryId === selectedCategory ? null : categoryId;
     setSelectedCategory(newCategory);
     setSelectedSubcategories([]);
     
-    // Atualizar URL
+    // Update URL
     if (newCategory) {
       searchParams.set("categoria", newCategory);
     } else {
@@ -167,6 +99,20 @@ const Store = () => {
     searchParams.delete("categoria");
     setSearchParams(searchParams);
   };
+  
+  // Convert products to the format expected by ProductGrid
+  const formattedProducts = filteredProducts.map(product => ({
+    id: product.id,
+    name: product.name,
+    description: product.description,
+    price: typeof product.price === 'number' 
+      ? new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(product.price)
+      : product.price.toString(),
+    category: categories.find(cat => cat.id.toString() === product.categoryId)?.name || '',
+    subcategory: Object.values(product.subcategoryValues || {}).join(', '),
+    imageUrl: product.images.length > 0 ? product.images[0].url : 'https://images.unsplash.com/photo-1567899378494-47b22a2ae96a?auto=format&fit=crop&q=80&w=600&h=400',
+    featured: product.featured,
+  }));
   
   return (
     <div className="min-h-screen flex flex-col">
@@ -199,13 +145,20 @@ const Store = () => {
             {/* Grid de produtos */}
             <div className="flex-grow">
               {/* Contador de resultados e ordenação */}
-              <ResultsHeader productCount={filteredProducts.length} />
+              <ResultsHeader productCount={formattedProducts.length} />
               
               {/* Exibição dos produtos filtrados */}
-              <ProductGrid 
-                products={filteredProducts} 
-                resetFilters={resetFilters}
-              />
+              {isLoading ? (
+                <div className="text-center py-12">
+                  <div className="animate-spin h-8 w-8 border-4 border-primary border-t-transparent rounded-full mx-auto"></div>
+                  <p className="mt-4 text-muted-foreground">Carregando produtos...</p>
+                </div>
+              ) : (
+                <ProductGrid 
+                  products={formattedProducts} 
+                  resetFilters={resetFilters}
+                />
+              )}
             </div>
           </div>
         </div>
