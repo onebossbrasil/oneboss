@@ -5,6 +5,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
 import ProductForm from "./ProductForm";
 import CategoryManager from "./CategoryManager";
+import CsvImporter from "./products/CsvImporter";
 import { LogOut } from "lucide-react";
 
 interface AdminDashboardProps {
@@ -46,13 +47,18 @@ const AdminDashboard = ({ onLogout }: AdminDashboardProps) => {
           onValueChange={setActiveTab} 
           className="space-y-6"
         >
-          <TabsList className="grid grid-cols-2 w-full max-w-md">
+          <TabsList className="grid grid-cols-3 w-full max-w-md">
             <TabsTrigger value="produtos">Gerenciar Produtos</TabsTrigger>
+            <TabsTrigger value="importar">Importar Produtos</TabsTrigger>
             <TabsTrigger value="categorias">Gerenciar Categorias</TabsTrigger>
           </TabsList>
           
           <TabsContent value="produtos" className="space-y-4">
             <ProductForm />
+          </TabsContent>
+          
+          <TabsContent value="importar" className="space-y-4">
+            <CsvImporter />
           </TabsContent>
           
           <TabsContent value="categorias" className="space-y-4">
