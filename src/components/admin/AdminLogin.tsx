@@ -20,8 +20,8 @@ const AdminLogin = ({ onLogin }: AdminLoginProps) => {
     e.preventDefault();
     
     // In a real application, this would be a proper authentication check against a backend
-    // For this demo, we're using hardcoded credentials
-    if (username === "admin" && password === "admin123") {
+    // For this demo, we're using the specific credentials as requested
+    if (username === "admin" && password === "Isa251212") {
       onLogin(true);
       toast({
         title: "Login realizado com sucesso",
