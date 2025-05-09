@@ -1,5 +1,6 @@
 
 import { ImportedProduct, ParsedCsvRow } from "@/types/csv";
+import { CategoryType } from "@/contexts/CategoryContext";
 
 /**
  * Parses CSV data into rows and headers
@@ -100,7 +101,7 @@ export const mapRowsToProducts = (parsedData: ParsedCsvRow[], mapping: Record<st
 /**
  * Validates product data for required fields and data integrity
  */
-export const validateProducts = (products: ImportedProduct[], categories: Array<{ name: string; id: string }>): string[] => {
+export const validateProducts = (products: ImportedProduct[], categories: CategoryType[]): string[] => {
   const validationErrors: string[] = [];
   
   products.forEach((product, index) => {
