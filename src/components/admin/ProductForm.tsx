@@ -3,12 +3,13 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
-import { Upload } from "lucide-react";
+import { Upload, ChevronDown, ChevronUp } from "lucide-react";
 import ProductDetailsForm from "./products/ProductDetailsForm";
 import CategorySelector from "./products/CategorySelector";
 import ImageUpload from "./products/ImageUpload";
 import ProductList from "./products/ProductList";
 import { useProducts } from "@/contexts/ProductContext";
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 
 const ProductForm = () => {
   const { toast } = useToast();
@@ -17,11 +18,15 @@ const ProductForm = () => {
   const [imagePreviewUrls, setImagePreviewUrls] = useState<string[]>([]);
   const [selectedCategory, setSelectedCategory] = useState("");
   const [subcategoryValues, setSubcategoryValues] = useState<Record<string, string>>({});
+  const [isOpen, setIsOpen] = useState(false);
   const [formData, setFormData] = useState({
     name: "",
+    shortDescription: "",
     description: "",
     price: "",
+    salePrice: "",
     stockQuantity: "1",
+    published: true,
     featured: false
   });
   
@@ -93,6 +98,20 @@ const ProductForm = () => {
         return;
       }
       
+      // Convert sale price to a number if provided
+      let salePrice = undefined;
+      if (formData.salePrice) {
+        salePrice = parseFloat(formData.salePrice.replace(/[^\d,.-]/g, '').replace(',', '.'));
+        if (isNaN(salePrice)) {
+          toast({
+            title: "Preço promocional inválido",
+            description: "Por favor, insira um preço promocional válido.",
+            variant: "destructive"
+          });
+          return;
+        }
+      }
+      
       // Convert stock quantity to a number
       const stockQuantity = parseInt(formData.stockQuantity, 10);
       if (isNaN(stockQuantity)) {
@@ -107,10 +126,13 @@ const ProductForm = () => {
       // Prepare product data
       const productData = {
         name: formData.name,
+        shortDescription: formData.shortDescription || null,
         description: formData.description,
         price,
+        salePrice: salePrice || null,
         categoryId: selectedCategory,
         subcategoryValues,
+        published: formData.published,
         featured: formData.featured,
         stockQuantity,
         images: [] // Will be added during creation
@@ -122,15 +144,19 @@ const ProductForm = () => {
       // Reset form
       setFormData({
         name: "",
+        shortDescription: "",
         description: "",
         price: "",
+        salePrice: "",
         stockQuantity: "1",
+        published: true,
         featured: false
       });
       setSelectedCategory("");
       setSubcategoryValues({});
       setImages([]);
       setImagePreviewUrls([]);
+      setIsOpen(false);
     } catch (error) {
       console.error("Error saving product:", error);
       toast({
@@ -143,41 +169,53 @@ const ProductForm = () => {
   
   return (
     <div className="space-y-6">
-      <Card>
-        <CardContent className="pt-6">
-          <form onSubmit={handleSubmit} className="space-y-6">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div className="space-y-4">
-                <ProductDetailsForm 
-                  formData={formData}
-                  onChange={handleFormChange}
-                />
+      <Collapsible
+        open={isOpen}
+        onOpenChange={setIsOpen}
+        className="border rounded-lg shadow-sm"
+      >
+        <CollapsibleTrigger asChild>
+          <Button variant="ghost" className="flex w-full justify-between p-4">
+            <span className="text-lg font-medium">Cadastrar Novo Produto</span>
+            {isOpen ? <ChevronUp className="h-5 w-5" /> : <ChevronDown className="h-5 w-5" />}
+          </Button>
+        </CollapsibleTrigger>
+        <CollapsibleContent>
+          <CardContent className="pt-0">
+            <form onSubmit={handleSubmit} className="space-y-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="space-y-4">
+                  <ProductDetailsForm 
+                    formData={formData}
+                    onChange={handleFormChange}
+                  />
+                  
+                  <CategorySelector
+                    selectedCategory={selectedCategory}
+                    subcategoryValues={subcategoryValues}
+                    onCategoryChange={handleCategoryChange}
+                    onSubcategoryChange={handleSubcategoryChange}
+                  />
+                </div>
                 
-                <CategorySelector
-                  selectedCategory={selectedCategory}
-                  subcategoryValues={subcategoryValues}
-                  onCategoryChange={handleCategoryChange}
-                  onSubcategoryChange={handleSubcategoryChange}
-                />
+                <div className="space-y-4">
+                  <ImageUpload
+                    images={images}
+                    imagePreviewUrls={imagePreviewUrls}
+                    handleImageChange={handleImageChange}
+                    handleRemoveImage={handleRemoveImage}
+                  />
+                </div>
               </div>
               
-              <div className="space-y-4">
-                <ImageUpload
-                  images={images}
-                  imagePreviewUrls={imagePreviewUrls}
-                  handleImageChange={handleImageChange}
-                  handleRemoveImage={handleRemoveImage}
-                />
-              </div>
-            </div>
-            
-            <Button type="submit" className="w-full md:w-auto">
-              <Upload className="mr-2 h-4 w-4" />
-              Cadastrar Produto
-            </Button>
-          </form>
-        </CardContent>
-      </Card>
+              <Button type="submit" className="w-full md:w-auto">
+                <Upload className="mr-2 h-4 w-4" />
+                Cadastrar Produto
+              </Button>
+            </form>
+          </CardContent>
+        </CollapsibleContent>
+      </Collapsible>
       
       <ProductList />
     </div>

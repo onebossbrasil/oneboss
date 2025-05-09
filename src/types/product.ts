@@ -8,10 +8,13 @@ export type ProductImage = {
 export type Product = {
   id: string;
   name: string;
+  shortDescription?: string;
   description: string;
   price: number;
+  salePrice?: number | null;
   categoryId: string | null;
   subcategoryValues: Record<string, string>;
+  published: boolean;
   featured: boolean;
   stockQuantity: number;
   images: ProductImage[];

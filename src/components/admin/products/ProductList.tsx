@@ -34,9 +34,12 @@ export default function ProductList() {
   const [subcategoryValues, setSubcategoryValues] = useState<Record<string, string>>({});
   const [formData, setFormData] = useState({
     name: "",
+    shortDescription: "",
     description: "",
     price: "",
+    salePrice: "",
     stockQuantity: "1",
+    published: true,
     featured: false
   });
   const [dialogOpen, setDialogOpen] = useState(false);
@@ -45,9 +48,12 @@ export default function ProductList() {
     setSelectedProduct(product);
     setFormData({
       name: product.name,
+      shortDescription: product.shortDescription || "",
       description: product.description,
       price: product.price.toString(),
+      salePrice: product.salePrice ? product.salePrice.toString() : "",
       stockQuantity: product.stockQuantity.toString(),
+      published: product.published,
       featured: product.featured
     });
     setSelectedCategory(product.categoryId || "");
@@ -61,12 +67,12 @@ export default function ProductList() {
     try {
       await updateProduct(product.id, {
         ...product,
-        featured: !product.featured
+        published: !product.published
       });
       
       toast({
-        title: product.featured ? "Produto ocultado" : "Produto destacado",
-        description: `${product.name} ${product.featured ? "não será exibido" : "será exibido"} na loja.`
+        title: product.published ? "Produto ocultado" : "Produto publicado",
+        description: `${product.name} ${product.published ? "não será exibido" : "será exibido"} na loja.`
       });
     } catch (error) {
       console.error("Error toggling product visibility:", error);
@@ -145,6 +151,20 @@ export default function ProductList() {
         return;
       }
       
+      // Convert sale price to a number if provided
+      let salePrice = undefined;
+      if (formData.salePrice) {
+        salePrice = parseFloat(formData.salePrice.replace(/[^\d,.-]/g, '').replace(',', '.'));
+        if (isNaN(salePrice)) {
+          toast({
+            title: "Preço promocional inválido",
+            description: "Por favor, insira um preço promocional válido.",
+            variant: "destructive"
+          });
+          return;
+        }
+      }
+      
       // Convert stock quantity to a number
       const stockQuantity = parseInt(formData.stockQuantity, 10);
       if (isNaN(stockQuantity)) {
@@ -159,10 +179,13 @@ export default function ProductList() {
       // Prepare product data
       const productData = {
         name: formData.name,
+        shortDescription: formData.shortDescription || null,
         description: formData.description,
         price,
+        salePrice: salePrice || null,
         categoryId: selectedCategory,
         subcategoryValues,
+        published: formData.published,
         featured: formData.featured,
         stockQuantity
       };
@@ -177,9 +200,12 @@ export default function ProductList() {
       setSelectedProduct(null);
       setFormData({
         name: "",
+        shortDescription: "",
         description: "",
         price: "",
+        salePrice: "",
         stockQuantity: "1",
+        published: true,
         featured: false
       });
       setSelectedCategory("");
@@ -197,7 +223,7 @@ export default function ProductList() {
   };
 
   return (
-    <div className="mt-8">
+    <div>
       <h3 className="text-lg font-medium mb-4">Produtos Cadastrados</h3>
       
       <div className="border rounded-md overflow-hidden">
@@ -208,7 +234,7 @@ export default function ProductList() {
               <TableHead>Nome</TableHead>
               <TableHead>Preço</TableHead>
               <TableHead>Estoque</TableHead>
-              <TableHead className="text-center">Exibido</TableHead>
+              <TableHead className="text-center">Publicado</TableHead>
               <TableHead className="text-right">Ações</TableHead>
             </TableRow>
           </TableHeader>
@@ -241,10 +267,18 @@ export default function ProductList() {
                       style: 'currency',
                       currency: 'BRL'
                     }).format(product.price)}
+                    {product.salePrice && (
+                      <div className="text-sm text-muted-foreground line-through">
+                        {new Intl.NumberFormat('pt-BR', {
+                          style: 'currency',
+                          currency: 'BRL'
+                        }).format(product.salePrice)}
+                      </div>
+                    )}
                   </TableCell>
                   <TableCell>{product.stockQuantity}</TableCell>
                   <TableCell className="text-center">
-                    {product.featured ? (
+                    {product.published ? (
                       <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
                         Sim
                       </span>
@@ -260,9 +294,9 @@ export default function ProductList() {
                         variant="outline"
                         size="icon"
                         onClick={() => handleVisibilityToggle(product)}
-                        title={product.featured ? "Ocultar produto" : "Exibir produto"}
+                        title={product.published ? "Ocultar produto" : "Publicar produto"}
                       >
-                        {product.featured ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                        {product.published ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                       </Button>
                       <Button
                         variant="outline"

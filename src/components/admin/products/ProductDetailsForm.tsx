@@ -8,9 +8,12 @@ import { Switch } from "@/components/ui/switch";
 interface ProductDetailsFormProps {
   formData: {
     name: string;
+    shortDescription: string;
     description: string;
     price: string;
+    salePrice: string;
     stockQuantity: string;
+    published: boolean;
     featured: boolean;
   };
   onChange: (field: string, value: any) => void;
@@ -19,7 +22,7 @@ interface ProductDetailsFormProps {
 const ProductDetailsForm = ({ formData, onChange }: ProductDetailsFormProps) => {
   const handleNumberInput = (field: string, value: string) => {
     // Allow only numbers and standard price formatting
-    if (field === 'price') {
+    if (field === 'price' || field === 'salePrice') {
       // Format as currency
       const numericValue = value.replace(/[^\d]/g, '');
       if (numericValue === '') {
@@ -55,7 +58,17 @@ const ProductDetailsForm = ({ formData, onChange }: ProductDetailsFormProps) => 
       </div>
       
       <div className="space-y-2">
-        <Label htmlFor="description">Descrição</Label>
+        <Label htmlFor="shortDescription">Descrição Curta</Label>
+        <Input
+          id="shortDescription"
+          placeholder="Breve descrição do produto"
+          value={formData.shortDescription}
+          onChange={(e) => onChange("shortDescription", e.target.value)}
+        />
+      </div>
+      
+      <div className="space-y-2">
+        <Label htmlFor="description">Descrição Longa</Label>
         <Textarea
           id="description"
           placeholder="Descrição detalhada do produto"
@@ -67,7 +80,7 @@ const ProductDetailsForm = ({ formData, onChange }: ProductDetailsFormProps) => 
       
       <div className="grid grid-cols-2 gap-4">
         <div className="space-y-2">
-          <Label htmlFor="price">Preço</Label>
+          <Label htmlFor="price">Preço Normal</Label>
           <Input
             id="price"
             placeholder="R$ 0,00"
@@ -78,25 +91,46 @@ const ProductDetailsForm = ({ formData, onChange }: ProductDetailsFormProps) => 
         </div>
         
         <div className="space-y-2">
-          <Label htmlFor="stockQuantity">Quantidade em Estoque</Label>
+          <Label htmlFor="salePrice">Preço Promocional</Label>
           <Input
-            id="stockQuantity"
-            type="text"
-            placeholder="0"
-            value={formData.stockQuantity}
-            onChange={(e) => handleNumberInput("stockQuantity", e.target.value)}
-            required
+            id="salePrice"
+            placeholder="R$ 0,00"
+            value={formData.salePrice}
+            onChange={(e) => handleNumberInput("salePrice", e.target.value)}
           />
         </div>
       </div>
       
-      <div className="flex items-center space-x-2">
-        <Switch
-          id="featured"
-          checked={formData.featured}
-          onCheckedChange={(checked) => onChange("featured", checked)}
+      <div className="space-y-2">
+        <Label htmlFor="stockQuantity">Quantidade em Estoque</Label>
+        <Input
+          id="stockQuantity"
+          type="text"
+          placeholder="0"
+          value={formData.stockQuantity}
+          onChange={(e) => handleNumberInput("stockQuantity", e.target.value)}
+          required
         />
-        <Label htmlFor="featured">Destaque na página inicial</Label>
+      </div>
+      
+      <div className="flex flex-col gap-3">
+        <div className="flex items-center space-x-2">
+          <Switch
+            id="published"
+            checked={formData.published}
+            onCheckedChange={(checked) => onChange("published", checked)}
+          />
+          <Label htmlFor="published">Produto publicado na loja</Label>
+        </div>
+        
+        <div className="flex items-center space-x-2">
+          <Switch
+            id="featured"
+            checked={formData.featured}
+            onCheckedChange={(checked) => onChange("featured", checked)}
+          />
+          <Label htmlFor="featured">Destaque na página inicial</Label>
+        </div>
       </div>
     </div>
   );
