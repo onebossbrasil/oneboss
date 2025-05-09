@@ -108,7 +108,7 @@ const Store = () => {
     description: product.description,
     price: typeof product.price === 'number' 
       ? new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(product.price)
-      : product.price.toString(),
+      : product.price + "",
     category: categories.find(cat => cat.id.toString() === product.categoryId)?.name || '',
     subcategory: Object.values(product.subcategoryValues || {}).join(', '),
     imageUrl: product.images.length > 0 ? product.images[0].url : 'https://images.unsplash.com/photo-1567899378494-47b22a2ae96a?auto=format&fit=crop&q=80&w=600&h=400',

@@ -10,12 +10,12 @@ import {
   CarouselPrevious,
 } from "@/components/ui/carousel";
 import ProductItem from "./ProductItem";
-import { type Product } from "@/data/featuredProducts";
 import useEmblaCarousel from "embla-carousel-react";
 import { cn } from "@/lib/utils";
+import { FormattedProduct } from "@/types/product";
 
 type ProductSliderProps = {
-  products: Product[];
+  products: FormattedProduct[];
 };
 
 const ProductSlider = ({ products }: ProductSliderProps) => {

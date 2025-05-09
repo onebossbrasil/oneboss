@@ -1,23 +1,16 @@
 
 import { Link } from "react-router-dom";
-
-type Product = {
-  id: number;
-  name: string;
-  price: string;
-  category: string;
-  imageUrl: string;
-};
+import { FormattedProduct } from "@/types/product";
 
 type ProductItemProps = {
-  product: Product;
+  product: FormattedProduct;
 };
 
 const ProductItem = ({ product }: ProductItemProps) => {
   return (
     <Link
       key={product.id}
-      to={`/product/${product.id}`}
+      to={`/produto/${product.id}`}
       className="product-card h-full block"
     >
       <div className="relative aspect-[4/3] rounded-t-lg overflow-hidden">

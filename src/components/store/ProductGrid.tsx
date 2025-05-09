@@ -2,20 +2,10 @@
 import { ChevronDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import ProductCard from "@/components/ProductCard";
-
-type Product = {
-  id: number;
-  name: string;
-  description: string;
-  price: string;
-  category: string;
-  subcategory: string;
-  imageUrl: string;
-  featured: boolean;
-};
+import { FormattedProduct } from "@/types/product";
 
 type ProductGridProps = {
-  products: Product[];
+  products: FormattedProduct[];
   resetFilters: () => void;
 };
 

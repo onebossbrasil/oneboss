@@ -23,20 +23,24 @@ const ContactForm = ({ productId, productName }: ContactFormProps) => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    const success = await addLead({
-      name,
-      email,
-      phone,
-      message,
-      productId
-    });
-    
-    if (success) {
+    try {
+      await addLead({
+        name,
+        email,
+        phone,
+        message,
+        productId
+      });
+      
+      // Mark as submitted if we get here (no error was thrown)
       setSubmitted(true);
       setName("");
       setEmail("");
       setPhone("");
       setMessage("");
+    } catch (error) {
+      // Error handling is done in the context
+      console.error("Failed to submit lead:", error);
     }
   };
 
