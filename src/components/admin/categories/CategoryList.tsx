@@ -9,11 +9,17 @@ import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { useCategories } from "@/contexts/CategoryContext";
 
+interface CategoryListProps {
+  selectedCategory: string | null;
+  setSelectedCategory: (value: string | null) => void;
+  setSelectedSubcategory: (value: number | null) => void;
+}
+
 const CategoryList = ({
   selectedCategory,
   setSelectedCategory,
   setSelectedSubcategory
-}) => {
+}: CategoryListProps) => {
   const { toast } = useToast();
   const { categories, addCategory, removeCategory } = useCategories();
   const [newCategoryName, setNewCategoryName] = useState("");
@@ -49,11 +55,6 @@ const CategoryList = ({
       });
     } catch (error) {
       console.error("Error adding category:", error);
-      toast({
-        title: "Erro ao adicionar categoria",
-        description: "Ocorreu um erro ao adicionar a categoria.",
-        variant: "destructive",
-      });
     } finally {
       setIsSubmitting(false);
     }
@@ -69,11 +70,6 @@ const CategoryList = ({
       }
       
       removeCategory(categoryId);
-      
-      toast({
-        title: "Categoria removida",
-        description: "A categoria foi removida com sucesso.",
-      });
     }
   };
   

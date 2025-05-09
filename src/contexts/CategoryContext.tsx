@@ -1,4 +1,3 @@
-
 import React, { createContext, useContext, useState, useEffect } from "react";
 import { CategoryType } from "@/types/category";
 import { useToast } from "@/hooks/use-toast";
