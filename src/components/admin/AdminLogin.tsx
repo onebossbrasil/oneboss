@@ -46,34 +46,22 @@ const AdminLogin = ({ onLogin }: AdminLoginProps) => {
 
       console.log("Autenticação bem-sucedida para:", data.user.email);
       
-      // Verificar se o e-mail está na tabela de permissões usando a função is_admin
-      const { data: adminCheck, error: adminError } = await supabase
-        .rpc('current_user_is_admin');
+      // Verificar se o e-mail está na tabela de permissões
+      const { data: adminData, error: adminError } = await supabase
+        .from('admin_permissions')
+        .select('*')
+        .eq('email', data.user.email)
+        .single();
       
-      console.log("Verificação de admin:", { adminCheck, adminError });
+      console.log("Verificação de permissões de admin:", { adminData, adminError });
 
-      if (adminError) {
-        console.error("Erro ao verificar permissões:", adminError);
-        throw new Error("Erro ao verificar permissões de administrador.");
-      }
-
-      if (!adminCheck) {
-        console.error("Usuário não é administrador");
+      if (adminError || !adminData) {
+        console.error("Erro ou nenhum dado encontrado na verificação de permissões:", adminError);
         throw new Error("Acesso não autorizado. Você não tem permissões de administrador.");
       }
       
-      // Se chegou aqui, buscar o papel do administrador
-      const { data: adminData, error: roleError } = await supabase
-        .from('admin_permissions')
-        .select('role')
-        .eq('email', data.user.email)
-        .single();
-        
-      if (roleError) {
-        console.warn("Erro ao buscar papel do administrador:", roleError);
-      }
-      
-      const adminRole = adminData?.role || "admin";
+      // Se chegou aqui, o usuário é administrador
+      const adminRole = adminData.role || "admin";
 
       onLogin(true);
       toast({
