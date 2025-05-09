@@ -18,34 +18,49 @@ const Admin = () => {
     // Verificar se o usuário está autenticado com Supabase
     const checkAuth = async () => {
       try {
+        console.log("Verificando autenticação...");
         // Recuperar a sessão atual
         const { data: { session } } = await supabase.auth.getSession();
         
         if (!session) {
+          console.log("Nenhuma sessão encontrada");
           setIsAuthenticated(false);
           setIsAdmin(false);
           setIsLoading(false);
           return;
         }
         
+        console.log("Sessão encontrada para:", session.user.email);
         setIsAuthenticated(!!session);
         
-        // Verificar se o usuário tem permissões de administrador
+        // Verificar se o usuário tem permissões de administrador diretamente
         if (session?.user?.email) {
-          const { data: adminData, error: adminError } = await supabase
-            .from('admin_permissions')
-            .select('*')
-            .eq('email', session.user.email)
-            .single();
-          
-          console.log("Verificação de admin:", { adminData, adminError, userEmail: session.user.email });
-          
-          if (adminError) {
-            console.error("Erro ao verificar permissões de admin:", adminError);
+          try {
+            const { data: adminData, error: adminError } = await supabase
+              .from('admin_permissions')
+              .select('role')
+              .eq('email', session.user.email)
+              .single();
+            
+            console.log("Verificação direta de permissões admin:", { adminData, adminError });
+            
+            if (adminError) {
+              if (adminError.code === 'PGRST116') { // No rows found
+                console.log("Usuário não é administrador");
+                setIsAdmin(false);
+              } else {
+                console.error("Erro ao verificar permissões de admin:", adminError);
+                setError("Erro ao verificar permissões. Por favor, tente novamente.");
+                setIsAdmin(false);
+              }
+            } else {
+              console.log("Usuário é administrador com papel:", adminData?.role);
+              setIsAdmin(!!adminData);
+            }
+          } catch (checkError) {
+            console.error("Exceção ao verificar permissões:", checkError);
             setError("Erro ao verificar permissões. Por favor, tente novamente.");
             setIsAdmin(false);
-          } else {
-            setIsAdmin(!!adminData);
           }
         }
         
@@ -68,18 +83,24 @@ const Admin = () => {
         try {
           const { data: adminData, error: adminError } = await supabase
             .from('admin_permissions')
-            .select('*')
+            .select('role')
             .eq('email', session.user.email)
             .single();
           
           if (adminError) {
-            console.error("Erro ao verificar permissões de admin:", adminError);
-            setIsAdmin(false);
+            if (adminError.code === 'PGRST116') { // No rows found
+              console.log("Usuário não é administrador");
+              setIsAdmin(false);
+            } else {
+              console.error("Erro ao verificar permissões de admin no event listener:", adminError);
+              setIsAdmin(false);
+            }
           } else {
+            console.log("Usuário é administrador com papel:", adminData?.role);
             setIsAdmin(!!adminData);
           }
         } catch (error) {
-          console.error("Erro ao verificar permissões:", error);
+          console.error("Erro ao verificar permissões no event listener:", error);
           setIsAdmin(false);
         }
       } else {
@@ -99,11 +120,14 @@ const Admin = () => {
       
       if (session?.user?.email) {
         try {
+          console.log("Verificando permissões após login para:", session.user.email);
           const { data: adminData, error: adminError } = await supabase
             .from('admin_permissions')
             .select('*')
             .eq('email', session.user.email)
             .single();
+            
+          console.log("Resultado da verificação de admin após login:", { adminData, adminError });
             
           if (adminError) {
             console.error("Erro ao verificar permissões de admin após login:", adminError);
@@ -114,6 +138,7 @@ const Admin = () => {
             });
             setIsAdmin(false);
           } else {
+            console.log("Definindo isAdmin como true");
             setIsAdmin(!!adminData);
           }
         } catch (error) {
@@ -177,11 +202,13 @@ const Admin = () => {
 
   // Se não estiver autenticado, mostrar tela de login
   if (!isAuthenticated) {
+    console.log("Mostrando tela de login, não autenticado");
     return <AdminLogin onLogin={handleLogin} />;
   }
 
   // Se estiver autenticado, mas não for admin, mostrar mensagem de acesso negado
   if (!isAdmin) {
+    console.log("Mostrando tela de acesso negado, não é admin");
     return (
       <div className="flex flex-col items-center justify-center min-h-screen p-4">
         <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-6 max-w-md w-full text-center">
@@ -203,6 +230,7 @@ const Admin = () => {
   }
 
   // Se estiver autenticado e for admin, mostrar painel de administração
+  console.log("Mostrando painel de administração");
   return <AdminDashboard onLogout={handleLogout} />;
 };
 

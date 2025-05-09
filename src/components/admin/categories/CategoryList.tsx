@@ -9,6 +9,7 @@ import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { useCategories } from "@/contexts/CategoryContext";
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import { supabase } from "@/integrations/supabase/client";
 
 interface CategoryListProps {
   selectedCategory: string | null;
@@ -22,7 +23,7 @@ const CategoryList = ({
   setSelectedSubcategory
 }: CategoryListProps) => {
   const { toast } = useToast();
-  const { categories, addCategory, removeCategory } = useCategories();
+  const { categories, addCategory, removeCategory, refreshCategories } = useCategories();
   const [newCategoryName, setNewCategoryName] = useState("");
   const [newCategorySlug, setNewCategorySlug] = useState("");
   const [dialogOpen, setDialogOpen] = useState(false);
@@ -47,7 +48,32 @@ const CategoryList = ({
     
     try {
       console.log("Tentando adicionar categoria:", { name: newCategoryName, slug: newCategorySlug });
-      await addCategory(newCategoryName, newCategorySlug);
+      
+      // Obter a sessão atual para o email do usuário
+      const { data: { session } } = await supabase.auth.getSession();
+      
+      if (!session || !session.user || !session.user.email) {
+        throw new Error("Usuário não autenticado ou email não disponível.");
+      }
+      
+      // Usar a função SQL segura para criar a categoria
+      const { data, error } = await supabase.rpc(
+        'admin_create_category',
+        {
+          _name: newCategoryName,
+          _value: newCategorySlug,
+          _admin_email: session.user.email
+        }
+      );
+      
+      console.log("Resposta da criação de categoria:", { data, error });
+      
+      if (error) {
+        throw error;
+      }
+      
+      // Atualizar a lista de categorias
+      await refreshCategories();
       
       setNewCategoryName("");
       setNewCategorySlug("");

@@ -253,11 +253,19 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      admin_create_category: {
+        Args: { _name: string; _value: string; _admin_email: string }
+        Returns: string
+      }
       current_user_is_admin: {
         Args: Record<PropertyKey, never>
         Returns: boolean
       }
       get_auth_email: {
+        Args: Record<PropertyKey, never>
+        Returns: string
+      }
+      get_auth_user_email: {
         Args: Record<PropertyKey, never>
         Returns: string
       }
