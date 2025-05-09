@@ -32,14 +32,22 @@ export const fetchCategoriesData = async () => {
 
 // Create a new category
 export const createCategory = async (name: string, value: string) => {
-  const { data, error } = await supabase
-    .from('categories')
-    .insert({ name, value })
-    .select()
-    .single();
-    
-  if (error) throw error;
-  return data;
+  try {
+    const { data, error } = await supabase
+      .from('categories')
+      .insert({ name, value })
+      .select()
+      .single();
+      
+    if (error) {
+      console.error("Error creating category:", error);
+      throw error;
+    }
+    return data;
+  } catch (err) {
+    console.error("Exception creating category:", err);
+    throw err;
+  }
 };
 
 // Delete a category

@@ -8,6 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { useCategories } from "@/contexts/CategoryContext";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 
 interface CategoryListProps {
   selectedCategory: string | null;
@@ -26,6 +27,7 @@ const CategoryList = ({
   const [newCategorySlug, setNewCategorySlug] = useState("");
   const [dialogOpen, setDialogOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [formError, setFormError] = useState<string | null>(null);
   
   const handleAddCategory = async () => {
     if (!newCategoryName || !newCategorySlug) return;
@@ -41,6 +43,7 @@ const CategoryList = ({
     }
     
     setIsSubmitting(true);
+    setFormError(null);
     
     try {
       await addCategory(newCategoryName, newCategorySlug);
@@ -53,8 +56,9 @@ const CategoryList = ({
         title: "Categoria adicionada",
         description: `${newCategoryName} foi adicionada com sucesso.`,
       });
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error adding category:", error);
+      setFormError(error?.message || "Erro ao adicionar categoria. Tente novamente.");
     } finally {
       setIsSubmitting(false);
     }
@@ -93,6 +97,11 @@ const CategoryList = ({
                   </DialogDescription>
                 </DialogHeader>
                 <div className="grid gap-4 py-4">
+                  {formError && (
+                    <Alert variant="destructive">
+                      <AlertDescription>{formError}</AlertDescription>
+                    </Alert>
+                  )}
                   <div className="space-y-2">
                     <Label htmlFor="new-category">Nome da Categoria</Label>
                     <Input 
