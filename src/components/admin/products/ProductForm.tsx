@@ -1,8 +1,14 @@
 
 import { useState } from "react";
-import CollapsibleProductForm from "./products/CollapsibleProductForm";
-import { useProducts } from "@/contexts/ProductContext";
+import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
+import { Upload, ChevronDown, ChevronUp } from "lucide-react";
+import ProductDetailsForm from "./products/ProductDetailsForm";
+import CategorySelector from "./products/CategorySelector";
+import ImageUpload from "./products/ImageUpload";
+import { useProducts } from "@/contexts/ProductContext";
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 
 const ProductForm = () => {
   const { toast } = useToast();
