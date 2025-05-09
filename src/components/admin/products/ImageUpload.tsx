@@ -1,71 +1,113 @@
 
-import { useState } from "react";
-import { Image } from "lucide-react";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+import React from "react";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
+import { Upload, X } from "lucide-react";
+import { ProductImage } from "@/types/product";
 
-type ImageUploadProps = {
+interface ImageUploadProps {
   images: File[];
   imagePreviewUrls: string[];
+  existingImages?: ProductImage[];
   handleImageChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   handleRemoveImage: (index: number) => void;
-};
+}
 
-const ImageUpload = ({ 
-  images, 
-  imagePreviewUrls, 
-  handleImageChange, 
-  handleRemoveImage 
-}: ImageUploadProps) => {
+const ImageUpload: React.FC<ImageUploadProps> = ({
+  images,
+  imagePreviewUrls,
+  existingImages = [],
+  handleImageChange,
+  handleRemoveImage
+}) => {
   return (
-    <div className="space-y-4">
-      <Label htmlFor="images">Imagens do Produto</Label>
-      <div className="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-dashed border-gray-300 rounded-md">
-        <div className="space-y-1 text-center">
-          <Image className="mx-auto h-12 w-12 text-gray-400" />
-          <div className="flex text-sm text-gray-600">
-            <label htmlFor="image-upload" className="relative cursor-pointer bg-white rounded-md font-medium text-gold hover:text-gold-dark focus-within:outline-none">
-              <span>Fazer upload de imagens</span>
-              <Input
-                id="image-upload"
+    <Card>
+      <CardContent className="pt-6">
+        <div className="space-y-4">
+          <div>
+            <h3 className="text-sm font-medium mb-2">Imagens do Produto</h3>
+            <p className="text-sm text-muted-foreground mb-4">
+              Arraste e solte ou clique para adicionar imagens do produto. 
+              Recomendado: 800x800px, máximo 5MB.
+            </p>
+            
+            <div className="border-2 border-dashed border-muted-foreground/25 rounded-md p-8 text-center">
+              <input
                 type="file"
-                accept="image/*"
+                id="image-upload"
                 multiple
-                className="sr-only"
+                accept="image/*"
+                className="hidden"
                 onChange={handleImageChange}
               />
-            </label>
-            <p className="pl-1">ou arraste e solte</p>
-          </div>
-          <p className="text-xs text-gray-500">
-            PNG, JPG, GIF até 10MB
-          </p>
-        </div>
-      </div>
-      
-      {imagePreviewUrls.length > 0 && (
-        <div className="grid grid-cols-3 gap-2 mt-2">
-          {imagePreviewUrls.map((url, index) => (
-            <div key={index} className="relative">
-              <img 
-                src={url} 
-                alt={`Preview ${index}`}
-                className="h-24 w-full object-cover rounded-md"
-              />
-              <button
-                type="button"
-                className="absolute top-1 right-1 bg-black/50 text-white rounded-full p-1"
-                onClick={() => handleRemoveImage(index)}
+              <label
+                htmlFor="image-upload"
+                className="cursor-pointer flex flex-col items-center justify-center"
               >
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                </svg>
-              </button>
+                <Upload className="h-10 w-10 text-muted-foreground mb-2" />
+                <span className="text-sm text-muted-foreground">
+                  Clique para fazer upload ou arraste e solte
+                </span>
+                <span className="text-xs text-muted-foreground mt-1">
+                  PNG, JPG, GIF até 5MB
+                </span>
+              </label>
             </div>
-          ))}
+          </div>
+          
+          {(imagePreviewUrls.length > 0 || existingImages.length > 0) && (
+            <div>
+              <h4 className="text-sm font-medium mb-2">Imagens adicionadas</h4>
+              <div className="grid grid-cols-3 gap-4">
+                {existingImages.map((image, index) => (
+                  <div
+                    key={`existing-${image.id}`}
+                    className="relative aspect-square border rounded-md overflow-hidden"
+                  >
+                    <img
+                      src={image.url}
+                      alt={`Imagem do produto ${index + 1}`}
+                      className="w-full h-full object-cover"
+                    />
+                    <Button
+                      variant="destructive"
+                      size="icon"
+                      className="absolute top-1 right-1 h-6 w-6 rounded-full"
+                      onClick={() => handleRemoveImage(index)}
+                      type="button"
+                    >
+                      <X className="h-3 w-3" />
+                    </Button>
+                  </div>
+                ))}
+                
+                {imagePreviewUrls.slice(existingImages.length).map((url, index) => (
+                  <div
+                    key={`new-${index}`}
+                    className="relative aspect-square border rounded-md overflow-hidden"
+                  >
+                    <img
+                      src={url}
+                      alt={`Nova imagem ${index + 1}`}
+                      className="w-full h-full object-cover"
+                    />
+                    <Button
+                      variant="destructive"
+                      size="icon"
+                      className="absolute top-1 right-1 h-6 w-6 rounded-full"
+                      onClick={() => handleRemoveImage(index + existingImages.length)}
+                      type="button"
+                    >
+                      <X className="h-3 w-3" />
+                    </Button>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
         </div>
-      )}
-    </div>
+      </CardContent>
+    </Card>
   );
 };
 

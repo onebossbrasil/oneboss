@@ -1,5 +1,5 @@
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
@@ -7,6 +7,7 @@ import { Upload } from "lucide-react";
 import ProductDetailsForm from "./products/ProductDetailsForm";
 import CategorySelector from "./products/CategorySelector";
 import ImageUpload from "./products/ImageUpload";
+import ProductList from "./products/ProductList";
 import { useProducts } from "@/contexts/ProductContext";
 
 const ProductForm = () => {
@@ -141,41 +142,45 @@ const ProductForm = () => {
   };
   
   return (
-    <Card>
-      <CardContent className="pt-6">
-        <form onSubmit={handleSubmit} className="space-y-6">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div className="space-y-4">
-              <ProductDetailsForm 
-                formData={formData}
-                onChange={handleFormChange}
-              />
+    <div className="space-y-6">
+      <Card>
+        <CardContent className="pt-6">
+          <form onSubmit={handleSubmit} className="space-y-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="space-y-4">
+                <ProductDetailsForm 
+                  formData={formData}
+                  onChange={handleFormChange}
+                />
+                
+                <CategorySelector
+                  selectedCategory={selectedCategory}
+                  subcategoryValues={subcategoryValues}
+                  onCategoryChange={handleCategoryChange}
+                  onSubcategoryChange={handleSubcategoryChange}
+                />
+              </div>
               
-              <CategorySelector
-                selectedCategory={selectedCategory}
-                subcategoryValues={subcategoryValues}
-                onCategoryChange={handleCategoryChange}
-                onSubcategoryChange={handleSubcategoryChange}
-              />
+              <div className="space-y-4">
+                <ImageUpload
+                  images={images}
+                  imagePreviewUrls={imagePreviewUrls}
+                  handleImageChange={handleImageChange}
+                  handleRemoveImage={handleRemoveImage}
+                />
+              </div>
             </div>
             
-            <div className="space-y-4">
-              <ImageUpload
-                images={images}
-                imagePreviewUrls={imagePreviewUrls}
-                handleImageChange={handleImageChange}
-                handleRemoveImage={handleRemoveImage}
-              />
-            </div>
-          </div>
-          
-          <Button type="submit" className="w-full md:w-auto">
-            <Upload className="mr-2 h-4 w-4" />
-            Cadastrar Produto
-          </Button>
-        </form>
-      </CardContent>
-    </Card>
+            <Button type="submit" className="w-full md:w-auto">
+              <Upload className="mr-2 h-4 w-4" />
+              Cadastrar Produto
+            </Button>
+          </form>
+        </CardContent>
+      </Card>
+      
+      <ProductList />
+    </div>
   );
 };
 
