@@ -43,11 +43,14 @@ export const fetchProductsFromSupabase = async (): Promise<{ products: Product[]
     const formattedProducts: Product[] = productsData.map((product: any) => ({
       id: product.id,
       name: product.name,
+      shortDescription: product.short_description || '',
       description: product.description || '',
       price: parseFloat(product.price),
+      salePrice: product.sale_price ? parseFloat(product.sale_price) : null,
       categoryId: product.category_id,
       subcategoryValues: product.subcategory_values || {},
       featured: product.featured || false,
+      published: product.published !== undefined ? product.published : true, // Add published field with default true
       stockQuantity: product.stock_quantity || 0,
       images: imagesByProduct[product.id] || [],
       createdAt: product.created_at,
