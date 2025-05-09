@@ -26,12 +26,7 @@ const AdminLogin = ({ onLogin }: AdminLoginProps) => {
     setIsSubmitting(true);
     
     try {
-      // Check if email matches the admin email
-      if (email !== "mar.medeiros2015@gmail.com") {
-        throw new Error("Acesso não autorizado");
-      }
-      
-      // Authenticate with Supabase
+      // Autenticar com Supabase
       const { data, error: authError } = await supabase.auth.signInWithPassword({
         email,
         password,
@@ -41,19 +36,31 @@ const AdminLogin = ({ onLogin }: AdminLoginProps) => {
         throw authError;
       }
 
+      // Verificar se o e-mail está na tabela de permissões
+      const { data: adminData, error: adminError } = await supabase
+        .from('admin_permissions')
+        .select('*')
+        .eq('email', email)
+        .single();
+
+      if (adminError || !adminData) {
+        throw new Error("Acesso não autorizado. Você não tem permissões de administrador.");
+      }
+
       onLogin(true);
       toast({
         title: "Login realizado com sucesso",
-        description: "Bem-vindo ao painel administrativo.",
+        description: `Bem-vindo ao painel administrativo, ${adminData.role}.`,
       });
     } catch (error: any) {
       console.error("Login error:", error);
       setError(error.message || "Falha na autenticação. Verifique suas credenciais.");
       toast({
         title: "Falha na autenticação",
-        description: "Usuário ou senha incorretos.",
+        description: "Usuário ou senha incorretos, ou sem permissões de administrador.",
         variant: "destructive",
       });
+      onLogin(false);
     } finally {
       setIsSubmitting(false);
     }
