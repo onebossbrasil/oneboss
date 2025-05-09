@@ -10,6 +10,7 @@ import ResultsHeader from "@/components/store/ResultsHeader";
 import ProductGrid from "@/components/store/ProductGrid";
 import { useProducts } from "@/contexts/ProductContext";
 import { useCategories } from "@/contexts/CategoryContext";
+import { FormattedProduct } from "@/types/product";
 
 const Store = () => {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -101,7 +102,7 @@ const Store = () => {
   };
   
   // Convert products to the format expected by ProductGrid
-  const formattedProducts = filteredProducts.map(product => ({
+  const formattedProducts: FormattedProduct[] = filteredProducts.map(product => ({
     id: product.id,
     name: product.name,
     description: product.description,

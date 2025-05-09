@@ -1,19 +1,10 @@
-
 import { Link } from "react-router-dom";
 import { Badge } from "@/components/ui/badge";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { FormattedProduct } from "@/types/product";
 
 type ProductCardProps = {
-  product: {
-    id: number;
-    name: string;
-    description: string;
-    price: string;
-    category: string;
-    subcategory: string;
-    imageUrl: string;
-    featured: boolean;
-  };
+  product: FormattedProduct;
 };
 
 const ProductCard = ({ product }: ProductCardProps) => {
