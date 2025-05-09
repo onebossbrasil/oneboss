@@ -8,8 +8,8 @@ import {
   deleteCategory,
   createSubcategory,
   deleteSubcategory,
-  addSubcategoryValue,
-  removeSubcategoryValue
+  addSubcategoryValue as addSubcategoryValueService,
+  removeSubcategoryValue as removeSubcategoryValueService
 } from "@/services/categoryService";
 import {
   groupSubcategoriesByCategory,
@@ -166,7 +166,7 @@ export const CategoryProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   const addSubcategoryValue = async (categoryId: number, subcategoryId: number, value: string) => {
     try {
       setIsLoading(true);
-      await addSubcategoryValue(subcategoryId, value, categoryId); // Fixed: passing all three arguments
+      await addSubcategoryValueService(subcategoryId, value, categoryId);
       await fetchCategories();
       
       toast({
@@ -188,7 +188,7 @@ export const CategoryProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   const removeSubcategoryValue = async (categoryId: number, subcategoryId: number, value: string) => {
     try {
       setIsLoading(true);
-      await removeSubcategoryValue(subcategoryId, value, categoryId); // Fixed: passing all three arguments
+      await removeSubcategoryValueService(subcategoryId, value, categoryId);
       await fetchCategories();
       
       toast({
