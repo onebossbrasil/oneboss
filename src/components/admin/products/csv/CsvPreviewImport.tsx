@@ -4,17 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { AlertTriangle } from "lucide-react";
 import { Table, TableHeader, TableRow, TableHead, TableBody, TableCell } from "@/components/ui/table";
-
-interface ImportedProduct {
-  name: string;
-  price: string;
-  description: string;
-  category: string;
-  subcategories?: string;
-  featured: boolean;
-  images: string[];
-  stockQuantity: number;
-}
+import { ImportedProduct } from "@/types/csv";
 
 interface CsvPreviewImportProps {
   errors: string[];
