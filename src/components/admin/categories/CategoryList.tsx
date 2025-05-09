@@ -19,8 +19,9 @@ const CategoryList = ({
   const [newCategoryName, setNewCategoryName] = useState("");
   const [newCategorySlug, setNewCategorySlug] = useState("");
   const [dialogOpen, setDialogOpen] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   
-  const handleAddCategory = () => {
+  const handleAddCategory = async () => {
     if (!newCategoryName || !newCategorySlug) return;
     
     // Verifica se já existe uma categoria com esse slug
@@ -33,16 +34,29 @@ const CategoryList = ({
       return;
     }
     
-    addCategory(newCategoryName, newCategorySlug);
+    setIsSubmitting(true);
     
-    setNewCategoryName("");
-    setNewCategorySlug("");
-    setDialogOpen(false);
-    
-    toast({
-      title: "Categoria adicionada",
-      description: `${newCategoryName} foi adicionada com sucesso.`,
-    });
+    try {
+      await addCategory(newCategoryName, newCategorySlug);
+      
+      setNewCategoryName("");
+      setNewCategorySlug("");
+      setDialogOpen(false);
+      
+      toast({
+        title: "Categoria adicionada",
+        description: `${newCategoryName} foi adicionada com sucesso.`,
+      });
+    } catch (error) {
+      console.error("Error adding category:", error);
+      toast({
+        title: "Erro ao adicionar categoria",
+        description: "Ocorreu um erro ao adicionar a categoria.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const handleRemoveCategory = (categoryId: number) => {
@@ -106,9 +120,9 @@ const CategoryList = ({
                   <Button 
                     type="button" 
                     onClick={handleAddCategory}
-                    disabled={!newCategoryName || !newCategorySlug}
+                    disabled={!newCategoryName || !newCategorySlug || isSubmitting}
                   >
-                    Adicionar Categoria
+                    {isSubmitting ? "Adicionando..." : "Adicionar Categoria"}
                   </Button>
                 </DialogFooter>
               </DialogContent>

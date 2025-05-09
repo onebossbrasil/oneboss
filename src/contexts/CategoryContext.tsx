@@ -123,7 +123,7 @@ export const CategoryProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     try {
       setIsLoading(true);
       
-      // Insert new category
+      // Insert new category without requiring authentication
       const { data, error } = await supabase
         .from('categories')
         .insert({ name, value })
