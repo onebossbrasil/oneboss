@@ -47,7 +47,7 @@ export const deleteCategory = async (categoryId: number) => {
   const { error } = await supabase
     .from('categories')
     .delete()
-    .eq('id', categoryId);
+    .eq('id', categoryId.toString());
     
   if (error) throw error;
 };
@@ -57,7 +57,7 @@ export const createSubcategory = async (categoryId: number, name: string, type: 
   const { data, error } = await supabase
     .from('subcategories')
     .insert({ 
-      category_id: categoryId,
+      category_id: categoryId.toString(),
       name,
       type
     })
@@ -73,7 +73,7 @@ export const deleteSubcategory = async (subcategoryId: number) => {
   const { error } = await supabase
     .from('subcategories')
     .delete()
-    .eq('id', subcategoryId);
+    .eq('id', subcategoryId.toString());
     
   if (error) throw error;
 };
@@ -83,7 +83,7 @@ export const addSubcategoryValue = async (subcategoryId: number | string, value:
   const { error } = await supabase
     .from('subcategory_values')
     .insert({ 
-      subcategory_id: typeof subcategoryId === 'number' ? subcategoryId : subcategoryId,
+      subcategory_id: subcategoryId.toString(),
       value
     });
     
@@ -96,7 +96,7 @@ export const removeSubcategoryValue = async (subcategoryId: number | string, val
   const { data: valueData, error: findError } = await supabase
     .from('subcategory_values')
     .select('id')
-    .eq('subcategory_id', typeof subcategoryId === 'number' ? subcategoryId : subcategoryId)
+    .eq('subcategory_id', subcategoryId.toString())
     .eq('value', value)
     .single();
     
