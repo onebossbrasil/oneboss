@@ -1,21 +1,22 @@
 
 import React, { createContext, useContext, useState, useEffect } from "react";
-import { supabase } from "@/integrations/supabase/client";
+import { CategoryType } from "@/types/category";
 import { useToast } from "@/hooks/use-toast";
-
-export type SubcategoryType = {
-  id: number;
-  name: string;
-  type: string;
-  values: string[];
-};
-
-export type CategoryType = {
-  id: number;
-  name: string;
-  value: string;
-  subcategories: SubcategoryType[];
-};
+import {
+  fetchCategoriesData,
+  createCategory,
+  deleteCategory,
+  createSubcategory,
+  deleteSubcategory,
+  addSubcategoryValue,
+  removeSubcategoryValue
+} from "@/services/categoryService";
+import {
+  groupSubcategoriesByCategory,
+  groupValuesBySubcategory,
+  formatCategoriesData,
+  findCategoryById
+} from "@/utils/categoryUtils";
 
 type CategoryContextType = {
   categories: CategoryType[];
@@ -47,63 +48,16 @@ export const CategoryProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       setIsLoading(true);
       setError(null);
 
-      // Fetch categories
-      const { data: categoriesData, error: categoriesError } = await supabase
-        .from('categories')
-        .select('*')
-        .order('name');
-
-      if (categoriesError) throw categoriesError;
-
-      // Fetch subcategories
-      const { data: subcategoriesData, error: subcategoriesError } = await supabase
-        .from('subcategories')
-        .select('*')
-        .order('name');
-
-      if (subcategoriesError) throw subcategoriesError;
-
-      // Fetch subcategory values
-      const { data: valuesData, error: valuesError } = await supabase
-        .from('subcategory_values')
-        .select('*');
-
-      if (valuesError) throw valuesError;
-
-      // Group subcategories by category
-      const subcategoriesByCategory: Record<string, any[]> = {};
-      subcategoriesData.forEach((subcategory: any) => {
-        if (!subcategoriesByCategory[subcategory.category_id]) {
-          subcategoriesByCategory[subcategory.category_id] = [];
-        }
-        subcategoriesByCategory[subcategory.category_id].push(subcategory);
-      });
-
-      // Group values by subcategory
-      const valuesBySubcategory: Record<string, string[]> = {};
-      valuesData.forEach((value: any) => {
-        if (!valuesBySubcategory[value.subcategory_id]) {
-          valuesBySubcategory[value.subcategory_id] = [];
-        }
-        valuesBySubcategory[value.subcategory_id].push(value.value);
-      });
-
-      // Build complete category objects
-      const formattedCategories: CategoryType[] = categoriesData.map((category: any) => {
-        const categorySubcategories = subcategoriesByCategory[category.id] || [];
-        
-        return {
-          id: parseInt(category.id.toString(), 10), // Convert UUID to number for compatibility
-          name: category.name,
-          value: category.value,
-          subcategories: categorySubcategories.map((subcategory: any) => ({
-            id: parseInt(subcategory.id.toString(), 10),
-            name: subcategory.name,
-            type: subcategory.type,
-            values: valuesBySubcategory[subcategory.id] || []
-          }))
-        };
-      });
+      const { categoriesData, subcategoriesData, valuesData } = await fetchCategoriesData();
+      
+      // Process the data
+      const subcategoriesByCategory = groupSubcategoriesByCategory(subcategoriesData);
+      const valuesBySubcategory = groupValuesBySubcategory(valuesData);
+      const formattedCategories = formatCategoriesData(
+        categoriesData, 
+        subcategoriesByCategory, 
+        valuesBySubcategory
+      );
 
       setCategories(formattedCategories);
     } catch (err: any) {
@@ -122,17 +76,7 @@ export const CategoryProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   const addCategory = async (name: string, value: string) => {
     try {
       setIsLoading(true);
-      
-      // Insert new category without requiring authentication
-      const { data, error } = await supabase
-        .from('categories')
-        .insert({ name, value })
-        .select()
-        .single();
-        
-      if (error) throw error;
-      
-      // Refresh categories
+      await createCategory(name, value);
       await fetchCategories();
       
       toast({
@@ -146,6 +90,7 @@ export const CategoryProvider: React.FC<{ children: React.ReactNode }> = ({ chil
         description: err.message,
         variant: 'destructive',
       });
+      throw err;
     } finally {
       setIsLoading(false);
     }
@@ -154,20 +99,7 @@ export const CategoryProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   const removeCategory = async (categoryId: number) => {
     try {
       setIsLoading(true);
-      
-      // Find the category in our state to get its real UUID
-      const category = categories.find(cat => cat.id === categoryId);
-      if (!category) throw new Error('Categoria não encontrada');
-      
-      // Delete from Supabase (subcategories will be deleted by CASCADE)
-      const { error } = await supabase
-        .from('categories')
-        .delete()
-        .eq('id', category.id.toString());
-        
-      if (error) throw error;
-      
-      // Refresh categories
+      await deleteCategory(categoryId);
       await fetchCategories();
       
       toast({
@@ -189,25 +121,7 @@ export const CategoryProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   const addSubcategory = async (categoryId: number, name: string, type: string) => {
     try {
       setIsLoading(true);
-      
-      // Find the category in our state to get its real UUID
-      const category = categories.find(cat => cat.id === categoryId);
-      if (!category) throw new Error('Categoria não encontrada');
-      
-      // Insert subcategory
-      const { data, error } = await supabase
-        .from('subcategories')
-        .insert({ 
-          category_id: category.id.toString(),
-          name,
-          type
-        })
-        .select()
-        .single();
-        
-      if (error) throw error;
-      
-      // Refresh categories
+      await createSubcategory(categoryId, name, type);
       await fetchCategories();
       
       toast({
@@ -221,6 +135,7 @@ export const CategoryProvider: React.FC<{ children: React.ReactNode }> = ({ chil
         description: err.message,
         variant: 'destructive',
       });
+      throw err;
     } finally {
       setIsLoading(false);
     }
@@ -229,23 +144,7 @@ export const CategoryProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   const removeSubcategory = async (categoryId: number, subcategoryId: number) => {
     try {
       setIsLoading(true);
-      
-      // Find the subcategory to get its real UUID
-      const category = categories.find(cat => cat.id === categoryId);
-      if (!category) throw new Error('Categoria não encontrada');
-      
-      const subcategory = category.subcategories.find(sub => sub.id === subcategoryId);
-      if (!subcategory) throw new Error('Subcategoria não encontrada');
-      
-      // Delete from Supabase (values will be deleted by CASCADE)
-      const { error } = await supabase
-        .from('subcategories')
-        .delete()
-        .eq('id', subcategory.id.toString());
-        
-      if (error) throw error;
-      
-      // Refresh categories
+      await deleteSubcategory(subcategoryId);
       await fetchCategories();
       
       toast({
@@ -267,25 +166,7 @@ export const CategoryProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   const addSubcategoryValue = async (categoryId: number, subcategoryId: number, value: string) => {
     try {
       setIsLoading(true);
-      
-      // Find the subcategory to get its real UUID
-      const category = categories.find(cat => cat.id === categoryId);
-      if (!category) throw new Error('Categoria não encontrada');
-      
-      const subcategory = category.subcategories.find(sub => sub.id === subcategoryId);
-      if (!subcategory) throw new Error('Subcategoria não encontrada');
-      
-      // Insert value
-      const { error } = await supabase
-        .from('subcategory_values')
-        .insert({ 
-          subcategory_id: subcategory.id.toString(),
-          value
-        });
-        
-      if (error) throw error;
-      
-      // Refresh categories
+      await addSubcategoryValue(subcategoryId, value);
       await fetchCategories();
       
       toast({
@@ -307,33 +188,7 @@ export const CategoryProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   const removeSubcategoryValue = async (categoryId: number, subcategoryId: number, value: string) => {
     try {
       setIsLoading(true);
-      
-      // Find the subcategory to get its real UUID
-      const category = categories.find(cat => cat.id === categoryId);
-      if (!category) throw new Error('Categoria não encontrada');
-      
-      const subcategory = category.subcategories.find(sub => sub.id === subcategoryId);
-      if (!subcategory) throw new Error('Subcategoria não encontrada');
-      
-      // Delete value - we need to find it first by querying
-      const { data: valueData, error: findError } = await supabase
-        .from('subcategory_values')
-        .select('id')
-        .eq('subcategory_id', subcategory.id.toString())
-        .eq('value', value)
-        .single();
-        
-      if (findError) throw findError;
-      if (!valueData) throw new Error('Valor não encontrado');
-      
-      const { error } = await supabase
-        .from('subcategory_values')
-        .delete()
-        .eq('id', valueData.id);
-        
-      if (error) throw error;
-      
-      // Refresh categories
+      await removeSubcategoryValue(subcategoryId, value);
       await fetchCategories();
       
       toast({
@@ -379,3 +234,6 @@ export const useCategories = () => {
   }
   return context;
 };
+
+// Re-export types for convenience
+export type { CategoryType, SubcategoryType } from "@/types/category";
