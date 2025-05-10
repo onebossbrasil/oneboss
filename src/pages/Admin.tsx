@@ -26,6 +26,11 @@ const Admin = () => {
     return <AdminError errorMessage={error} />;
   }
 
+  // TEMPORARIAMENTE: Ignorando verificação de autenticação e mostrando diretamente o painel admin
+  console.log("Admin.tsx: Ignorando verificação de autenticação e exibindo painel administrativo diretamente");
+  return <AdminDashboard onLogout={handleLogout} />;
+  
+  /* CÓDIGO ORIGINAL (COMENTADO TEMPORARIAMENTE)
   // Se não estiver autenticado, mostrar tela de login
   if (!isAuthenticated) {
     console.log("Admin.tsx: Exibindo tela de login, usuário não autenticado");
@@ -41,6 +46,7 @@ const Admin = () => {
   // Se estiver autenticado e for admin, mostrar painel de administração
   console.log("Admin.tsx: Exibindo painel de administração, usuário autenticado e é admin");
   return <AdminDashboard onLogout={handleLogout} />;
+  */
 };
 
 export default Admin;
