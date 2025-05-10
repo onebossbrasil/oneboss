@@ -5,6 +5,8 @@ import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { Checkbox } from "@/components/ui/checkbox";
 import { useCategories } from "@/contexts/CategoryContext";
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
+import { SubcategoryType } from "@/types/category";
 
 type FilterSidebarProps = {
   selectedCategory: string | null;
@@ -24,18 +26,32 @@ const FilterSidebar = ({
   setIsMobileFiltersOpen,
 }: FilterSidebarProps) => {
   const { categories } = useCategories();
+  const [openSubcategories, setOpenSubcategories] = useState<Record<string, boolean>>({});
+  
+  // Toggle a subcategory group open/closed state
+  const toggleSubcategoryGroup = (subcategoryId: string) => {
+    setOpenSubcategories(prev => ({
+      ...prev,
+      [subcategoryId]: !prev[subcategoryId]
+    }));
+  };
   
   // Helper function to get subcategories for selected category
   const getSubcategories = () => {
     if (!selectedCategory) return [];
+    
+    // Find the category by its value (since that's what we're using in URL/selection)
     const category = categories.find(cat => cat.value === selectedCategory);
     if (!category) return [];
     
-    // Flatten subcategory values for display in the filter
-    return category.subcategories.flatMap(subcat => 
-      subcat.values.map(val => val)
-    );
+    // Return the full subcategories array, not flattened
+    return category.subcategories;
   };
+  
+  // Log for debugging
+  console.log("Selected Category:", selectedCategory);
+  console.log("Selected Subcategories:", selectedSubcategories);
+  console.log("Available Categories:", categories.map(c => ({ id: c.id, value: c.value, name: c.name })));
   
   return (
     <>
@@ -74,26 +90,46 @@ const FilterSidebar = ({
         
         <Separator className="my-6" />
         
-        {/* Filtro por subcategoria */}
+        {/* Filtro por subcategoria - organized by subcategory groups */}
         {selectedCategory && (
           <div className="space-y-4">
             <h3 className="font-medium">Subcategorias</h3>
-            <div className="space-y-3">
-              {getSubcategories().map((subcategory) => (
-                <div key={subcategory} className="flex items-center space-x-2">
-                  <Checkbox 
-                    id={subcategory} 
-                    checked={selectedSubcategories.includes(subcategory)}
-                    onCheckedChange={() => onSubcategoryToggle(subcategory)}
-                    className="border-gold/40 data-[state=checked]:bg-gold data-[state=checked]:border-gold"
-                  />
-                  <label 
-                    htmlFor={subcategory}
-                    className="text-sm cursor-pointer"
-                  >
-                    {subcategory}
-                  </label>
-                </div>
+            <div className="space-y-4">
+              {getSubcategories().map((subcategory: SubcategoryType) => (
+                <Collapsible 
+                  key={subcategory.id} 
+                  open={openSubcategories[subcategory.id.toString()] || false}
+                  onOpenChange={() => toggleSubcategoryGroup(subcategory.id.toString())}
+                  className="border border-border rounded-md px-3 py-2"
+                >
+                  <CollapsibleTrigger asChild>
+                    <div className="flex items-center justify-between cursor-pointer">
+                      <span className="font-medium text-sm">{subcategory.name}</span>
+                      <span className="text-muted-foreground text-xs">
+                        {openSubcategories[subcategory.id.toString()] ? '−' : '+'}
+                      </span>
+                    </div>
+                  </CollapsibleTrigger>
+                  
+                  <CollapsibleContent className="pt-3 space-y-2">
+                    {subcategory.values.map((value) => (
+                      <div key={`${subcategory.id}-${value}`} className="flex items-center space-x-2">
+                        <Checkbox 
+                          id={value} 
+                          checked={selectedSubcategories.includes(value)}
+                          onCheckedChange={() => onSubcategoryToggle(value)}
+                          className="border-gold/40 data-[state=checked]:bg-gold data-[state=checked]:border-gold"
+                        />
+                        <label 
+                          htmlFor={value}
+                          className="text-sm cursor-pointer"
+                        >
+                          {value}
+                        </label>
+                      </div>
+                    ))}
+                  </CollapsibleContent>
+                </Collapsible>
               ))}
             </div>
           </div>

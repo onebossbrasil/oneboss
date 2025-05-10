@@ -11,8 +11,10 @@ import ProductGrid from "@/components/store/ProductGrid";
 import { useProducts } from "@/contexts/ProductContext";
 import { useCategories } from "@/contexts/CategoryContext";
 import { FormattedProduct } from "@/types/product";
+import { useToast } from "@/hooks/use-toast";
 
 const Store = () => {
+  const { toast } = useToast();
   const [searchParams, setSearchParams] = useSearchParams();
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [selectedSubcategories, setSelectedSubcategories] = useState<string[]>([]);
@@ -32,8 +34,23 @@ const Store = () => {
     }
   }, [searchParams]);
   
+  // Improved function to find category ID by its value
+  const getCategoryIdByValue = (value: string | null) => {
+    if (!value) return null;
+    const category = categories.find(cat => cat.value === value);
+    return category ? category.id.toString() : null;
+  };
+  
   // Filter products when the filters change
   useEffect(() => {
+    // Log filters for debugging
+    console.log("Filtering with:", {
+      searchQuery,
+      selectedCategory,
+      selectedCategoryId: getCategoryIdByValue(selectedCategory),
+      selectedSubcategories
+    });
+    
     // First, only include published products
     let result = products.filter(product => product.published !== false);
     
@@ -47,31 +64,43 @@ const Store = () => {
       );
     }
     
-    // Filter by category
-    if (selectedCategory) {
-      const category = categories.find(cat => cat.value === selectedCategory);
-      if (category) {
-        result = result.filter(product => product.categoryId === category.id.toString());
-      }
+    // Filter by category (using ID)
+    const selectedCategoryId = getCategoryIdByValue(selectedCategory);
+    if (selectedCategoryId) {
+      console.log(`Filtering by category ID: ${selectedCategoryId}`);
+      result = result.filter(product => {
+        console.log(`Product ${product.name} category: ${product.categoryId}, selected: ${selectedCategoryId}`);
+        return product.categoryId === selectedCategoryId;
+      });
     }
     
-    // Filter by subcategories
+    // Filter by subcategories (improved logic)
     if (selectedSubcategories.length > 0) {
       result = result.filter(product => {
+        // Skip if no subcategory values
         if (!product.subcategoryValues) return false;
         
         // Check if any of the product's subcategory values match the selected subcategories
-        return Object.values(product.subcategoryValues).some(value => 
-          selectedSubcategories.includes(value)
+        const productSubcategoryValues = Object.values(product.subcategoryValues);
+        
+        // Log for debugging
+        console.log(`Product ${product.id} subcategory values:`, productSubcategoryValues, 
+                    "Selected subcategories:", selectedSubcategories);
+        
+        // Check if any selected subcategory is in the product's values
+        return selectedSubcategories.some(selected => 
+          productSubcategoryValues.includes(selected)
         );
       });
     }
     
+    console.log(`Filtered products: ${result.length} of ${products.length}`);
     setFilteredProducts(result);
   }, [selectedCategory, selectedSubcategories, searchQuery, products, categories]);
   
   // Toggle subcategory
   const toggleSubcategory = (subcategory: string) => {
+    console.log("Toggling subcategory:", subcategory);
     if (selectedSubcategories.includes(subcategory)) {
       setSelectedSubcategories(selectedSubcategories.filter(s => s !== subcategory));
     } else {
@@ -82,6 +111,8 @@ const Store = () => {
   // Select category
   const handleCategorySelect = (categoryId: string) => {
     const newCategory = categoryId === selectedCategory ? null : categoryId;
+    console.log("Selected category value:", newCategory);
+    
     setSelectedCategory(newCategory);
     setSelectedSubcategories([]);
     
@@ -101,6 +132,11 @@ const Store = () => {
     setSearchQuery("");
     searchParams.delete("categoria");
     setSearchParams(searchParams);
+    
+    toast({
+      title: "Filtros limpos",
+      description: "Todos os filtros foram removidos.",
+    });
   };
   
   // Convert products to the format expected by ProductGrid
