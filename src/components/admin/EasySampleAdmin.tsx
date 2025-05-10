@@ -27,6 +27,26 @@ const EasySampleAdmin = () => {
         throw new Error(`Erro ao verificar permissões de admin: ${adminCheckError.message}`);
       }
       
+      // Adicionar permissões de admin primeiro
+      if (!existingAdmin) {
+        console.log("Adicionando permissões de admin para admin@example.com");
+        const { error: permissionError } = await supabase
+          .from('admin_permissions')
+          .insert({
+            email: 'admin@example.com',
+            role: 'admin'
+          });
+        
+        if (permissionError) {
+          console.error("Erro ao adicionar permissões de admin:", permissionError);
+          throw new Error(`Erro ao adicionar permissões de admin: ${permissionError.message}`);
+        }
+        
+        console.log("Permissões de admin adicionadas com sucesso.");
+      } else {
+        console.log("Permissões de admin já existem:", existingAdmin);
+      }
+      
       // 2. Tentar fazer login se o usuário já existe
       const { data: authData, error: signInError } = await supabase.auth.signInWithPassword({
         email: 'admin@example.com',
@@ -36,24 +56,6 @@ const EasySampleAdmin = () => {
       // Se o login funcionar, significa que o usuário já existe
       if (!signInError && authData?.user) {
         console.log("Login realizado com sucesso para usuário existente:", authData.user.email);
-        
-        // Garantir que as permissões admin existam
-        if (!existingAdmin) {
-          console.log("Usuário existe mas não tem permissões de admin, adicionando...");
-          const { error: permissionError } = await supabase
-            .from('admin_permissions')
-            .insert({
-              email: 'admin@example.com',
-              role: 'admin'
-            });
-          
-          if (permissionError) {
-            console.error("Erro ao adicionar permissões de admin:", permissionError);
-            throw new Error(`Erro ao adicionar permissões de admin: ${permissionError.message}`);
-          }
-          
-          console.log("Permissões de admin adicionadas com sucesso.");
-        }
         
         toast({
           title: "Login realizado com sucesso!",
@@ -69,11 +71,6 @@ const EasySampleAdmin = () => {
       const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
         email: 'admin@example.com',
         password: 'admin123',
-        options: {
-          data: {
-            role: 'admin'
-          }
-        }
       });
       
       if (signUpError) {
@@ -83,20 +80,7 @@ const EasySampleAdmin = () => {
       
       console.log("Usuário admin criado com sucesso:", signUpData?.user?.email);
       
-      // 4. Adicionar permissões de admin
-      const { error: permissionError } = await supabase
-        .from('admin_permissions')
-        .insert({
-          email: 'admin@example.com',
-          role: 'admin'
-        });
-      
-      if (permissionError && !permissionError.message.includes("already exists")) {
-        console.error("Erro ao adicionar permissões de admin:", permissionError);
-        throw new Error(`Erro ao adicionar permissões de admin: ${permissionError.message}`);
-      }
-      
-      // 5. Fazer login com as credenciais criadas
+      // 4. Fazer login com as credenciais criadas
       const { data: loginData, error: loginError } = await supabase.auth.signInWithPassword({
         email: 'admin@example.com',
         password: 'admin123',
