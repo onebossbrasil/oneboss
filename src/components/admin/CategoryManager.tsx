@@ -7,14 +7,24 @@ import ValueList from "./categories/ValueList";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { AlertCircle, Loader2, RefreshCw } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 const CategoryManager = () => {
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [selectedSubcategory, setSelectedSubcategory] = useState<number | null>(null);
+  const [activeTab, setActiveTab] = useState<string>("categories");
   const { isLoading, error, refreshCategories } = useCategories();
 
   const handleRefresh = () => {
     refreshCategories();
+  };
+
+  // Reset subcategory selection when changing to categories tab on mobile
+  const handleTabChange = (value: string) => {
+    setActiveTab(value);
+    if (value === "categories") {
+      setSelectedSubcategory(null);
+    }
   };
 
   if (isLoading) {
@@ -42,6 +52,125 @@ const CategoryManager = () => {
     );
   }
 
+  // Show breadcrumb navigation for mobile (only when a category is selected)
+  const renderMobileBreadcrumb = () => {
+    if (!selectedCategory) return null;
+
+    const category = useCategories().categories.find(cat => cat.value === selectedCategory);
+    const subcategory = category?.subcategories.find(sub => sub.id === selectedSubcategory);
+
+    return (
+      <div className="flex flex-wrap items-center text-sm mb-4 text-muted-foreground">
+        <button 
+          onClick={() => {
+            setActiveTab("categories");
+            setSelectedSubcategory(null);
+          }}
+          className="hover:underline"
+        >
+          Categorias
+        </button>
+
+        {selectedCategory && (
+          <>
+            <span className="mx-2">/</span>
+            <button 
+              onClick={() => {
+                setActiveTab("subcategories");
+                setSelectedSubcategory(null);
+              }}
+              className="hover:underline"
+            >
+              {category?.name}
+            </button>
+          </>
+        )}
+
+        {selectedSubcategory && (
+          <>
+            <span className="mx-2">/</span>
+            <button 
+              onClick={() => setActiveTab("values")}
+              className="hover:underline"
+            >
+              {subcategory?.name}
+            </button>
+          </>
+        )}
+      </div>
+    );
+  };
+
+  // Desktop view (three panels side by side)
+  const desktopView = (
+    <div className="hidden md:grid md:grid-cols-3 gap-6">
+      <CategoryList 
+        selectedCategory={selectedCategory}
+        setSelectedCategory={setSelectedCategory}
+        setSelectedSubcategory={setSelectedSubcategory}
+      />
+      
+      <SubcategoryList 
+        selectedCategory={selectedCategory}
+        selectedSubcategory={selectedSubcategory}
+        setSelectedSubcategory={setSelectedSubcategory}
+      />
+      
+      <ValueList 
+        selectedCategory={selectedCategory}
+        selectedSubcategory={selectedSubcategory}
+      />
+    </div>
+  );
+
+  // Mobile view (tabs navigation)
+  const mobileView = (
+    <div className="md:hidden">
+      {renderMobileBreadcrumb()}
+      
+      <Tabs value={activeTab} onValueChange={handleTabChange} className="space-y-4">
+        <TabsList className="grid grid-cols-3 w-full">
+          <TabsTrigger value="categories">Categorias</TabsTrigger>
+          <TabsTrigger value="subcategories" disabled={!selectedCategory}>Subcategorias</TabsTrigger>
+          <TabsTrigger value="values" disabled={!selectedSubcategory}>Valores</TabsTrigger>
+        </TabsList>
+        
+        <TabsContent value="categories">
+          <CategoryList 
+            selectedCategory={selectedCategory}
+            setSelectedCategory={(cat) => {
+              setSelectedCategory(cat);
+              if (cat) {
+                setActiveTab("subcategories");
+              }
+            }}
+            setSelectedSubcategory={setSelectedSubcategory}
+          />
+        </TabsContent>
+        
+        <TabsContent value="subcategories">
+          <SubcategoryList 
+            selectedCategory={selectedCategory}
+            selectedSubcategory={selectedSubcategory}
+            setSelectedSubcategory={(subcat) => {
+              setSelectedSubcategory(subcat);
+              if (subcat) {
+                setActiveTab("values");
+              }
+            }}
+          />
+        </TabsContent>
+        
+        <TabsContent value="values">
+          <ValueList 
+            selectedCategory={selectedCategory}
+            selectedSubcategory={selectedSubcategory}
+          />
+        </TabsContent>
+      </Tabs>
+    </div>
+  );
+
   return (
     <div className="space-y-4">
       <div className="flex justify-end">
@@ -51,27 +180,8 @@ const CategoryManager = () => {
         </Button>
       </div>
       
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        {/* Categories Panel */}
-        <CategoryList 
-          selectedCategory={selectedCategory}
-          setSelectedCategory={setSelectedCategory}
-          setSelectedSubcategory={setSelectedSubcategory}
-        />
-        
-        {/* Subcategories Panel */}
-        <SubcategoryList 
-          selectedCategory={selectedCategory}
-          selectedSubcategory={selectedSubcategory}
-          setSelectedSubcategory={setSelectedSubcategory}
-        />
-        
-        {/* Values Panel */}
-        <ValueList 
-          selectedCategory={selectedCategory}
-          selectedSubcategory={selectedSubcategory}
-        />
-      </div>
+      {desktopView}
+      {mobileView}
     </div>
   );
 };

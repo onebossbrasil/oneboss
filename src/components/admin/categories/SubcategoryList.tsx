@@ -91,11 +91,11 @@ const SubcategoryList = ({
             {category && (
               <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
                 <DialogTrigger asChild>
-                  <Button variant="outline" size="sm">
-                    <Plus className="h-4 w-4 mr-1" /> Nova
+                  <Button variant="outline" size="sm" className="h-9">
+                    <Plus className="h-4 w-4 mr-1" /> <span className="md:inline hidden">Nova</span>
                   </Button>
                 </DialogTrigger>
-                <DialogContent>
+                <DialogContent className="sm:max-w-md max-w-[95vw] w-full">
                   <DialogHeader>
                     <DialogTitle>Adicionar Subcategoria</DialogTitle>
                     <DialogDescription>
@@ -126,6 +126,7 @@ const SubcategoryList = ({
                     <Button 
                       onClick={handleAddSubcategory}
                       disabled={!newSubcategoryName || !newSubcategoryType}
+                      className="w-full sm:w-auto"
                     >
                       Adicionar Subcategoria
                     </Button>

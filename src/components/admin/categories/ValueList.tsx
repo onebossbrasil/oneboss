@@ -80,7 +80,7 @@ const ValueList = ({
     <Card className="md:col-span-1">
       <CardContent className="pt-6">
         <div className="space-y-4">
-          <div className="flex justify-between items-center">
+          <div className="flex justify-between items-center flex-wrap gap-2">
             <h3 className="text-lg font-medium">
               {subcategory ? `Valores: ${subcategory.name}` : 'Valores'}
             </h3>
@@ -90,13 +90,14 @@ const ValueList = ({
                   placeholder="Novo valor..."
                   value={newValueName}
                   onChange={(e) => setNewValueName(e.target.value)}
-                  className="h-9 w-40"
+                  className="h-9 w-full md:w-40"
                 />
                 <Button 
                   variant="outline" 
                   size="sm"
                   onClick={handleAddValue}
                   disabled={!newValueName}
+                  className="h-9"
                 >
                   <Plus className="h-4 w-4" />
                 </Button>

@@ -9,7 +9,6 @@ import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { useCategories } from "@/contexts/CategoryContext";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { supabase } from "@/integrations/supabase/client";
 
 interface CategoryListProps {
   selectedCategory: string | null;
@@ -23,7 +22,7 @@ const CategoryList = ({
   setSelectedSubcategory
 }: CategoryListProps) => {
   const { toast } = useToast();
-  const { categories, addCategory, removeCategory, refreshCategories } = useCategories();
+  const { categories, addCategory, removeCategory } = useCategories();
   const [newCategoryName, setNewCategoryName] = useState("");
   const [newCategorySlug, setNewCategorySlug] = useState("");
   const [dialogOpen, setDialogOpen] = useState(false);
@@ -89,11 +88,11 @@ const CategoryList = ({
             <h3 className="text-lg font-medium">Categorias</h3>
             <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
               <DialogTrigger asChild>
-                <Button variant="outline" size="sm">
-                  <Plus className="h-4 w-4 mr-1" /> Nova
+                <Button variant="outline" size="sm" className="h-9">
+                  <Plus className="h-4 w-4 mr-1" /> <span className="md:inline hidden">Nova</span>
                 </Button>
               </DialogTrigger>
-              <DialogContent>
+              <DialogContent className="sm:max-w-md max-w-[95vw] w-full">
                 <DialogHeader>
                   <DialogTitle>Adicionar Categoria</DialogTitle>
                   <DialogDescription>
@@ -130,6 +129,7 @@ const CategoryList = ({
                     type="button" 
                     onClick={handleAddCategory}
                     disabled={!newCategoryName || !newCategorySlug || isSubmitting}
+                    className="w-full sm:w-auto"
                   >
                     {isSubmitting ? "Adicionando..." : "Adicionar Categoria"}
                   </Button>
