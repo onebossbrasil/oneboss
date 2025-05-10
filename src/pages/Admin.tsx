@@ -1,45 +1,19 @@
 
-import React, { useEffect } from "react";
-import AdminLogin from "@/components/admin/AdminLogin";
+import React from "react";
 import AdminDashboard from "@/components/admin/AdminDashboard";
-import { useAdminAuth } from "@/hooks/useAdminAuth";
-import AdminLoading from "@/components/admin/states/AdminLoading";
-import AdminError from "@/components/admin/states/AdminError";
-import AccessDenied from "@/components/admin/states/AccessDenied";
+import { useToast } from "@/hooks/use-toast";
 
 const Admin = () => {
-  const { isAuthenticated, isAdmin, isLoading, error, handleLogin, handleLogout } = useAdminAuth();
+  const { toast } = useToast();
 
-  useEffect(() => {
-    console.log("Estado atual do Admin.tsx:", { isAuthenticated, isAdmin, isLoading, error });
-  }, [isAuthenticated, isAdmin, isLoading, error]);
+  const handleLogout = () => {
+    toast({
+      title: "Logout simulado",
+      description: "Em um sistema real, você seria desconectado."
+    });
+  };
 
-  // Se estiver carregando, mostrar indicador de carregamento
-  if (isLoading) {
-    console.log("Admin.tsx: Exibindo tela de carregamento");
-    return <AdminLoading />;
-  }
-
-  // Se houver erro, mostrar mensagem de erro
-  if (error) {
-    console.log("Admin.tsx: Exibindo tela de erro:", error);
-    return <AdminError errorMessage={error} />;
-  }
-
-  // Se não estiver autenticado, mostrar tela de login
-  if (!isAuthenticated) {
-    console.log("Admin.tsx: Exibindo tela de login, usuário não autenticado");
-    return <AdminLogin onLogin={handleLogin} />;
-  }
-
-  // Se estiver autenticado, mas não for admin, mostrar mensagem de acesso negado
-  if (!isAdmin) {
-    console.log("Admin.tsx: Exibindo tela de acesso negado, usuário autenticado mas não é admin");
-    return <AccessDenied onLogout={handleLogout} />;
-  }
-
-  // Se estiver autenticado e for admin, mostrar painel de administração
-  console.log("Admin.tsx: Exibindo painel de administração, usuário autenticado e é admin");
+  // Renderizar diretamente o painel administrativo sem verificações
   return <AdminDashboard onLogout={handleLogout} />;
 };
 
