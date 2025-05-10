@@ -15,11 +15,15 @@ const EasySampleAdmin = () => {
       setIsLoading(true);
       console.log("Iniciando configuração de acesso admin...");
       
+      // Use a valid email format to avoid validation errors
+      const adminEmail = "admin123@example.com";
+      const adminPassword = "admin123";
+      
       // 1. Verificar permissões de admin existentes primeiro
       const { data: existingAdmin, error: adminCheckError } = await supabase
         .from('admin_permissions')
         .select('*')
-        .eq('email', 'admin@example.com')
+        .eq('email', adminEmail)
         .maybeSingle();
       
       if (adminCheckError && adminCheckError.code !== 'PGRST116') {
@@ -29,11 +33,11 @@ const EasySampleAdmin = () => {
       
       // Adicionar permissões de admin primeiro
       if (!existingAdmin) {
-        console.log("Adicionando permissões de admin para admin@example.com");
+        console.log(`Adicionando permissões de admin para ${adminEmail}`);
         const { error: permissionError } = await supabase
           .from('admin_permissions')
           .insert({
-            email: 'admin@example.com',
+            email: adminEmail,
             role: 'admin'
           });
         
@@ -49,8 +53,8 @@ const EasySampleAdmin = () => {
       
       // 2. Tentar fazer login se o usuário já existe
       const { data: authData, error: signInError } = await supabase.auth.signInWithPassword({
-        email: 'admin@example.com',
-        password: 'admin123',
+        email: adminEmail,
+        password: adminPassword,
       });
       
       // Se o login funcionar, significa que o usuário já existe
@@ -69,8 +73,8 @@ const EasySampleAdmin = () => {
       // 3. Se não conseguiu login, tente criar o usuário
       console.log("Criando novo usuário admin...");
       const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
-        email: 'admin@example.com',
-        password: 'admin123',
+        email: adminEmail,
+        password: adminPassword,
       });
       
       if (signUpError) {
@@ -82,8 +86,8 @@ const EasySampleAdmin = () => {
       
       // 4. Fazer login com as credenciais criadas
       const { data: loginData, error: loginError } = await supabase.auth.signInWithPassword({
-        email: 'admin@example.com',
-        password: 'admin123',
+        email: adminEmail,
+        password: adminPassword,
       });
       
       if (loginError) {

@@ -149,6 +149,11 @@ const AdminLogin = ({ onLogin }: AdminLoginProps) => {
                 />
               </div>
             </div>
+            <div className="text-sm text-muted-foreground">
+              <p>Para acesso rápido use:</p>
+              <p>Email: admin123@example.com</p>
+              <p>Senha: admin123</p>
+            </div>
           </CardContent>
           <CardFooter>
             <Button type="submit" className="w-full" disabled={isSubmitting}>
