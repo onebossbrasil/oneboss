@@ -3,10 +3,8 @@ import { useState } from "react";
 import { Filter, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
-import { Checkbox } from "@/components/ui/checkbox";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useCategories } from "@/contexts/CategoryContext";
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { SubcategoryType } from "@/types/category";
 
 type FilterSidebarProps = {
@@ -83,11 +81,13 @@ const FilterSidebar = ({
           Limpar Filtros
         </Button>
         
-        {/* Filtro por categoria */}
-        <div className="space-y-4 mb-6">
+        {/* Combined Filters Section with a single ScrollArea */}
+        <div className="space-y-6">
           <h3 className="font-medium">Categorias</h3>
-          <ScrollArea className="h-[200px] pr-4">
-            <div className="space-y-1">
+          
+          <ScrollArea className="h-[400px] pr-4">
+            {/* Categories section */}
+            <div className="space-y-1 mb-6">
               {categories.map((category) => (
                 <div key={category.id} className="flex flex-col">
                   <Button
@@ -100,16 +100,12 @@ const FilterSidebar = ({
                 </div>
               ))}
             </div>
-          </ScrollArea>
-        </div>
-        
-        <Separator className="my-6" />
-        
-        {/* Filtro por subcategoria - usando o mesmo estilo das categorias */}
-        {selectedCategory && (
-          <div className="space-y-4">
-            <h3 className="font-medium">Subcategorias</h3>
-            <ScrollArea className="h-[300px] pr-4">
+            
+            <Separator className="my-4" />
+            
+            {/* Subcategories section - using the same style as categories */}
+            <div className="space-y-4 mt-4">
+              <h3 className="font-medium">Subcategorias</h3>
               <div className="space-y-1">
                 {getSubcategories().map((subcategory: SubcategoryType) => (
                   <div key={subcategory.id} className="mb-2">
@@ -128,9 +124,9 @@ const FilterSidebar = ({
                   </div>
                 ))}
               </div>
-            </ScrollArea>
-          </div>
-        )}
+            </div>
+          </ScrollArea>
+        </div>
         
         {/* Botão para aplicar filtros (apenas mobile) */}
         <div className="fixed bottom-0 left-0 right-0 p-4 bg-background border-t border-border md:hidden">
