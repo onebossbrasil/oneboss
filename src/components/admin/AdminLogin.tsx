@@ -34,6 +34,13 @@ const AdminLogin = ({ onLogin }: AdminLoginProps) => {
         password,
       });
 
+      console.log("Resposta de autenticação:", { 
+        sucesso: !authError && !!data.user, 
+        userId: data?.user?.id,
+        userEmail: data?.user?.email,
+        erro: authError
+      });
+
       if (authError) {
         console.error("Erro de autenticação:", authError);
         throw authError;

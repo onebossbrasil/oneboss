@@ -1,5 +1,5 @@
 
-import React from "react";
+import React, { useEffect } from "react";
 import AdminLogin from "@/components/admin/AdminLogin";
 import AdminDashboard from "@/components/admin/AdminDashboard";
 import { useAdminAuth } from "@/hooks/useAdminAuth";
@@ -10,30 +10,36 @@ import AccessDenied from "@/components/admin/states/AccessDenied";
 const Admin = () => {
   const { isAuthenticated, isAdmin, isLoading, error, handleLogin, handleLogout } = useAdminAuth();
 
+  useEffect(() => {
+    console.log("Estado atual do Admin.tsx:", { isAuthenticated, isAdmin, isLoading, error });
+  }, [isAuthenticated, isAdmin, isLoading, error]);
+
   // Se estiver carregando, mostrar indicador de carregamento
   if (isLoading) {
+    console.log("Admin.tsx: Exibindo tela de carregamento");
     return <AdminLoading />;
   }
 
   // Se houver erro, mostrar mensagem de erro
   if (error) {
+    console.log("Admin.tsx: Exibindo tela de erro:", error);
     return <AdminError errorMessage={error} />;
   }
 
   // Se não estiver autenticado, mostrar tela de login
   if (!isAuthenticated) {
-    console.log("Mostrando tela de login, não autenticado");
+    console.log("Admin.tsx: Exibindo tela de login, usuário não autenticado");
     return <AdminLogin onLogin={handleLogin} />;
   }
 
   // Se estiver autenticado, mas não for admin, mostrar mensagem de acesso negado
   if (!isAdmin) {
-    console.log("Mostrando tela de acesso negado, não é admin");
+    console.log("Admin.tsx: Exibindo tela de acesso negado, usuário autenticado mas não é admin");
     return <AccessDenied onLogout={handleLogout} />;
   }
 
   // Se estiver autenticado e for admin, mostrar painel de administração
-  console.log("Mostrando painel de administração");
+  console.log("Admin.tsx: Exibindo painel de administração, usuário autenticado e é admin");
   return <AdminDashboard onLogout={handleLogout} />;
 };
 
