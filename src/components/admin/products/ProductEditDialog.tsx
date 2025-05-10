@@ -69,7 +69,10 @@ const ProductEditDialog = ({ product, open, onOpenChange }: ProductEditDialogPro
             </div>
           </div>
           
-          <ProductEditActions onCancel={handleDialogClose} />
+          <ProductEditActions 
+            onCancel={handleDialogClose} 
+            isSubmitting={false} 
+          />
         </form>
       </DialogContent>
     </Dialog>
