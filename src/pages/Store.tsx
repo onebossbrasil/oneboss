@@ -182,12 +182,13 @@ const Store = () => {
               onSubcategoryToggle={toggleSubcategory}
               isMobileFiltersOpen={isMobileFiltersOpen}
               setIsMobileFiltersOpen={setIsMobileFiltersOpen}
+              resetFilters={resetFilters}
             />
             
             {/* Grid de produtos */}
             <div className="flex-grow">
               {/* Contador de resultados e ordenação */}
-              <ResultsHeader productCount={formattedProducts.length} />
+              <ResultsHeader productCount={filteredProducts.length} />
               
               {/* Exibição dos produtos filtrados */}
               {isLoading ? (

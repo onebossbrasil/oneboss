@@ -1,9 +1,10 @@
 
 import { useState } from "react";
-import { Filter } from "lucide-react";
+import { Filter, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { Checkbox } from "@/components/ui/checkbox";
+import { ScrollArea } from "@/components/ui/scroll-area";
 import { useCategories } from "@/contexts/CategoryContext";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { SubcategoryType } from "@/types/category";
@@ -15,6 +16,7 @@ type FilterSidebarProps = {
   onSubcategoryToggle: (subcategory: string) => void;
   isMobileFiltersOpen: boolean;
   setIsMobileFiltersOpen: (isOpen: boolean) => void;
+  resetFilters: () => void;
 };
 
 const FilterSidebar = ({
@@ -24,6 +26,7 @@ const FilterSidebar = ({
   onSubcategoryToggle,
   isMobileFiltersOpen,
   setIsMobileFiltersOpen,
+  resetFilters,
 }: FilterSidebarProps) => {
   const { categories } = useCategories();
   const [openSubcategories, setOpenSubcategories] = useState<Record<string, boolean>>({});
@@ -66,72 +69,66 @@ const FilterSidebar = ({
             className="md:hidden text-muted-foreground"
             onClick={() => setIsMobileFiltersOpen(false)}
           >
-            ✕
+            <X size={18} />
           </Button>
         </div>
+        
+        {/* Clear Filters Button */}
+        <Button
+          variant="outline"
+          size="sm"
+          className="mb-6 text-xs w-full border-gold/40 text-gold hover:bg-gold/10 hover:text-gold"
+          onClick={resetFilters}
+        >
+          Limpar Filtros
+        </Button>
         
         {/* Filtro por categoria */}
         <div className="space-y-4 mb-6">
           <h3 className="font-medium">Categorias</h3>
-          <div className="space-y-2">
-            {categories.map((category) => (
-              <div key={category.id} className="flex flex-col">
-                <Button
-                  variant="ghost"
-                  className={`justify-start font-normal ${selectedCategory === category.value ? 'bg-gold/10 text-gold' : ''}`}
-                  onClick={() => onCategorySelect(category.value)}
-                >
-                  {category.name}
-                </Button>
-              </div>
-            ))}
-          </div>
+          <ScrollArea className="h-[200px] pr-4">
+            <div className="space-y-1">
+              {categories.map((category) => (
+                <div key={category.id} className="flex flex-col">
+                  <Button
+                    variant="ghost"
+                    className={`justify-start font-normal h-8 px-2 ${selectedCategory === category.value ? 'bg-gold/10 text-gold' : ''}`}
+                    onClick={() => onCategorySelect(category.value)}
+                  >
+                    {category.name}
+                  </Button>
+                </div>
+              ))}
+            </div>
+          </ScrollArea>
         </div>
         
         <Separator className="my-6" />
         
-        {/* Filtro por subcategoria - organized by subcategory groups */}
+        {/* Filtro por subcategoria - usando o mesmo estilo das categorias */}
         {selectedCategory && (
           <div className="space-y-4">
             <h3 className="font-medium">Subcategorias</h3>
-            <div className="space-y-4">
-              {getSubcategories().map((subcategory: SubcategoryType) => (
-                <Collapsible 
-                  key={subcategory.id} 
-                  open={openSubcategories[subcategory.id.toString()] || false}
-                  onOpenChange={() => toggleSubcategoryGroup(subcategory.id.toString())}
-                  className="border border-border rounded-md px-3 py-2"
-                >
-                  <CollapsibleTrigger asChild>
-                    <div className="flex items-center justify-between cursor-pointer">
-                      <span className="font-medium text-sm">{subcategory.name}</span>
-                      <span className="text-muted-foreground text-xs">
-                        {openSubcategories[subcategory.id.toString()] ? '−' : '+'}
-                      </span>
-                    </div>
-                  </CollapsibleTrigger>
-                  
-                  <CollapsibleContent className="pt-3 space-y-2">
+            <ScrollArea className="h-[300px] pr-4">
+              <div className="space-y-1">
+                {getSubcategories().map((subcategory: SubcategoryType) => (
+                  <div key={subcategory.id} className="mb-2">
+                    <p className="text-sm font-medium mb-1 text-muted-foreground">{subcategory.name}</p>
                     {subcategory.values.map((value) => (
-                      <div key={`${subcategory.id}-${value}`} className="flex items-center space-x-2">
-                        <Checkbox 
-                          id={value} 
-                          checked={selectedSubcategories.includes(value)}
-                          onCheckedChange={() => onSubcategoryToggle(value)}
-                          className="border-gold/40 data-[state=checked]:bg-gold data-[state=checked]:border-gold"
-                        />
-                        <label 
-                          htmlFor={value}
-                          className="text-sm cursor-pointer"
+                      <div key={`${subcategory.id}-${value}`} className="flex flex-col">
+                        <Button
+                          variant="ghost"
+                          className={`justify-start font-normal h-8 px-2 ${selectedSubcategories.includes(value) ? 'bg-gold/10 text-gold' : ''}`}
+                          onClick={() => onSubcategoryToggle(value)}
                         >
                           {value}
-                        </label>
+                        </Button>
                       </div>
                     ))}
-                  </CollapsibleContent>
-                </Collapsible>
-              ))}
-            </div>
+                  </div>
+                ))}
+              </div>
+            </ScrollArea>
           </div>
         )}
         
