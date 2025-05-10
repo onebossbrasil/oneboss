@@ -10,7 +10,7 @@ import {
   deleteSubcategory,
   addSubcategoryValue as addSubcategoryValueService,
   removeSubcategoryValue as removeSubcategoryValueService
-} from "@/services/categoryService";
+} from "@/services/category";
 import {
   groupSubcategoriesByCategory,
   groupValuesBySubcategory,
