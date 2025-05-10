@@ -9,7 +9,6 @@ import WhyChooseUs from "../components/WhyChooseUs";
 import SponsorsBanner from "../components/SponsorsBanner";
 import ContactForm from "../components/ContactForm";
 import NewsletterSignup from "../components/NewsletterSignup";
-import EasySampleAdmin from "@/components/admin/EasySampleAdmin";
 
 const Index = () => {
   useEffect(() => {
@@ -21,13 +20,6 @@ const Index = () => {
       <Header />
       <main className="flex-1">
         <Hero />
-        
-        <div className="container mx-auto py-8">
-          <div className="text-center mb-8">
-            <EasySampleAdmin />
-          </div>
-        </div>
-        
         <CategoryBanners />
         <FeaturedProducts />
         <WhyChooseUs />
