@@ -154,6 +154,7 @@ export type Database = {
           stock_quantity: number | null
           subcategory_values: Json | null
           updated_at: string | null
+          url: string | null
         }
         Insert: {
           category_id?: string | null
@@ -169,6 +170,7 @@ export type Database = {
           stock_quantity?: number | null
           subcategory_values?: Json | null
           updated_at?: string | null
+          url?: string | null
         }
         Update: {
           category_id?: string | null
@@ -184,6 +186,7 @@ export type Database = {
           stock_quantity?: number | null
           subcategory_values?: Json | null
           updated_at?: string | null
+          url?: string | null
         }
         Relationships: []
       }
