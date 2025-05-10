@@ -57,20 +57,6 @@ export const createCategory = async (name: string, value: string) => {
   try {
     console.log("Criando categoria:", { name, value });
     
-    // Verificar a sessão do usuário atual
-    const { data: sessionData, error: sessionError } = await supabase.auth.getSession();
-    if (sessionError) {
-      console.error("Erro ao verificar sessão:", sessionError);
-      throw new Error("Erro ao verificar autenticação. Por favor, faça login novamente.");
-    }
-    
-    if (!sessionData.session) {
-      console.error("Usuário não autenticado");
-      throw new Error("Usuário não está autenticado. Por favor, faça login.");
-    }
-    
-    console.log("Usuário autenticado:", sessionData.session.user.email);
-    
     const { data, error } = await supabase
       .from('categories')
       .insert({ name, value })
@@ -95,6 +81,19 @@ export const deleteCategory = async (categoryId: number) => {
   try {
     console.log("Deletando categoria:", categoryId);
     
+    // Primeiro, vamos remover todas as subcategorias associadas
+    // Isso também removerá automaticamente os valores das subcategorias devido às restrições de chave estrangeira
+    const { error: subError } = await supabase
+      .from('subcategories')
+      .delete()
+      .eq('category_id', categoryId.toString());
+      
+    if (subError) {
+      console.error("Erro ao deletar subcategorias:", subError);
+      throw subError;
+    }
+    
+    // Agora deletamos a categoria
     const { error } = await supabase
       .from('categories')
       .delete()
@@ -106,6 +105,17 @@ export const deleteCategory = async (categoryId: number) => {
     }
     
     console.log("Categoria deletada com sucesso");
+    
+    // Atualizamos qualquer produto que referencia esta categoria para não ter categoria
+    const { error: prodError } = await supabase
+      .from('products')
+      .update({ category_id: null })
+      .eq('category_id', categoryId.toString());
+    
+    if (prodError) {
+      console.error("Erro ao atualizar produtos:", prodError);
+      // Não lançamos erro aqui pois a categoria já foi deletada com sucesso
+    }
   } catch (err) {
     console.error("Exceção ao deletar categoria:", err);
     throw err;
@@ -145,6 +155,18 @@ export const deleteSubcategory = async (subcategoryId: number) => {
   try {
     console.log("Deletando subcategoria:", subcategoryId);
     
+    // Primeiro, remover todos os valores associados a esta subcategoria
+    const { error: valuesError } = await supabase
+      .from('subcategory_values')
+      .delete()
+      .eq('subcategory_id', subcategoryId.toString());
+      
+    if (valuesError) {
+      console.error("Erro ao deletar valores da subcategoria:", valuesError);
+      throw valuesError;
+    }
+    
+    // Agora deletamos a subcategoria
     const { error } = await supabase
       .from('subcategories')
       .delete()

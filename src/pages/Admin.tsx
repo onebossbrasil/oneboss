@@ -13,7 +13,7 @@ const Admin = () => {
     });
   };
 
-  // Renderizar diretamente o painel administrativo sem verificações
+  // Renderizar diretamente o painel administrativo sem verificações de autenticação
   return <AdminDashboard onLogout={handleLogout} />;
 };
 

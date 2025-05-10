@@ -47,56 +47,19 @@ const CategoryList = ({
     setFormError(null);
     
     try {
-      console.log("Tentando adicionar categoria:", { name: newCategoryName, slug: newCategorySlug });
-      
-      // Obter a sessão atual para o email do usuário
-      const { data: { session } } = await supabase.auth.getSession();
-      
-      if (!session || !session.user || !session.user.email) {
-        throw new Error("Usuário não autenticado ou email não disponível.");
-      }
-      
-      // Usar a função SQL segura para criar a categoria
-      const { data, error } = await supabase.rpc(
-        'admin_create_category',
-        {
-          _name: newCategoryName,
-          _value: newCategorySlug,
-          _admin_email: session.user.email
-        }
-      );
-      
-      console.log("Resposta da criação de categoria:", { data, error });
-      
-      if (error) {
-        throw error;
-      }
-      
-      // Atualizar a lista de categorias
-      await refreshCategories();
-      
+      await addCategory(newCategoryName, newCategorySlug);
       setNewCategoryName("");
       setNewCategorySlug("");
       setDialogOpen(false);
-      
-      toast({
-        title: "Categoria adicionada",
-        description: `${newCategoryName} foi adicionada com sucesso.`,
-      });
     } catch (error: any) {
       console.error("Error adding category:", error);
       setFormError(error?.message || "Erro ao adicionar categoria. Tente novamente.");
-      toast({
-        title: "Erro ao adicionar categoria",
-        description: error?.message || "Verifique suas permissões de administrador e tente novamente.",
-        variant: "destructive",
-      });
     } finally {
       setIsSubmitting(false);
     }
   };
 
-  const handleRemoveCategory = (categoryId: number) => {
+  const handleRemoveCategory = async (categoryId: number) => {
     if (window.confirm("Tem certeza que deseja remover esta categoria? Todos os produtos associados a ela ficarão sem categoria.")) {
       // Se a categoria que estamos removendo é a selecionada atualmente, limpa a seleção
       const categoryToRemove = categories.find(cat => cat.id === categoryId);
@@ -105,7 +68,16 @@ const CategoryList = ({
         setSelectedSubcategory(null);
       }
       
-      removeCategory(categoryId);
+      try {
+        await removeCategory(categoryId);
+      } catch (error) {
+        console.error("Error removing category:", error);
+        toast({
+          title: "Erro ao remover categoria",
+          description: "Ocorreu um erro ao tentar remover a categoria. Tente novamente.",
+          variant: "destructive",
+        });
+      }
     }
   };
   
@@ -194,11 +166,18 @@ const CategoryList = ({
                     e.stopPropagation();
                     handleRemoveCategory(cat.id);
                   }}
+                  className="text-red-500 hover:text-red-700 hover:bg-red-50"
                 >
-                  <Trash2 className="h-4 w-4 text-red-500" />
+                  <Trash2 className="h-4 w-4" />
                 </Button>
               </div>
             ))}
+            
+            {categories.length === 0 && (
+              <p className="text-sm text-muted-foreground py-2">
+                Nenhuma categoria encontrada. Adicione uma nova categoria para começar.
+              </p>
+            )}
           </div>
         </div>
       </CardContent>

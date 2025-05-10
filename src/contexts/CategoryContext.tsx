@@ -1,3 +1,4 @@
+
 import React, { createContext, useContext, useState, useEffect } from "react";
 import { CategoryType } from "@/types/category";
 import { useToast } from "@/hooks/use-toast";
@@ -61,10 +62,10 @@ export const CategoryProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       setCategories(formattedCategories);
     } catch (err: any) {
       console.error('Error fetching categories:', err);
-      setError(err.message);
+      setError(err.message || "Erro ao carregar categorias");
       toast({
         title: 'Erro ao carregar categorias',
-        description: err.message,
+        description: err.message || "Ocorreu um erro ao carregar as categorias",
         variant: 'destructive',
       });
     } finally {
@@ -86,7 +87,7 @@ export const CategoryProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       console.error('Error adding category:', err);
       toast({
         title: 'Erro ao adicionar categoria',
-        description: err.message,
+        description: err.message || "Erro ao adicionar categoria",
         variant: 'destructive',
       });
       throw err;
@@ -109,9 +110,10 @@ export const CategoryProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       console.error('Error removing category:', err);
       toast({
         title: 'Erro ao remover categoria',
-        description: err.message,
+        description: err.message || "Erro ao remover categoria",
         variant: 'destructive',
       });
+      throw err;
     } finally {
       setIsLoading(false);
     }
@@ -131,7 +133,7 @@ export const CategoryProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       console.error('Error adding subcategory:', err);
       toast({
         title: 'Erro ao adicionar subcategoria',
-        description: err.message,
+        description: err.message || "Erro ao adicionar subcategoria",
         variant: 'destructive',
       });
       throw err;
@@ -154,9 +156,10 @@ export const CategoryProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       console.error('Error removing subcategory:', err);
       toast({
         title: 'Erro ao remover subcategoria',
-        description: err.message,
+        description: err.message || "Erro ao remover subcategoria",
         variant: 'destructive',
       });
+      throw err;
     } finally {
       setIsLoading(false);
     }
@@ -176,9 +179,10 @@ export const CategoryProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       console.error('Error adding subcategory value:', err);
       toast({
         title: 'Erro ao adicionar valor',
-        description: err.message,
+        description: err.message || "Erro ao adicionar valor",
         variant: 'destructive',
       });
+      throw err;
     } finally {
       setIsLoading(false);
     }
@@ -198,9 +202,10 @@ export const CategoryProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       console.error('Error removing subcategory value:', err);
       toast({
         title: 'Erro ao remover valor',
-        description: err.message,
+        description: err.message || "Erro ao remover valor",
         variant: 'destructive',
       });
+      throw err;
     } finally {
       setIsLoading(false);
     }
