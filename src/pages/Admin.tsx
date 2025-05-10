@@ -14,12 +14,6 @@ const Admin = () => {
     console.log("Estado atual do Admin.tsx:", { isAuthenticated, isAdmin, isLoading, error });
   }, [isAuthenticated, isAdmin, isLoading, error]);
 
-  // Ignorando completamente verificações de autenticação e carregamento
-  // Renderiza diretamente o painel administrativo
-  console.log("Admin.tsx: Renderizando painel administrativo diretamente (sem verificações)");
-  return <AdminDashboard onLogout={handleLogout} />;
-
-  /* CÓDIGO ORIGINAL (COMENTADO TEMPORARIAMENTE)
   // Se estiver carregando, mostrar indicador de carregamento
   if (isLoading) {
     console.log("Admin.tsx: Exibindo tela de carregamento");
@@ -47,7 +41,6 @@ const Admin = () => {
   // Se estiver autenticado e for admin, mostrar painel de administração
   console.log("Admin.tsx: Exibindo painel de administração, usuário autenticado e é admin");
   return <AdminDashboard onLogout={handleLogout} />;
-  */
 };
 
 export default Admin;
