@@ -52,13 +52,12 @@ const FilterSidebar = ({
     if (!category) return [];
     
     // Return the full subcategories array, not flattened
-    return category.subcategories;
+    return category.subcategories || [];
   };
   
-  // Log for debugging
-  console.log("Selected Category:", selectedCategory);
-  console.log("Selected Subcategories:", selectedSubcategories);
-  console.log("Available Categories:", categories.map(c => ({ id: c.id, value: c.value, name: c.name })));
+  // Get subcategories for the selected category
+  const subcategories = getSubcategories();
+  const hasSubcategories = subcategories.length > 0;
   
   return (
     <>
@@ -110,30 +109,39 @@ const FilterSidebar = ({
                 ))}
               </div>
               
-              <Separator className="my-4" />
-              
-              {/* Subcategories section - using the same style as categories */}
-              <div className="space-y-4 mt-4">
-                <h3 className="font-medium">Subcategorias</h3>
-                <div className="space-y-1">
-                  {getSubcategories().map((subcategory: SubcategoryType) => (
-                    <div key={subcategory.id} className="mb-2">
-                      <p className="text-sm font-medium mb-1 text-muted-foreground">{subcategory.name}</p>
-                      {subcategory.values.map((value) => (
-                        <div key={`${subcategory.id}-${value}`} className="flex flex-col">
-                          <Button
-                            variant="ghost"
-                            className={`justify-start font-normal h-8 px-2 ${selectedSubcategories.includes(value) ? 'bg-gold/10 text-gold' : ''}`}
-                            onClick={() => onSubcategoryToggle(value)}
-                          >
-                            {value}
-                          </Button>
-                        </div>
-                      ))}
-                    </div>
-                  ))}
-                </div>
-              </div>
+              {selectedCategory && (
+                <>
+                  <Separator className="my-4" />
+                  
+                  {/* Subcategories section - using the same style as categories */}
+                  <div className="space-y-4 mt-4">
+                    <h3 className="font-medium">Subcategorias</h3>
+                    
+                    {!hasSubcategories ? (
+                      <p className="text-sm text-muted-foreground">Nenhuma subcategoria disponível para esta categoria</p>
+                    ) : (
+                      <div className="space-y-1">
+                        {subcategories.map((subcategory: SubcategoryType) => (
+                          <div key={subcategory.id} className="mb-2">
+                            <p className="text-sm font-medium mb-1 text-muted-foreground">{subcategory.name}</p>
+                            {subcategory.values.map((value) => (
+                              <div key={`${subcategory.id}-${value}`} className="flex flex-col">
+                                <Button
+                                  variant="ghost"
+                                  className={`justify-start font-normal h-8 px-2 ${selectedSubcategories.includes(value) ? 'bg-gold/10 text-gold' : ''}`}
+                                  onClick={() => onSubcategoryToggle(value)}
+                                >
+                                  {value}
+                                </Button>
+                              </div>
+                            ))}
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                </>
+              )}
             </ScrollArea>
           </div>
         </SidebarContent>
