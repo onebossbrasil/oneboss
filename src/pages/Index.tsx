@@ -1,26 +1,39 @@
 
-import { Car, Home as HomeIcon, Anchor, Plane, Watch, Paintbrush } from "lucide-react";
-import Header from "@/components/Header";
-import Hero from "@/components/Hero";
-import CategoryBanners from "@/components/CategoryBanners";
-import FeaturedProducts from "@/components/FeaturedProducts";
-import SponsorsBanner from "@/components/SponsorsBanner";
-import WhyChooseUs from "@/components/WhyChooseUs";
-import Footer from "@/components/Footer";
-import { useIsMobile } from "@/hooks/use-mobile";
+import React, { useEffect } from "react";
+import Header from "../components/Header";
+import Footer from "../components/Footer";
+import Hero from "../components/Hero";
+import CategoryBanners from "../components/CategoryBanners";
+import FeaturedProducts from "../components/FeaturedProducts";
+import WhyChooseUs from "../components/WhyChooseUs";
+import SponsorsBanner from "../components/SponsorsBanner";
+import ContactForm from "../components/ContactForm";
+import NewsletterSignup from "../components/NewsletterSignup";
+import EasySampleAdmin from "@/components/admin/EasySampleAdmin";
 
-// This file doesn't need to pass categories to CategoryBanners anymore
-// since we've moved the data directly into the CategoryBanners component
 const Index = () => {
+  useEffect(() => {
+    document.title = "Loja Premium - Produtos de Luxo";
+  }, []);
+  
   return (
     <div className="min-h-screen flex flex-col">
       <Header />
-      <main className="flex-grow">
+      <main className="flex-1">
         <Hero />
+        
+        <div className="container mx-auto py-8">
+          <div className="text-center mb-8">
+            <EasySampleAdmin />
+          </div>
+        </div>
+        
         <CategoryBanners />
         <FeaturedProducts />
-        <SponsorsBanner />
         <WhyChooseUs />
+        <SponsorsBanner />
+        <ContactForm />
+        <NewsletterSignup />
       </main>
       <Footer />
     </div>
