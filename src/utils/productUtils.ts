@@ -29,8 +29,8 @@ export const fetchProductsFromSupabase = async (): Promise<{ products: Product[]
       .select('*')
       .order('created_at', { ascending: false });
       
-    // Convert to Promise before passing to fetchWithTimeout
-    const productsResult = await fetchWithTimeout(productsPromise.then(result => result));
+    // Create a proper Promise from the Supabase query
+    const productsResult = await fetchWithTimeout(Promise.resolve(productsPromise));
 
     if (productsResult.error) {
       throw productsResult.error;
@@ -42,8 +42,8 @@ export const fetchProductsFromSupabase = async (): Promise<{ products: Product[]
       .select('*')
       .order('sort_order');
       
-    // Convert to Promise before passing to fetchWithTimeout
-    const imagesResult = await fetchWithTimeout(imagesPromise.then(result => result));
+    // Create a proper Promise from the Supabase query
+    const imagesResult = await fetchWithTimeout(Promise.resolve(imagesPromise));
 
     if (imagesResult.error) {
       throw imagesResult.error;
