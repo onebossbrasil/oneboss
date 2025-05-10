@@ -12,20 +12,24 @@ import ProductTableRow from "./ProductTableRow";
 import ProductEditDialog from "./ProductEditDialog";
 import { Product } from "@/types/product";
 import { useToast } from "@/hooks/use-toast";
+import { Alert, AlertTitle, AlertDescription } from "@/components/ui/alert";
+import { Button } from "@/components/ui/button";
+import { RefreshCw } from "lucide-react";
 
 export default function ProductList() {
   const { products, refreshProducts, isLoading, error } = useProducts();
   const { toast } = useToast();
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const [dialogOpen, setDialogOpen] = useState(false);
+  const [isRefreshing, setIsRefreshing] = useState(false);
 
   useEffect(() => {
-    // Carregar produtos ao montar o componente
+    // Load products at mount
     refreshProducts();
   }, [refreshProducts]);
 
   useEffect(() => {
-    // Mostrar toast de erro se houver algum problema ao carregar os produtos
+    // Show toast of error if there's a problem loading products
     if (error) {
       toast({
         title: "Erro ao carregar produtos",
@@ -45,9 +49,51 @@ export default function ProductList() {
     setDialogOpen(false);
   };
 
+  const handleManualRefresh = async () => {
+    setIsRefreshing(true);
+    await refreshProducts();
+    setIsRefreshing(false);
+    
+    toast({
+      title: "Lista atualizada",
+      description: "Os dados foram sincronizados com o banco de dados",
+    });
+  };
+
   return (
     <div>
-      <h3 className="text-lg font-medium mb-4">Produtos Cadastrados</h3>
+      <div className="flex justify-between items-center mb-4">
+        <h3 className="text-lg font-medium">Produtos Cadastrados</h3>
+        
+        <Button 
+          variant="outline" 
+          size="sm" 
+          onClick={handleManualRefresh}
+          disabled={isLoading || isRefreshing}
+          className="flex items-center gap-1"
+        >
+          <RefreshCw className={`h-4 w-4 ${isRefreshing ? 'animate-spin' : ''}`} />
+          <span className="hidden sm:inline">Atualizar</span>
+        </Button>
+      </div>
+      
+      {error && (
+        <Alert variant="destructive" className="mb-4">
+          <AlertTitle>Problema de conexão</AlertTitle>
+          <AlertDescription className="flex flex-col gap-2">
+            <p>{error}</p>
+            <Button 
+              variant="outline" 
+              size="sm" 
+              onClick={handleManualRefresh}
+              disabled={isRefreshing}
+              className="w-full sm:w-auto mt-2"
+            >
+              Tentar novamente
+            </Button>
+          </AlertDescription>
+        </Alert>
+      )}
       
       {isLoading ? (
         <div className="flex justify-center py-8">
@@ -55,33 +101,35 @@ export default function ProductList() {
         </div>
       ) : (
         <div className="border rounded-md overflow-hidden">
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead className="w-12">Imagem</TableHead>
-                <TableHead>Nome</TableHead>
-                <TableHead>Preço</TableHead>
-                <TableHead>Estoque</TableHead>
-                <TableHead className="text-center">Publicado</TableHead>
-                <TableHead className="text-right">Ações</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {products.length === 0 ? (
+          <div className="overflow-x-auto">
+            <Table>
+              <TableHeader>
                 <TableRow>
-                  <ProductEmptyState />
+                  <TableHead className="w-12">Imagem</TableHead>
+                  <TableHead>Nome</TableHead>
+                  <TableHead>Preço</TableHead>
+                  <TableHead>Estoque</TableHead>
+                  <TableHead className="text-center">Publicado</TableHead>
+                  <TableHead className="text-right">Ações</TableHead>
                 </TableRow>
-              ) : (
-                products.map((product) => (
-                  <ProductTableRow 
-                    key={product.id} 
-                    product={product} 
-                    onEditClick={handleEditClick} 
-                  />
-                ))
-              )}
-            </TableBody>
-          </Table>
+              </TableHeader>
+              <TableBody>
+                {products.length === 0 ? (
+                  <TableRow>
+                    <ProductEmptyState />
+                  </TableRow>
+                ) : (
+                  products.map((product) => (
+                    <ProductTableRow 
+                      key={product.id} 
+                      product={product} 
+                      onEditClick={handleEditClick} 
+                    />
+                  ))
+                )}
+              </TableBody>
+            </Table>
+          </div>
         </div>
       )}
 
@@ -89,6 +137,7 @@ export default function ProductList() {
         product={selectedProduct}
         open={dialogOpen}
         onOpenChange={setDialogOpen}
+        onClose={handleDialogClose}
       />
     </div>
   );

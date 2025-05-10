@@ -1,5 +1,5 @@
 
-import React, { createContext, useContext, useState, useEffect } from "react";
+import React, { createContext, useContext, useState, useEffect, useCallback } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { Product } from "@/types/product";
 import { fetchProductsFromSupabase } from "@/utils/productUtils";
@@ -23,14 +23,11 @@ export const ProductProvider: React.FC<{ children: React.ReactNode }> = ({ child
   const [products, setProducts] = useState<Product[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [retryCount, setRetryCount] = useState(0);
   const { addProduct: addProductOperation, updateProduct: updateProductOperation, deleteProduct: deleteProductOperation } = useProductOperations();
 
-  // Load products when the component mounts
-  useEffect(() => {
-    fetchProducts();
-  }, []);
-
-  const fetchProducts = async () => {
+  // Improved fetchProducts with retry logic
+  const fetchProducts = useCallback(async () => {
     setIsLoading(true);
     setError(null);
     
@@ -42,18 +39,43 @@ export const ProductProvider: React.FC<{ children: React.ReactNode }> = ({ child
       }
       
       setProducts(fetchedProducts);
+      // Reset retry count on success
+      setRetryCount(0);
     } catch (err: any) {
       console.error('Error in fetchProducts:', err);
-      setError(err.message);
-      toast({
-        title: 'Erro ao carregar produtos',
-        description: err.message,
-        variant: 'destructive',
-      });
+      setError(err.message || 'Falha ao conectar com o banco de dados');
+      
+      // Implement exponential backoff for retries (max 3 retries)
+      if (retryCount < 3) {
+        const nextRetryDelay = Math.pow(2, retryCount) * 1000; // Exponential backoff: 1s, 2s, 4s
+        console.log(`Tentando reconectar em ${nextRetryDelay / 1000} segundos...`);
+        
+        setTimeout(() => {
+          setRetryCount(prev => prev + 1);
+          fetchProducts();
+        }, nextRetryDelay);
+        
+        toast({
+          title: 'Reconectando ao banco de dados',
+          description: `Tentativa ${retryCount + 1} de 3...`,
+          variant: 'default',
+        });
+      } else {
+        toast({
+          title: 'Erro ao carregar produtos',
+          description: 'Não foi possível conectar ao banco de dados após várias tentativas.',
+          variant: 'destructive',
+        });
+      }
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [toast, retryCount]);
+
+  // Load products when the component mounts or when retry count changes
+  useEffect(() => {
+    fetchProducts();
+  }, [fetchProducts]);
 
   const addProduct = async (
     product: Omit<Product, 'id' | 'createdAt' | 'updatedAt' | 'images'>, 
@@ -89,10 +111,10 @@ export const ProductProvider: React.FC<{ children: React.ReactNode }> = ({ child
     }
   };
 
-  const refreshProducts = () => fetchProducts();
+  const refreshProducts = useCallback(() => fetchProducts(), [fetchProducts]);
 
   // Get featured products as a computed property
-  const featuredProducts = products.filter(product => product.featured);
+  const featuredProducts = products.filter(product => product.featured && product.published);
 
   return (
     <ProductContext.Provider value={{

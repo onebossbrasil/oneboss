@@ -16,10 +16,14 @@ interface ProductEditDialogProps {
   product: Product | null;
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  onClose?: () => void;
 }
 
-const ProductEditDialog = ({ product, open, onOpenChange }: ProductEditDialogProps) => {
-  const handleDialogClose = () => onOpenChange(false);
+const ProductEditDialog = ({ product, open, onOpenChange, onClose }: ProductEditDialogProps) => {
+  const handleDialogClose = () => {
+    onOpenChange(false);
+    onClose?.();
+  };
   
   const {
     formData,
@@ -36,8 +40,11 @@ const ProductEditDialog = ({ product, open, onOpenChange }: ProductEditDialogPro
   } = useProductEdit(product, handleDialogClose);
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-3xl">
+    <Dialog open={open} onOpenChange={(isOpen) => {
+      onOpenChange(isOpen);
+      if (!isOpen && onClose) onClose();
+    }}>
+      <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>Editar Produto</DialogTitle>
         </DialogHeader>

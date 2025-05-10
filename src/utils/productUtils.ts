@@ -2,23 +2,46 @@
 import { Product, ProductImage } from "@/types/product";
 import { supabase } from "@/integrations/supabase/client";
 
+// Add timeout to Supabase requests
+const fetchWithTimeout = async <T>(promise: Promise<T>, timeoutMs = 10000): Promise<T> => {
+  let timeoutId: NodeJS.Timeout;
+  
+  const timeoutPromise = new Promise<never>((_, reject) => {
+    timeoutId = setTimeout(() => {
+      reject(new Error('Tempo de conexão esgotado. Verifique sua internet.'));
+    }, timeoutMs);
+  });
+  
+  return Promise.race([
+    promise,
+    timeoutPromise
+  ]).then(result => {
+    clearTimeout(timeoutId);
+    return result as T;
+  });
+};
+
 export const fetchProductsFromSupabase = async (): Promise<{ products: Product[], error: string | null }> => {
   try {
-    // Fetch products from Supabase
-    const { data: productsData, error: productsError } = await supabase
+    // Fetch products from Supabase with timeout
+    const productsPromise = supabase
       .from('products')
       .select('*')
       .order('created_at', { ascending: false });
+      
+    const { data: productsData, error: productsError } = await fetchWithTimeout(productsPromise);
 
     if (productsError) {
       throw productsError;
     }
 
-    // Fetch all product images
-    const { data: imagesData, error: imagesError } = await supabase
+    // Fetch all product images with timeout
+    const imagesPromise = supabase
       .from('product_images')
       .select('*')
       .order('sort_order');
+      
+    const { data: imagesData, error: imagesError } = await fetchWithTimeout(imagesPromise);
 
     if (imagesError) {
       throw imagesError;
@@ -60,7 +83,20 @@ export const fetchProductsFromSupabase = async (): Promise<{ products: Product[]
     return { products: formattedProducts, error: null };
   } catch (err: any) {
     console.error('Error fetching products:', err);
-    return { products: [], error: err.message };
+    
+    // Categorize error messages for better user feedback
+    let errorMessage: string;
+    if (err.code === 'PGRST301') {
+      errorMessage = 'Erro de autenticação. Faça login novamente.';
+    } else if (err.message?.includes('timeout') || err.message?.includes('fetch')) {
+      errorMessage = 'Falha na conexão com o servidor. Verifique sua internet.';
+    } else if (err.code?.includes('auth')) {
+      errorMessage = 'Sessão expirada ou inválida. Faça login novamente.';
+    } else {
+      errorMessage = err.message || 'Erro desconhecido ao buscar produtos.';
+    }
+    
+    return { products: [], error: errorMessage };
   }
 };
 
@@ -98,8 +134,16 @@ export const uploadProductImage = async (productId: string, imageFile: File, sor
     if (imageError) throw imageError;
     
     return imageData;
-  } catch (err) {
+  } catch (err: any) {
     console.error('Error uploading product image:', err);
-    throw err;
+    
+    // Provide more specific error messages
+    if (err.message?.includes('storage')) {
+      throw new Error('Falha ao enviar imagem. O servidor de armazenamento pode estar indisponível.');
+    } else if (err.message?.includes('quota')) {
+      throw new Error('Limite de armazenamento excedido. Remova algumas imagens antigas.');
+    } else {
+      throw err;
+    }
   }
 };
