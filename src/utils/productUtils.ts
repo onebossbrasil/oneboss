@@ -29,10 +29,11 @@ export const fetchProductsFromSupabase = async (): Promise<{ products: Product[]
       .select('*')
       .order('created_at', { ascending: false });
       
-    const { data: productsData, error: productsError } = await fetchWithTimeout(productsPromise);
+    // Convert to Promise before passing to fetchWithTimeout
+    const productsResult = await fetchWithTimeout(productsPromise.then(result => result));
 
-    if (productsError) {
-      throw productsError;
+    if (productsResult.error) {
+      throw productsResult.error;
     }
 
     // Fetch all product images with timeout
@@ -41,16 +42,17 @@ export const fetchProductsFromSupabase = async (): Promise<{ products: Product[]
       .select('*')
       .order('sort_order');
       
-    const { data: imagesData, error: imagesError } = await fetchWithTimeout(imagesPromise);
+    // Convert to Promise before passing to fetchWithTimeout
+    const imagesResult = await fetchWithTimeout(imagesPromise.then(result => result));
 
-    if (imagesError) {
-      throw imagesError;
+    if (imagesResult.error) {
+      throw imagesResult.error;
     }
 
     // Map images to their products
     const imagesByProduct: Record<string, ProductImage[]> = {};
     
-    imagesData.forEach((image: any) => {
+    imagesResult.data.forEach((image: any) => {
       if (!imagesByProduct[image.product_id]) {
         imagesByProduct[image.product_id] = [];
       }
@@ -63,7 +65,7 @@ export const fetchProductsFromSupabase = async (): Promise<{ products: Product[]
     });
 
     // Create final products array with images
-    const formattedProducts: Product[] = productsData.map((product: any) => ({
+    const formattedProducts: Product[] = productsResult.data.map((product: any) => ({
       id: product.id,
       name: product.name,
       shortDescription: product.short_description || '',
