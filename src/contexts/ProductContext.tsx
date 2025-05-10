@@ -25,6 +25,7 @@ export const ProductProvider: React.FC<{ children: React.ReactNode }> = ({ child
   const [error, setError] = useState<string | null>(null);
   const { addProduct: addProductOperation, updateProduct: updateProductOperation, deleteProduct: deleteProductOperation } = useProductOperations();
 
+  // Load products when the component mounts
   useEffect(() => {
     fetchProducts();
   }, []);
