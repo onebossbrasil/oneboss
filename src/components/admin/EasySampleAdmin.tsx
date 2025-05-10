@@ -15,34 +15,45 @@ const EasySampleAdmin = () => {
       setIsLoading(true);
       console.log("Iniciando configuração de acesso admin...");
       
-      // 1. Verificar se já existe uma conta de admin de exemplo
-      const { data: existingData, error: checkError } = await supabase
+      // 1. Verificar permissões de admin existentes primeiro
+      const { data: existingAdmin, error: adminCheckError } = await supabase
         .from('admin_permissions')
         .select('*')
         .eq('email', 'admin@example.com')
-        .single();
+        .maybeSingle();
       
-      if (checkError && checkError.code !== 'PGRST116') {
-        console.error("Erro ao verificar admin existente:", checkError);
-        throw checkError;
+      if (adminCheckError && adminCheckError.code !== 'PGRST116') {
+        console.error("Erro ao verificar permissões de admin:", adminCheckError);
+        throw new Error(`Erro ao verificar permissões de admin: ${adminCheckError.message}`);
       }
       
-      // Se já existe, tentamos fazer login diretamente
-      if (existingData) {
-        console.log("Admin já existe, tentando fazer login...");
+      // 2. Tentar fazer login se o usuário já existe
+      const { data: authData, error: signInError } = await supabase.auth.signInWithPassword({
+        email: 'admin@example.com',
+        password: 'admin123',
+      });
+      
+      // Se o login funcionar, significa que o usuário já existe
+      if (!signInError && authData?.user) {
+        console.log("Login realizado com sucesso para usuário existente:", authData.user.email);
         
-        // Tenta fazer login com as credenciais do admin
-        const { data: signInData, error: signInError } = await supabase.auth.signInWithPassword({
-          email: 'admin@example.com',
-          password: 'admin123',
-        });
-        
-        if (signInError) {
-          console.error("Erro ao fazer login com admin existente:", signInError);
-          throw signInError;
+        // Garantir que as permissões admin existam
+        if (!existingAdmin) {
+          console.log("Usuário existe mas não tem permissões de admin, adicionando...");
+          const { error: permissionError } = await supabase
+            .from('admin_permissions')
+            .insert({
+              email: 'admin@example.com',
+              role: 'admin'
+            });
+          
+          if (permissionError) {
+            console.error("Erro ao adicionar permissões de admin:", permissionError);
+            throw new Error(`Erro ao adicionar permissões de admin: ${permissionError.message}`);
+          }
+          
+          console.log("Permissões de admin adicionadas com sucesso.");
         }
-        
-        console.log("Login realizado com sucesso:", signInData.user?.email);
         
         toast({
           title: "Login realizado com sucesso!",
@@ -53,67 +64,56 @@ const EasySampleAdmin = () => {
         return;
       }
       
-      console.log("Admin não existe, criando novo usuário...");
-      
-      // 2. Criar usuário no Supabase Auth
-      const { data: authData, error: authError } = await supabase.auth.signUp({
+      // 3. Se não conseguiu login, tente criar o usuário
+      console.log("Criando novo usuário admin...");
+      const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
         email: 'admin@example.com',
         password: 'admin123',
+        options: {
+          data: {
+            role: 'admin'
+          }
+        }
       });
       
-      if (authError) {
-        // Se o usuário já existe, tentamos fazer login
-        if (authError.message.includes("already")) {
-          console.log("Usuário já existe, tentando fazer login...");
-          
-          const { data: signInData, error: signInError } = await supabase.auth.signInWithPassword({
-            email: 'admin@example.com',
-            password: 'admin123',
-          });
-          
-          if (signInError) {
-            console.error("Erro ao fazer login após verificar usuário existente:", signInError);
-            throw signInError;
-          }
-          
-          console.log("Login realizado com sucesso após verificar usuário existente:", signInData.user?.email);
-        } else {
-          console.error("Erro ao criar usuário:", authError);
-          throw authError;
-        }
-      } else {
-        console.log("Usuário criado com sucesso:", authData.user?.email);
+      if (signUpError) {
+        console.error("Erro ao criar usuário admin:", signUpError);
+        throw new Error(`Erro ao criar usuário admin: ${signUpError.message}`);
       }
       
-      // 3. Adicionar permissões de admin (se ainda não existirem)
-      const { error: adminError } = await supabase
+      console.log("Usuário admin criado com sucesso:", signUpData?.user?.email);
+      
+      // 4. Adicionar permissões de admin
+      const { error: permissionError } = await supabase
         .from('admin_permissions')
         .insert({
           email: 'admin@example.com',
           role: 'admin'
-        })
-        .select()
-        .single();
+        });
       
-      if (adminError) {
-        // Se o erro for que o registro já existe, isso é ok
-        if (!adminError.message.includes("already exists")) {
-          console.error("Erro ao adicionar permissões de admin:", adminError);
-          throw adminError;
-        } else {
-          console.log("Permissões de admin já existem");
-        }
-      } else {
-        console.log("Permissões de admin adicionadas com sucesso");
+      if (permissionError && !permissionError.message.includes("already exists")) {
+        console.error("Erro ao adicionar permissões de admin:", permissionError);
+        throw new Error(`Erro ao adicionar permissões de admin: ${permissionError.message}`);
       }
       
-      // 4. Exibir toast de sucesso
+      // 5. Fazer login com as credenciais criadas
+      const { data: loginData, error: loginError } = await supabase.auth.signInWithPassword({
+        email: 'admin@example.com',
+        password: 'admin123',
+      });
+      
+      if (loginError) {
+        console.error("Erro ao fazer login após criar usuário:", loginError);
+        throw new Error(`Erro ao fazer login após criar usuário: ${loginError.message}`);
+      }
+      
+      console.log("Login realizado com sucesso após criar usuário:", loginData.user?.email);
+      
       toast({
         title: "Acesso de admin configurado com sucesso!",
         description: "Redirecionando para o painel administrativo.",
       });
       
-      // 5. Redirecionar para a página de admin
       navigate("/admin");
       
     } catch (error: any) {
