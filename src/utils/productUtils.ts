@@ -1,4 +1,3 @@
-
 import { Product, ProductImage } from "@/types/product";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -147,5 +146,54 @@ export const uploadProductImage = async (productId: string, imageFile: File, sor
     } else {
       throw err;
     }
+  }
+};
+
+// New function to delete product images
+export const deleteProductImage = async (imageId: string) => {
+  try {
+    // First, get the image URL to extract the file path for storage deletion
+    const { data: imageData, error: fetchError } = await supabase
+      .from('product_images')
+      .select('url')
+      .eq('id', imageId)
+      .single();
+    
+    if (fetchError) throw fetchError;
+    
+    // Delete the entry from the database
+    const { error: deleteError } = await supabase
+      .from('product_images')
+      .delete()
+      .eq('id', imageId);
+    
+    if (deleteError) throw deleteError;
+    
+    // Extract file path from URL to delete from storage
+    // This is optional as we may want to keep files in storage
+    // Format is typically: https://[storage-url]/storage/v1/object/public/products/[product-id]/[filename]
+    try {
+      const url = new URL(imageData.url);
+      const pathSegments = url.pathname.split('/');
+      const bucketName = 'products';
+      
+      // Extract the path after the bucket name (product_id/filename)
+      const filePath = pathSegments.slice(pathSegments.indexOf('products') + 1).join('/');
+      
+      // Delete file from storage if path was extracted properly
+      if (filePath) {
+        await supabase.storage
+          .from(bucketName)
+          .remove([filePath]);
+      }
+    } catch (storageErr) {
+      console.warn('Could not delete image file from storage:', storageErr);
+      // Don't throw here, as the database record is already deleted
+    }
+    
+    return { success: true };
+  } catch (err: any) {
+    console.error('Error deleting product image:', err);
+    throw new Error('Falha ao excluir a imagem do produto.');
   }
 };

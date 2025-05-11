@@ -1,7 +1,7 @@
 
 import { useState, useEffect } from "react";
 import { useProducts } from "@/contexts/ProductContext";
-import { Product } from "@/types/product";
+import { Product, ProductImage } from "@/types/product";
 import { useToast } from "@/hooks/use-toast";
 
 export const useProductEdit = (
@@ -14,6 +14,7 @@ export const useProductEdit = (
   const [imagePreviewUrls, setImagePreviewUrls] = useState<string[]>([]);
   const [selectedCategory, setSelectedCategory] = useState("");
   const [subcategoryValues, setSubcategoryValues] = useState<Record<string, string>>({});
+  const [deletedImageIds, setDeletedImageIds] = useState<string[]>([]);
   const [formData, setFormData] = useState({
     name: "",
     shortDescription: "",
@@ -42,6 +43,7 @@ export const useProductEdit = (
       setSubcategoryValues(product.subcategoryValues || {});
       setImagePreviewUrls(product.images.map(img => img.url));
       setImages([]);
+      setDeletedImageIds([]); // Reset deleted image IDs
     }
   }, [product]);
 
@@ -74,20 +76,34 @@ export const useProductEdit = (
   };
   
   const handleRemoveImage = (index: number) => {
-    // Remove image and its preview
-    const newImages = [...images];
-    const newPreviewUrls = [...imagePreviewUrls];
-    
-    // Revoke the URL to free memory if it's a newly added image
-    if (index >= (product?.images.length || 0)) {
-      URL.revokeObjectURL(newPreviewUrls[index]);
+    if (!product) return;
+
+    // Check if this is an existing image from the database
+    if (index < product.images.length) {
+      const imageToDelete = product.images[index];
+      setDeletedImageIds(prev => [...prev, imageToDelete.id]);
+      
+      // Remove from preview URLs
+      const newPreviewUrls = [...imagePreviewUrls];
+      newPreviewUrls.splice(index, 1);
+      setImagePreviewUrls(newPreviewUrls);
+    } else {
+      // This is a newly added image
+      const newImageIndex = index - product.images.length;
+      
+      // Remove from images array
+      const newImages = [...images];
+      newImages.splice(newImageIndex, 1);
+      setImages(newImages);
+      
+      // Revoke URL to free memory
+      URL.revokeObjectURL(imagePreviewUrls[index]);
+      
+      // Remove from preview URLs
+      const newPreviewUrls = [...imagePreviewUrls];
+      newPreviewUrls.splice(index, 1);
+      setImagePreviewUrls(newPreviewUrls);
     }
-    
-    newImages.splice(index - (product?.images.length || 0), 1);
-    newPreviewUrls.splice(index, 1);
-    
-    setImages(newImages);
-    setImagePreviewUrls(newPreviewUrls);
   };
 
   const handleUpdateProduct = async (e: React.FormEvent) => {
@@ -153,7 +169,8 @@ export const useProductEdit = (
         subcategoryValues,
         published: formData.published,
         featured: formData.featured,
-        stockQuantity
+        stockQuantity,
+        deletedImageIds: deletedImageIds // Pass the deleted image IDs to updateProduct
       };
       
       // Update product

@@ -3,7 +3,7 @@ import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { Product } from "@/types/product";
-import { uploadProductImage } from "@/utils/productUtils";
+import { uploadProductImage, deleteProductImage } from "@/utils/productUtils";
 
 export const useProductOperations = () => {
   const { toast } = useToast();
@@ -83,7 +83,7 @@ export const useProductOperations = () => {
 
   const updateProduct = async (
     id: string, 
-    productData: Partial<Product>, 
+    productData: Partial<Product> & { deletedImageIds?: string[] }, 
     newImages?: File[]
   ) => {
     try {
@@ -123,6 +123,13 @@ export const useProductOperations = () => {
         .eq('id', id);
         
       if (error) throw error;
+      
+      // Delete images that were removed in the UI
+      if (productData.deletedImageIds && productData.deletedImageIds.length > 0) {
+        await Promise.all(
+          productData.deletedImageIds.map(imageId => deleteProductImage(imageId))
+        );
+      }
       
       // Upload new images if any
       if (newImages && newImages.length > 0) {
