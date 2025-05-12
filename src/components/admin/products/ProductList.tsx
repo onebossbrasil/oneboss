@@ -96,7 +96,7 @@ export default function ProductList() {
           disabled={isLoading || isRefreshing}
           className="flex items-center gap-1"
         >
-          <RefreshCw className={isRefreshing ? "animate-spin" : ""} />
+          <RefreshCw className={isRefreshing ? "animate-spin h-4 w-4" : "h-4 w-4"} />
           <span className="hidden sm:inline">Atualizar</span>
         </Button>
       </div>
