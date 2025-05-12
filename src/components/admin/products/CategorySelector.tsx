@@ -3,6 +3,7 @@ import { useCategories } from "@/contexts/CategoryContext";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Label } from "@/components/ui/label";
 import { useState, useEffect } from "react";
+import { CategoryProvider } from "@/contexts/CategoryContext";
 
 type CategorySelectorProps = {
   selectedCategory: string;
@@ -11,7 +12,7 @@ type CategorySelectorProps = {
   onSubcategoryChange: (type: string, value: string) => void;
 };
 
-const CategorySelector = ({
+const CategorySelectorContent = ({
   selectedCategory,
   subcategoryValues,
   onCategoryChange,
@@ -144,6 +145,15 @@ const CategorySelector = ({
         </Select>
       </div>
     </div>
+  );
+};
+
+// Wrapper component that provides CategoryContext
+const CategorySelector = (props: CategorySelectorProps) => {
+  return (
+    <CategoryProvider>
+      <CategorySelectorContent {...props} />
+    </CategoryProvider>
   );
 };
 

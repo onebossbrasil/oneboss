@@ -15,10 +15,6 @@ const CategoryManager = () => {
   const [activeTab, setActiveTab] = useState<string>("categories");
   const { isLoading, error, refreshCategories } = useCategories();
 
-  const handleRefresh = () => {
-    refreshCategories();
-  };
-
   // Reset subcategory selection when changing to categories tab on mobile
   const handleTabChange = (value: string) => {
     setActiveTab(value);
@@ -44,7 +40,7 @@ const CategoryManager = () => {
         <AlertDescription>
           {error}. Por favor, tente novamente mais tarde.
         </AlertDescription>
-        <Button variant="outline" className="mt-2" onClick={handleRefresh}>
+        <Button variant="outline" className="mt-2" onClick={refreshCategories}>
           <RefreshCw className="mr-2 h-4 w-4" />
           Tentar novamente
         </Button>
@@ -173,8 +169,8 @@ const CategoryManager = () => {
 
   return (
     <div className="space-y-4">
-      <div className="flex justify-end">
-        <Button variant="outline" size="sm" onClick={handleRefresh} className="mb-2">
+      <div className="flex justify-end lg:hidden">
+        <Button variant="outline" size="sm" onClick={refreshCategories} className="mb-2">
           <RefreshCw className="mr-2 h-4 w-4" />
           Atualizar categorias
         </Button>

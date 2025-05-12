@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { CategoryType } from "@/types/category";
 import { fetchCategoriesData } from "@/services/category";
@@ -14,13 +14,24 @@ export function useCategoryData() {
   const [categories, setCategories] = useState<CategoryType[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [isFetching, setIsFetching] = useState(false);
 
-  const fetchCategories = async () => {
+  const fetchCategories = useCallback(async () => {
+    // Prevent multiple simultaneous requests
+    if (isFetching) {
+      console.log("Fetch already in progress, skipping");
+      return;
+    }
+    
     try {
+      setIsFetching(true);
       setIsLoading(true);
       setError(null);
 
+      console.log("Fetching categories data...");
       const { categoriesData, subcategoriesData, valuesData } = await fetchCategoriesData();
+      
+      console.log(`Fetched: ${categoriesData.length} categories, ${subcategoriesData.length} subcategories, ${valuesData.length} values`);
       
       // Process the data
       const subcategoriesByCategory = groupSubcategoriesByCategory(subcategoriesData);
@@ -42,8 +53,9 @@ export function useCategoryData() {
       });
     } finally {
       setIsLoading(false);
+      setIsFetching(false);
     }
-  };
+  }, [toast, isFetching]);
 
   return {
     categories,

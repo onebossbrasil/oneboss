@@ -1,6 +1,5 @@
 
-import { supabase } from "@/integrations/supabase/client";
-
-export const logServiceAction = (action: string, details?: any) => {
-  console.log(`Category Service - ${action}:`, details || '');
+// Utility for consistent logging in category services
+export const logServiceAction = (action: string, data?: any) => {
+  console.log(`[CategoryService] ${action}`, data !== undefined ? data : '');
 };

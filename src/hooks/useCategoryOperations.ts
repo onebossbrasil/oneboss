@@ -1,5 +1,5 @@
 
-import { useEffect } from "react";
+import { useEffect, useCallback } from "react";
 import { useCategoryData, useCategoryMutations, useSubcategoryMutations, useSubcategoryValueMutations } from "@/hooks/category";
 
 export function useCategoryOperations() {
@@ -26,11 +26,22 @@ export function useCategoryOperations() {
     removeSubcategoryValue
   } = useSubcategoryValueMutations(setIsLoading, fetchCategories);
 
+  // Load categories when component mounts
+  useEffect(() => {
+    console.log("Loading categories in useCategoryOperations");
+    fetchCategories();
+  }, []);
+
+  const refreshCategoriesCallback = useCallback(() => {
+    console.log("Refreshing categories");
+    return fetchCategories();
+  }, [fetchCategories]);
+
   return {
     categories,
     isLoading,
     error,
-    fetchCategories,
+    fetchCategories: refreshCategoriesCallback,
     addCategory,
     removeCategory,
     addSubcategory,

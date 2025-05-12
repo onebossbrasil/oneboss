@@ -5,6 +5,7 @@ import ProductForm from "../ProductForm";
 import CategoryManager from "../CategoryManager";
 import CsvImporter from "../products/CsvImporter";
 import LeadsManager from "../LeadsManager";
+import { CategoryProvider } from "@/contexts/CategoryContext";
 
 interface MobileContentProps {
   activeTab: string;
@@ -26,12 +27,18 @@ const MobileContent = ({ activeTab }: MobileContentProps) => {
         </h2>
       </div>
       
-      {/* Wrap product-related content with a single ProductProvider to prevent remounts */}
+      {/* Wrap product-related content with ProductProvider */}
       <ProductProvider>
         {activeTab === "produtos" && <ProductForm />}
         {activeTab === "importar" && <CsvImporter />}
-        {activeTab === "categorias" && <CategoryManager />}
       </ProductProvider>
+      
+      {/* Wrap category content with CategoryProvider */}
+      {activeTab === "categorias" && (
+        <CategoryProvider>
+          <CategoryManager />
+        </CategoryProvider>
+      )}
       
       {activeTab === "leads" && <LeadsManager />}
     </>

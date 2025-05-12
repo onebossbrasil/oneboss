@@ -1,7 +1,7 @@
 
-import { CategoryType, SubcategoryType } from "@/types/category";
+import { CategoryType, SubcategoryType } from "./category";
 
-export type CategoryContextType = {
+export interface CategoryContextType {
   categories: CategoryType[];
   isLoading: boolean;
   error: string | null;
@@ -12,4 +12,4 @@ export type CategoryContextType = {
   addSubcategoryValue: (categoryId: number, subcategoryId: number, value: string) => Promise<void>;
   removeSubcategoryValue: (categoryId: number, subcategoryId: number, value: string) => Promise<void>;
   refreshCategories: () => Promise<void>;
-};
+}

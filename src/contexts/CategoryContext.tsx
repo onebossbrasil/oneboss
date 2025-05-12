@@ -1,5 +1,5 @@
 
-import React, { createContext, useContext, useEffect } from "react";
+import React, { createContext, useContext, useCallback } from "react";
 import { CategoryType, SubcategoryType } from "@/types/category";
 import { CategoryContextType } from "@/types/categoryContext";
 import { useCategoryOperations } from "@/hooks/useCategoryOperations";
@@ -20,11 +20,10 @@ export const CategoryProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     removeSubcategoryValue,
   } = useCategoryOperations();
 
-  useEffect(() => {
-    fetchCategories();
-  }, []);
-
-  const refreshCategories = () => fetchCategories();
+  const refreshCategories = useCallback(() => {
+    console.log("Refreshing categories from CategoryContext");
+    return fetchCategories();
+  }, [fetchCategories]);
 
   return (
     <CategoryContext.Provider value={{
