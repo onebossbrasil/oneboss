@@ -1,7 +1,7 @@
 
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import AdminDashboard from "@/components/admin/AdminDashboard";
+import AdminDashboard from "@/components/admin/dashboard";
 import AdminLogin from "@/components/admin/AdminLogin";
 import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
