@@ -12,6 +12,7 @@ import { CategoryProvider } from "./contexts/CategoryContext";
 import { ProductProvider } from "./contexts/ProductContext";
 import { LeadProvider } from "./contexts/LeadContext";
 import { NewsletterProvider } from "./contexts/NewsletterContext";
+import { AuthProvider } from "./contexts/AuthContext";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -24,27 +25,29 @@ const queryClient = new QueryClient({
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
-    <TooltipProvider>
-      <CategoryProvider>
-        <ProductProvider>
-          <LeadProvider>
-            <NewsletterProvider>
-              <Toaster />
-              <Sonner />
-              <BrowserRouter>
-                <Routes>
-                  <Route path="/" element={<Index />} />
-                  <Route path="/loja" element={<Store />} />
-                  <Route path="/admin" element={<Admin />} />
-                  {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-                  <Route path="*" element={<NotFound />} />
-                </Routes>
-              </BrowserRouter>
-            </NewsletterProvider>
-          </LeadProvider>
-        </ProductProvider>
-      </CategoryProvider>
-    </TooltipProvider>
+    <AuthProvider>
+      <TooltipProvider>
+        <CategoryProvider>
+          <ProductProvider>
+            <LeadProvider>
+              <NewsletterProvider>
+                <Toaster />
+                <Sonner />
+                <BrowserRouter>
+                  <Routes>
+                    <Route path="/" element={<Index />} />
+                    <Route path="/loja" element={<Store />} />
+                    <Route path="/admin" element={<Admin />} />
+                    {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+                    <Route path="*" element={<NotFound />} />
+                  </Routes>
+                </BrowserRouter>
+              </NewsletterProvider>
+            </LeadProvider>
+          </ProductProvider>
+        </CategoryProvider>
+      </TooltipProvider>
+    </AuthProvider>
   </QueryClientProvider>
 );
 

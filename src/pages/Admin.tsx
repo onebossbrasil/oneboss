@@ -1,22 +1,35 @@
 
 import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import AdminDashboard from "@/components/admin/AdminDashboard";
+import AdminLogin from "@/components/admin/AdminLogin";
 import { useToast } from "@/hooks/use-toast";
 import { SidebarProvider } from "@/components/ui/sidebar";
 import { Alert, AlertTitle, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import AdminError from "@/components/admin/states/AdminError";
+import { useAuth } from "@/contexts/AuthContext";
 
 const Admin = () => {
   const { toast } = useToast();
+  const navigate = useNavigate();
+  const { session, user, isLoading: authLoading, signOut } = useAuth();
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [dbConnectionError, setDbConnectionError] = useState<string | null>(null);
   const [isCheckingConnection, setIsCheckingConnection] = useState(true);
 
-  // Check database connection on mount
+  // Check if user is authenticated
   useEffect(() => {
-    checkDatabaseConnection();
-  }, []);
+    if (!authLoading) {
+      if (user && session) {
+        setIsAuthenticated(true);
+        checkDatabaseConnection();
+      } else {
+        setIsAuthenticated(false);
+      }
+    }
+  }, [user, session, authLoading]);
 
   const checkDatabaseConnection = async () => {
     setIsCheckingConnection(true);
@@ -38,17 +51,53 @@ const Admin = () => {
     }
   };
 
-  const handleLogout = () => {
-    toast({
-      title: "Logout simulado",
-      description: "Em um sistema real, você seria desconectado."
-    });
+  const handleLogout = async () => {
+    try {
+      await signOut();
+      toast({
+        title: "Logout realizado",
+        description: "Você saiu do painel administrativo.",
+      });
+      navigate("/");
+    } catch (error) {
+      console.error("Logout error:", error);
+      toast({
+        title: "Erro ao fazer logout",
+        description: "Ocorreu um erro ao sair do sistema.",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleLogin = (success: boolean) => {
+    if (success) {
+      setIsAuthenticated(true);
+    } else {
+      setIsAuthenticated(false);
+    }
   };
 
   const handleRetryConnection = () => {
     setDbConnectionError(null);
     checkDatabaseConnection();
   };
+
+  // Show loading state while checking authentication
+  if (authLoading) {
+    return (
+      <div className="flex justify-center items-center h-screen bg-gray-50 dark:bg-gray-900">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-900 mx-auto mb-4"></div>
+          <p className="text-muted-foreground">Verificando autenticação...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // If not authenticated, show login
+  if (!isAuthenticated) {
+    return <AdminLogin onLogin={handleLogin} />;
+  }
 
   // Show loading state while checking connection
   if (isCheckingConnection) {
@@ -71,7 +120,7 @@ const Admin = () => {
     );
   }
 
-  // Renderizar o painel administrativo se a conexão estiver OK
+  // Renderizar o painel administrativo se a conexão estiver OK e autenticado
   return (
     <SidebarProvider>
       <AdminDashboard onLogout={handleLogout} />

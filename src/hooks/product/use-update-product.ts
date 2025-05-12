@@ -89,6 +89,8 @@ export const useUpdateProduct = () => {
         errorMessage = err.message;
       } else if (err.message?.includes('conexão') || err.code === 'PGRST301') {
         errorMessage = 'Falha na conexão com o banco de dados. Verifique sua internet.';
+      } else if (err.code === '42501') {
+        errorMessage = 'Permissão negada. Certifique-se de estar logado como administrador.';
       } 
       
       toast({

@@ -17,7 +17,7 @@ const CategorySelector = ({
   onCategoryChange,
   onSubcategoryChange
 }: CategorySelectorProps) => {
-  const { categories } = useCategories();
+  const { categories, isLoading, error } = useCategories();
   const [activeSubcategoryType, setActiveSubcategoryType] = useState<string | null>(null);
   
   // Reset active subcategory type when category changes
@@ -54,11 +54,25 @@ const CategorySelector = ({
     setActiveSubcategoryType(type);
   };
 
+  // If categories are loading, show a placeholder
+  if (isLoading) {
+    return <div className="space-y-4">Carregando categorias...</div>;
+  }
+  
+  // If there's an error fetching categories, show an error message
+  if (error) {
+    return <div className="text-red-500">Erro ao carregar categorias: {error}</div>;
+  }
+
   return (
     <div className="space-y-4">
       <div>
         <Label htmlFor="category">Categoria</Label>
-        <Select onValueChange={onCategoryChange} value={selectedCategory}>
+        <Select 
+          onValueChange={onCategoryChange} 
+          value={selectedCategory}
+          disabled={categories.length === 0}
+        >
           <SelectTrigger>
             <SelectValue placeholder="Selecione uma categoria" />
           </SelectTrigger>
