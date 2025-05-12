@@ -31,6 +31,7 @@ const ProductEditDialog = ({ product, open, onOpenChange, onClose }: ProductEdit
     subcategoryValues,
     images,
     imagePreviewUrls,
+    isSubmitting,
     handleFormChange,
     handleCategoryChange,
     handleSubcategoryChange,
@@ -78,7 +79,7 @@ const ProductEditDialog = ({ product, open, onOpenChange, onClose }: ProductEdit
           
           <ProductEditActions 
             onCancel={handleDialogClose} 
-            isSubmitting={false} 
+            isSubmitting={isSubmitting} 
           />
         </form>
       </DialogContent>
