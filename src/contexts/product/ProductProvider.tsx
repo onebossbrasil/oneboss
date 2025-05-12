@@ -30,16 +30,12 @@ export const ProductProvider: React.FC<{ children: React.ReactNode }> = ({ child
     }
   }, [user]);
   
-  // Optimized approach to check if we should fetch products
-  const shouldFetchProducts = useMemo(() => {
-    return Boolean(session) || retryCount > 0;
-  }, [session, retryCount]);
-  
-  // Improved effect with better dependency management
+  // Always fetch products regardless of authentication status
   useEffect(() => {
     let isMounted = true;
     
-    if (shouldFetchProducts && isMounted) {
+    // Remove authentication check to allow public viewing of products
+    if (isMounted) {
       console.log("ProductProvider requesting fetchProducts");
       fetchProducts();
     }
@@ -47,7 +43,7 @@ export const ProductProvider: React.FC<{ children: React.ReactNode }> = ({ child
     return () => {
       isMounted = false;
     };
-  }, [shouldFetchProducts, fetchProducts]);
+  }, [fetchProducts]);
 
   // Stable refreshProducts function with force parameter
   const refreshProducts = useCallback(async (force = true) => {

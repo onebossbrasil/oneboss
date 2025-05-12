@@ -1,7 +1,7 @@
 
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Search, ShoppingCart, User, Menu, X } from 'lucide-react';
+import { Search, User, Menu, X } from 'lucide-react';
 
 const Header = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -32,10 +32,6 @@ const Header = () => {
             <button className="text-foreground hover:text-gold transition-colors">
               <Search size={20} />
             </button>
-            <Link to="/cart" className="text-foreground hover:text-gold transition-colors relative">
-              <ShoppingCart size={20} />
-              <span className="absolute -top-2 -right-2 bg-gold text-white text-xs rounded-full w-4 h-4 flex items-center justify-center">0</span>
-            </Link>
             <Link to="/profile" className="text-foreground hover:text-gold transition-colors">
               <User size={20} />
             </Link>
@@ -43,10 +39,6 @@ const Header = () => {
 
           {/* Mobile Menu Button */}
           <div className="flex items-center space-x-3 md:hidden">
-            <Link to="/cart" className="text-foreground hover:text-gold transition-colors relative">
-              <ShoppingCart size={20} />
-              <span className="absolute -top-2 -right-2 bg-gold text-white text-xs rounded-full w-4 h-4 flex items-center justify-center">0</span>
-            </Link>
             <button 
               className="text-foreground hover:text-gold transition-colors"
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
