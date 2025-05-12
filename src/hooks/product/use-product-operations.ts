@@ -1,7 +1,5 @@
 
-import { useAddProduct } from "@/hooks/product/use-add-product";
-import { useUpdateProduct } from "@/hooks/product/use-update-product";
-import { useDeleteProduct } from "@/hooks/product/use-delete-product";
+import { useAddProduct, useUpdateProduct, useDeleteProduct } from "@/hooks/product";
 
 export const useProductOperations = () => {
   const { isLoading: isAddLoading, addProduct } = useAddProduct();
