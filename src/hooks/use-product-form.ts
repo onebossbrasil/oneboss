@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { useProducts } from "@/contexts/ProductContext";
 import { useToast } from "@/hooks/use-toast";
@@ -61,14 +60,6 @@ export const useProductForm = () => {
       ...prev,
       [type]: value
     }));
-
-    // Update the featured state in formData if the featured subcategory changes
-    if (type === 'featured') {
-      setFormData(prev => ({ 
-        ...prev, 
-        featured: value === 'true' 
-      }));
-    }
   };
 
   const handleFormChange = (field: string, value: any) => {
