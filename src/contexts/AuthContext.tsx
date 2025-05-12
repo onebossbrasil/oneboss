@@ -31,17 +31,34 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         return;
       }
       
-      // Usar RPC para chamar a função is_current_user_admin - mais seguro e eficiente
+      console.log("Verificando status admin para:", user.email);
+      
+      // Usar RPC para chamar a função is_current_user_admin atualizada - mais seguro e eficiente
       const { data, error } = await supabase.rpc('is_current_user_admin');
       
       if (error) {
         console.error("Erro ao verificar permissões de administrador:", error);
+        console.error("Detalhes da requisição:", {
+          userId: user.id,
+          email: user.email,
+          hasValidSession: !!session
+        });
         setIsAdmin(false);
         return;
       }
       
       setIsAdmin(!!data);
       console.log("Status de administrador verificado:", !!data, "para", user.email);
+      
+      // Para depuração adicional, vamos tentar obter o email via RPC
+      try {
+        const { data: emailData, error: emailError } = await supabase.rpc('get_current_user_email');
+        if (!emailError && emailData) {
+          console.log("Email retornado pela função RPC:", emailData);
+        }
+      } catch (e) {
+        console.error("Erro ao obter email via RPC:", e);
+      }
     } catch (err) {
       console.error("Erro ao verificar permissões:", err);
       setIsAdmin(false);
@@ -95,6 +112,15 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         console.error("Sign in error:", error.message);
       } else {
         console.log("Sign in successful:", data.user?.email);
+        // Verificar status de admin imediatamente após login bem-sucedido
+        if (data.user) {
+          setUser(data.user);
+          setSession(data.session);
+          // Use setTimeout para evitar problemas de deadlock com auth state
+          setTimeout(() => {
+            checkAdminStatus();
+          }, 0);
+        }
       }
       
       return { data: data.session, error };

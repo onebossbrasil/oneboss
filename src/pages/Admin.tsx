@@ -11,6 +11,7 @@ import { supabase } from "@/integrations/supabase/client";
 import AdminError from "@/components/admin/states/AdminError";
 import AccessDenied from "@/components/admin/states/AccessDenied";
 import { useAuth } from "@/contexts/AuthContext";
+import { RefreshCcw } from "lucide-react";
 
 const Admin = () => {
   const { toast } = useToast();
@@ -19,6 +20,7 @@ const Admin = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [dbConnectionError, setDbConnectionError] = useState<string | null>(null);
   const [isCheckingConnection, setIsCheckingConnection] = useState(true);
+  const [isCheckingPermissions, setIsCheckingPermissions] = useState(false);
 
   // Check if user is authenticated
   useEffect(() => {
@@ -88,6 +90,12 @@ const Admin = () => {
     checkDatabaseConnection();
   };
 
+  const handleForceRefresh = () => {
+    localStorage.removeItem('supabase.auth.token');
+    sessionStorage.clear();
+    window.location.reload();
+  };
+
   // Show loading state while checking authentication
   if (authLoading) {
     return (
@@ -107,7 +115,22 @@ const Admin = () => {
 
   // Se autenticado mas não é admin, mostrar AccessDenied
   if (isAuthenticated && !isAdmin) {
-    return <AccessDenied onLogout={handleLogout} />;
+    return (
+      <div>
+        <AccessDenied onLogout={handleLogout} />
+        <div className="fixed bottom-4 right-4">
+          <Button 
+            variant="outline" 
+            size="sm" 
+            onClick={handleForceRefresh}
+            className="flex items-center gap-2"
+          >
+            <RefreshCcw className="h-4 w-4" />
+            Limpar cache e recarregar
+          </Button>
+        </div>
+      </div>
+    );
   }
 
   // Show loading state while checking connection
