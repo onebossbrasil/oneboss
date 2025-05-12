@@ -7,8 +7,7 @@ import CategoryBanners from "../components/CategoryBanners";
 import FeaturedProducts from "../components/FeaturedProducts";
 import WhyChooseUs from "../components/WhyChooseUs";
 import SponsorsBanner from "../components/SponsorsBanner";
-import ContactForm from "../components/ContactForm";
-import NewsletterSignup from "../components/NewsletterSignup";
+import AdvertiseWithUs from "../components/AdvertiseWithUs";
 
 const Index = () => {
   useEffect(() => {
@@ -24,8 +23,7 @@ const Index = () => {
         <FeaturedProducts />
         <WhyChooseUs />
         <SponsorsBanner />
-        <ContactForm />
-        <NewsletterSignup />
+        <AdvertiseWithUs />
       </main>
       <Footer />
     </div>
