@@ -24,6 +24,7 @@ import {
   SidebarMenuItem,
   SidebarMenuButton,
 } from "@/components/ui/sidebar";
+import { ProductProvider } from "@/contexts/ProductContext";
 
 interface AdminDashboardProps {
   onLogout: () => void;
@@ -156,17 +157,19 @@ const AdminDashboard = ({ onLogout }: AdminDashboardProps) => {
                 <TabsTrigger value="leads">Gerenciar Leads</TabsTrigger>
               </TabsList>
               
-              <TabsContent value="produtos" className="space-y-4">
-                <ProductForm />
-              </TabsContent>
-              
-              <TabsContent value="importar" className="space-y-4">
-                <CsvImporter />
-              </TabsContent>
-              
-              <TabsContent value="categorias" className="space-y-4">
-                <CategoryManager />
-              </TabsContent>
+              <ProductProvider>
+                <TabsContent value="produtos" className="space-y-4">
+                  <ProductForm />
+                </TabsContent>
+                
+                <TabsContent value="importar" className="space-y-4">
+                  <CsvImporter />
+                </TabsContent>
+                
+                <TabsContent value="categorias" className="space-y-4">
+                  <CategoryManager />
+                </TabsContent>
+              </ProductProvider>
               
               <TabsContent value="leads" className="space-y-4">
                 <LeadsManager />
@@ -189,9 +192,12 @@ const AdminDashboard = ({ onLogout }: AdminDashboardProps) => {
               </h2>
             </div>
             
-            {activeTab === "produtos" && <ProductForm />}
-            {activeTab === "importar" && <CsvImporter />}
-            {activeTab === "categorias" && <CategoryManager />}
+            <ProductProvider>
+              {activeTab === "produtos" && <ProductForm />}
+              {activeTab === "importar" && <CsvImporter />}
+              {activeTab === "categorias" && <CategoryManager />}
+            </ProductProvider>
+            
             {activeTab === "leads" && <LeadsManager />}
           </div>
         </div>

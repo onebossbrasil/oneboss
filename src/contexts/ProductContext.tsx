@@ -77,6 +77,7 @@ export const ProductProvider: React.FC<{ children: React.ReactNode }> = ({ child
 
   // Load products when the component mounts or when retry count changes or session changes
   useEffect(() => {
+    console.log("ProductProvider useEffect triggered, session:", !!session);
     // Only attempt to fetch if we have a session or we're not authenticated yet
     // This prevents excessive loading during auth transitions
     if (session || retryCount > 0) {
@@ -149,6 +150,8 @@ export const ProductProvider: React.FC<{ children: React.ReactNode }> = ({ child
 
   // Get featured products as a computed property
   const featuredProducts = products.filter(product => product.featured && product.published);
+
+  console.log("ProductProvider rendering with", products.length, "products");
 
   return (
     <ProductContext.Provider value={{
