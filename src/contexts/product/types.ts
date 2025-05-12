@@ -9,5 +9,5 @@ export type ProductContextType = {
   addProduct: (product: Omit<Product, 'id' | 'createdAt' | 'updatedAt' | 'images'>, images: File[]) => Promise<void>;
   updateProduct: (id: string, productData: Partial<Product>, newImages?: File[]) => Promise<void>;
   deleteProduct: (id: string) => Promise<void>;
-  refreshProducts: () => Promise<void>;
+  refreshProducts: (force?: boolean) => Promise<void>;
 };

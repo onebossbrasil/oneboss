@@ -68,7 +68,8 @@ export default function ProductList() {
     setLastRefreshTime(now);
     
     try {
-      await refreshProducts();
+      // Explicitly passing true to force the refresh
+      await refreshProducts(true);
       toast({
         title: "Lista atualizada",
         description: "Os dados foram sincronizados com o banco de dados",
