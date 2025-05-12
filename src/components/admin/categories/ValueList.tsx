@@ -27,7 +27,7 @@ const ValueList = ({
   const getCurrentSubcategory = (): SubcategoryType | null => {
     const category = getCurrentCategory();
     if (!category || selectedSubcategory === null) return null;
-    return category.subcategories.find(subcat => subcat.id === selectedSubcategory) || null;
+    return category.subcategories.find(subcat => Number(subcat.id) === selectedSubcategory) || null;
   };
   
   const category = getCurrentCategory();
@@ -51,7 +51,7 @@ const ValueList = ({
       return;
     }
     
-    addSubcategoryValue(category.id, subcategory.id, newValueName);
+    addSubcategoryValue(Number(category.id), Number(subcategory.id), newValueName);
     setNewValueName("");
     
     toast({
@@ -68,7 +68,7 @@ const ValueList = ({
     
     if (!category || !subcategory) return;
     
-    removeSubcategoryValue(category.id, subcategory.id, value);
+    removeSubcategoryValue(Number(category.id), Number(subcategory.id), value);
     
     toast({
       title: "Valor removido",

@@ -48,7 +48,7 @@ const SubcategoryList = ({
       return;
     }
     
-    addSubcategory(category.id, newSubcategoryName, newSubcategoryType);
+    addSubcategory(Number(category.id), newSubcategoryName, newSubcategoryType);
     
     setNewSubcategoryName("");
     setNewSubcategoryType("");
@@ -67,7 +67,7 @@ const SubcategoryList = ({
     if (!category) return;
     
     if (window.confirm("Tem certeza que deseja remover esta subcategoria?")) {
-      removeSubcategory(category.id, subcategoryId);
+      removeSubcategory(Number(category.id), subcategoryId);
       
       if (selectedSubcategory === subcategoryId) {
         setSelectedSubcategory(null);
@@ -143,12 +143,12 @@ const SubcategoryList = ({
                   <div
                     key={subcat.id}
                     className={`flex items-center justify-between w-full p-2 rounded-md hover:bg-accent ${
-                      selectedSubcategory === subcat.id ? 'bg-accent' : ''
+                      selectedSubcategory === Number(subcat.id) ? 'bg-accent' : ''
                     }`}
                   >
                     <button
                       className="flex items-center flex-1 text-left"
-                      onClick={() => setSelectedSubcategory(subcat.id)}
+                      onClick={() => setSelectedSubcategory(Number(subcat.id))}
                     >
                       <List className="h-4 w-4 mr-2" />
                       <span className="text-sm">{subcat.name}</span>
@@ -161,7 +161,7 @@ const SubcategoryList = ({
                       size="icon" 
                       onClick={(e) => {
                         e.stopPropagation();
-                        handleRemoveSubcategory(subcat.id);
+                        handleRemoveSubcategory(Number(subcat.id));
                       }}
                     >
                       <Trash2 className="h-4 w-4 text-red-500" />

@@ -59,7 +59,7 @@ const CategoryList = ({
     }
   };
 
-  const handleRemoveCategory = async (categoryId: number) => {
+  const handleRemoveCategory = async (categoryId: number | string) => {
     if (window.confirm("Tem certeza que deseja remover esta categoria? Todos os produtos associados a ela ficarão sem categoria.")) {
       // Se a categoria que estamos removendo é a selecionada atualmente, limpa a seleção
       const categoryToRemove = categories.find(cat => cat.id === categoryId);
@@ -69,8 +69,8 @@ const CategoryList = ({
       }
       
       try {
-        setDeletingCategory(categoryId);
-        await removeCategory(categoryId);
+        setDeletingCategory(typeof categoryId === 'string' ? parseInt(categoryId) : categoryId);
+        await removeCategory(Number(categoryId));
         toast({
           title: "Categoria removida",
           description: "A categoria foi removida com sucesso.",
