@@ -1,3 +1,4 @@
+
 import { useState, useEffect, useCallback } from "react";
 import { useProducts } from "@/contexts/ProductContext";
 import {
@@ -96,7 +97,7 @@ export default function ProductList() {
           disabled={isLoading || isRefreshing}
           className="flex items-center gap-1"
         >
-          <RefreshCw className={isRefreshing ? 'animate-spin' : ''} />
+          <RefreshCw className={isRefreshing ? "animate-spin" : ""} />
           <span className="hidden sm:inline">Atualizar</span>
         </Button>
       </div>
