@@ -12,7 +12,6 @@ const ProductBreadcrumbs = ({ product }: ProductBreadcrumbsProps) => {
   const { categories } = useCategories();
   
   // Find the category for this product
-  // Convert product.categoryId from string to number for comparison with category.id
   const categoryId = product.categoryId ? parseInt(product.categoryId) : null;
   const category = categories.find(cat => cat.id === categoryId);
   

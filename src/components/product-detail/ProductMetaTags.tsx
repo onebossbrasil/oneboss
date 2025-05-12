@@ -1,4 +1,5 @@
 
+import React from "react";
 import { Helmet } from "react-helmet";
 import { Product } from "@/types/product";
 
@@ -21,7 +22,10 @@ const ProductMetaTags = ({ product }: ProductMetaTagsProps) => {
   return (
     <Helmet>
       <title>{`${product.name} | ONE BOSS Luxury Marketplace`}</title>
-      <meta name="description" content={product.shortDescription || product.description?.substring(0, 160) || `${product.name} - ONE BOSS Luxury Marketplace`} />
+      <meta 
+        name="description" 
+        content={product.shortDescription || product.description?.substring(0, 160) || `${product.name} - ONE BOSS Luxury Marketplace`} 
+      />
       
       {/* Open Graph / Facebook */}
       <meta property="og:type" content="product" />
