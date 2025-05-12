@@ -16,7 +16,7 @@ interface AdminLoginProps {
 const AdminLogin = ({ onLogin }: AdminLoginProps) => {
   const { toast } = useToast();
   const navigate = useNavigate();
-  const { signIn, session } = useAuth();
+  const { signIn, session, isAdmin } = useAuth();
   
   // Mantenha o email pré-preenchido para facilitar os testes
   const [email, setEmail] = useState("mar.medeiros2015@gmail.com");
@@ -28,10 +28,14 @@ const AdminLogin = ({ onLogin }: AdminLoginProps) => {
   useEffect(() => {
     if (session) {
       console.log("AdminLogin: Usuário já autenticado como", session.user?.email);
-      onLogin(true);
-      navigate("/admin");
+      if (isAdmin) {
+        onLogin(true);
+        navigate("/admin");
+      } else {
+        setError("Esta conta não possui permissões de administrador.");
+      }
     }
-  }, [session, navigate, onLogin]);
+  }, [session, navigate, onLogin, isAdmin]);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();

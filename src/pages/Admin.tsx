@@ -9,12 +9,13 @@ import { Alert, AlertTitle, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import AdminError from "@/components/admin/states/AdminError";
+import AccessDenied from "@/components/admin/states/AccessDenied";
 import { useAuth } from "@/contexts/AuthContext";
 
 const Admin = () => {
   const { toast } = useToast();
   const navigate = useNavigate();
-  const { session, user, isLoading: authLoading, signOut } = useAuth();
+  const { session, user, isLoading: authLoading, isAdmin, signOut } = useAuth();
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [dbConnectionError, setDbConnectionError] = useState<string | null>(null);
   const [isCheckingConnection, setIsCheckingConnection] = useState(true);
@@ -24,13 +25,14 @@ const Admin = () => {
     if (!authLoading) {
       const authenticated = !!user && !!session;
       console.log("Auth status in Admin:", authenticated ? "logged in" : "not logged in", user?.email);
+      console.log("Admin status:", isAdmin ? "é admin" : "não é admin");
       setIsAuthenticated(authenticated);
       
       if (authenticated) {
         checkDatabaseConnection();
       }
     }
-  }, [user, session, authLoading]);
+  }, [user, session, authLoading, isAdmin]);
 
   const checkDatabaseConnection = async () => {
     setIsCheckingConnection(true);
@@ -101,6 +103,11 @@ const Admin = () => {
   // If not authenticated, show login
   if (!isAuthenticated) {
     return <AdminLogin onLogin={handleLogin} />;
+  }
+
+  // Se autenticado mas não é admin, mostrar AccessDenied
+  if (isAuthenticated && !isAdmin) {
+    return <AccessDenied onLogout={handleLogout} />;
   }
 
   // Show loading state while checking connection

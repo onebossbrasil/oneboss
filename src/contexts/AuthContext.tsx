@@ -7,6 +7,7 @@ type AuthContextType = {
   session: Session | null;
   user: User | null;
   isLoading: boolean;
+  isAdmin: boolean;
   signIn: (email: string, password: string) => Promise<{ 
     error: Error | null;
     data: Session | null;
@@ -19,7 +20,31 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [session, setSession] = useState<Session | null>(null);
   const [user, setUser] = useState<User | null>(null);
+  const [isAdmin, setIsAdmin] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+
+  // Função para verificar se o usuário é administrador
+  const checkAdminStatus = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('admin_permissions')
+        .select('role')
+        .eq('email', user?.email)
+        .single();
+      
+      if (error) {
+        console.error("Erro ao verificar permissões de administrador:", error);
+        setIsAdmin(false);
+        return;
+      }
+      
+      setIsAdmin(!!data);
+      console.log("Status de administrador verificado:", !!data);
+    } catch (err) {
+      console.error("Erro ao verificar permissões:", err);
+      setIsAdmin(false);
+    }
+  };
 
   useEffect(() => {
     // Set up auth state listener FIRST (important for preventing auth deadlocks)
@@ -44,10 +69,21 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       subscription.unsubscribe();
     };
   }, []);
+  
+  // Verificar status de administrador quando o usuário muda
+  useEffect(() => {
+    if (user) {
+      checkAdminStatus();
+    } else {
+      setIsAdmin(false);
+    }
+  }, [user]);
 
   const signIn = async (email: string, password: string) => {
     try {
       console.log("Attempting sign in with:", email);
+      setIsLoading(true);
+      
       const { data, error } = await supabase.auth.signInWithPassword({
         email,
         password,
@@ -63,15 +99,20 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     } catch (error) {
       console.error("Error signing in:", error);
       return { data: null, error: error as Error };
+    } finally {
+      setIsLoading(false);
     }
   };
 
   const signOut = async () => {
     try {
+      setIsLoading(true);
       await supabase.auth.signOut();
       console.log("Signed out successfully");
     } catch (error) {
       console.error("Error signing out:", error);
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -81,6 +122,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         session,
         user,
         isLoading,
+        isAdmin,
         signIn,
         signOut,
       }}
