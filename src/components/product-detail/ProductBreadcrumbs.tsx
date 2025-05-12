@@ -12,7 +12,8 @@ const ProductBreadcrumbs = ({ product }: ProductBreadcrumbsProps) => {
   const { categories } = useCategories();
   
   // Find the category for this product
-  const category = categories.find(cat => cat.id === product.categoryId);
+  // Convert categoryId to string before comparison since categories.id is string type
+  const category = categories.find(cat => cat.id === (product.categoryId ? product.categoryId.toString() : null));
   
   return (
     <nav aria-label="Breadcrumb">

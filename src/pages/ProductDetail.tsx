@@ -69,8 +69,17 @@ const ProductDetail = () => {
           description: productData.description || "",
           price: parseFloat(productData.price),
           salePrice: productData.sale_price ? parseFloat(productData.sale_price) : null,
-          categoryId: productData.category_id,
-          subcategoryValues: productData.subcategory_values || {},
+          // Ensure categoryId is a string
+          categoryId: productData.category_id ? String(productData.category_id) : null,
+          // Ensure subcategoryValues is Record<string, string>
+          subcategoryValues: productData.subcategory_values ? 
+            (typeof productData.subcategory_values === 'object' ? 
+              Object.entries(productData.subcategory_values).reduce((acc, [key, value]) => {
+                acc[key] = String(value);
+                return acc;
+              }, {} as Record<string, string>) : 
+              {}) : 
+            {},
           featured: productData.featured || false,
           published: productData.published !== undefined ? productData.published : true,
           stockQuantity: productData.stock_quantity || 0,
