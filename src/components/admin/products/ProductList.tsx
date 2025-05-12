@@ -68,6 +68,7 @@ export default function ProductList() {
     setLastRefreshTime(now);
     
     try {
+      // The issue is here - RefreshCw size should not have an argument
       await refreshProducts(true);
       toast({
         title: "Lista atualizada",
