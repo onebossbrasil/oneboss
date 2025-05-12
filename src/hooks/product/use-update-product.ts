@@ -3,7 +3,7 @@ import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { Product } from "@/types/product";
-import { uploadProductImage, deleteProductImage } from "@/utils/productUtils";
+import { uploadProductImage, deleteProductImage } from "@/utils/product";
 import { useAuth } from "@/contexts/AuthContext";
 
 export const useUpdateProduct = () => {

@@ -2,7 +2,7 @@
 import { useState, useCallback } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { Product } from "@/types/product";
-import { fetchProductsFromSupabase } from "@/utils/productUtils";
+import { fetchProductsFromSupabase } from "@/utils/product";
 import { useAuth } from "@/contexts/AuthContext";
 
 export const useProductData = () => {
