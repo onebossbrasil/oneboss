@@ -4,10 +4,12 @@ import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { Product } from "@/types/product";
 import { uploadProductImage } from "@/utils/productUtils";
+import { useAuth } from "@/contexts/AuthContext";
 
 export const useAddProduct = () => {
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
+  const { session } = useAuth();
 
   const addProduct = async (
     product: Omit<Product, 'id' | 'createdAt' | 'updatedAt' | 'images'>, 
@@ -16,9 +18,16 @@ export const useAddProduct = () => {
     try {
       setIsLoading(true);
       
+      if (!session) {
+        throw new Error('Você precisa estar autenticado como administrador para adicionar produtos.');
+      }
+      
+      console.log("Adding product with auth:", !!session.access_token);
+      
       // Check connection before attempting operation
       const { error: connectionError } = await supabase.from('products').select('id').limit(1);
       if (connectionError) {
+        console.error("Connection error:", connectionError);
         throw new Error('Não foi possível conectar ao banco de dados. Verifique sua conexão.');
       }
       
@@ -40,10 +49,16 @@ export const useAddProduct = () => {
         .select()
         .single();
         
-      if (error) throw error;
+      if (error) {
+        console.error("Insert error:", error);
+        throw error;
+      }
+      
+      console.log("Product added successfully, ID:", data.id);
       
       // Upload images if any
       if (images.length > 0) {
+        console.log("Uploading images:", images.length);
         await Promise.all(
           images.map((image, index) => 
             uploadProductImage(data.id, image, index)
@@ -68,6 +83,10 @@ export const useAddProduct = () => {
         errorMessage = 'Já existe um produto com este nome.';
       } else if (err.code === '23502') {
         errorMessage = 'Campos obrigatórios não preenchidos.';
+      } else if (err.code === '42501') {
+        errorMessage = 'Permissão negada. Certifique-se de estar logado como administrador.';
+      } else if (!session) {
+        errorMessage = 'Você precisa estar autenticado como administrador para adicionar produtos.';
       }
       
       toast({

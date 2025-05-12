@@ -4,6 +4,7 @@ import { useToast } from "@/hooks/use-toast";
 import { Product } from "@/types/product";
 import { fetchProductsFromSupabase } from "@/utils/productUtils";
 import { useProductOperations } from "@/hooks/use-product-operations";
+import { useAuth } from "@/contexts/AuthContext";
 
 type ProductContextType = {
   products: Product[];
@@ -20,6 +21,7 @@ const ProductContext = createContext<ProductContextType | undefined>(undefined);
 
 export const ProductProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { toast } = useToast();
+  const { session } = useAuth();
   const [products, setProducts] = useState<Product[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -32,6 +34,7 @@ export const ProductProvider: React.FC<{ children: React.ReactNode }> = ({ child
     setError(null);
     
     try {
+      console.log("Fetching products, authenticated:", !!session?.access_token);
       const { products: fetchedProducts, error: fetchError } = await fetchProductsFromSupabase();
       
       if (fetchError) {
@@ -70,18 +73,31 @@ export const ProductProvider: React.FC<{ children: React.ReactNode }> = ({ child
     } finally {
       setIsLoading(false);
     }
-  }, [toast, retryCount]);
+  }, [toast, retryCount, session]);
 
-  // Load products when the component mounts or when retry count changes
+  // Load products when the component mounts or when retry count changes or session changes
   useEffect(() => {
-    fetchProducts();
-  }, [fetchProducts]);
+    // Only attempt to fetch if we have a session or we're not authenticated yet
+    // This prevents excessive loading during auth transitions
+    if (session || retryCount > 0) {
+      fetchProducts();
+    }
+  }, [fetchProducts, session]);
 
   const addProduct = async (
     product: Omit<Product, 'id' | 'createdAt' | 'updatedAt' | 'images'>, 
     images: File[]
   ) => {
     try {
+      if (!session) {
+        toast({
+          title: 'Acesso negado',
+          description: 'Você precisa estar autenticado para adicionar produtos.',
+          variant: 'destructive',
+        });
+        return;
+      }
+      
       await addProductOperation(product, images);
       await fetchProducts(); // Refresh products list
     } catch (err) {
@@ -95,6 +111,15 @@ export const ProductProvider: React.FC<{ children: React.ReactNode }> = ({ child
     newImages?: File[]
   ) => {
     try {
+      if (!session) {
+        toast({
+          title: 'Acesso negado',
+          description: 'Você precisa estar autenticado para atualizar produtos.',
+          variant: 'destructive',
+        });
+        return;
+      }
+      
       await updateProductOperation(id, productData, newImages);
       await fetchProducts(); // Refresh products list
     } catch (err) {
@@ -104,6 +129,15 @@ export const ProductProvider: React.FC<{ children: React.ReactNode }> = ({ child
 
   const deleteProduct = async (id: string) => {
     try {
+      if (!session) {
+        toast({
+          title: 'Acesso negado',
+          description: 'Você precisa estar autenticado para remover produtos.',
+          variant: 'destructive',
+        });
+        return;
+      }
+      
       await deleteProductOperation(id);
       await fetchProducts(); // Refresh products list
     } catch (err) {

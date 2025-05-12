@@ -22,11 +22,12 @@ const Admin = () => {
   // Check if user is authenticated
   useEffect(() => {
     if (!authLoading) {
-      if (user && session) {
-        setIsAuthenticated(true);
+      const authenticated = !!user && !!session;
+      console.log("Auth status in Admin:", authenticated ? "logged in" : "not logged in", user?.email);
+      setIsAuthenticated(authenticated);
+      
+      if (authenticated) {
         checkDatabaseConnection();
-      } else {
-        setIsAuthenticated(false);
       }
     }
   }, [user, session, authLoading]);
@@ -34,6 +35,7 @@ const Admin = () => {
   const checkDatabaseConnection = async () => {
     setIsCheckingConnection(true);
     try {
+      console.log("Checking database connection with token:", !!session?.access_token);
       // Simple query to check connection
       const { error } = await supabase.from('products').select('id').limit(1);
       
@@ -41,6 +43,7 @@ const Admin = () => {
         console.error('Database connection error:', error);
         setDbConnectionError(error.message);
       } else {
+        console.log("Database connection successful");
         setDbConnectionError(null);
       }
     } catch (err: any) {
@@ -72,6 +75,7 @@ const Admin = () => {
   const handleLogin = (success: boolean) => {
     if (success) {
       setIsAuthenticated(true);
+      checkDatabaseConnection();
     } else {
       setIsAuthenticated(false);
     }
@@ -114,9 +118,19 @@ const Admin = () => {
   // Show error state if database connection fails
   if (dbConnectionError) {
     return (
-      <AdminError 
-        errorMessage={`Erro ao conectar ao banco de dados: ${dbConnectionError}`} 
-      />
+      <div className="container mx-auto px-4 py-8">
+        <Alert variant="destructive" className="mb-6">
+          <AlertTitle>Erro de conexão</AlertTitle>
+          <AlertDescription>
+            {`Erro ao conectar ao banco de dados: ${dbConnectionError}`}
+          </AlertDescription>
+        </Alert>
+        
+        <div className="flex justify-between items-center">
+          <Button onClick={handleRetryConnection}>Tentar novamente</Button>
+          <Button variant="outline" onClick={handleLogout}>Sair</Button>
+        </div>
+      </div>
     );
   }
 

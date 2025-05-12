@@ -4,10 +4,12 @@ import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { Product } from "@/types/product";
 import { uploadProductImage, deleteProductImage } from "@/utils/productUtils";
+import { useAuth } from "@/contexts/AuthContext";
 
 export const useUpdateProduct = () => {
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
+  const { session } = useAuth();
 
   const updateProduct = async (
     id: string, 
@@ -16,6 +18,14 @@ export const useUpdateProduct = () => {
   ) => {
     try {
       setIsLoading(true);
+      
+      // Verificando se o usuário está autenticado
+      if (!session) {
+        throw new Error('Você precisa estar autenticado como administrador para editar produtos.');
+      }
+
+      console.log("Atualizando produto com ID:", id);
+      console.log("Token de autenticação disponível:", !!session.access_token);
       
       // Prepare product data for update
       const updateData: Record<string, any> = {
@@ -44,16 +54,24 @@ export const useUpdateProduct = () => {
         throw new Error('Produto não encontrado. Ele pode ter sido excluído.');
       }
       
+      console.log("Enviando dados de atualização:", updateData);
+      
       // Update product in database
       const { error } = await supabase
         .from('products')
         .update(updateData)
         .eq('id', id);
         
-      if (error) throw error;
+      if (error) {
+        console.error("Erro ao atualizar produto:", error);
+        throw error;
+      }
+      
+      console.log("Produto atualizado com sucesso. Processando imagens...");
       
       // Delete images that were removed in the UI
       if (productData.deletedImageIds && productData.deletedImageIds.length > 0) {
+        console.log("Removendo imagens:", productData.deletedImageIds);
         await Promise.all(
           productData.deletedImageIds.map(imageId => deleteProductImage(imageId))
         );
@@ -61,6 +79,7 @@ export const useUpdateProduct = () => {
       
       // Upload new images if any
       if (newImages && newImages.length > 0) {
+        console.log("Enviando novas imagens:", newImages.length);
         // Get current number of images to determine sort_order for new ones
         const { data: existingImages } = await supabase
           .from('product_images')
@@ -91,7 +110,9 @@ export const useUpdateProduct = () => {
         errorMessage = 'Falha na conexão com o banco de dados. Verifique sua internet.';
       } else if (err.code === '42501') {
         errorMessage = 'Permissão negada. Certifique-se de estar logado como administrador.';
-      } 
+      } else if (!session) {
+        errorMessage = 'Você precisa estar autenticado como administrador para editar produtos.';
+      }
       
       toast({
         title: 'Erro ao atualizar produto',

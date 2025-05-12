@@ -1,5 +1,5 @@
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
@@ -16,12 +16,20 @@ interface AdminLoginProps {
 const AdminLogin = ({ onLogin }: AdminLoginProps) => {
   const { toast } = useToast();
   const navigate = useNavigate();
-  const { signIn } = useAuth();
+  const { signIn, session } = useAuth();
   
   const [email, setEmail] = useState("mar.medeiros2015@gmail.com");
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  // Verificar se já está autenticado ao carregar
+  useEffect(() => {
+    if (session) {
+      onLogin(true);
+      navigate("/admin");
+    }
+  }, [session, navigate, onLogin]);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -29,9 +37,11 @@ const AdminLogin = ({ onLogin }: AdminLoginProps) => {
     setError(null);
 
     try {
+      console.log("Iniciando login com:", email);
       const { data: session, error } = await signIn(email, password);
       
       if (error) {
+        console.error("Login error:", error);
         setError("Falha na autenticação. Verifique seu e-mail e senha.");
         onLogin(false);
         toast({
@@ -40,6 +50,7 @@ const AdminLogin = ({ onLogin }: AdminLoginProps) => {
           variant: "destructive",
         });
       } else if (session) {
+        console.log("Login bem-sucedido:", email);
         toast({
           title: "Login realizado",
           description: "Você está sendo redirecionado ao painel administrativo.",
@@ -48,6 +59,7 @@ const AdminLogin = ({ onLogin }: AdminLoginProps) => {
         navigate("/admin");
       }
     } catch (err) {
+      console.error("Error during login:", err);
       setError("Ocorreu um erro ao processar o login.");
       onLogin(false);
       toast({
