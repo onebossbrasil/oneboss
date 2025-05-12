@@ -18,17 +18,14 @@ const CategorySelector = ({
   onSubcategoryChange
 }: CategorySelectorProps) => {
   const { categories } = useCategories();
-  const [activeSubcategoryType, setActiveSubcategoryType] = useState<string | null>(null);
-  
-  // Reset active subcategory type when category changes
-  useEffect(() => {
-    setActiveSubcategoryType(null);
-  }, [selectedCategory]);
   
   // Get all subcategory types for the selected category
   const subcategoryTypes = () => {
     const category = categories.find(cat => cat.value === selectedCategory);
-    return category ? category.subcategories.map(sc => sc.type) : [];
+    return category ? category.subcategories.map(sc => ({ 
+      type: sc.type,
+      name: sc.name 
+    })) : [];
   };
   
   // Get available values for a specific subcategory type
@@ -39,19 +36,10 @@ const CategorySelector = ({
     const subcategory = category.subcategories.find(sc => sc.type === subcatType);
     return subcategory ? subcategory.values : [];
   };
-  
-  // Get the label of a subcategory type
-  const getSubcategoryLabel = (subcatType: string) => {
-    const category = categories.find(cat => cat.value === selectedCategory);
-    if (!category) return subcatType.charAt(0).toUpperCase() + subcatType.slice(1);
-    
-    const subcategory = category.subcategories.find(sc => sc.type === subcatType);
-    return subcategory ? subcategory.name : subcatType.charAt(0).toUpperCase() + subcatType.slice(1);
-  };
-  
+
   // Handle subcategory selection
-  const handleSubcategoryTypeSelect = (type: string) => {
-    setActiveSubcategoryType(type);
+  const handleSubcategorySelect = (type: string, value: string) => {
+    onSubcategoryChange(type, value);
   };
 
   return (
@@ -72,45 +60,28 @@ const CategorySelector = ({
         </Select>
       </div>
       
-      {selectedCategory && (
-        <div>
-          <Label htmlFor="subcategoryType">Subcategoria</Label>
-          <Select 
-            onValueChange={handleSubcategoryTypeSelect} 
-            value={activeSubcategoryType || ""}
-          >
-            <SelectTrigger>
-              <SelectValue placeholder="Selecione uma subcategoria" />
-            </SelectTrigger>
-            <SelectContent>
-              {subcategoryTypes().map((type) => (
-                <SelectItem key={type} value={type}>
-                  {getSubcategoryLabel(type)}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
-      )}
-      
-      {activeSubcategoryType && (
-        <div>
-          <Label htmlFor="subcategoryValue">{getSubcategoryLabel(activeSubcategoryType)} - Valor</Label>
-          <Select 
-            onValueChange={(value) => onSubcategoryChange(activeSubcategoryType, value)}
-            value={subcategoryValues[activeSubcategoryType] || ""}
-          >
-            <SelectTrigger>
-              <SelectValue placeholder={`Selecione um valor para ${getSubcategoryLabel(activeSubcategoryType)}`} />
-            </SelectTrigger>
-            <SelectContent>
-              {getSubcategoryOptions(activeSubcategoryType).map((option) => (
-                <SelectItem key={option} value={option}>
-                  {option}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+      {selectedCategory && subcategoryTypes().length > 0 && (
+        <div className="space-y-4">
+          {subcategoryTypes().map((subcategory) => (
+            <div key={subcategory.type}>
+              <Label htmlFor={`subcategory-${subcategory.type}`}>{subcategory.name}</Label>
+              <Select 
+                onValueChange={(value) => handleSubcategorySelect(subcategory.type, value)}
+                value={subcategoryValues[subcategory.type] || ""}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder={`Selecione ${subcategory.name.toLowerCase()}`} />
+                </SelectTrigger>
+                <SelectContent>
+                  {getSubcategoryOptions(subcategory.type).map((option) => (
+                    <SelectItem key={option} value={option}>
+                      {option}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          ))}
         </div>
       )}
 

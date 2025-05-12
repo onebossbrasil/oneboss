@@ -44,7 +44,7 @@ export const useUpdateProduct = () => {
         throw new Error('Produto não encontrado. Ele pode ter sido excluído.');
       }
       
-      // Update product in database
+      // Update product in database - no user permissions check here
       const { error } = await supabase
         .from('products')
         .update(updateData)
@@ -89,7 +89,10 @@ export const useUpdateProduct = () => {
         errorMessage = err.message;
       } else if (err.message?.includes('conexão') || err.code === 'PGRST301') {
         errorMessage = 'Falha na conexão com o banco de dados. Verifique sua internet.';
-      } 
+      } else if (err.message?.includes('permission denied')) {
+        errorMessage = 'Erro de permissão. Operação permitida apenas para administradores.';
+        console.warn('Permission error encountered. In development mode, this is expected due to simulated auth.');
+      }
       
       toast({
         title: 'Erro ao atualizar produto',
