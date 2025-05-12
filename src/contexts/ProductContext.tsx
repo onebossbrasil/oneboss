@@ -21,12 +21,21 @@ const ProductContext = createContext<ProductContextType | undefined>(undefined);
 
 export const ProductProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { toast } = useToast();
-  const { session } = useAuth();
+  const { session, user } = useAuth();
   const [products, setProducts] = useState<Product[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [retryCount, setRetryCount] = useState(0);
   const { addProduct: addProductOperation, updateProduct: updateProductOperation, deleteProduct: deleteProductOperation } = useProductOperations();
+
+  // Debug user authentication status
+  useEffect(() => {
+    if (user) {
+      console.log("ProductContext: Usuario autenticado:", user.email);
+    } else {
+      console.log("ProductContext: Nenhum usuário autenticado");
+    }
+  }, [user]);
 
   // Improved fetchProducts with retry logic
   const fetchProducts = useCallback(async () => {
@@ -35,6 +44,10 @@ export const ProductProvider: React.FC<{ children: React.ReactNode }> = ({ child
     
     try {
       console.log("Fetching products, authenticated:", !!session?.access_token);
+      if (user) {
+        console.log("Fetching with user:", user.email);
+      }
+      
       const { products: fetchedProducts, error: fetchError } = await fetchProductsFromSupabase();
       
       if (fetchError) {
@@ -73,7 +86,7 @@ export const ProductProvider: React.FC<{ children: React.ReactNode }> = ({ child
     } finally {
       setIsLoading(false);
     }
-  }, [toast, retryCount, session]);
+  }, [toast, retryCount, session, user]);
 
   // Load products when the component mounts or when retry count changes or session changes
   useEffect(() => {
@@ -99,9 +112,17 @@ export const ProductProvider: React.FC<{ children: React.ReactNode }> = ({ child
         return;
       }
       
+      console.log("Adicionando produto como:", user?.email);
       await addProductOperation(product, images);
       await fetchProducts(); // Refresh products list
+      
+      toast({
+        title: "Produto adicionado",
+        description: "Produto adicionado com sucesso!",
+        variant: "default"
+      });
     } catch (err) {
+      console.error("Erro ao adicionar produto:", err);
       // Error is already handled in the operation
     }
   };
@@ -112,7 +133,7 @@ export const ProductProvider: React.FC<{ children: React.ReactNode }> = ({ child
     newImages?: File[]
   ) => {
     try {
-      if (!session) {
+      if (!session || !user) {
         toast({
           title: 'Acesso negado',
           description: 'Você precisa estar autenticado para atualizar produtos.',
@@ -121,9 +142,20 @@ export const ProductProvider: React.FC<{ children: React.ReactNode }> = ({ child
         return;
       }
       
+      // Log detailed authentication information
+      console.log("Atualizando produto como:", user.email);
+      console.log("Token válido:", !!session.access_token);
+      
       await updateProductOperation(id, productData, newImages);
       await fetchProducts(); // Refresh products list
+      
+      toast({
+        title: "Produto atualizado",
+        description: "As alterações foram salvas com sucesso!",
+        variant: "default"
+      });
     } catch (err) {
+      console.error("Erro ao atualizar produto:", err);
       // Error is already handled in the operation
     }
   };
@@ -139,6 +171,7 @@ export const ProductProvider: React.FC<{ children: React.ReactNode }> = ({ child
         return;
       }
       
+      console.log("Removendo produto como:", user?.email);
       await deleteProductOperation(id);
       await fetchProducts(); // Refresh products list
     } catch (err) {

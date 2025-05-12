@@ -9,7 +9,7 @@ import { useAuth } from "@/contexts/AuthContext";
 export const useUpdateProduct = () => {
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
-  const { session } = useAuth();
+  const { session, user } = useAuth();
 
   const updateProduct = async (
     id: string, 
@@ -25,7 +25,8 @@ export const useUpdateProduct = () => {
       }
 
       console.log("Atualizando produto com ID:", id);
-      console.log("Token de autenticação disponível:", !!session.access_token);
+      console.log("Usuário autenticado:", user?.email);
+      console.log("Token de autenticação:", session.access_token?.substring(0, 10) + "...");
       
       // Prepare product data for update
       const updateData: Record<string, any> = {
@@ -56,7 +57,7 @@ export const useUpdateProduct = () => {
       
       console.log("Enviando dados de atualização:", updateData);
       
-      // Update product in database
+      // Update product in database with explicit auth header for debugging
       const { error } = await supabase
         .from('products')
         .update(updateData)
@@ -110,8 +111,14 @@ export const useUpdateProduct = () => {
         errorMessage = 'Falha na conexão com o banco de dados. Verifique sua internet.';
       } else if (err.code === '42501') {
         errorMessage = 'Permissão negada. Certifique-se de estar logado como administrador.';
+      } else if (err.code?.includes('PGRST')) {
+        errorMessage = `Erro ao comunicar com o banco de dados (${err.code}). Verifique sua conexão.`;
       } else if (!session) {
         errorMessage = 'Você precisa estar autenticado como administrador para editar produtos.';
+      } else if (!user) {
+        errorMessage = 'Usuário não encontrado na sessão. Tente fazer login novamente.';
+      } else {
+        errorMessage = `Erro: ${err.message || 'Erro desconhecido'}`;
       }
       
       toast({

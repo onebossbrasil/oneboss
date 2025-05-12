@@ -26,6 +26,7 @@ const AdminLogin = ({ onLogin }: AdminLoginProps) => {
   // Verificar se já está autenticado ao carregar
   useEffect(() => {
     if (session) {
+      console.log("AdminLogin: Usuário já autenticado como", session.user?.email);
       onLogin(true);
       navigate("/admin");
     }
@@ -117,7 +118,10 @@ const AdminLogin = ({ onLogin }: AdminLoginProps) => {
           </form>
         </CardContent>
         <CardFooter className="flex justify-center text-sm text-muted-foreground">
-          Acesso restrito a administradores
+          <div className="text-center">
+            <p>Acesso restrito a administradores</p>
+            <p className="mt-2 text-xs text-muted-foreground">Credenciais padrão: mar.medeiros2015@gmail.com</p>
+          </div>
         </CardFooter>
       </Card>
     </div>
