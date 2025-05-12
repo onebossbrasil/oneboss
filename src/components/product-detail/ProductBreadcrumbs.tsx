@@ -11,7 +11,7 @@ interface ProductBreadcrumbsProps {
 const ProductBreadcrumbs = ({ product }: ProductBreadcrumbsProps) => {
   const { categories } = useCategories();
   
-  // Find the category for this product
+  // Find the category for this product - ensure categoryId is properly converted to number for comparison
   const categoryId = product.categoryId ? parseInt(product.categoryId) : null;
   const category = categories.find(cat => cat.id === categoryId);
   
