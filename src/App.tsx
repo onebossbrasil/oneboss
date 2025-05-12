@@ -9,7 +9,7 @@ import Store from "./pages/Store";
 import Admin from "./pages/Admin";
 import NotFound from "./pages/NotFound";
 import { CategoryProvider } from "./contexts/CategoryContext";
-import { ProductProvider } from "./contexts/ProductContext";
+import { ProductProvider } from "./contexts/product";
 import { LeadProvider } from "./contexts/LeadContext";
 import { NewsletterProvider } from "./contexts/NewsletterContext";
 import { AuthProvider } from "./contexts/AuthContext";
