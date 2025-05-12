@@ -4,8 +4,6 @@ import { useNavigate } from "react-router-dom";
 import AdminDashboard from "@/components/admin/AdminDashboard";
 import AdminLogin from "@/components/admin/AdminLogin";
 import { useToast } from "@/hooks/use-toast";
-import { SidebarProvider } from "@/components/ui/sidebar";
-import { Alert, AlertTitle, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import AdminError from "@/components/admin/states/AdminError";
@@ -20,9 +18,8 @@ const Admin = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [dbConnectionError, setDbConnectionError] = useState<string | null>(null);
   const [isCheckingConnection, setIsCheckingConnection] = useState(true);
-  const [isCheckingPermissions, setIsCheckingPermissions] = useState(false);
 
-  // Check if user is authenticated
+  // Check if user is authenticated - optimization to prevent extra renders
   useEffect(() => {
     if (!authLoading) {
       const authenticated = !!user && !!session;
@@ -32,6 +29,8 @@ const Admin = () => {
       
       if (authenticated) {
         checkDatabaseConnection();
+      } else {
+        setIsCheckingConnection(false);
       }
     }
   }, [user, session, authLoading, isAdmin]);
@@ -149,27 +148,23 @@ const Admin = () => {
   if (dbConnectionError) {
     return (
       <div className="container mx-auto px-4 py-8">
-        <Alert variant="destructive" className="mb-6">
-          <AlertTitle>Erro de conexão</AlertTitle>
-          <AlertDescription>
+        <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md">
+          <h2 className="text-xl font-bold text-red-600 dark:text-red-400 mb-4">Erro de conexão</h2>
+          <p className="mb-4 text-gray-700 dark:text-gray-300">
             {`Erro ao conectar ao banco de dados: ${dbConnectionError}`}
-          </AlertDescription>
-        </Alert>
-        
-        <div className="flex justify-between items-center">
-          <Button onClick={handleRetryConnection}>Tentar novamente</Button>
-          <Button variant="outline" onClick={handleLogout}>Sair</Button>
+          </p>
+          
+          <div className="flex justify-between items-center">
+            <Button onClick={handleRetryConnection}>Tentar novamente</Button>
+            <Button variant="outline" onClick={handleLogout}>Sair</Button>
+          </div>
         </div>
       </div>
     );
   }
 
   // Renderizar o painel administrativo se a conexão estiver OK e autenticado
-  return (
-    <SidebarProvider>
-      <AdminDashboard onLogout={handleLogout} />
-    </SidebarProvider>
-  );
+  return <AdminDashboard onLogout={handleLogout} />;
 };
 
 export default Admin;

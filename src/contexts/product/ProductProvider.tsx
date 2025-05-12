@@ -1,5 +1,5 @@
 
-import React, { createContext, useContext, useEffect } from "react";
+import React, { createContext, useContext, useEffect, useMemo } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/contexts/AuthContext";
 import { useProductOperations } from "@/hooks/use-product-operations";
@@ -31,14 +31,18 @@ export const ProductProvider: React.FC<{ children: React.ReactNode }> = ({ child
   }, [user]);
 
   // Load products when the component mounts or when retry count changes or session changes
+  // Utilizamos um useMemo para evitar execuções desnecessárias do useEffect
+  const shouldFetchProducts = useMemo(() => {
+    return !!(session || retryCount > 0);
+  }, [session, retryCount]);
+  
   useEffect(() => {
-    console.log("ProductProvider useEffect triggered, session:", !!session);
+    console.log("ProductProvider useEffect triggered, should fetch:", shouldFetchProducts);
     // Only attempt to fetch if we have a session or we're not authenticated yet
-    // This prevents excessive loading during auth transitions
-    if (session || retryCount > 0) {
+    if (shouldFetchProducts) {
       fetchProducts();
     }
-  }, [fetchProducts, session, retryCount]);
+  }, [fetchProducts, shouldFetchProducts]);
 
   const addProduct = async (
     product: Omit<ProductContextType["products"][0], 'id' | 'createdAt' | 'updatedAt' | 'images'>, 
@@ -84,10 +88,7 @@ export const ProductProvider: React.FC<{ children: React.ReactNode }> = ({ child
         return;
       }
       
-      // Log detailed authentication information
       console.log("Atualizando produto como:", user.email);
-      console.log("Token válido:", !!session.access_token);
-      
       await updateProductOperation(id, productData, newImages);
       await fetchProducts(); // Refresh products list
       
@@ -123,19 +124,22 @@ export const ProductProvider: React.FC<{ children: React.ReactNode }> = ({ child
 
   const refreshProducts = async () => fetchProducts();
 
+  // Memoize context value to prevent unnecessary re-renders
+  const contextValue = useMemo(() => ({
+    products,
+    featuredProducts,
+    isLoading,
+    error,
+    addProduct,
+    updateProduct,
+    deleteProduct,
+    refreshProducts
+  }), [products, featuredProducts, isLoading, error]);
+
   console.log("ProductProvider rendering with", products.length, "products");
 
   return (
-    <ProductContext.Provider value={{
-      products,
-      featuredProducts,
-      isLoading,
-      error,
-      addProduct,
-      updateProduct,
-      deleteProduct,
-      refreshProducts
-    }}>
+    <ProductContext.Provider value={contextValue}>
       {children}
     </ProductContext.Provider>
   );

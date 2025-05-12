@@ -1,5 +1,5 @@
 
-import { createContext, useContext, useEffect, useState } from "react";
+import { createContext, useContext, useEffect, useState, useMemo } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Session, User } from "@supabase/supabase-js";
 
@@ -22,6 +22,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
   const [isAdmin, setIsAdmin] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  const [authError, setAuthError] = useState<Error | null>(null);
 
   // Função para verificar se o usuário é administrador
   const checkAdminStatus = async () => {
@@ -43,6 +44,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
           email: user.email,
           hasValidSession: !!session
         });
+        setAuthError(error);
         setIsAdmin(false);
         return;
       }
@@ -61,6 +63,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       }
     } catch (err) {
       console.error("Erro ao verificar permissões:", err);
+      setAuthError(err instanceof Error ? err : new Error('Unknown error'));
       setIsAdmin(false);
     }
   };
@@ -92,11 +95,15 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   // Verificar status de administrador quando o usuário muda
   useEffect(() => {
     if (user) {
-      checkAdminStatus();
+      // Usar setTimeout para evitar problemas de deadlock com auth state
+      const timer = setTimeout(() => {
+        checkAdminStatus();
+      }, 0);
+      return () => clearTimeout(timer);
     } else {
       setIsAdmin(false);
     }
-  }, [user]);
+  }, [user, session?.access_token]);
 
   const signIn = async (email: string, password: string) => {
     try {
@@ -110,20 +117,16 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       
       if (error) {
         console.error("Sign in error:", error.message);
+        return { data: null, error };
       } else {
         console.log("Sign in successful:", data.user?.email);
         // Verificar status de admin imediatamente após login bem-sucedido
         if (data.user) {
           setUser(data.user);
           setSession(data.session);
-          // Use setTimeout para evitar problemas de deadlock com auth state
-          setTimeout(() => {
-            checkAdminStatus();
-          }, 0);
         }
+        return { data: data.session, error: null };
       }
-      
-      return { data: data.session, error };
     } catch (error) {
       console.error("Error signing in:", error);
       return { data: null, error: error as Error };
@@ -137,6 +140,9 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       setIsLoading(true);
       await supabase.auth.signOut();
       console.log("Signed out successfully");
+      setIsAdmin(false);
+      setUser(null);
+      setSession(null);
     } catch (error) {
       console.error("Error signing out:", error);
     } finally {
@@ -144,17 +150,18 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     }
   };
 
+  // Memoize context value to prevent unnecessary re-renders
+  const contextValue = useMemo(() => ({
+    session,
+    user,
+    isLoading,
+    isAdmin,
+    signIn,
+    signOut,
+  }), [session, user, isLoading, isAdmin]);
+
   return (
-    <AuthContext.Provider
-      value={{
-        session,
-        user,
-        isLoading,
-        isAdmin,
-        signIn,
-        signOut,
-      }}
-    >
+    <AuthContext.Provider value={contextValue}>
       {children}
     </AuthContext.Provider>
   );

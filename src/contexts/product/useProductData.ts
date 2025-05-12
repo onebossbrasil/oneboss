@@ -1,5 +1,5 @@
 
-import { useState, useCallback } from "react";
+import { useState, useCallback, useRef } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { Product } from "@/types/product";
 import { fetchProductsFromSupabase } from "@/utils/product";
@@ -12,9 +12,19 @@ export const useProductData = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [retryCount, setRetryCount] = useState(0);
+  
+  // Use a ref to track if a fetch is in progress
+  const isFetchingRef = useRef(false);
 
-  // Improved fetchProducts with retry logic
+  // Improved fetchProducts with retry logic and debounce
   const fetchProducts = useCallback(async () => {
+    // Prevent multiple simultaneous fetches
+    if (isFetchingRef.current) {
+      console.log("Fetch already in progress, skipping");
+      return;
+    }
+    
+    isFetchingRef.current = true;
     setIsLoading(true);
     setError(null);
     
@@ -44,6 +54,7 @@ export const useProductData = () => {
         
         setTimeout(() => {
           setRetryCount(prev => prev + 1);
+          isFetchingRef.current = false; // Reset the flag before retrying
           fetchProducts();
         }, nextRetryDelay);
         
@@ -61,6 +72,7 @@ export const useProductData = () => {
       }
     } finally {
       setIsLoading(false);
+      isFetchingRef.current = false;
     }
   }, [toast, retryCount, session, user]);
 
