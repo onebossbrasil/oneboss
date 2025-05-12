@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Product } from "@/types/product";
 
@@ -16,7 +15,9 @@ export const useCategorySelection = (product: Product | null) => {
 
   const handleCategoryChange = (value: string) => {
     setSelectedCategory(value);
-    setSubcategoryValues({});
+    // Keep the featured status but reset other subcategory values
+    const featured = subcategoryValues.featured;
+    setSubcategoryValues(featured ? { featured } : {});
   };
   
   const handleSubcategoryChange = (type: string, value: string) => {

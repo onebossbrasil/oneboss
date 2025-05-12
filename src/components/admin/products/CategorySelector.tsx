@@ -2,6 +2,7 @@
 import { useCategories } from "@/contexts/CategoryContext";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Label } from "@/components/ui/label";
+import { useState, useEffect } from "react";
 
 type CategorySelectorProps = {
   selectedCategory: string;
@@ -17,9 +18,15 @@ const CategorySelector = ({
   onSubcategoryChange
 }: CategorySelectorProps) => {
   const { categories } = useCategories();
-
-  // Get available subcategory types for the selected category
-  const getSubcategoryTypes = () => {
+  const [activeSubcategoryType, setActiveSubcategoryType] = useState<string | null>(null);
+  
+  // Reset active subcategory type when category changes
+  useEffect(() => {
+    setActiveSubcategoryType(null);
+  }, [selectedCategory]);
+  
+  // Get all subcategory types for the selected category
+  const subcategoryTypes = () => {
     const category = categories.find(cat => cat.value === selectedCategory);
     return category ? category.subcategories.map(sc => sc.type) : [];
   };
@@ -41,6 +48,11 @@ const CategorySelector = ({
     const subcategory = category.subcategories.find(sc => sc.type === subcatType);
     return subcategory ? subcategory.name : subcatType.charAt(0).toUpperCase() + subcatType.slice(1);
   };
+  
+  // Handle subcategory selection
+  const handleSubcategoryTypeSelect = (type: string) => {
+    setActiveSubcategoryType(type);
+  };
 
   return (
     <div className="space-y-4">
@@ -60,18 +72,39 @@ const CategorySelector = ({
         </Select>
       </div>
       
-      {selectedCategory && getSubcategoryTypes().map((subcatType) => (
-        <div key={subcatType}>
-          <Label htmlFor={subcatType}>{getSubcategoryLabel(subcatType)}</Label>
+      {selectedCategory && (
+        <div>
+          <Label htmlFor="subcategoryType">Subcategoria</Label>
           <Select 
-            onValueChange={(value) => onSubcategoryChange(subcatType, value)}
-            value={subcategoryValues[subcatType] || ""}
+            onValueChange={handleSubcategoryTypeSelect} 
+            value={activeSubcategoryType || ""}
           >
             <SelectTrigger>
-              <SelectValue placeholder={`Selecione ${getSubcategoryLabel(subcatType)}`} />
+              <SelectValue placeholder="Selecione uma subcategoria" />
             </SelectTrigger>
             <SelectContent>
-              {getSubcategoryOptions(subcatType).map((option) => (
+              {subcategoryTypes().map((type) => (
+                <SelectItem key={type} value={type}>
+                  {getSubcategoryLabel(type)}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+      )}
+      
+      {activeSubcategoryType && (
+        <div>
+          <Label htmlFor="subcategoryValue">{getSubcategoryLabel(activeSubcategoryType)} - Valor</Label>
+          <Select 
+            onValueChange={(value) => onSubcategoryChange(activeSubcategoryType, value)}
+            value={subcategoryValues[activeSubcategoryType] || ""}
+          >
+            <SelectTrigger>
+              <SelectValue placeholder={`Selecione um valor para ${getSubcategoryLabel(activeSubcategoryType)}`} />
+            </SelectTrigger>
+            <SelectContent>
+              {getSubcategoryOptions(activeSubcategoryType).map((option) => (
                 <SelectItem key={option} value={option}>
                   {option}
                 </SelectItem>
@@ -79,11 +112,14 @@ const CategorySelector = ({
             </SelectContent>
           </Select>
         </div>
-      ))}
+      )}
 
       <div>
         <Label htmlFor="featured">Em Destaque?</Label>
-        <Select defaultValue="false">
+        <Select 
+          value={subcategoryValues['featured'] || "false"} 
+          onValueChange={(value) => onSubcategoryChange('featured', value)}
+        >
           <SelectTrigger>
             <SelectValue placeholder="O produto ficará em destaque?" />
           </SelectTrigger>

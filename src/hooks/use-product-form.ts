@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { useProducts } from "@/contexts/ProductContext";
 import { useToast } from "@/hooks/use-toast";
@@ -51,7 +50,9 @@ export const useProductForm = () => {
   
   const handleCategoryChange = (value: string) => {
     setSelectedCategory(value);
-    setSubcategoryValues({});
+    // Keep the featured status but reset other subcategory values
+    const featured = subcategoryValues.featured;
+    setSubcategoryValues(featured ? { featured } : {});
   };
   
   const handleSubcategoryChange = (type: string, value: string) => {
@@ -62,7 +63,12 @@ export const useProductForm = () => {
   };
 
   const handleFormChange = (field: string, value: any) => {
-    setFormData(prev => ({ ...prev, [field]: value }));
+    if (field === 'featured') {
+      setFormData(prev => ({ ...prev, [field]: value }));
+      handleSubcategoryChange('featured', value.toString());
+    } else {
+      setFormData(prev => ({ ...prev, [field]: value }));
+    }
   };
   
   const handleSubmit = async (e: React.FormEvent) => {
