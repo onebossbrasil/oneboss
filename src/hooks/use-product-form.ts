@@ -1,17 +1,9 @@
 
 import { useState } from "react";
-import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
-import { useToast } from "@/hooks/use-toast";
-import { Upload, ChevronDown, ChevronUp } from "lucide-react";
-import ProductDetailsForm from "./ProductDetailsForm";
-import CategorySelector from "./CategorySelector";
-import ImageUpload from "./ImageUpload";
 import { useProducts } from "@/contexts/ProductContext";
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
-import CollapsibleProductForm from "./CollapsibleProductForm";
+import { useToast } from "@/hooks/use-toast";
 
-const ProductForm = () => {
+export const useProductForm = () => {
   const { toast } = useToast();
   const { addProduct } = useProducts();
   const [images, setImages] = useState<File[]>([]);
@@ -166,24 +158,20 @@ const ProductForm = () => {
       });
     }
   };
-  
-  return (
-    <CollapsibleProductForm 
-      isOpen={isOpen}
-      setIsOpen={setIsOpen}
-      formData={formData}
-      handleFormChange={handleFormChange}
-      selectedCategory={selectedCategory}
-      subcategoryValues={subcategoryValues}
-      onCategoryChange={handleCategoryChange}
-      onSubcategoryChange={handleSubcategoryChange}
-      images={images}
-      imagePreviewUrls={imagePreviewUrls}
-      handleImageChange={handleImageChange}
-      handleRemoveImage={handleRemoveImage}
-      handleSubmit={handleSubmit}
-    />
-  );
-};
 
-export default ProductForm;
+  return {
+    formData,
+    images,
+    imagePreviewUrls,
+    selectedCategory,
+    subcategoryValues,
+    isOpen,
+    setIsOpen,
+    handleFormChange,
+    handleImageChange,
+    handleRemoveImage,
+    handleCategoryChange,
+    handleSubcategoryChange,
+    handleSubmit
+  };
+};
