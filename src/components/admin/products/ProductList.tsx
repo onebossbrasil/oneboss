@@ -1,3 +1,4 @@
+
 import { useState, useEffect, useCallback } from "react";
 import { useProducts } from "@/contexts/ProductContext";
 import {
@@ -67,7 +68,7 @@ export default function ProductList() {
     setLastRefreshTime(now);
     
     try {
-      await refreshProducts(true);
+      await refreshProducts();
       toast({
         title: "Lista atualizada",
         description: "Os dados foram sincronizados com o banco de dados",
