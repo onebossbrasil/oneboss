@@ -1,5 +1,5 @@
 
-import React, { createContext, useContext, useEffect, useMemo } from "react";
+import React, { createContext, useContext, useEffect, useMemo, useCallback } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/contexts/AuthContext";
 import { useProductOperations } from "@/hooks/use-product-operations";
@@ -29,22 +29,34 @@ export const ProductProvider: React.FC<{ children: React.ReactNode }> = ({ child
       console.log("ProductContext: Nenhum usuário autenticado");
     }
   }, [user]);
-
-  // Load products when the component mounts or when retry count changes or session changes
-  // Utilizamos um useMemo para evitar execuções desnecessárias do useEffect
+  
+  // Optimized approach to check if we should fetch products
   const shouldFetchProducts = useMemo(() => {
-    return !!(session || retryCount > 0);
+    return Boolean(session) || retryCount > 0;
   }, [session, retryCount]);
   
+  // Improved effect with better dependency management
   useEffect(() => {
-    console.log("ProductProvider useEffect triggered, should fetch:", shouldFetchProducts);
-    // Only attempt to fetch if we have a session or we're not authenticated yet
-    if (shouldFetchProducts) {
+    let isMounted = true;
+    
+    if (shouldFetchProducts && isMounted) {
+      console.log("ProductProvider requesting fetchProducts");
       fetchProducts();
     }
-  }, [fetchProducts, shouldFetchProducts]);
+    
+    return () => {
+      isMounted = false;
+    };
+  }, [shouldFetchProducts, fetchProducts]);
 
-  const addProduct = async (
+  // Stable refreshProducts function with force parameter
+  const refreshProducts = useCallback(async (force = true) => {
+    console.log("Manual refresh products requested, force =", force);
+    return fetchProducts(force);
+  }, [fetchProducts]);
+
+  // Optimized product operations
+  const addProduct = useCallback(async (
     product: Omit<ProductContextType["products"][0], 'id' | 'createdAt' | 'updatedAt' | 'images'>, 
     images: File[]
   ) => {
@@ -60,7 +72,7 @@ export const ProductProvider: React.FC<{ children: React.ReactNode }> = ({ child
       
       console.log("Adicionando produto como:", user?.email);
       await addProductOperation(product, images);
-      await fetchProducts(); // Refresh products list
+      await refreshProducts(); 
       
       toast({
         title: "Produto adicionado",
@@ -71,9 +83,9 @@ export const ProductProvider: React.FC<{ children: React.ReactNode }> = ({ child
       console.error("Erro ao adicionar produto:", err);
       // Error is already handled in the operation
     }
-  };
+  }, [session, user, addProductOperation, refreshProducts, toast]);
 
-  const updateProduct = async (
+  const updateProduct = useCallback(async (
     id: string, 
     productData: Partial<ProductContextType["products"][0]>, 
     newImages?: File[]
@@ -90,7 +102,7 @@ export const ProductProvider: React.FC<{ children: React.ReactNode }> = ({ child
       
       console.log("Atualizando produto como:", user.email);
       await updateProductOperation(id, productData, newImages);
-      await fetchProducts(); // Refresh products list
+      await refreshProducts();
       
       toast({
         title: "Produto atualizado",
@@ -101,9 +113,9 @@ export const ProductProvider: React.FC<{ children: React.ReactNode }> = ({ child
       console.error("Erro ao atualizar produto:", err);
       // Error is already handled in the operation
     }
-  };
+  }, [session, user, updateProductOperation, refreshProducts, toast]);
 
-  const deleteProduct = async (id: string) => {
+  const deleteProduct = useCallback(async (id: string) => {
     try {
       if (!session) {
         toast({
@@ -116,15 +128,13 @@ export const ProductProvider: React.FC<{ children: React.ReactNode }> = ({ child
       
       console.log("Removendo produto como:", user?.email);
       await deleteProductOperation(id);
-      await fetchProducts(); // Refresh products list
+      await refreshProducts();
     } catch (err) {
       // Error is already handled in the operation
     }
-  };
+  }, [session, user, deleteProductOperation, refreshProducts, toast]);
 
-  const refreshProducts = async () => fetchProducts();
-
-  // Memoize context value to prevent unnecessary re-renders
+  // Deep memoization of context value to prevent unnecessary re-renders
   const contextValue = useMemo(() => ({
     products,
     featuredProducts,
@@ -134,7 +144,16 @@ export const ProductProvider: React.FC<{ children: React.ReactNode }> = ({ child
     updateProduct,
     deleteProduct,
     refreshProducts
-  }), [products, featuredProducts, isLoading, error]);
+  }), [
+    products, 
+    featuredProducts, 
+    isLoading, 
+    error, 
+    addProduct,
+    updateProduct,
+    deleteProduct,
+    refreshProducts
+  ]);
 
   console.log("ProductProvider rendering with", products.length, "products");
 

@@ -2,7 +2,7 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { Folder, Plus, Trash2 } from "lucide-react";
+import { Folder, Plus, Trash2, Loader2 } from "lucide-react";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -28,6 +28,7 @@ const CategoryList = ({
   const [dialogOpen, setDialogOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [formError, setFormError] = useState<string | null>(null);
+  const [deletingCategory, setDeletingCategory] = useState<number | null>(null);
   
   const handleAddCategory = async () => {
     if (!newCategoryName || !newCategorySlug) return;
@@ -68,14 +69,21 @@ const CategoryList = ({
       }
       
       try {
+        setDeletingCategory(categoryId);
         await removeCategory(categoryId);
-      } catch (error) {
+        toast({
+          title: "Categoria removida",
+          description: "A categoria foi removida com sucesso.",
+        });
+      } catch (error: any) {
         console.error("Error removing category:", error);
         toast({
           title: "Erro ao remover categoria",
-          description: "Ocorreu um erro ao tentar remover a categoria. Tente novamente.",
+          description: error?.message || "Ocorreu um erro ao tentar remover a categoria. Tente novamente.",
           variant: "destructive",
         });
+      } finally {
+        setDeletingCategory(null);
       }
     }
   };
@@ -166,9 +174,14 @@ const CategoryList = ({
                     e.stopPropagation();
                     handleRemoveCategory(cat.id);
                   }}
+                  disabled={deletingCategory === cat.id}
                   className="text-red-500 hover:text-red-700 hover:bg-red-50"
                 >
-                  <Trash2 className="h-4 w-4" />
+                  {deletingCategory === cat.id ? (
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                  ) : (
+                    <Trash2 className="h-4 w-4" />
+                  )}
                 </Button>
               </div>
             ))}

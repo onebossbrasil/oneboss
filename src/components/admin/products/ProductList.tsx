@@ -1,5 +1,5 @@
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useProducts } from "@/contexts/ProductContext";
 import {
   Table,
@@ -22,9 +22,14 @@ export default function ProductList() {
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [isRefreshing, setIsRefreshing] = useState(false);
+  
+  // Add debounce protection for manual refreshes
+  const [lastRefreshTime, setLastRefreshTime] = useState(0);
+  const MIN_REFRESH_INTERVAL = 1500; // ms
 
   useEffect(() => {
     // Load products at mount
+    console.log("ProductList mounting, fetching products");
     refreshProducts();
   }, [refreshProducts]);
 
@@ -49,16 +54,36 @@ export default function ProductList() {
     setDialogOpen(false);
   };
 
-  const handleManualRefresh = async () => {
-    setIsRefreshing(true);
-    await refreshProducts();
-    setIsRefreshing(false);
+  const handleManualRefresh = useCallback(async () => {
+    const now = Date.now();
+    if (now - lastRefreshTime < MIN_REFRESH_INTERVAL) {
+      toast({
+        title: "Aguarde um momento",
+        description: "Por favor aguarde antes de atualizar novamente",
+      });
+      return;
+    }
     
-    toast({
-      title: "Lista atualizada",
-      description: "Os dados foram sincronizados com o banco de dados",
-    });
-  };
+    setIsRefreshing(true);
+    setLastRefreshTime(now);
+    
+    try {
+      await refreshProducts(true);
+      toast({
+        title: "Lista atualizada",
+        description: "Os dados foram sincronizados com o banco de dados",
+      });
+    } catch (error) {
+      console.error("Error refreshing products:", error);
+      toast({
+        title: "Erro ao atualizar lista",
+        description: "Não foi possível sincronizar com o banco de dados",
+        variant: "destructive",
+      });
+    } finally {
+      setIsRefreshing(false);
+    }
+  }, [refreshProducts, lastRefreshTime, toast]);
 
   return (
     <div>

@@ -1,4 +1,5 @@
 
+import { useState } from "react";
 import { useToast } from "@/hooks/use-toast";
 import {
   createCategory,
@@ -10,6 +11,7 @@ export function useCategoryMutations(
   fetchCategories: () => Promise<void>
 ) {
   const { toast } = useToast();
+  const [isDeleting, setIsDeleting] = useState(false);
 
   const addCategory = async (name: string, value: string) => {
     try {
@@ -35,8 +37,15 @@ export function useCategoryMutations(
   };
 
   const removeCategory = async (categoryId: number) => {
+    if (isDeleting) {
+      console.log("Deletion already in progress, ignoring request");
+      return;
+    }
+    
     try {
+      setIsDeleting(true);
       setIsLoading(true);
+      console.log(`Deleting category with ID: ${categoryId}`);
       await deleteCategory(categoryId);
       await fetchCategories();
       
@@ -54,11 +63,13 @@ export function useCategoryMutations(
       throw err;
     } finally {
       setIsLoading(false);
+      setIsDeleting(false);
     }
   };
 
   return {
     addCategory,
     removeCategory,
+    isDeleting
   };
 }

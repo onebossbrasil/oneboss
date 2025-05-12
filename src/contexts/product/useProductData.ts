@@ -1,5 +1,5 @@
 
-import { useState, useCallback, useRef } from "react";
+import { useState, useCallback, useRef, useEffect } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { Product } from "@/types/product";
 import { fetchProductsFromSupabase } from "@/utils/product";
@@ -15,12 +15,24 @@ export const useProductData = () => {
   
   // Use a ref to track if a fetch is in progress
   const isFetchingRef = useRef(false);
+  // Track the last successful fetch time to prevent excessive calls
+  const lastFetchTimeRef = useRef<number>(0);
+  // Minimum time between fetches (in milliseconds)
+  const MIN_FETCH_INTERVAL = 2000;
 
-  // Improved fetchProducts with retry logic and debounce
-  const fetchProducts = useCallback(async () => {
-    // Prevent multiple simultaneous fetches
+  // Improved fetchProducts with retry logic, debounce and better request management
+  const fetchProducts = useCallback(async (force = false) => {
+    // Check if we're already fetching or if it's too soon since the last fetch
+    const now = Date.now();
+    const timeSinceLastFetch = now - lastFetchTimeRef.current;
+    
     if (isFetchingRef.current) {
       console.log("Fetch already in progress, skipping");
+      return;
+    }
+    
+    if (!force && timeSinceLastFetch < MIN_FETCH_INTERVAL) {
+      console.log(`Throttling fetch request. Last fetch was ${timeSinceLastFetch}ms ago.`);
       return;
     }
     
@@ -41,6 +53,8 @@ export const useProductData = () => {
       }
       
       setProducts(fetchedProducts);
+      // Update last fetch time on success
+      lastFetchTimeRef.current = Date.now();
       // Reset retry count on success
       setRetryCount(0);
     } catch (err: any) {

@@ -81,41 +81,91 @@ export const deleteCategory = async (categoryId: number) => {
   try {
     logServiceAction("Deletando categoria", categoryId);
     
-    // Primeiro, vamos remover todas as subcategorias associadas
-    // Isso também removerá automaticamente os valores das subcategorias devido às restrições de chave estrangeira
-    const { error: subError } = await supabase
-      .from('subcategories')
-      .delete()
-      .eq('category_id', categoryId.toString());
-      
-    if (subError) {
-      console.error("Erro ao deletar subcategorias:", subError);
-      throw subError;
-    }
-    
-    // Agora deletamos a categoria
-    const { error } = await supabase
+    // Identify the category first to get its UUID format
+    const { data: categoryData, error: findError } = await supabase
       .from('categories')
-      .delete()
+      .select('id')
       .eq('id', categoryId.toString());
       
-    if (error) {
-      console.error("Erro ao deletar categoria:", error);
-      throw error;
+    if (findError) {
+      console.error("Erro ao encontrar categoria:", findError);
+      throw findError;
     }
     
-    logServiceAction("Categoria deletada com sucesso");
+    if (!categoryData || categoryData.length === 0) {
+      throw new Error("Categoria não encontrada");
+    }
     
-    // Atualizamos qualquer produto que referencia esta categoria para não ter categoria
+    const categoryUuid = categoryData[0].id;
+    
+    // Update any products that reference this category
+    logServiceAction("Atualizando produtos associados à categoria");
+    
     const { error: prodError } = await supabase
       .from('products')
       .update({ category_id: null })
-      .eq('category_id', categoryId.toString());
+      .eq('category_id', categoryUuid);
     
     if (prodError) {
       console.error("Erro ao atualizar produtos:", prodError);
-      // Não lançamos erro aqui pois a categoria já foi deletada com sucesso
+      throw prodError;
     }
+    
+    // Find subcategories to delete
+    const { data: subcategoriesData, error: subFindError } = await supabase
+      .from('subcategories')
+      .select('id')
+      .eq('category_id', categoryUuid);
+      
+    if (subFindError) {
+      console.error("Erro ao buscar subcategorias:", subFindError);
+      throw subFindError;
+    }
+    
+    // Delete subcategory values first
+    if (subcategoriesData && subcategoriesData.length > 0) {
+      logServiceAction(`Removendo valores de ${subcategoriesData.length} subcategorias`);
+      
+      for (const subcat of subcategoriesData) {
+        const { error: valuesError } = await supabase
+          .from('subcategory_values')
+          .delete()
+          .eq('subcategory_id', subcat.id);
+          
+        if (valuesError) {
+          console.error(`Erro ao deletar valores da subcategoria ${subcat.id}:`, valuesError);
+          throw valuesError;
+        }
+      }
+    }
+    
+    // Then delete subcategories
+    if (subcategoriesData && subcategoriesData.length > 0) {
+      logServiceAction("Removendo subcategorias");
+      const { error: deleteSubError } = await supabase
+        .from('subcategories')
+        .delete()
+        .eq('category_id', categoryUuid);
+        
+      if (deleteSubError) {
+        console.error("Erro ao deletar subcategorias:", deleteSubError);
+        throw deleteSubError;
+      }
+    }
+    
+    // Finally delete the category
+    logServiceAction("Removendo a categoria");
+    const { error: deleteCatError } = await supabase
+      .from('categories')
+      .delete()
+      .eq('id', categoryUuid);
+      
+    if (deleteCatError) {
+      console.error("Erro ao deletar categoria:", deleteCatError);
+      throw deleteCatError;
+    }
+    
+    logServiceAction("Categoria deletada com sucesso");
   } catch (err) {
     console.error("Exceção ao deletar categoria:", err);
     throw err;
