@@ -57,7 +57,7 @@ export const useUpdateProduct = () => {
       
       console.log("Enviando dados de atualização:", updateData);
       
-      // Update product in database with explicit auth header for debugging
+      // Update product in database with explicit auth header
       const { error } = await supabase
         .from('products')
         .update(updateData)

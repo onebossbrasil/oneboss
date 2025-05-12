@@ -18,6 +18,7 @@ const AdminLogin = ({ onLogin }: AdminLoginProps) => {
   const navigate = useNavigate();
   const { signIn, session } = useAuth();
   
+  // Mantenha o email pré-preenchido para facilitar os testes
   const [email, setEmail] = useState("mar.medeiros2015@gmail.com");
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
@@ -51,7 +52,8 @@ const AdminLogin = ({ onLogin }: AdminLoginProps) => {
           variant: "destructive",
         });
       } else if (session) {
-        console.log("Login bem-sucedido:", email);
+        console.log("Login bem-sucedido:", session.user.email);
+        console.log("Access token:", session.access_token?.substring(0, 15) + "...");
         toast({
           title: "Login realizado",
           description: "Você está sendo redirecionado ao painel administrativo.",
