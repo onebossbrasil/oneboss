@@ -13,7 +13,7 @@ const ProductBreadcrumbs = ({ product }: ProductBreadcrumbsProps) => {
   
   // Find the category for this product
   // Convert categoryId to string before comparison since categories.id is string type
-  const category = categories.find(cat => cat.id === (product.categoryId ? product.categoryId.toString() : null));
+  const category = categories.find(cat => cat.id === product.categoryId);
   
   return (
     <nav aria-label="Breadcrumb">

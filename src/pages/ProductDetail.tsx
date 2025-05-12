@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from "react";
 import { useParams, Link, useNavigate } from "react-router-dom";
 import Header from "@/components/Header";
@@ -69,9 +68,7 @@ const ProductDetail = () => {
           description: productData.description || "",
           price: parseFloat(productData.price),
           salePrice: productData.sale_price ? parseFloat(productData.sale_price) : null,
-          // Ensure categoryId is a string
           categoryId: productData.category_id ? String(productData.category_id) : null,
-          // Ensure subcategoryValues is Record<string, string>
           subcategoryValues: productData.subcategory_values ? 
             (typeof productData.subcategory_values === 'object' ? 
               Object.entries(productData.subcategory_values).reduce((acc, [key, value]) => {
