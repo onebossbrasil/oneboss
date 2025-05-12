@@ -1,20 +1,15 @@
 
 import { useEffect, useState } from "react";
-import { useParams, Link, useNavigate } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
-import ProductGallery from "@/components/product-detail/ProductGallery";
-import ProductInfo from "@/components/product-detail/ProductInfo";
-import ProductDescription from "@/components/product-detail/ProductDescription";
-import ProductAdditionalInfo from "@/components/product-detail/ProductAdditionalInfo";
 import ProductMetaTags from "@/components/product-detail/ProductMetaTags";
-import RelatedProducts from "@/components/product-detail/RelatedProducts";
-import ContactSection from "@/components/product-detail/ContactSection";
-import ProductBreadcrumbs from "@/components/product-detail/ProductBreadcrumbs";
+import ProductDetailSkeleton from "@/components/product-detail/ProductDetailSkeleton";
+import ProductNotFound from "@/components/product-detail/ProductNotFound";
+import ProductDetailContent from "@/components/product-detail/ProductDetailContent";
 import { supabase } from "@/integrations/supabase/client";
 import { Product } from "@/types/product";
 import { useToast } from "@/hooks/use-toast";
-import { ChevronLeft, Loader2 } from "lucide-react";
 
 const ProductDetail = () => {
   const { productId } = useParams<{ productId: string }>();
@@ -116,85 +111,18 @@ const ProductDetail = () => {
   };
 
   if (isLoading) {
-    return (
-      <div className="min-h-screen flex flex-col">
-        <Header />
-        <main className="flex-1 flex items-center justify-center">
-          <div className="flex flex-col items-center justify-center p-8">
-            <Loader2 className="h-12 w-12 animate-spin text-primary" />
-            <p className="mt-4 text-xl text-muted-foreground">Carregando produto...</p>
-          </div>
-        </main>
-        <Footer />
-      </div>
-    );
+    return <ProductDetailSkeleton />;
   }
 
   if (error || !product) {
-    return (
-      <div className="min-h-screen flex flex-col">
-        <Header />
-        <main className="flex-1 flex items-center justify-center">
-          <div className="text-center p-8">
-            <h2 className="text-2xl font-bold text-destructive mb-4">
-              {error || "Produto não encontrado"}
-            </h2>
-            <p className="mb-6 text-muted-foreground">
-              Não foi possível encontrar o produto solicitado.
-            </p>
-            <Link
-              to="/loja"
-              className="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-primary hover:bg-primary/90"
-            >
-              Voltar para a loja
-            </Link>
-          </div>
-        </main>
-        <Footer />
-      </div>
-    );
+    return <ProductNotFound error={error} />;
   }
 
   return (
     <div className="min-h-screen flex flex-col">
       <ProductMetaTags product={product} />
       <Header />
-      
-      <main className="flex-1 container mx-auto px-4 py-8">
-        {/* Back button and Breadcrumbs */}
-        <div className="mb-6">
-          <button 
-            onClick={handleGoBack}
-            className="flex items-center text-sm text-muted-foreground hover:text-foreground mb-4 transition-colors"
-          >
-            <ChevronLeft className="h-4 w-4 mr-1" />
-            Voltar
-          </button>
-          <ProductBreadcrumbs product={product} />
-        </div>
-        
-        {/* Product Hero Section */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 mb-12">
-          {/* Product Gallery */}
-          <ProductGallery images={product.images} productName={product.name} />
-          
-          {/* Product Info */}
-          <ProductInfo product={product} />
-        </div>
-        
-        {/* Product Description and Details */}
-        <ProductDescription product={product} />
-        
-        {/* Additional Information */}
-        <ProductAdditionalInfo />
-        
-        {/* Related Products */}
-        <RelatedProducts currentProductId={product.id} categoryId={product.categoryId} />
-        
-        {/* Contact Section */}
-        <ContactSection productName={product.name} productId={product.id} />
-      </main>
-      
+      <ProductDetailContent product={product} onGoBack={handleGoBack} />
       <Footer />
     </div>
   );
