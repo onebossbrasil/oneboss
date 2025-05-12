@@ -60,8 +60,8 @@ export const useRelatedProducts = (currentProductId: string, categoryId: string 
 
         // Format the products with their first image
         const formattedProducts: FormattedProduct[] = productsData.map((product: any) => {
-          // Find category name
-          const category = categories.find(c => c.id === product.category_id);
+          // Find category name - ensure string comparison
+          const category = categories.find(c => c.id.toString() === product.category_id?.toString());
           
           return {
             id: product.id,

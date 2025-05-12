@@ -11,9 +11,9 @@ interface ProductBreadcrumbsProps {
 const ProductBreadcrumbs = ({ product }: ProductBreadcrumbsProps) => {
   const { categories } = useCategories();
   
-  // Find the category for this product - ensure categoryId is properly converted to number for comparison
-  const categoryId = product.categoryId ? parseInt(product.categoryId) : null;
-  const category = categories.find(cat => cat.id === categoryId);
+  // Find the category for this product - directly compare without conversion
+  const categoryId = product.categoryId || null;
+  const category = categories.find(cat => cat.id.toString() === categoryId);
   
   return (
     <nav aria-label="Breadcrumb">
