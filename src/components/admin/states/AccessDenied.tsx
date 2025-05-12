@@ -2,22 +2,26 @@
 import React, { useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { LogOut } from "lucide-react";
+import { useAuth } from "@/contexts/AuthContext";
 
 interface AccessDeniedProps {
   onLogout: () => void;
 }
 
 const AccessDenied = ({ onLogout }: AccessDeniedProps) => {
+  const { user } = useAuth();
+  
   useEffect(() => {
     console.log("Renderizando componente AccessDenied - usuário autenticado mas sem permissões de admin");
-  }, []);
+    console.log("Email do usuário:", user?.email);
+  }, [user]);
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen p-4">
       <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-6 max-w-md w-full text-center">
         <h2 className="text-xl font-bold text-red-800 dark:text-red-300 mb-3">Acesso Negado</h2>
         <p className="text-red-700 dark:text-red-200 mb-4">
-          Sua conta não possui permissões de administrador.
+          Sua conta ({user?.email || 'não identificada'}) não possui permissões de administrador.
         </p>
         <p className="text-sm text-red-600 dark:text-red-400 mb-4">
           Para obter acesso administrativo, entre em contato com o administrador do sistema.

@@ -26,11 +26,13 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   // Função para verificar se o usuário é administrador
   const checkAdminStatus = async () => {
     try {
-      const { data, error } = await supabase
-        .from('admin_permissions')
-        .select('role')
-        .eq('email', user?.email)
-        .single();
+      if (!session || !user?.email) {
+        setIsAdmin(false);
+        return;
+      }
+      
+      // Usar RPC para chamar a função is_current_user_admin - mais seguro e eficiente
+      const { data, error } = await supabase.rpc('is_current_user_admin');
       
       if (error) {
         console.error("Erro ao verificar permissões de administrador:", error);
@@ -39,7 +41,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       }
       
       setIsAdmin(!!data);
-      console.log("Status de administrador verificado:", !!data);
+      console.log("Status de administrador verificado:", !!data, "para", user.email);
     } catch (err) {
       console.error("Erro ao verificar permissões:", err);
       setIsAdmin(false);
