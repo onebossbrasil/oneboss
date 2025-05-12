@@ -4,7 +4,7 @@ import ProductGallery from "./ProductGallery";
 import ProductInfo from "./ProductInfo";
 import ProductDescription from "./ProductDescription";
 import ProductAdditionalInfo from "./ProductAdditionalInfo";
-import RelatedProducts from "./RelatedProducts";
+import RelatedProducts from "./related-products";
 import ContactSection from "./ContactSection";
 import ProductBreadcrumbs from "./ProductBreadcrumbs";
 import BackButton from "./BackButton";
