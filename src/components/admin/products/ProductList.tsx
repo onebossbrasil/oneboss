@@ -1,4 +1,3 @@
-
 import { useState, useEffect, useCallback } from "react";
 import { useProducts } from "@/contexts/ProductContext";
 import {
@@ -68,7 +67,6 @@ export default function ProductList() {
     setLastRefreshTime(now);
     
     try {
-      // The issue is here - RefreshCw size should not have an argument
       await refreshProducts(true);
       toast({
         title: "Lista atualizada",
@@ -98,7 +96,7 @@ export default function ProductList() {
           disabled={isLoading || isRefreshing}
           className="flex items-center gap-1"
         >
-          <RefreshCw className={`h-4 w-4 ${isRefreshing ? 'animate-spin' : ''}`} />
+          <RefreshCw className={isRefreshing ? 'animate-spin' : ''} />
           <span className="hidden sm:inline">Atualizar</span>
         </Button>
       </div>
