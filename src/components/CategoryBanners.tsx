@@ -89,9 +89,9 @@ const CategoryBanners = () => {
                   <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent mix-blend-multiply"></div>
                   <div className="absolute inset-0 opacity-40 group-hover:opacity-70 transition-opacity duration-500 bg-gradient-to-br from-gold/20 to-transparent"></div>
                   
-                  {/* Content with improved glassmorphism */}
-                  <div className="absolute inset-0 flex flex-col justify-end p-4 md:p-8">
-                    <div className="glassmorphism rounded-lg p-4 md:p-6 backdrop-blur-md bg-white/10 border border-white/30 shadow-lg transform transition-all duration-500 group-hover:translate-y-[-5px] group-hover:bg-white/15 w-full">
+                  {/* Modified Content for mobile - fixed position at bottom instead of overlay */}
+                  <div className={`absolute inset-0 flex flex-col ${isMobile ? "justify-end pb-4" : "justify-end p-4 md:p-8"}`}>
+                    <div className={`glassmorphism rounded-lg p-4 backdrop-blur-md bg-white/10 border border-white/30 shadow-lg transform transition-all duration-500 group-hover:translate-y-[-5px] group-hover:bg-white/15 ${isMobile ? "mx-4" : ""}`}>
                       <h3 className="text-white font-playfair text-xl md:text-3xl font-bold text-center mb-2 tracking-wide">
                         {category.title}
                       </h3>
