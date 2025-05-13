@@ -75,7 +75,7 @@ const CategoryBanners = () => {
               to={`/loja?categoria=${category.slug}`}
               className={`${isMobile ? "animate-slide-in-right" : category.size === "full" ? "md:col-span-2 animate-scale-in" : "animate-scale-in"} group relative overflow-hidden`}
             >
-              <div className="h-[200px] w-full relative">
+              <div className="h-[300px] w-full relative">
                 {/* Full coverage background image */}
                 <img 
                   src={category.image} 
@@ -86,8 +86,8 @@ const CategoryBanners = () => {
                 {/* Dark overlay for better text visibility */}
                 <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent"></div>
                 
-                {/* Center the content both vertically and horizontally */}
-                <div className="absolute inset-0 flex items-center justify-center">
+                {/* Position the content at the bottom with padding */}
+                <div className="absolute inset-0 flex items-end justify-center pb-6">
                   <div className="glassmorphism text-center px-6 py-4 rounded-lg backdrop-blur-md bg-white/10 border border-white/30 shadow-lg transform transition-all duration-500 group-hover:bg-white/15">
                     <h3 className="text-white font-playfair text-xl md:text-3xl font-bold mb-2 tracking-wide">
                       {category.title}
