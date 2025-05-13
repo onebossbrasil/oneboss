@@ -8,7 +8,7 @@ const categoryData = [
   {
     id: 1,
     title: "AUTOMÓVEIS",
-    image: "https://images.unsplash.com/photo-1503376780353-7e6692767b70?auto=format&fit=crop&q=80&w=1200&h=600",
+    image: "/lovable-uploads/b105ff99-4dec-4198-839a-a2e4e3dc70e9.png",
     slug: "automoveis",
     size: "full" as const,
   },
