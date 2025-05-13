@@ -56,11 +56,12 @@ const ProductDetail = () => {
           throw new Error(imagesError.message);
         }
 
-        // Convert category_id to string before creating the product object
-        const categoryId = productData.category_id !== null && productData.category_id !== undefined 
-          ? String(productData.category_id) 
-          : null;
-          
+        // Convert category_id to string
+        let categoryId: string | null = null;
+        if (productData.category_id !== null && productData.category_id !== undefined) {
+          categoryId = String(productData.category_id);
+        }
+        
         // Process subcategory values ensuring they are all strings
         const subcategoryValues: Record<string, string> = {};
         if (productData.subcategory_values && typeof productData.subcategory_values === 'object') {
@@ -77,8 +78,8 @@ const ProductDetail = () => {
           description: productData.description || "",
           price: parseFloat(productData.price),
           salePrice: productData.sale_price ? parseFloat(productData.sale_price) : null,
-          categoryId: categoryId,
-          subcategoryValues: subcategoryValues,
+          categoryId, // Using the explicitly converted string value
+          subcategoryValues, // Using the prepared subcategoryValues object
           featured: productData.featured || false,
           published: productData.published !== undefined ? productData.published : true,
           stockQuantity: productData.stock_quantity || 0,

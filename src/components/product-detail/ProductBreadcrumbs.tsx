@@ -11,9 +11,8 @@ interface ProductBreadcrumbsProps {
 const ProductBreadcrumbs = ({ product }: ProductBreadcrumbsProps) => {
   const { categories } = useCategories();
   
-  // Find the category for this product - directly compare without conversion
-  const categoryId = product.categoryId || null;
-  const category = categories.find(cat => cat.id.toString() === categoryId);
+  // Find the category for this product (categoryId is already a string)
+  const category = categories.find(cat => cat.id.toString() === product.categoryId);
   
   return (
     <nav aria-label="Breadcrumb">
