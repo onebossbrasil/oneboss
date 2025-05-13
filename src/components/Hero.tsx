@@ -18,6 +18,7 @@ const Hero = () => {
   const [api, setApi] = useState<CarouselApi>();
   
   const bannerImages = [
+    "/lovable-uploads/ea5e00ad-4293-4c9d-b6a5-80a544366ed4.png",
     "/lovable-uploads/d31ae657-c225-4f14-b8b8-39eade59dd48.png",
     "/lovable-uploads/c0b49897-08c2-4312-88cf-df7567ba1def.png"
   ];
@@ -40,7 +41,7 @@ const Hero = () => {
     };
   }, [api]);
   
-  // Auto-rotate carousel
+  // Auto-rotate carousel with infinite loop
   useEffect(() => {
     if (!api) return;
     
@@ -67,9 +68,9 @@ const Hero = () => {
                   <img 
                     src={image} 
                     alt={`Banner slide ${index + 1}`}
-                    className="absolute inset-0 w-full h-full object-cover"
+                    className="absolute inset-0 w-full h-full object-cover object-center"
                   />
-                  <div className="absolute inset-0 bg-gradient-to-r from-black/90 to-black/50"></div>
+                  <div className="absolute inset-0 bg-black/40"></div>
                 </div>
               </CarouselItem>
             ))}
