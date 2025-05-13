@@ -16,6 +16,9 @@ const ProductBreadcrumbs = ({ product }: ProductBreadcrumbsProps) => {
     cat.id.toString() === (product.categoryId ? product.categoryId.toString() : null)
   );
   
+  // Get the proper category value/slug from the found category
+  const categorySlug = category?.value || '';
+  
   return (
     <nav aria-label="Breadcrumb">
       <ol className="flex items-center flex-wrap text-sm">
@@ -36,7 +39,7 @@ const ProductBreadcrumbs = ({ product }: ProductBreadcrumbsProps) => {
         {category && (
           <li className="flex items-center">
             <Link 
-              to={`/loja?categoria=${category.value}`}
+              to={`/loja?categoria=${categorySlug}`}
               className="text-muted-foreground hover:text-foreground"
             >
               {category.name}

@@ -7,7 +7,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { PhoneCall, Mail, Send, Loader2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
-import { supabase } from "@/integrations/supabase/client";
+import { useLeads } from "@/contexts/LeadContext";
 
 interface ContactSectionProps {
   productName: string;
@@ -16,6 +16,8 @@ interface ContactSectionProps {
 
 const ContactSection = ({ productName, productId }: ContactSectionProps) => {
   const { toast } = useToast();
+  const { addLead } = useLeads();
+  
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
@@ -37,16 +39,14 @@ const ContactSection = ({ productName, productId }: ContactSectionProps) => {
     try {
       setIsSubmitting(true);
       
-      // Save lead to database
-      const { error } = await supabase.from("leads").insert({
+      // Create the lead using the context function
+      await addLead({
         name,
         email,
-        phone: phone || null,
-        message,
-        product_id: productId,
+        phone,
+        message: `Interesse no produto: ${productName}. Mensagem: ${message}`,
+        productId
       });
-      
-      if (error) throw error;
       
       toast({
         title: "Mensagem enviada",
