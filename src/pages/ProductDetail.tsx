@@ -64,11 +64,14 @@ const ProductDetail = () => {
           description: productData.description || "",
           price: parseFloat(productData.price),
           salePrice: productData.sale_price ? parseFloat(productData.sale_price) : null,
+          // Explicitly convert category_id to string
           categoryId: productData.category_id ? String(productData.category_id) : null,
+          // Ensure all subcategory values are strings
           subcategoryValues: productData.subcategory_values ? 
             (typeof productData.subcategory_values === 'object' ? 
               Object.entries(productData.subcategory_values).reduce((acc, [key, value]) => {
-                acc[key] = String(value);
+                // Explicitly check and convert any value to string
+                acc[key] = value !== null && value !== undefined ? String(value) : '';
                 return acc;
               }, {} as Record<string, string>) : 
               {}) : 
