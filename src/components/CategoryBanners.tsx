@@ -58,8 +58,8 @@ const CategoryBanners = () => {
       <div className="absolute -top-40 -right-40 w-96 h-96 bg-gold/5 rounded-full blur-3xl"></div>
       <div className="absolute -bottom-40 -left-40 w-96 h-96 bg-gold/5 rounded-full blur-3xl"></div>
       
-      <div className="container mx-auto px-4 md:px-8 relative z-10">
-        <div className="text-center mb-10 md:mb-16">
+      <div className={`mx-auto relative z-10 ${isMobile ? "px-0" : "container px-4 md:px-8"}`}>
+        <div className="text-center mb-10 md:mb-16 px-4">
           <h2 className="font-playfair text-3xl md:text-5xl font-bold mb-4">
             Categorias <span className="text-gold">Premium</span>
           </h2>
@@ -69,14 +69,17 @@ const CategoryBanners = () => {
           </p>
         </div>
         
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8">
+        <div className={`grid grid-cols-1 md:grid-cols-2 ${isMobile ? "gap-0" : "gap-6 md:gap-8"}`}>
           {categoryData.map((category) => (
             <Link
               key={category.id}
               to={`/loja?categoria=${category.slug}`}
-              className={`${isMobile ? "" : category.size === "full" ? "md:col-span-2" : ""} group rounded-xl overflow-hidden transition-all duration-500 hover:shadow-xl hover:shadow-gold/20 block`}
+              className={`${isMobile ? "animate-slide-in-right" : category.size === "full" ? "md:col-span-2 animate-scale-in" : "animate-scale-in"} group rounded-xl ${isMobile ? "" : "overflow-hidden"} transition-all duration-500 hover:shadow-xl hover:shadow-gold/20 block`}
             >
-              <AspectRatio ratio={isMobile ? 16/9 : category.size === "full" ? 21/9 : 16/10} className="w-full h-full">
+              <AspectRatio 
+                ratio={isMobile ? 16/6 : category.size === "full" ? 21/9 : 16/10} 
+                className="w-full h-full"
+              >
                 <div className="relative w-full h-full overflow-hidden">
                   {/* Background Image with zoom effect */}
                   <img 
@@ -89,9 +92,9 @@ const CategoryBanners = () => {
                   <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent mix-blend-multiply"></div>
                   <div className="absolute inset-0 opacity-40 group-hover:opacity-70 transition-opacity duration-500 bg-gradient-to-br from-gold/20 to-transparent"></div>
                   
-                  {/* Modified Content for mobile - fixed position at bottom instead of overlay */}
-                  <div className={`absolute inset-0 flex flex-col ${isMobile ? "justify-end pb-4" : "justify-end p-4 md:p-8"}`}>
-                    <div className={`glassmorphism rounded-lg p-4 backdrop-blur-md bg-white/10 border border-white/30 shadow-lg transform transition-all duration-500 group-hover:translate-y-[-5px] group-hover:bg-white/15 ${isMobile ? "mx-4" : ""}`}>
+                  {/* Modified Content for mobile - position at the bottom with more space above */}
+                  <div className={`absolute inset-0 flex flex-col ${isMobile ? "justify-end pb-8" : "justify-end p-4 md:p-8"}`}>
+                    <div className={`glassmorphism rounded-lg p-4 backdrop-blur-md bg-white/10 border border-white/30 shadow-lg transform transition-all duration-500 group-hover:translate-y-[-5px] group-hover:bg-white/15 ${isMobile ? "mx-4 mb-4" : ""}`}>
                       <h3 className="text-white font-playfair text-xl md:text-3xl font-bold text-center mb-2 tracking-wide">
                         {category.title}
                       </h3>
@@ -112,7 +115,7 @@ const CategoryBanners = () => {
           ))}
         </div>
         
-        <div className="mt-12 md:mt-16 flex justify-center">
+        <div className="mt-12 md:mt-16 flex justify-center px-4">
           <Link 
             to="/loja" 
             className="border border-gold bg-transparent text-gold hover:bg-gold hover:text-white py-3 px-8 md:py-4 md:px-10 rounded-lg font-medium transition-all duration-300 flex items-center group"

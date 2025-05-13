@@ -123,3 +123,19 @@
 .hero-gradient {
   background: linear-gradient(90deg, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0.4) 100%);
 }
+
+/* Added custom animation classes */
+@keyframes slide-in-right {
+  0% { 
+    transform: translateX(30px);
+    opacity: 0;
+  }
+  100% { 
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+.animate-slide-in-right {
+  animation: slide-in-right 0.5s forwards;
+}
