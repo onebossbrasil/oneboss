@@ -84,9 +84,9 @@ const CategoryBanners = () => {
                   {/* Gradient Overlay */}
                   <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
                   
-                  {/* Content */}
+                  {/* Content - Modified to span full width */}
                   <div className="absolute inset-0 flex flex-col justify-end p-4 md:p-8">
-                    <div className={`glassmorphism rounded-lg ${isMobile ? 'p-2.5 max-w-[85%]' : 'p-4 md:p-6'} transform transition-all duration-500 backdrop-blur-sm bg-white/10 border border-white/20 shadow-lg group-hover:scale-[1.02] w-fit mx-auto`}>
+                    <div className={`glassmorphism rounded-lg ${isMobile ? 'p-2.5' : 'p-4 md:p-6'} transform transition-all duration-500 backdrop-blur-sm bg-white/10 border border-white/20 shadow-lg group-hover:scale-[1.02] w-full`}>
                       <h3 className={`text-white font-playfair ${isMobile ? 'text-lg' : 'text-xl md:text-3xl'} font-bold text-center`}>
                         {category.title}
                       </h3>
