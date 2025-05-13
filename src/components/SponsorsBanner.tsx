@@ -1,11 +1,14 @@
 
 import { Button } from "@/components/ui/button";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 const SponsorsBanner = () => {
+  const isMobile = useIsMobile();
+  
   return (
     <section className="py-10 md:py-16 bg-background border-t border-gold/10">
-      <div className="container mx-auto px-4">
-        <div className="text-center mb-6 md:mb-10">
+      <div className={isMobile ? "" : "container mx-auto px-4"}>
+        <div className="text-center mb-6 md:mb-10 px-4">
           <h2 className="font-playfair text-2xl md:text-3xl font-bold mb-3 md:mb-4">
             Parceiros <span className="text-gold">Premium</span>
           </h2>
@@ -14,7 +17,7 @@ const SponsorsBanner = () => {
           </p>
         </div>
         
-        <div className="relative h-64 md:h-96 w-full rounded-xl overflow-hidden">
+        <div className={`relative ${isMobile ? "h-96" : "h-64 md:h-96"} w-full ${isMobile ? "" : "rounded-xl"} overflow-hidden animate-slide-in-right`}>
           {/* Banner image */}
           <img 
             src="/lovable-uploads/94c4f913-0185-4aaa-b639-fa0e29e727ac.png" 
@@ -51,7 +54,7 @@ const SponsorsBanner = () => {
           </div>
         </div>
         
-        <div className="mt-6 md:mt-8 text-center">
+        <div className="mt-6 md:mt-8 text-center px-4">
           <Button 
             variant="outline" 
             className="border border-gold/30 hover:border-gold text-gold hover:bg-gold hover:text-white transition-all duration-300"

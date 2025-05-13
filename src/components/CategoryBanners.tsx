@@ -1,4 +1,3 @@
-
 import { Link } from "react-router-dom";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { AspectRatio } from "@/components/ui/aspect-ratio";
@@ -58,7 +57,7 @@ const CategoryBanners = () => {
       <div className="absolute -top-40 -right-40 w-96 h-96 bg-gold/5 rounded-full blur-3xl"></div>
       <div className="absolute -bottom-40 -left-40 w-96 h-96 bg-gold/5 rounded-full blur-3xl"></div>
       
-      <div className={`mx-auto relative z-10 ${isMobile ? "px-0" : "container px-4 md:px-8"}`}>
+      <div className={`mx-auto relative z-10 ${isMobile ? "" : "container px-4 md:px-8"}`}>
         <div className="text-center mb-10 md:mb-16 px-4">
           <h2 className="font-playfair text-3xl md:text-5xl font-bold mb-4">
             Categorias <span className="text-gold">Premium</span>
@@ -74,10 +73,10 @@ const CategoryBanners = () => {
             <Link
               key={category.id}
               to={`/loja?categoria=${category.slug}`}
-              className={`${isMobile ? "animate-slide-in-right" : category.size === "full" ? "md:col-span-2 animate-scale-in" : "animate-scale-in"} group rounded-xl ${isMobile ? "" : "overflow-hidden"} transition-all duration-500 hover:shadow-xl hover:shadow-gold/20 block`}
+              className={`${isMobile ? "animate-slide-in-right" : category.size === "full" ? "md:col-span-2 animate-scale-in" : "animate-scale-in"} group ${isMobile ? "rounded-none" : "rounded-xl overflow-hidden"} transition-all duration-500 hover:shadow-xl hover:shadow-gold/20 block`}
             >
               <AspectRatio 
-                ratio={isMobile ? 16/6 : category.size === "full" ? 21/9 : 16/10} 
+                ratio={isMobile ? 16/4 : category.size === "full" ? 21/9 : 16/10} 
                 className="w-full h-full"
               >
                 <div className="relative w-full h-full overflow-hidden">
@@ -93,8 +92,8 @@ const CategoryBanners = () => {
                   <div className="absolute inset-0 opacity-40 group-hover:opacity-70 transition-opacity duration-500 bg-gradient-to-br from-gold/20 to-transparent"></div>
                   
                   {/* Modified Content for mobile - position at the bottom with more space above */}
-                  <div className={`absolute inset-0 flex flex-col ${isMobile ? "justify-end pb-8" : "justify-end p-4 md:p-8"}`}>
-                    <div className={`glassmorphism rounded-lg p-4 backdrop-blur-md bg-white/10 border border-white/30 shadow-lg transform transition-all duration-500 group-hover:translate-y-[-5px] group-hover:bg-white/15 ${isMobile ? "mx-4 mb-4" : ""}`}>
+                  <div className={`absolute inset-0 flex flex-col ${isMobile ? "justify-end pb-12" : "justify-end p-4 md:p-8"}`}>
+                    <div className={`glassmorphism ${isMobile ? "mx-4 mb-6 rounded-lg" : "rounded-lg"} p-4 backdrop-blur-md bg-white/10 border border-white/30 shadow-lg transform transition-all duration-500 group-hover:translate-y-[-5px] group-hover:bg-white/15`}>
                       <h3 className="text-white font-playfair text-xl md:text-3xl font-bold text-center mb-2 tracking-wide">
                         {category.title}
                       </h3>
