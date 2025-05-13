@@ -53,19 +53,23 @@ const CategoryBanners = () => {
   const isMobile = useIsMobile();
   
   return (
-    <section className="py-10 md:py-16 bg-background">
-      <div className="container mx-auto px-4 md:px-8">
-        <div className="text-center mb-8 md:mb-16">
-          <h2 className="font-playfair text-3xl md:text-4xl font-bold mb-3 md:mb-4">
+    <section className="py-16 md:py-24 bg-background relative overflow-hidden">
+      {/* Decorative elements */}
+      <div className="absolute -top-40 -right-40 w-96 h-96 bg-gold/5 rounded-full blur-3xl"></div>
+      <div className="absolute -bottom-40 -left-40 w-96 h-96 bg-gold/5 rounded-full blur-3xl"></div>
+      
+      <div className="container mx-auto px-4 md:px-8 relative z-10">
+        <div className="text-center mb-10 md:mb-16">
+          <h2 className="font-playfair text-3xl md:text-5xl font-bold mb-4">
             Categorias <span className="text-gold">Premium</span>
           </h2>
-          <div className="w-16 md:w-24 h-1 bg-gold mx-auto mb-4 md:mb-6"></div>
+          <div className="w-24 md:w-32 h-1 bg-gradient-to-r from-gold/40 via-gold to-gold/40 mx-auto mb-6"></div>
           <p className="max-w-2xl mx-auto text-sm md:text-lg text-muted-foreground">
             Explore nossas coleções exclusivas e descubra produtos que refletem excelência, sofisticação e exclusividade
           </p>
         </div>
         
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-5 md:gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8">
           {categoryData.map((category) => (
             <Link
               key={category.id}
@@ -74,42 +78,49 @@ const CategoryBanners = () => {
             >
               <AspectRatio ratio={isMobile ? 16/9 : category.size === "full" ? 21/9 : 16/10} className="w-full h-full">
                 <div className="relative w-full h-full overflow-hidden">
-                  {/* Background Image */}
+                  {/* Background Image with zoom effect */}
                   <img 
                     src={category.image} 
                     alt={category.title}
                     className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
                   />
                   
-                  {/* Gradient Overlay */}
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
+                  {/* Enhanced gradient overlay with light effect */}
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent mix-blend-multiply"></div>
+                  <div className="absolute inset-0 opacity-40 group-hover:opacity-70 transition-opacity duration-500 bg-gradient-to-br from-gold/20 to-transparent"></div>
                   
-                  {/* Content - Modified to span full width */}
+                  {/* Content with improved glassmorphism */}
                   <div className="absolute inset-0 flex flex-col justify-end p-4 md:p-8">
-                    <div className={`glassmorphism rounded-lg ${isMobile ? 'p-2.5' : 'p-4 md:p-6'} transform transition-all duration-500 backdrop-blur-sm bg-white/10 border border-white/20 shadow-lg group-hover:scale-[1.02] w-full`}>
-                      <h3 className={`text-white font-playfair ${isMobile ? 'text-lg' : 'text-xl md:text-3xl'} font-bold text-center`}>
+                    <div className="glassmorphism rounded-lg p-4 md:p-6 backdrop-blur-md bg-white/10 border border-white/30 shadow-lg transform transition-all duration-500 group-hover:translate-y-[-5px] group-hover:bg-white/15 w-full">
+                      <h3 className="text-white font-playfair text-xl md:text-3xl font-bold text-center mb-2 tracking-wide">
                         {category.title}
                       </h3>
                       
-                      <div className="mt-2 md:mt-3 flex justify-center">
-                        <span className={`inline-block ${isMobile ? 'px-3 py-1 text-xs' : 'px-4 py-1.5 text-sm md:text-base'} rounded-full border border-white/30 text-white transition-colors duration-300 group-hover:border-gold group-hover:text-gold`}>
+                      <div className="mt-3 flex justify-center">
+                        <span className="inline-block px-4 py-1.5 text-sm md:text-base rounded-full border border-gold/50 text-white transition-colors duration-300 group-hover:border-gold group-hover:text-gold">
                           Ver Coleção
                         </span>
                       </div>
                     </div>
                   </div>
+                  
+                  {/* Subtle shine effect */}
+                  <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-white/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700"></div>
                 </div>
               </AspectRatio>
             </Link>
           ))}
         </div>
         
-        <div className="mt-10 md:mt-16 flex justify-center">
+        <div className="mt-12 md:mt-16 flex justify-center">
           <Link 
             to="/loja" 
-            className="border border-gold/30 hover:border-gold text-gold hover:bg-gold hover:text-white py-2 px-6 md:py-3 md:px-8 rounded-lg font-medium transition-all duration-300"
+            className="border border-gold bg-transparent text-gold hover:bg-gold hover:text-white py-3 px-8 md:py-4 md:px-10 rounded-lg font-medium transition-all duration-300 flex items-center group"
           >
-            Ver todas as categorias
+            <span>Ver todas as categorias</span>
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 ml-2 transition-transform duration-300 group-hover:translate-x-1" viewBox="0 0 20 20" fill="currentColor">
+              <path fillRule="evenodd" d="M10.293 5.293a1 1 0 011.414 0l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414-1.414L12.586 11H5a1 1 0 110-2h7.586l-2.293-2.293a1 1 0 010-1.414z" clipRule="evenodd" />
+            </svg>
           </Link>
         </div>
       </div>
