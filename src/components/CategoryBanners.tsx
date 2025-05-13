@@ -1,3 +1,4 @@
+
 import { Link } from "react-router-dom";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { AspectRatio } from "@/components/ui/aspect-ratio";
@@ -75,41 +76,43 @@ const CategoryBanners = () => {
               to={`/loja?categoria=${category.slug}`}
               className={`${isMobile ? "animate-slide-in-right" : category.size === "full" ? "md:col-span-2 animate-scale-in" : "animate-scale-in"} group ${isMobile ? "rounded-none" : "rounded-xl overflow-hidden"} transition-all duration-500 hover:shadow-xl hover:shadow-gold/20 block`}
             >
-              <AspectRatio 
-                ratio={isMobile ? 16/4 : category.size === "full" ? 21/9 : 16/10} 
-                className="w-full h-full"
-              >
-                <div className="relative w-full h-full overflow-hidden">
-                  {/* Background Image with zoom effect */}
-                  <img 
-                    src={category.image} 
-                    alt={category.title}
-                    className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
-                  />
-                  
-                  {/* Enhanced gradient overlay with light effect */}
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent mix-blend-multiply"></div>
-                  <div className="absolute inset-0 opacity-40 group-hover:opacity-70 transition-opacity duration-500 bg-gradient-to-br from-gold/20 to-transparent"></div>
-                  
-                  {/* Modified Content for mobile - position at the bottom with more space above */}
-                  <div className={`absolute inset-0 flex flex-col ${isMobile ? "justify-end pb-12" : "justify-end p-4 md:p-8"}`}>
-                    <div className={`glassmorphism ${isMobile ? "mx-4 mb-6 rounded-lg" : "rounded-lg"} p-4 backdrop-blur-md bg-white/10 border border-white/30 shadow-lg transform transition-all duration-500 group-hover:translate-y-[-5px] group-hover:bg-white/15`}>
-                      <h3 className="text-white font-playfair text-xl md:text-3xl font-bold text-center mb-2 tracking-wide">
-                        {category.title}
-                      </h3>
-                      
-                      <div className="mt-3 flex justify-center">
-                        <span className="inline-block px-4 py-1.5 text-sm md:text-base rounded-full border border-gold/50 text-white transition-colors duration-300 group-hover:border-gold group-hover:text-gold">
-                          Ver Coleção
-                        </span>
+              <div className="h-[400px]">
+                <AspectRatio 
+                  ratio={isMobile ? 16/4 : category.size === "full" ? 21/9 : 16/10} 
+                  className="w-full h-full"
+                >
+                  <div className="relative w-full h-full overflow-hidden">
+                    {/* Background Image with zoom effect */}
+                    <img 
+                      src={category.image} 
+                      alt={category.title}
+                      className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                    />
+                    
+                    {/* Enhanced gradient overlay with light effect */}
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent mix-blend-multiply"></div>
+                    <div className="absolute inset-0 opacity-40 group-hover:opacity-70 transition-opacity duration-500 bg-gradient-to-br from-gold/20 to-transparent"></div>
+                    
+                    {/* Modified Content for mobile - position at the bottom with more space above */}
+                    <div className={`absolute inset-0 flex flex-col ${isMobile ? "justify-end pb-12" : "justify-end p-4 md:p-8"}`}>
+                      <div className={`glassmorphism ${isMobile ? "mx-4 mb-6 rounded-lg" : "rounded-lg"} p-4 backdrop-blur-md bg-white/10 border border-white/30 shadow-lg transform transition-all duration-500 group-hover:translate-y-[-5px] group-hover:bg-white/15`}>
+                        <h3 className="text-white font-playfair text-xl md:text-3xl font-bold text-center mb-2 tracking-wide">
+                          {category.title}
+                        </h3>
+                        
+                        <div className="mt-3 flex justify-center">
+                          <span className="inline-block px-4 py-1.5 text-sm md:text-base rounded-full border border-gold/50 text-white transition-colors duration-300 group-hover:border-gold group-hover:text-gold">
+                            Ver Coleção
+                          </span>
+                        </div>
                       </div>
                     </div>
+                    
+                    {/* Subtle shine effect */}
+                    <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-white/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700"></div>
                   </div>
-                  
-                  {/* Subtle shine effect */}
-                  <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-white/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700"></div>
-                </div>
-              </AspectRatio>
+                </AspectRatio>
+              </div>
             </Link>
           ))}
         </div>
