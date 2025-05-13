@@ -68,7 +68,7 @@ const CategoryBanners = () => {
           </p>
         </div>
         
-        <div className={`grid grid-cols-1 md:grid-cols-2 gap-0`}>
+        <div className={`grid grid-cols-1 md:grid-cols-2 ${!isMobile ? "gap-4" : "gap-0"}`}>
           {categoryData.map((category) => (
             <Link
               key={category.id}
