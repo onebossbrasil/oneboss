@@ -53,13 +53,13 @@ const CategoryBanners = () => {
   const isMobile = useIsMobile();
   
   return (
-    <section className="py-16 md:py-24 bg-background relative overflow-hidden">
+    <section className="py-6 md:py-8 bg-background relative overflow-hidden">
       {/* Decorative elements */}
       <div className="absolute -top-40 -right-40 w-96 h-96 bg-gold/5 rounded-full blur-3xl"></div>
       <div className="absolute -bottom-40 -left-40 w-96 h-96 bg-gold/5 rounded-full blur-3xl"></div>
       
       <div className={`mx-auto relative z-10 ${isMobile ? "" : "container px-4 md:px-8"}`}>
-        <div className="text-center mb-10 md:mb-16 px-4">
+        <div className="text-center mb-6 md:mb-8 px-4">
           <h2 className="font-playfair text-3xl md:text-5xl font-bold mb-4">
             Categorias <span className="text-gold">Premium</span>
           </h2>
@@ -69,14 +69,14 @@ const CategoryBanners = () => {
           </p>
         </div>
         
-        <div className={`grid grid-cols-1 md:grid-cols-2 ${isMobile ? "gap-0" : "gap-6 md:gap-8"}`}>
+        <div className={`grid grid-cols-1 md:grid-cols-2 ${isMobile ? "gap-0" : "gap-0"}`}>
           {categoryData.map((category) => (
             <Link
               key={category.id}
               to={`/loja?categoria=${category.slug}`}
-              className={`${isMobile ? "animate-slide-in-right" : category.size === "full" ? "md:col-span-2 animate-scale-in" : "animate-scale-in"} group ${isMobile ? "rounded-none" : "rounded-xl overflow-hidden"} transition-all duration-500 hover:shadow-xl hover:shadow-gold/20 block`}
+              className={`${isMobile ? "animate-slide-in-right" : category.size === "full" ? "md:col-span-2 animate-scale-in" : "animate-scale-in"} group ${isMobile ? "rounded-none" : "rounded-none overflow-hidden"} transition-all duration-500 hover:shadow-xl hover:shadow-gold/20 block`}
             >
-              <div className="h-[400px]">
+              <div className="h-[200px]">
                 <AspectRatio 
                   ratio={isMobile ? 16/4 : category.size === "full" ? 21/9 : 16/10} 
                   className="w-full h-full"
@@ -117,7 +117,7 @@ const CategoryBanners = () => {
           ))}
         </div>
         
-        <div className="mt-12 md:mt-16 flex justify-center px-4">
+        <div className="mt-6 md:mt-8 flex justify-center px-4">
           <Link 
             to="/loja" 
             className="border border-gold bg-transparent text-gold hover:bg-gold hover:text-white py-3 px-8 md:py-4 md:px-10 rounded-lg font-medium transition-all duration-300 flex items-center group"

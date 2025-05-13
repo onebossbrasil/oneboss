@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -8,9 +9,9 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "@/components/ui/use-toast";
-import { useCategory } from "@/contexts/CategoryContext";
-import { useProduct } from "@/contexts/product";
-import { useLead } from "@/contexts/LeadContext";
+import { useCategories } from "@/contexts/CategoryContext";
+import { useProducts } from "@/contexts/product";
+import { useLeads } from "@/contexts/LeadContext";
 import { Separator } from "@/components/ui/separator";
 import { Link } from "react-router-dom";
 import Header from "../components/Header";
@@ -18,12 +19,12 @@ import Footer from "../components/Footer";
 
 const ProductDetail = () => {
   const { productId } = useParams<{ productId: string }>();
-  const { categories } = useCategory();
-  const { products, fetchProduct } = useProduct();
-  const { createLead } = useLead();
+  const { categories } = useCategories();
+  const { products, fetchProduct } = useProducts();
+  const { createLead } = useLeads();
   const [product, setProduct] = useState<any>(null);
   const [quantity, setQuantity] = useState(1);
-	const [name, setName] = useState("");
+  const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
   const [message, setMessage] = useState("");
