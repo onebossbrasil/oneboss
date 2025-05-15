@@ -52,15 +52,6 @@ const MobileHeader = ({
               </li>
               <li>
                 <Button
-                  variant={activeTab === "importar" ? "default" : "ghost"}
-                  className="w-full justify-start"
-                  onClick={() => handleTabChange("importar")}
-                >
-                  Importar Produtos
-                </Button>
-              </li>
-              <li>
-                <Button
                   variant={activeTab === "categorias" ? "default" : "ghost"}
                   className="w-full justify-start"
                   onClick={() => handleTabChange("categorias")}
