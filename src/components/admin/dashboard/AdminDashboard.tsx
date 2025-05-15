@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { ProductProvider } from "@/contexts/ProductContext";
@@ -7,6 +6,7 @@ import DesktopTabs from "./DesktopTabs";
 import MobileContent from "./MobileContent";
 import { SidebarProvider } from "@/components/ui/sidebar";
 import AdminHeader from "./AdminHeader";
+import AdminDebugPanel from "../AdminDebugPanel";
 
 interface AdminDashboardProps {
   onLogout: () => void;
@@ -25,6 +25,8 @@ const AdminDashboard = ({ onLogout }: AdminDashboardProps) => {
   return (
     <>
       <AdminHeader />
+      {/* Painel de debug apenas para admins */}
+      <AdminDebugPanel />
       <div className="pt-24 w-full max-w-full">
         <SidebarProvider>
           <AdminLayout activeTab={activeTab} onTabChange={handleTabChange} onLogout={onLogout}>
