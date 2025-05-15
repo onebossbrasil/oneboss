@@ -5,18 +5,15 @@ import { TableCell, TableRow } from "@/components/ui/table";
 import { Product } from "@/types/product";
 import { useProducts } from "@/contexts/ProductContext";
 import { useToast } from "@/hooks/use-toast";
-import { Checkbox } from "@/components/ui/checkbox";
 
 interface ProductTableRowProps {
   product: Product;
   onEditClick: (product: Product) => void;
   onSelectDelete: (product: Product) => void;
   isSelectedToDelete?: boolean;
-  isChecked?: boolean;
-  onCheckToggle?: () => void;
 }
 
-const ProductTableRow = ({ product, onEditClick, onSelectDelete, isSelectedToDelete, isChecked, onCheckToggle }: ProductTableRowProps) => {
+const ProductTableRow = ({ product, onEditClick, onSelectDelete, isSelectedToDelete }: ProductTableRowProps) => {
   const { updateProduct } = useProducts();
   const { toast } = useToast();
 
@@ -37,10 +34,7 @@ const ProductTableRow = ({ product, onEditClick, onSelectDelete, isSelectedToDel
   };
 
   return (
-    <TableRow className={`${isSelectedToDelete ? "bg-red-50 dark:bg-red-900/20" : ""} ${isChecked ? "bg-gray-100 dark:bg-gray-800" : ""}`}>
-      <TableCell>
-        <Checkbox checked={isChecked} onCheckedChange={onCheckToggle} aria-label={`Selecionar ${product.name}`} />
-      </TableCell>
+    <TableRow className={isSelectedToDelete ? "bg-red-50 dark:bg-red-900/20" : ""}>
       <TableCell>
         {product.images.length > 0 ? (
           <img
