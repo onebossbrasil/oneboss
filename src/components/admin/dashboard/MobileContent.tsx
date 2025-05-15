@@ -1,10 +1,11 @@
-
 import { ChevronLeft } from "lucide-react";
 import { ProductProvider } from "@/contexts/ProductContext";
 import ProductForm from "../ProductForm";
 import CategoryManager from "../CategoryManager";
 import CsvImporter from "../products/CsvImporter";
-import LeadsManager from "../LeadsManager";
+import ImportProductsCard from "../products/ImportProductsCard";
+import ManageCategoriesCard from "../products/ManageCategoriesCard";
+import ManageLeadsCard from "../products/ManageLeadsCard";
 import { CategoryProvider } from "@/contexts/CategoryContext";
 
 interface MobileContentProps {
@@ -27,20 +28,29 @@ const MobileContent = ({ activeTab }: MobileContentProps) => {
         </h2>
       </div>
       
-      {/* Wrap product-related content with ProductProvider */}
       <ProductProvider>
         {activeTab === "produtos" && <ProductForm />}
-        {activeTab === "importar" && <CsvImporter />}
+        {activeTab === "importar" && (
+          <>
+            <ImportProductsCard />
+            <CsvImporter />
+          </>
+        )}
       </ProductProvider>
       
-      {/* Wrap category content with CategoryProvider */}
       {activeTab === "categorias" && (
         <CategoryProvider>
+          <ManageCategoriesCard />
           <CategoryManager />
         </CategoryProvider>
       )}
       
-      {activeTab === "leads" && <LeadsManager />}
+      {activeTab === "leads" && (
+        <>
+          <ManageLeadsCard />
+          <LeadsManager />
+        </>
+      )}
     </>
   );
 };

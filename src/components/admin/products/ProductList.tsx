@@ -140,21 +140,31 @@ export default function ProductList() {
 
   return (
     <div className="flex flex-col items-center w-full">
-      {/* Destaque para área de cadastrar produto */}
       <div className="w-full flex justify-center mb-8">
-        <div className="bg-gold/10 border border-gold px-8 py-6 rounded-lg shadow-md w-[70%] flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 animate-fade-in">
+        <div className="bg-[#fcf8ed] border border-gold px-8 py-6 rounded-lg shadow-md w-[70%] flex flex-col sm:flex-row sm:items-center sm:justify-between gap-6 animate-fade-in">
           <div>
-            <h2 className="text-xl font-bold mb-2 text-gold">Cadastre um novo produto!</h2>
+            <h2 className="text-xl font-bold mb-2 text-gold" style={{ color: "#C9A227" }}>
+              Cadastre um novo produto!
+            </h2>
             <p className="text-muted-foreground mb-2">
               Clique no botão ao lado para adicionar rapidamente um novo item à loja.
             </p>
           </div>
           <Button
             variant="default"
-            className="btn-hover-effect flex items-center gap-2 font-bold px-6 py-4 text-lg"
+            className="flex items-center font-bold px-6 py-3 text-base shadow border border-gold bg-gold hover:bg-gold/80 text-white"
             onClick={() => setShowCreate(true)}
+            style={{
+              backgroundColor: "#C9A227",
+              borderColor: "#C9A227",
+              color: "#fff"
+            }}
           >
-            <Plus className="h-5 w-5" />
+            <span className="mr-2">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"
+                strokeLinecap="round" strokeLinejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5"
+                  y1="12" x2="19" y2="12"></line></svg>
+            </span>
             Cadastrar Produto
           </Button>
         </div>
