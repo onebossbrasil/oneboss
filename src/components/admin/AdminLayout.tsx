@@ -1,4 +1,3 @@
-
 import { ReactNode } from "react";
 import {
   Sidebar,
@@ -66,9 +65,9 @@ export default function AdminLayout({ children, activeTab, onTabChange, onLogout
 
   // Remove SidebarProvider from here; assume it's wrapped above.
   return (
-    <div className="min-h-screen flex bg-gray-50 dark:bg-gray-900 w-full">
+    <div className="min-h-screen flex bg-gray-100 dark:bg-gray-900 w-full">
       {/* Sidebar */}
-      <Sidebar className={state === "collapsed" ? "w-14" : "w-56"} collapsible="icon">
+      <Sidebar className={state === "collapsed" ? "w-14" : "w-56 bg-white dark:bg-gray-900 border-r border-gray-200"} collapsible="icon">
         <SidebarTrigger className="m-2 self-end" />
         <SidebarContent>
           <SidebarGroup>
@@ -114,7 +113,9 @@ export default function AdminLayout({ children, activeTab, onTabChange, onLogout
       </Sidebar>
 
       {/* Conteúdo */}
-      <main className="flex-1 p-4">{children}</main>
+      <main className="flex-1 p-8 md:p-10 xl:p-14 max-w-6xl mx-auto transition-all bg-white dark:bg-gray-900 rounded-lg shadow-sm border border-gray-200">
+        {children}
+      </main>
     </div>
   );
 }

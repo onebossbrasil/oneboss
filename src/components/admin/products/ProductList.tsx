@@ -1,4 +1,3 @@
-
 import { useState, useEffect, useCallback } from "react";
 import { useProducts } from "@/contexts/ProductContext";
 import {
@@ -16,9 +15,19 @@ import { Alert, AlertTitle, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { RefreshCw, Trash2 } from "lucide-react";
 import { useDeleteProduct } from "@/hooks/product/use-delete-product";
+import { Checkbox } from "@/components/ui/checkbox";
+import { useProductSelection } from "@/hooks/product/useProductSelection";
 
 export default function ProductList() {
   const { products, refreshProducts, isLoading, error } = useProducts();
+  const { 
+    selectedIds, 
+    toggleSelect, 
+    toggleSelectAll, 
+    isSelected, 
+    isAllSelected, 
+    clearSelection 
+  } = useProductSelection(products.map((p) => p.id));
   const { toast } = useToast();
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const [dialogOpen, setDialogOpen] = useState(false);
@@ -87,9 +96,17 @@ export default function ProductList() {
   }, [refreshProducts, lastRefreshTime, toast]);
 
   const handleConfirmDelete = async () => {
-    if (!confirmDelete) return;
+    if (selectedIds.length === 0 && !confirmDelete) return;
     try {
-      await deleteProduct(confirmDelete.id);
+      if (confirmDelete) {
+        await deleteProduct(confirmDelete.id);
+      } else {
+        // Multi-delete
+        for (let id of selectedIds) {
+          await deleteProduct(id);
+        }
+        clearSelection();
+      }
       setConfirmDelete(null);
       refreshProducts(true);
     } catch (error) {
@@ -116,12 +133,12 @@ export default function ProductList() {
             variant="destructive"
             size="sm"
             className="flex items-center gap-1"
-            disabled={!confirmDelete || isDeleting}
+            disabled={(selectedIds.length === 0 && !confirmDelete) || isDeleting}
             onClick={handleConfirmDelete}
             style={{ minWidth:100 }}
           >
             <Trash2 className="h-4 w-4" />
-            Excluir Produto
+            {selectedIds.length > 1 ? `Excluir Selecionados` : `Excluir Produto`}
           </Button>
         </div>
       </div>
@@ -149,12 +166,19 @@ export default function ProductList() {
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900"></div>
         </div>
       ) : (
-        <div className="border rounded-md overflow-hidden">
+        <div className="border rounded-md overflow-hidden bg-gray-50">
           <div className="overflow-x-auto">
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead className="w-12">Imagem</TableHead>
+                  <TableHead className="w-12">
+                    <Checkbox
+                      checked={isAllSelected}
+                      onCheckedChange={toggleSelectAll}
+                      aria-label="Selecionar todos"
+                    />
+                  </TableHead>
+                  <TableHead>Imagem</TableHead>
                   <TableHead>Nome</TableHead>
                   <TableHead>Preço</TableHead>
                   <TableHead>Estoque</TableHead>
@@ -175,6 +199,8 @@ export default function ProductList() {
                       onEditClick={handleEditClick}
                       onSelectDelete={setConfirmDelete}
                       isSelectedToDelete={confirmDelete?.id === product.id}
+                      isChecked={isSelected(product.id)}
+                      onCheckToggle={() => toggleSelect(product.id)}
                     />
                   ))
                 )}
