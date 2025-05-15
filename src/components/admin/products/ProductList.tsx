@@ -14,7 +14,8 @@ import { Product } from "@/types/product";
 import { useToast } from "@/hooks/use-toast";
 import { Alert, AlertTitle, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
-import { RefreshCw } from "lucide-react";
+import { RefreshCw, Trash2 } from "lucide-react";
+import { useDeleteProduct } from "@/hooks/product/use-delete-product";
 
 export default function ProductList() {
   const { products, refreshProducts, isLoading, error } = useProducts();
@@ -22,14 +23,15 @@ export default function ProductList() {
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [isRefreshing, setIsRefreshing] = useState(false);
-  
+  const [confirmDelete, setConfirmDelete] = useState<Product | null>(null);
+  const { isLoading: isDeleting, deleteProduct } = useDeleteProduct();
+
   // Add debounce protection for manual refreshes
   const [lastRefreshTime, setLastRefreshTime] = useState(0);
   const MIN_REFRESH_INTERVAL = 1500; // ms
 
   useEffect(() => {
     // Load products at mount
-    console.log("ProductList mounting, fetching products");
     refreshProducts();
   }, [refreshProducts]);
 
@@ -63,19 +65,17 @@ export default function ProductList() {
       });
       return;
     }
-    
+
     setIsRefreshing(true);
     setLastRefreshTime(now);
-    
+
     try {
-      // Explicitly passing true to force the refresh
       await refreshProducts(true);
       toast({
         title: "Lista atualizada",
         description: "Os dados foram sincronizados com o banco de dados",
       });
     } catch (error) {
-      console.error("Error refreshing products:", error);
       toast({
         title: "Erro ao atualizar lista",
         description: "Não foi possível sincronizar com o banco de dados",
@@ -86,31 +86,54 @@ export default function ProductList() {
     }
   }, [refreshProducts, lastRefreshTime, toast]);
 
+  const handleConfirmDelete = async () => {
+    if (!confirmDelete) return;
+    try {
+      await deleteProduct(confirmDelete.id);
+      setConfirmDelete(null);
+      refreshProducts(true);
+    } catch (error) {
+      // mensagem já tratada no hook
+    }
+  };
+
   return (
     <div>
-      <div className="flex justify-between items-center mb-4">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 gap-2">
         <h3 className="text-lg font-medium">Produtos Cadastrados</h3>
-        
-        <Button 
-          variant="outline" 
-          size="sm" 
-          onClick={handleManualRefresh}
-          disabled={isLoading || isRefreshing}
-          className="flex items-center gap-1"
-        >
-          <RefreshCw className={isRefreshing ? "animate-spin h-4 w-4" : "h-4 w-4"} />
-          <span className="hidden sm:inline">Atualizar</span>
-        </Button>
+        <div className="flex gap-2">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={handleManualRefresh}
+            disabled={isLoading || isRefreshing}
+            className="flex items-center gap-1"
+          >
+            <RefreshCw className={isRefreshing ? "animate-spin h-4 w-4" : "h-4 w-4"} />
+            <span className="hidden sm:inline">Atualizar</span>
+          </Button>
+          <Button
+            variant="destructive"
+            size="sm"
+            className="flex items-center gap-1"
+            disabled={!confirmDelete || isDeleting}
+            onClick={handleConfirmDelete}
+            style={{ minWidth:100 }}
+          >
+            <Trash2 className="h-4 w-4" />
+            Excluir Produto
+          </Button>
+        </div>
       </div>
-      
+
       {error && (
         <Alert variant="destructive" className="mb-4">
           <AlertTitle>Problema de conexão</AlertTitle>
           <AlertDescription className="flex flex-col gap-2">
             <p>{error}</p>
-            <Button 
-              variant="outline" 
-              size="sm" 
+            <Button
+              variant="outline"
+              size="sm"
               onClick={handleManualRefresh}
               disabled={isRefreshing}
               className="w-full sm:w-auto mt-2"
@@ -120,7 +143,7 @@ export default function ProductList() {
           </AlertDescription>
         </Alert>
       )}
-      
+
       {isLoading ? (
         <div className="flex justify-center py-8">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900"></div>
@@ -146,10 +169,12 @@ export default function ProductList() {
                   </TableRow>
                 ) : (
                   products.map((product) => (
-                    <ProductTableRow 
-                      key={product.id} 
-                      product={product} 
-                      onEditClick={handleEditClick} 
+                    <ProductTableRow
+                      key={product.id}
+                      product={product}
+                      onEditClick={handleEditClick}
+                      onSelectDelete={setConfirmDelete}
+                      isSelectedToDelete={confirmDelete?.id === product.id}
                     />
                   ))
                 )}
@@ -159,12 +184,34 @@ export default function ProductList() {
         </div>
       )}
 
-      <ProductEditDialog 
+      <ProductEditDialog
         product={selectedProduct}
         open={dialogOpen}
         onOpenChange={setDialogOpen}
         onClose={handleDialogClose}
       />
+
+      {/* Modal de confirmação de exclusão (pode estender com dialog/modal, simplificado aqui) */}
+      {confirmDelete && (
+        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-30 z-30">
+          <div className="bg-white rounded shadow-lg p-6 dark:bg-gray-900 flex flex-col gap-4 max-w-md w-full">
+            <h4 className="font-bold text-lg">Confirmar Exclusão</h4>
+            <p>Deseja excluir o produto <b>{confirmDelete.name}</b>?</p>
+            <div className="flex gap-2 justify-end">
+              <Button variant="secondary" onClick={() => setConfirmDelete(null)} disabled={isDeleting}>
+                Cancelar
+              </Button>
+              <Button
+                variant="destructive"
+                onClick={handleConfirmDelete}
+                disabled={isDeleting}
+              >
+                {isDeleting ? "Excluindo..." : "Excluir"}
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

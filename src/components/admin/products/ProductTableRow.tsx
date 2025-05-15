@@ -1,5 +1,5 @@
 
-import { Eye, EyeOff, Edit } from "lucide-react";
+import { Eye, EyeOff, Edit, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { TableCell, TableRow } from "@/components/ui/table";
 import { Product } from "@/types/product";
@@ -9,9 +9,11 @@ import { useToast } from "@/hooks/use-toast";
 interface ProductTableRowProps {
   product: Product;
   onEditClick: (product: Product) => void;
+  onSelectDelete: (product: Product) => void;
+  isSelectedToDelete?: boolean;
 }
 
-const ProductTableRow = ({ product, onEditClick }: ProductTableRowProps) => {
+const ProductTableRow = ({ product, onEditClick, onSelectDelete, isSelectedToDelete }: ProductTableRowProps) => {
   const { updateProduct } = useProducts();
   const { toast } = useToast();
 
@@ -21,7 +23,7 @@ const ProductTableRow = ({ product, onEditClick }: ProductTableRowProps) => {
         ...product,
         published: !product.published
       });
-      
+
       toast({
         title: product.published ? "Produto ocultado" : "Produto publicado",
         description: `${product.name} ${product.published ? "não será exibido" : "será exibido"} na loja.`
@@ -32,7 +34,7 @@ const ProductTableRow = ({ product, onEditClick }: ProductTableRowProps) => {
   };
 
   return (
-    <TableRow>
+    <TableRow className={isSelectedToDelete ? "bg-red-50 dark:bg-red-900/20" : ""}>
       <TableCell>
         {product.images.length > 0 ? (
           <img
@@ -90,6 +92,14 @@ const ProductTableRow = ({ product, onEditClick }: ProductTableRowProps) => {
             title="Editar produto"
           >
             <Edit className="h-4 w-4" />
+          </Button>
+          <Button
+            variant="destructive"
+            size="icon"
+            onClick={() => onSelectDelete(product)}
+            title="Excluir produto"
+          >
+            <Trash2 className="h-4 w-4" />
           </Button>
         </div>
       </TableCell>
