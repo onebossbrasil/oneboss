@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { ProductProvider } from "@/contexts/ProductContext";
@@ -5,6 +6,7 @@ import AdminLayout from "@/components/admin/AdminLayout";
 import DesktopTabs from "./DesktopTabs";
 import MobileContent from "./MobileContent";
 import { SidebarProvider } from "@/components/ui/sidebar";
+import AdminHeader from "./AdminHeader";
 
 interface AdminDashboardProps {
   onLogout: () => void;
@@ -17,22 +19,25 @@ const AdminDashboard = ({ onLogout }: AdminDashboardProps) => {
 
   const handleTabChange = (value: string) => {
     setActiveTab(value);
-    setMobileMenuOpen(false); // Fecha menu mobile ao trocar de aba
+    setMobileMenuOpen(false);
   };
 
   return (
-    <SidebarProvider>
-      <AdminLayout activeTab={activeTab} onTabChange={handleTabChange} onLogout={onLogout}>
-        {/* Versão desktop */}
-        <div className="hidden lg:block">
-          <DesktopTabs activeTab={activeTab} onTabChange={setActiveTab} />
-        </div>
-        {/* Versão mobile */}
-        <div className="lg:hidden">
-          <MobileContent activeTab={activeTab} />
-        </div>
-      </AdminLayout>
-    </SidebarProvider>
+    <>
+      <AdminHeader />
+      <div className="pt-24 w-full max-w-full">
+        <SidebarProvider>
+          <AdminLayout activeTab={activeTab} onTabChange={handleTabChange} onLogout={onLogout}>
+            <div className="hidden lg:block">
+              <DesktopTabs activeTab={activeTab} onTabChange={setActiveTab} />
+            </div>
+            <div className="lg:hidden">
+              <MobileContent activeTab={activeTab} />
+            </div>
+          </AdminLayout>
+        </SidebarProvider>
+      </div>
+    </>
   );
 };
 

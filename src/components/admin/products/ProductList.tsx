@@ -7,6 +7,7 @@ import {
   TableHead,
   TableHeader,
   TableRow,
+  TableCell,
 } from "@/components/ui/table";
 import ProductTableRow from "./ProductTableRow";
 import ProductEditDialog from "./ProductEditDialog";
@@ -14,8 +15,10 @@ import { Product } from "@/types/product";
 import { useToast } from "@/hooks/use-toast";
 import { Alert, AlertTitle, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
-import { RefreshCw, Trash2 } from "lucide-react";
+import { RefreshCw, Trash2, Plus } from "lucide-react";
 import { useDeleteProduct } from "@/hooks/product/use-delete-product";
+import ProductTableHeader from "./ProductTableHeader";
+import { Checkbox } from "@/components/ui/checkbox";
 
 export default function ProductList() {
   const { products, refreshProducts, isLoading, error } = useProducts();
@@ -25,18 +28,28 @@ export default function ProductList() {
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [confirmDelete, setConfirmDelete] = useState<Product | null>(null);
   const { isLoading: isDeleting, deleteProduct } = useDeleteProduct();
+  const [showCreate, setShowCreate] = useState(false);
 
-  // Add debounce protection for manual refreshes
+  // Seleção em massa
+  const [selectedIds, setSelectedIds] = useState<string[]>([]);
+  const allSelected = products.length > 0 && selectedIds.length === products.length;
+
+  // Debounce proteção para atualizar manualmente
   const [lastRefreshTime, setLastRefreshTime] = useState(0);
   const MIN_REFRESH_INTERVAL = 1500; // ms
 
   useEffect(() => {
-    // Load products at mount
+    // Load products ao montar
     refreshProducts();
   }, [refreshProducts]);
 
   useEffect(() => {
-    // Show toast of error if there's a problem loading products
+    // Resetar seleção quando recarrega produtos
+    setSelectedIds([]);
+  }, [products]);
+
+  useEffect(() => {
+    // Toast erro (problema ao carregar)
     if (error) {
       toast({
         title: "Erro ao carregar produtos",
@@ -87,19 +100,105 @@ export default function ProductList() {
   }, [refreshProducts, lastRefreshTime, toast]);
 
   const handleConfirmDelete = async () => {
-    if (!confirmDelete) return;
+    let idsToDelete: string[] = [];
+
+    // Se houver seleção em massa, deletar todos os produtos selecionados.
+    if (selectedIds.length > 0) {
+      idsToDelete = selectedIds;
+    } else if (confirmDelete) {
+      idsToDelete = [confirmDelete.id];
+    }
+    if (idsToDelete.length === 0) return;
+
     try {
-      await deleteProduct(confirmDelete.id);
+      for (const id of idsToDelete) {
+        await deleteProduct(id);
+      }
       setConfirmDelete(null);
+      setSelectedIds([]);
       refreshProducts(true);
     } catch (error) {
       // mensagem já tratada no hook
     }
   };
 
+  // Marcar/desmarcar todos os produtos
+  const handleToggleAll = (checked: boolean) => {
+    if (checked) {
+      setSelectedIds(products.map(p => p.id));
+    } else {
+      setSelectedIds([]);
+    }
+  };
+
+  // Marcar/desmarcar produto individual
+  const handleToggleProduct = (id: string, checked: boolean) => {
+    setSelectedIds(prev =>
+      checked ? [...prev, id] : prev.filter(pid => pid !== id)
+    );
+  };
+
   return (
-    <div>
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 gap-2">
+    <div className="flex flex-col items-center w-full">
+      {/* Destaque para área de cadastrar produto */}
+      <div className="w-full flex justify-center mb-8">
+        <div className="bg-gold/10 border border-gold px-8 py-6 rounded-lg shadow-md w-[70%] flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 animate-fade-in">
+          <div>
+            <h2 className="text-xl font-bold mb-2 text-gold">Cadastre um novo produto!</h2>
+            <p className="text-muted-foreground mb-2">
+              Clique no botão ao lado para adicionar rapidamente um novo item à loja.
+            </p>
+          </div>
+          <Button
+            variant="default"
+            className="btn-hover-effect flex items-center gap-2 font-bold px-6 py-4 text-lg"
+            onClick={() => setShowCreate(true)}
+          >
+            <Plus className="h-5 w-5" />
+            Cadastrar Produto
+          </Button>
+        </div>
+      </div>
+
+      <div className="w-full flex justify-center">
+        <div className="border rounded-md overflow-hidden bg-white dark:bg-gray-900 shadow-sm w-full max-w-5xl" style={{ width: "70%" }}>
+          <div className="overflow-x-auto">
+            <Table>
+              <TableHeader>
+                <ProductTableHeader
+                  allSelected={allSelected}
+                  onToggleAll={checked => handleToggleAll(!!checked)}
+                />
+              </TableHeader>
+              <TableBody>
+                {products.length === 0 ? (
+                  <TableRow>
+                    <ProductEmptyState />
+                  </TableRow>
+                ) : (
+                  products.map((product) => (
+                    <ProductTableRow
+                      key={product.id}
+                      product={product}
+                      onEditClick={handleEditClick}
+                      onSelectDelete={setConfirmDelete}
+                      isSelectedToDelete={confirmDelete?.id === product.id}
+                      selectionCheckbox={
+                        <Checkbox
+                          checked={selectedIds.includes(product.id)}
+                          onCheckedChange={checked => handleToggleProduct(product.id, !!checked)}
+                        />
+                      }
+                    />
+                  ))
+                )}
+              </TableBody>
+            </Table>
+          </div>
+        </div>
+      </div>
+
+      <div className="flex flex-col sm:flex-row justify-between items-center gap-2 mt-6 mb-4 w-full max-w-5xl" style={{ width: "70%" }}>
         <h3 className="text-lg font-medium">Produtos Cadastrados</h3>
         <div className="flex gap-2">
           <Button
@@ -116,9 +215,9 @@ export default function ProductList() {
             variant="destructive"
             size="sm"
             className="flex items-center gap-1"
-            disabled={!confirmDelete || isDeleting}
+            disabled={(!confirmDelete && selectedIds.length === 0) || isDeleting}
             onClick={handleConfirmDelete}
-            style={{ minWidth:100 }}
+            style={{ minWidth: 100 }}
           >
             <Trash2 className="h-4 w-4" />
             Excluir Produto
@@ -127,7 +226,7 @@ export default function ProductList() {
       </div>
 
       {error && (
-        <Alert variant="destructive" className="mb-4">
+        <Alert variant="destructive" className="mb-4 w-full max-w-5xl" style={{ width: "70%" }}>
           <AlertTitle>Problema de conexão</AlertTitle>
           <AlertDescription className="flex flex-col gap-2">
             <p>{error}</p>
@@ -145,53 +244,22 @@ export default function ProductList() {
       )}
 
       {isLoading ? (
-        <div className="flex justify-center py-8">
+        <div className="flex justify-center py-8 w-full">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900"></div>
         </div>
-      ) : (
-        <div className="border rounded-md overflow-hidden">
-          <div className="overflow-x-auto">
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead className="w-12">Imagem</TableHead>
-                  <TableHead>Nome</TableHead>
-                  <TableHead>Preço</TableHead>
-                  <TableHead>Estoque</TableHead>
-                  <TableHead className="text-center">Publicado</TableHead>
-                  <TableHead className="text-right">Ações</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {products.length === 0 ? (
-                  <TableRow>
-                    <ProductEmptyState />
-                  </TableRow>
-                ) : (
-                  products.map((product) => (
-                    <ProductTableRow
-                      key={product.id}
-                      product={product}
-                      onEditClick={handleEditClick}
-                      onSelectDelete={setConfirmDelete}
-                      isSelectedToDelete={confirmDelete?.id === product.id}
-                    />
-                  ))
-                )}
-              </TableBody>
-            </Table>
-          </div>
-        </div>
-      )}
+      ) : null}
 
       <ProductEditDialog
         product={selectedProduct}
-        open={dialogOpen}
+        open={dialogOpen || showCreate}
         onOpenChange={setDialogOpen}
-        onClose={handleDialogClose}
+        onClose={() => {
+          setShowCreate(false);
+          handleDialogClose();
+        }}
       />
 
-      {/* Modal de confirmação de exclusão (pode estender com dialog/modal, simplificado aqui) */}
+      {/* Modal de confirmação de exclusão */}
       {confirmDelete && (
         <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-30 z-30">
           <div className="bg-white rounded shadow-lg p-6 dark:bg-gray-900 flex flex-col gap-4 max-w-md w-full">
@@ -216,8 +284,9 @@ export default function ProductList() {
   );
 }
 
+// Adicionando prop selectionCheckbox em ProductTableRow
 const ProductEmptyState = () => (
-  <td colSpan={6} className="text-center py-4 text-muted-foreground">
+  <td colSpan={7} className="text-center py-4 text-muted-foreground">
     Nenhum produto cadastrado
   </td>
 );

@@ -5,15 +5,23 @@ import { TableCell, TableRow } from "@/components/ui/table";
 import { Product } from "@/types/product";
 import { useProducts } from "@/contexts/ProductContext";
 import { useToast } from "@/hooks/use-toast";
+import { ReactNode } from "react";
 
 interface ProductTableRowProps {
   product: Product;
   onEditClick: (product: Product) => void;
   onSelectDelete: (product: Product) => void;
   isSelectedToDelete?: boolean;
+  selectionCheckbox?: ReactNode;
 }
 
-const ProductTableRow = ({ product, onEditClick, onSelectDelete, isSelectedToDelete }: ProductTableRowProps) => {
+const ProductTableRow = ({
+  product,
+  onEditClick,
+  onSelectDelete,
+  isSelectedToDelete,
+  selectionCheckbox,
+}: ProductTableRowProps) => {
   const { updateProduct } = useProducts();
   const { toast } = useToast();
 
@@ -21,12 +29,14 @@ const ProductTableRow = ({ product, onEditClick, onSelectDelete, isSelectedToDel
     try {
       await updateProduct(product.id, {
         ...product,
-        published: !product.published
+        published: !product.published,
       });
 
       toast({
         title: product.published ? "Produto ocultado" : "Produto publicado",
-        description: `${product.name} ${product.published ? "não será exibido" : "será exibido"} na loja.`
+        description: `${product.name} ${
+          product.published ? "não será exibido" : "será exibido"
+        } na loja.`,
       });
     } catch (error) {
       console.error("Error toggling product visibility:", error);
@@ -35,6 +45,9 @@ const ProductTableRow = ({ product, onEditClick, onSelectDelete, isSelectedToDel
 
   return (
     <TableRow className={isSelectedToDelete ? "bg-red-50 dark:bg-red-900/20" : ""}>
+      <TableCell className="text-center">
+        {selectionCheckbox}
+      </TableCell>
       <TableCell>
         {product.images.length > 0 ? (
           <img
@@ -50,15 +63,15 @@ const ProductTableRow = ({ product, onEditClick, onSelectDelete, isSelectedToDel
       </TableCell>
       <TableCell className="font-medium">{product.name}</TableCell>
       <TableCell>
-        {new Intl.NumberFormat('pt-BR', {
-          style: 'currency',
-          currency: 'BRL'
+        {new Intl.NumberFormat("pt-BR", {
+          style: "currency",
+          currency: "BRL",
         }).format(product.price)}
         {product.salePrice && (
           <div className="text-sm text-muted-foreground line-through">
-            {new Intl.NumberFormat('pt-BR', {
-              style: 'currency',
-              currency: 'BRL'
+            {new Intl.NumberFormat("pt-BR", {
+              style: "currency",
+              currency: "BRL",
             }).format(product.salePrice)}
           </div>
         )}
