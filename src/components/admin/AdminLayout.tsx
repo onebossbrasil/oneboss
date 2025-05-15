@@ -1,7 +1,6 @@
 
 import { ReactNode } from "react";
 import {
-  SidebarProvider,
   Sidebar,
   SidebarContent,
   SidebarMenu,
@@ -50,7 +49,7 @@ const getTabIcon = (key: string) => {
 
 export default function AdminLayout({ children, activeTab, onTabChange, onLogout }: AdminLayoutProps) {
   const { user } = useAuth();
-  const { collapsed } = useSidebar();
+  const { state } = useSidebar();
   const location = useLocation();
   const navigate = useNavigate();
 
@@ -65,58 +64,57 @@ export default function AdminLayout({ children, activeTab, onTabChange, onLogout
       ? user.user_metadata.name[0]?.toUpperCase()
       : "A");
 
+  // Remove SidebarProvider from here; assume it's wrapped above.
   return (
-    <SidebarProvider>
-      <div className="min-h-screen flex bg-gray-50 dark:bg-gray-900 w-full">
-        {/* Sidebar */}
-        <Sidebar className={collapsed ? "w-14" : "w-56"} collapsible="icon">
-          <SidebarTrigger className="m-2 self-end" />
-          <SidebarContent>
-            <SidebarGroup>
-              <SidebarGroupLabel>Painel</SidebarGroupLabel>
-              <SidebarGroupContent>
-                <SidebarMenu>
-                  {tabs.map((tab) => (
-                    <SidebarMenuItem key={tab.key}>
-                      <SidebarMenuButton
-                        className={`w-full flex items-center ${
-                          activeTab === tab.key
-                            ? "bg-muted text-primary font-bold"
-                            : "hover:bg-muted/70"
-                        }`}
-                        onClick={() => onTabChange(tab.key)}
-                      >
-                        {getTabIcon(tab.key)}
-                        {!collapsed && <span>{tab.label}</span>}
-                      </SidebarMenuButton>
-                    </SidebarMenuItem>
-                  ))}
-                </SidebarMenu>
-              </SidebarGroupContent>
-            </SidebarGroup>
-            <div className="mt-10 px-4 flex flex-col items-center">
-              <Avatar className="mb-2">
-                <AvatarImage src={avatarUrl} alt={user?.email || "Admin"} />
-                <AvatarFallback>{avatarFallback}</AvatarFallback>
-              </Avatar>
-              <div className="text-xs text-muted-foreground break-all text-center">
-                {user?.email || "Sem usuário"}
-              </div>
-              <Button
-                variant="outline"
-                size="sm"
-                className="mt-3 w-full"
-                onClick={onLogout}
-              >
-                <LogOut className="mr-2 h-4 w-4" /> Sair
-              </Button>
+    <div className="min-h-screen flex bg-gray-50 dark:bg-gray-900 w-full">
+      {/* Sidebar */}
+      <Sidebar className={state === "collapsed" ? "w-14" : "w-56"} collapsible="icon">
+        <SidebarTrigger className="m-2 self-end" />
+        <SidebarContent>
+          <SidebarGroup>
+            <SidebarGroupLabel>Painel</SidebarGroupLabel>
+            <SidebarGroupContent>
+              <SidebarMenu>
+                {tabs.map((tab) => (
+                  <SidebarMenuItem key={tab.key}>
+                    <SidebarMenuButton
+                      className={`w-full flex items-center ${
+                        activeTab === tab.key
+                          ? "bg-muted text-primary font-bold"
+                          : "hover:bg-muted/70"
+                      }`}
+                      onClick={() => onTabChange(tab.key)}
+                    >
+                      {getTabIcon(tab.key)}
+                      {state !== "collapsed" && <span>{tab.label}</span>}
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                ))}
+              </SidebarMenu>
+            </SidebarGroupContent>
+          </SidebarGroup>
+          <div className="mt-10 px-4 flex flex-col items-center">
+            <Avatar className="mb-2">
+              <AvatarImage src={avatarUrl} alt={user?.email || "Admin"} />
+              <AvatarFallback>{avatarFallback}</AvatarFallback>
+            </Avatar>
+            <div className="text-xs text-muted-foreground break-all text-center">
+              {user?.email || "Sem usuário"}
             </div>
-          </SidebarContent>
-        </Sidebar>
+            <Button
+              variant="outline"
+              size="sm"
+              className="mt-3 w-full"
+              onClick={onLogout}
+            >
+              <LogOut className="mr-2 h-4 w-4" /> Sair
+            </Button>
+          </div>
+        </SidebarContent>
+      </Sidebar>
 
-        {/* Conteúdo */}
-        <main className="flex-1 p-4">{children}</main>
-      </div>
-    </SidebarProvider>
+      {/* Conteúdo */}
+      <main className="flex-1 p-4">{children}</main>
+    </div>
   );
 }
