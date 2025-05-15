@@ -1,41 +1,9 @@
 
-import CollapsibleProductForm from "./products/CollapsibleProductForm";
-import { useProductForm } from "@/hooks/use-product-form";
+import ProductList from "./products/ProductList";
 
 const ProductForm = () => {
-  const {
-    formData,
-    images,
-    imagePreviewUrls,
-    selectedCategory,
-    subcategoryValues,
-    isOpen,
-    setIsOpen,
-    handleFormChange,
-    handleImageChange,
-    handleRemoveImage,
-    handleCategoryChange,
-    handleSubcategoryChange,
-    handleSubmit
-  } = useProductForm();
-  
-  return (
-    <CollapsibleProductForm 
-      isOpen={isOpen}
-      setIsOpen={setIsOpen}
-      formData={formData}
-      handleFormChange={handleFormChange}
-      selectedCategory={selectedCategory}
-      subcategoryValues={subcategoryValues}
-      onCategoryChange={handleCategoryChange}
-      onSubcategoryChange={handleSubcategoryChange}
-      images={images}
-      imagePreviewUrls={imagePreviewUrls}
-      handleImageChange={handleImageChange}
-      handleRemoveImage={handleRemoveImage}
-      handleSubmit={handleSubmit}
-    />
-  );
+  // Exibe apenas a lista de produtos, sem o formulário de cadastro.
+  return <ProductList />;
 };
 
 export default ProductForm;
