@@ -1,3 +1,4 @@
+
 import { ReactNode } from "react";
 import {
   Sidebar,
@@ -52,7 +53,7 @@ export default function AdminLayout({ children, activeTab, onTabChange, onLogout
   const location = useLocation();
   const navigate = useNavigate();
 
-  // Extra robustness for avatar fetch
+  // Avatar e fallback
   const avatarUrl =
     (user as any)?.avatar_url ||
     (user as any)?.user_metadata?.avatar_url ||
@@ -63,24 +64,29 @@ export default function AdminLayout({ children, activeTab, onTabChange, onLogout
       ? user.user_metadata.name[0]?.toUpperCase()
       : "A");
 
-  // Remove SidebarProvider from here; assume it's wrapped above.
   return (
-    <div className="min-h-screen flex bg-gray-100 dark:bg-gray-900 w-full">
-      {/* Sidebar */}
-      <Sidebar className={state === "collapsed" ? "w-14" : "w-56 bg-white dark:bg-gray-900 border-r border-gray-200"} collapsible="icon">
+    <div className="min-h-screen flex w-full bg-gray-100">
+      {/* Sidebar SEM padding próprio, colada à esquerda */}
+      <Sidebar className={`${state === "collapsed" ? "w-14" : "w-56"} bg-gray-900 border-r border-gray-300`} collapsible="icon">
         <SidebarTrigger className="m-2 self-end" />
         <SidebarContent>
           <SidebarGroup>
-            <SidebarGroupLabel>Painel</SidebarGroupLabel>
+            <SidebarGroupLabel>
+              {/* Peq. Logo OneBoss acima do menu */}
+              <div className="flex items-center gap-2 py-4 px-2">
+                {/* Trocar para <img src=... /> se quiser usar imagem */}
+                <span className="font-bold text-lg text-white tracking-wide">oneboss</span>
+              </div>
+            </SidebarGroupLabel>
             <SidebarGroupContent>
               <SidebarMenu>
                 {tabs.map((tab) => (
                   <SidebarMenuItem key={tab.key}>
                     <SidebarMenuButton
-                      className={`w-full flex items-center ${
+                      className={`w-full flex items-center gap-2 px-2 py-2 rounded transition ${
                         activeTab === tab.key
-                          ? "bg-muted text-primary font-bold"
-                          : "hover:bg-muted/70"
+                          ? "bg-gray-800 text-white font-bold"
+                          : "hover:bg-gray-700 text-gray-200"
                       }`}
                       onClick={() => onTabChange(tab.key)}
                     >
@@ -92,18 +98,19 @@ export default function AdminLayout({ children, activeTab, onTabChange, onLogout
               </SidebarMenu>
             </SidebarGroupContent>
           </SidebarGroup>
-          <div className="mt-10 px-4 flex flex-col items-center">
+
+          <div className="mt-auto mb-4 px-4 flex flex-col items-center">
             <Avatar className="mb-2">
               <AvatarImage src={avatarUrl} alt={user?.email || "Admin"} />
               <AvatarFallback>{avatarFallback}</AvatarFallback>
             </Avatar>
-            <div className="text-xs text-muted-foreground break-all text-center">
+            <div className="text-xs text-gray-300 break-all text-center">
               {user?.email || "Sem usuário"}
             </div>
             <Button
               variant="outline"
               size="sm"
-              className="mt-3 w-full"
+              className="mt-3 w-full border-gray-600 text-gray-400 hover:bg-gray-700"
               onClick={onLogout}
             >
               <LogOut className="mr-2 h-4 w-4" /> Sair
@@ -112,10 +119,23 @@ export default function AdminLayout({ children, activeTab, onTabChange, onLogout
         </SidebarContent>
       </Sidebar>
 
-      {/* Conteúdo */}
-      <main className="flex-1 p-8 md:p-10 xl:p-14 max-w-6xl mx-auto transition-all bg-white dark:bg-gray-900 rounded-lg shadow-sm border border-gray-200">
-        {children}
-      </main>
+      {/* WRAPPER do conteúdo principal */}
+      <div className="flex-1 min-h-screen flex flex-col bg-gray-50">
+        {/* HEADER */}
+        <header className="h-20 flex items-center border-b border-gray-200 px-8 py-4 bg-gray-100 shadow-sm">
+          {/* Logo à esquerda + espaço para ações no futuro */}
+          <div className="flex items-center">
+            {/* Use img se desejar, ou apenas texto, como abaixo */}
+            <span className="font-playfair text-2xl font-bold text-gray-800 tracking-wide">oneboss</span>
+            <span className="ml-4 text-gray-400 text-base font-light">Painel Administrativo</span>
+          </div>
+          {/* Futuro espaço para actions... */}
+        </header>
+        {/* CONTEÚDO PRINCIPAL, padding lateral esquerdo para separar da sidebar */}
+        <main className="flex-1 max-w-6xl mx-auto w-full py-8 px-8">
+          {children}
+        </main>
+      </div>
     </div>
   );
 }
