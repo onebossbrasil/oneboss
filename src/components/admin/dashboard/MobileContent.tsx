@@ -1,3 +1,4 @@
+
 import { ChevronLeft } from "lucide-react";
 import { ProductProvider } from "@/contexts/ProductContext";
 import ProductForm from "../ProductForm";
@@ -7,6 +8,7 @@ import ImportProductsCard from "../products/ImportProductsCard";
 import ManageCategoriesCard from "../products/ManageCategoriesCard";
 import ManageLeadsCard from "../products/ManageLeadsCard";
 import { CategoryProvider } from "@/contexts/CategoryContext";
+import LeadsManager from "../LeadsManager";
 
 interface MobileContentProps {
   activeTab: string;
