@@ -1,4 +1,3 @@
-
 import { useCategories } from "@/contexts/CategoryContext";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Label } from "@/components/ui/label";
@@ -91,18 +90,21 @@ const CategorySelectorContent = ({
         <div>
           <Label htmlFor="subcategoryType">Subcategoria</Label>
           <Select 
-            onValueChange={handleSubcategoryTypeSelect} 
+            onValueChange={setActiveSubcategoryType} 
             value={activeSubcategoryType || ""}
           >
             <SelectTrigger>
               <SelectValue placeholder="Selecione uma subcategoria" />
             </SelectTrigger>
             <SelectContent>
-              {subcategoryTypes().map((type) => (
-                <SelectItem key={type} value={type}>
-                  {getSubcategoryLabel(type)}
-                </SelectItem>
-              ))}
+              {(() => {
+                const category = categories.find(cat => cat.value === selectedCategory);
+                return category ? category.subcategories.map(sc => (
+                  <SelectItem key={sc.type} value={sc.type}>
+                    {sc.name}
+                  </SelectItem>
+                )) : null;
+              })()}
             </SelectContent>
           </Select>
         </div>
@@ -110,20 +112,30 @@ const CategorySelectorContent = ({
       
       {activeSubcategoryType && (
         <div>
-          <Label htmlFor="subcategoryValue">{getSubcategoryLabel(activeSubcategoryType)} - Valor</Label>
+          <Label htmlFor="subcategoryValue">
+            {(() => {
+              const category = categories.find(cat => cat.value === selectedCategory);
+              const subcategory = category?.subcategories.find(sc => sc.type === activeSubcategoryType);
+              return (subcategory ? subcategory.name : activeSubcategoryType) + " - Valor";
+            })()}
+          </Label>
           <Select 
             onValueChange={(value) => onSubcategoryChange(activeSubcategoryType, value)}
             value={subcategoryValues[activeSubcategoryType] || ""}
           >
             <SelectTrigger>
-              <SelectValue placeholder={`Selecione um valor para ${getSubcategoryLabel(activeSubcategoryType)}`} />
+              <SelectValue placeholder={`Selecione um valor para ${activeSubcategoryType}`} />
             </SelectTrigger>
             <SelectContent>
-              {getSubcategoryOptions(activeSubcategoryType).map((option) => (
-                <SelectItem key={option} value={option}>
-                  {option}
-                </SelectItem>
-              ))}
+              {(() => {
+                const category = categories.find(cat => cat.value === selectedCategory);
+                const subcategory = category?.subcategories.find(sc => sc.type === activeSubcategoryType);
+                return subcategory ? subcategory.values.map((option: string) => (
+                  <SelectItem key={option} value={option}>
+                    {option}
+                  </SelectItem>
+                )) : null;
+              })()}
             </SelectContent>
           </Select>
         </div>
@@ -148,13 +160,10 @@ const CategorySelectorContent = ({
   );
 };
 
-// Wrapper component that provides CategoryContext
+// Remover o provider wrapper;
+// Agora exporta simplesmente o conteúdo.
 const CategorySelector = (props: CategorySelectorProps) => {
-  return (
-    <CategoryProvider>
-      <CategorySelectorContent {...props} />
-    </CategoryProvider>
-  );
+  return <CategorySelectorContent {...props} />;
 };
 
 export default CategorySelector;
