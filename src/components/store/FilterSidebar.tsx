@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { Filter, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -99,7 +100,7 @@ const FilterSidebar = ({
                   <div key={category.id} className="flex flex-col">
                     <Button
                       variant="ghost"
-                      className={`justify-start font-normal h-8 px-2 transition-colors duration-150 rounded-md ${selectedCategory === category.value ? 'bg-gold/10 text-gold' : ''}`}
+                      className={`justify-start font-normal h-8 px-2 ${selectedCategory === category.value ? 'bg-gold/10 text-gold' : ''}`}
                       onClick={() => onCategorySelect(category.value)}
                     >
                       {category.name}
@@ -112,7 +113,7 @@ const FilterSidebar = ({
                 <>
                   <Separator className="my-4" />
                   
-                  {/* Subcategorias section - usando mesmo estilo do botão categoria */}
+                  {/* Subcategories section - using the same style as categories */}
                   <div className="space-y-4 mt-4">
                     <h3 className="font-medium">Subcategorias</h3>
                     
@@ -122,21 +123,18 @@ const FilterSidebar = ({
                       <div className="space-y-1">
                         {subcategories.map((subcategory: SubcategoryType) => (
                           <div key={subcategory.id} className="mb-2">
-                            <span className="text-sm font-medium text-muted-foreground mb-1 block">
-                              {subcategory.name}
-                            </span>
-                            <div className="flex flex-col gap-1">
-                              {subcategory.values.map((value) => (
+                            <p className="text-sm font-medium mb-1 text-muted-foreground">{subcategory.name}</p>
+                            {subcategory.values.map((value) => (
+                              <div key={`${subcategory.id}-${value}`} className="flex flex-col">
                                 <Button
-                                  key={`${subcategory.id}-${value}`}
                                   variant="ghost"
-                                  className={`justify-start font-normal h-8 px-2 transition-colors duration-150 rounded-md ${selectedSubcategories.includes(value) ? 'bg-gold/10 text-gold' : ''}`}
+                                  className={`justify-start font-normal h-8 px-2 ${selectedSubcategories.includes(value) ? 'bg-gold/10 text-gold' : ''}`}
                                   onClick={() => onSubcategoryToggle(value)}
                                 >
                                   {value}
                                 </Button>
-                              ))}
-                            </div>
+                              </div>
+                            ))}
                           </div>
                         ))}
                       </div>
