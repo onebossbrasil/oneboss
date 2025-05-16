@@ -6,7 +6,7 @@ export interface CategoryContextType {
   isLoading: boolean;
   error: string | null;
   addCategory: (name: string, value: string) => Promise<void>;
-  removeCategory: (categoryId: number) => Promise<void>;
+  removeCategory: (categoryId: string) => Promise<void>;
   addSubcategory: (categoryId: number, name: string, type: string) => Promise<void>;
   removeSubcategory: (categoryId: number, subcategoryId: number) => Promise<void>;
   addSubcategoryValue: (categoryId: number, subcategoryId: number, value: string) => Promise<void>;

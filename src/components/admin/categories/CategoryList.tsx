@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
@@ -55,7 +54,7 @@ const CategoryList = ({
 
   const handleRemoveCategory = async (categoryId: string) => {
     if (window.confirm("Tem certeza que deseja remover esta categoria? Todos os produtos associados a ela ficarão sem categoria.")) {
-      const categoryToRemove = categories.find(cat => cat.id === categoryId);
+      const categoryToRemove = categories.find(cat => String(cat.id) === categoryId);
       if (categoryToRemove && categoryToRemove.value === selectedCategory) {
         setSelectedCategory(null);
         setSelectedSubcategory(null);
@@ -97,15 +96,20 @@ const CategoryList = ({
           <div className="space-y-2">
             {categories.map((cat) => (
               <CategoryListItem
-                key={cat.id}
-                cat={cat}
+                key={String(cat.id)}
+                cat={{
+                  id: String(cat.id),
+                  name: cat.name,
+                  value: cat.value,
+                  subcategories: { length: cat.subcategories.length ?? 0 },
+                }}
                 selected={selectedCategory === cat.value}
                 onSelect={() => {
                   setSelectedCategory(cat.value);
                   setSelectedSubcategory(null);
                 }}
-                onRemove={handleRemoveCategory} // agora espera apenas string
-                deleting={deletingCategory === cat.id}
+                onRemove={handleRemoveCategory}
+                deleting={deletingCategory === String(cat.id)}
               />
             ))}
             {categories.length === 0 && (
