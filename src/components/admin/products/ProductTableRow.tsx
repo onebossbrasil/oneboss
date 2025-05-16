@@ -1,10 +1,11 @@
+
 import { Eye, EyeOff, Edit, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { TableCell, TableRow } from "@/components/ui/table";
 import { Product } from "@/types/product";
 import { useProducts } from "@/contexts/ProductContext";
 import { useToast } from "@/hooks/use-toast";
-import { ReactNode } from "react";
+import { ReactNode, useState } from "react";
 import ProductVisibilityButton from "./ProductVisibilityButton";
 
 interface ProductTableRowProps {
@@ -24,11 +25,13 @@ const ProductTableRow = ({
 }: ProductTableRowProps) => {
   const { updateProduct } = useProducts();
   const { toast } = useToast();
+  const [isToggling, setIsToggling] = useState(false);
 
+  // Fix: only update the row, don't refresh the whole list immediately
   const handleVisibilityToggle = async (product: Product) => {
+    setIsToggling(true);
     try {
       await updateProduct(product.id, {
-        ...product,
         published: !product.published,
       });
 
@@ -38,8 +41,11 @@ const ProductTableRow = ({
           product.published ? "não será exibido" : "será exibido"
         } na loja.`,
       });
+      // Não há mais refreshProducts automático aqui!
     } catch (error) {
       console.error("Error toggling product visibility:", error);
+    } finally {
+      setIsToggling(false);
     }
   };
 
@@ -62,11 +68,11 @@ const ProductTableRow = ({
           </div>
         )}
       </TableCell>
-      <TableCell className="font-medium max-w-[240px] whitespace-nowrap overflow-hidden text-ellipsis group relative">
+      <TableCell className="font-medium min-w-[220px] max-w-[360px] whitespace-nowrap overflow-hidden text-ellipsis group relative">
         <span 
           title={product.name}
           className="block overflow-hidden text-ellipsis"
-          style={{ maxWidth: 220, display: "inline-block"}}
+          style={{ maxWidth: 340, display: "inline-block"}}
         >
           {product.name}
         </span>
@@ -86,22 +92,13 @@ const ProductTableRow = ({
         )}
       </TableCell>
       <TableCell>{product.stockQuantity}</TableCell>
-      <TableCell className="text-center">
-        {product.published ? (
-          <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
-            Sim
-          </span>
-        ) : (
-          <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
-            Não
-          </span>
-        )}
-      </TableCell>
+      {/* Removido a coluna de publicado */}
       <TableCell className="text-right">
         <div className="flex justify-end gap-2">
           <ProductVisibilityButton
             published={product.published}
             onClick={() => handleVisibilityToggle(product)}
+            disabled={isToggling}
           />
           <Button
             variant="outline"

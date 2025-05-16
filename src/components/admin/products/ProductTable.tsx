@@ -41,7 +41,7 @@ const ProductTable = ({
       <TableBody>
         {paginatedProducts.length === 0 ? (
           <TableRow>
-            <td colSpan={7} className="text-center py-4 text-muted-foreground">
+            <td colSpan={6} className="text-center py-4 text-muted-foreground">
               Nenhum produto cadastrado
             </td>
           </TableRow>

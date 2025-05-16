@@ -18,10 +18,10 @@ const ProductTableHeader = ({ allSelected, onToggleAll }: ProductTableHeaderProp
       />
     </TableHead>
     <TableHead className="w-12">Imagem</TableHead>
-    <TableHead>Nome</TableHead>
+    <TableHead className="min-w-[260px] w-[30%]">Nome</TableHead>
     <TableHead>Preço</TableHead>
     <TableHead>Estoque</TableHead>
-    <TableHead className="text-center">Publicado</TableHead>
+    {/* Removido o cabeçalho de Publicado */}
     <TableHead className="text-right">Ações</TableHead>
   </TableRow>
 );
