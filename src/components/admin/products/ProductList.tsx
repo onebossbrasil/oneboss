@@ -63,7 +63,7 @@ export default function ProductList() {
     setDialogOpen(true);
   };
 
-  // Corrigir: fechar ambos os estados ao fechar o modal (edição/criação)
+  // Corrigir fechamento robusto do modal ao salvar novo produto ou edição
   const handleDialogClose = () => {
     setSelectedProduct(null);
     setDialogOpen(false);
@@ -263,12 +263,13 @@ export default function ProductList() {
       <ProductEditDialog
         product={selectedProduct}
         open={dialogOpen || showCreate}
-        onOpenChange={(openState: boolean) => {
-          // Fechar ambos os estados ao fechar o modal
-          setDialogOpen(openState && !!selectedProduct);
-          setShowCreate(openState && !selectedProduct);
+        onOpenChange={openState => {
+          // Modal só muda seu estado aberto/fechado, mas reset é sempre pelo handleDialogClose
           if (!openState) {
             handleDialogClose();
+          } else {
+            setDialogOpen(!!selectedProduct);
+            setShowCreate(!selectedProduct);
           }
         }}
         onClose={handleDialogClose}
