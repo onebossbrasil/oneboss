@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { useCategories } from "@/contexts/CategoryContext";
 import CategoryList from "./categories/CategoryList";
@@ -99,19 +98,18 @@ const CategoryManager = () => {
 
   // Desktop view (three panels side by side)
   const desktopView = (
-    <div className="hidden md:grid md:grid-cols-3 gap-6">
+    <div className="hidden md:grid md:grid-cols-3 gap-10">
+      {/* Aumentado de gap-6 para gap-10 para dar mais espaço entre os cards */}
       <CategoryList 
         selectedCategory={selectedCategory}
         setSelectedCategory={setSelectedCategory}
         setSelectedSubcategory={setSelectedSubcategory}
       />
-      
       <SubcategoryList 
         selectedCategory={selectedCategory}
         selectedSubcategory={selectedSubcategory}
         setSelectedSubcategory={setSelectedSubcategory}
       />
-      
       <ValueList 
         selectedCategory={selectedCategory}
         selectedSubcategory={selectedSubcategory}

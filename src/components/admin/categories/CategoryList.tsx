@@ -1,8 +1,10 @@
+
 import { useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
 import { useCategories } from "@/contexts/CategoryContext";
-import CategoryListItem from "./CategoryListItem";
+import { Button } from "@/components/ui/button";
+import { Folder, Trash2, Loader2, List } from "lucide-react";
 
 interface CategoryListProps {
   selectedCategory: string | null;
@@ -16,7 +18,7 @@ const CategoryList = ({
   setSelectedSubcategory,
 }: CategoryListProps) => {
   const { toast } = useToast();
-  const { categories, addCategory, removeCategory, refreshCategories } = useCategories();
+  const { categories, removeCategory, refreshCategories } = useCategories();
   const [deletingCategory, setDeletingCategory] = useState<string | null>(null);
 
   const handleRemoveCategory = async (categoryId: string) => {
@@ -57,26 +59,52 @@ const CategoryList = ({
       <CardContent className="pt-6">
         <div className="space-y-4">
           <h3 className="text-lg font-medium mb-0 pl-1">Categorias</h3>
-
           <div className="space-y-2">
             {categories.length > 0 ? (
               categories.map((cat) => (
-                <CategoryListItem
+                <div
                   key={String(cat.id)}
-                  cat={{
-                    id: String(cat.id),
-                    name: cat.name,
-                    value: cat.value,
-                    subcategories: { length: cat.subcategories.length ?? 0 },
+                  className={`flex items-center justify-between w-full p-2 rounded-md border hover:bg-accent transition-colors ${
+                    selectedCategory === cat.value ? "bg-accent border-primary" : "bg-white border"
+                  }`}
+                  style={{
+                    minHeight: "52px",
+                    cursor: "pointer",
                   }}
-                  selected={selectedCategory === cat.value}
-                  onSelect={() => {
+                  onClick={() => {
                     setSelectedCategory(cat.value);
                     setSelectedSubcategory(null);
                   }}
-                  onRemove={handleRemoveCategory}
-                  deleting={deletingCategory === String(cat.id)}
-                />
+                  tabIndex={0}
+                  aria-selected={selectedCategory === cat.value}
+                >
+                  <span className="flex items-center flex-1 text-left">
+                    <List className="h-4 w-4 mr-2 text-primary" />
+                    <span className="text-sm font-medium truncate max-w-[60%]" title={cat.name}>
+                      {cat.name}
+                    </span>
+                    <span className="ml-2 text-xs text-muted-foreground">
+                      ({cat.subcategories.length ?? 0})
+                    </span>
+                  </span>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={e => {
+                      e.stopPropagation();
+                      handleRemoveCategory(String(cat.id));
+                    }}
+                    disabled={deletingCategory === String(cat.id)}
+                    className="text-red-500 hover:text-red-700 hover:bg-red-50 ml-1"
+                    aria-label="Excluir categoria"
+                  >
+                    {deletingCategory === String(cat.id) ? (
+                      <Loader2 className="h-5 w-5 animate-spin" />
+                    ) : (
+                      <Trash2 className="h-5 w-5" />
+                    )}
+                  </Button>
+                </div>
               ))
             ) : (
               <div className="py-2 text-center text-muted-foreground text-sm">
