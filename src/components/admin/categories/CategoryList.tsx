@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
@@ -17,7 +18,7 @@ const CategoryList = ({
   setSelectedSubcategory
 }: CategoryListProps) => {
   const { toast } = useToast();
-  const { categories, addCategory, removeCategory } = useCategories();
+  const { categories, addCategory, removeCategory, refreshCategories } = useCategories();
   const [newCategoryName, setNewCategoryName] = useState("");
   const [newCategorySlug, setNewCategorySlug] = useState("");
   const [dialogOpen, setDialogOpen] = useState(false);
@@ -45,6 +46,7 @@ const CategoryList = ({
       setNewCategoryName("");
       setNewCategorySlug("");
       setDialogOpen(false);
+      await refreshCategories(); // atualização imediata
     } catch (error: any) {
       setFormError(error?.message || "Erro ao adicionar categoria. Tente novamente.");
     } finally {
@@ -62,6 +64,7 @@ const CategoryList = ({
       try {
         setDeletingCategory(categoryId);
         await removeCategory(categoryId);
+        await refreshCategories(); // atualização imediata
         toast({
           title: "Categoria removida",
           description: "A categoria foi removida com sucesso.",
@@ -78,8 +81,9 @@ const CategoryList = ({
     }
   };
 
+  // Ajuste de layout!
   return (
-    <Card className="md:col-span-1">
+    <Card className="md:col-span-1 w-full max-w-[340px] min-w-[300px] mx-auto shadow-lg">
       <CardContent className="pt-6">
         <div className="space-y-4">
           <CategoryListHeader
@@ -125,3 +129,4 @@ const CategoryList = ({
 };
 
 export default CategoryList;
+

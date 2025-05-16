@@ -4,29 +4,30 @@ import { Folder, Trash2, Loader2 } from "lucide-react";
 
 type Props = {
   cat: {
-    id: string; // UUID string only!
+    id: string;
     name: string;
     value: string;
     subcategories: { length: number };
   };
   selected: boolean;
   onSelect: () => void;
-  onRemove: (id: string) => void; // Only UUID
+  onRemove: (id: string) => void;
   deleting: boolean;
 };
 
 const CategoryListItem = ({ cat, selected, onSelect, onRemove, deleting }: Props) => (
-  <div className="flex items-center justify-between w-full">
+  <div className="flex items-center justify-between w-full px-1">
     <button
-      className={`flex items-center flex-1 p-2 rounded-md hover:bg-accent ${
+      className={`flex items-center flex-1 p-2 rounded-md gap-3 hover:bg-accent transition-colors ${
         selected ? 'bg-accent' : ''
       }`}
       onClick={onSelect}
+      style={{ minWidth: 0 }}
     >
-      <Folder className="h-4 w-4 mr-2" />
-      <span className="text-sm">{cat.name}</span>
-      <span className="ml-auto text-xs text-muted-foreground">
-        {cat.subcategories.length} subcategorias
+      <Folder className="h-4 w-4 mr-2 shrink-0" />
+      <span className="text-sm truncate">{cat.name}</span>
+      <span className="ml-auto text-xs text-muted-foreground min-w-[90px] text-right">
+        {cat.subcategories.length} subcategoria{cat.subcategories.length !== 1 ? "s" : ""}
       </span>
     </button>
     <Button 
@@ -34,7 +35,7 @@ const CategoryListItem = ({ cat, selected, onSelect, onRemove, deleting }: Props
       size="icon"
       onClick={(e) => {
         e.stopPropagation();
-        onRemove(cat.id); // UUID string
+        onRemove(cat.id);
       }}
       disabled={deleting}
       className="text-red-500 hover:text-red-700 hover:bg-red-50"
