@@ -58,7 +58,7 @@ export default function AdminLayout({
   const location = useLocation();
   const navigate = useNavigate();
 
-  // Extra robustness for avatar fetch
+  // Robustez para avatar
   const avatarUrl =
     (user as any)?.avatar_url ||
     (user as any)?.user_metadata?.avatar_url ||
@@ -70,15 +70,16 @@ export default function AdminLayout({
       : "A");
 
   return (
-    <div className="min-h-screen flex flex-col md:flex-row bg-gray-50 dark:bg-gray-900 w-full max-w-full">
-      {/* Sidebar */}
+    <div className="flex flex-row w-full min-h-screen bg-gray-50 dark:bg-gray-900">
+      {/* Sidebar fixada no topo, z-30 para ficar acima, sem margem extra */}
       <Sidebar
-        className={`${
-          // Sidebar largura responsiva: fixa no desktop e overlay/colapsável no mobile
-          state === "collapsed"
-            ? "w-14"
-            : "w-56"
-        } md:relative md:h-auto h-auto`}
+        className={`
+          ${state === "collapsed" ? "w-14" : "w-56"}
+          h-screen sticky top-0 z-30
+          md:relative md:h-auto
+          flex-shrink-0
+          bg-sidebar
+        `}
         collapsible="icon"
       >
         <SidebarTrigger className="m-2 self-end" />
@@ -125,8 +126,10 @@ export default function AdminLayout({
         </SidebarContent>
       </Sidebar>
 
-      {/* Conteúdo principal: responsivo para ocupar todo espaço em telas menores */}
-      <main className="flex-1 p-2 md:p-4 w-full max-w-full">{children}</main>
+      {/* Conteúdo principal ocupa todo espaço disponível, sem margem superior */}
+      <main className="flex-1 w-full max-w-full p-2 md:p-4 overflow-x-auto">
+        {children}
+      </main>
     </div>
   );
 }
