@@ -116,7 +116,7 @@ const CategorySelectorContent = ({
             {(() => {
               const category = categories.find(cat => cat.value === selectedCategory);
               const subcategory = category?.subcategories.find(sc => sc.type === activeSubcategoryType);
-              return (subcategory ? subcategory.name : activeSubcategoryType) + " - Valor";
+              return (subcategory ? subcategory.name : activeSubcategoryType) + " - Atributos";
             })()}
           </Label>
           <Select 
@@ -124,7 +124,14 @@ const CategorySelectorContent = ({
             value={subcategoryValues[activeSubcategoryType] || ""}
           >
             <SelectTrigger>
-              <SelectValue placeholder={`Selecione um valor para ${activeSubcategoryType}`} />
+              <SelectValue placeholder={
+                (() => {
+                  const category = categories.find(cat => cat.value === selectedCategory);
+                  const subcategory = category?.subcategories.find(sc => sc.type === activeSubcategoryType);
+                  const nomeSubcategoria = subcategory ? subcategory.name.toLowerCase() : activeSubcategoryType.toLowerCase();
+                  return `Selecione um atributo para ${nomeSubcategoria}`;
+                })()
+              } />
             </SelectTrigger>
             <SelectContent>
               {(() => {
