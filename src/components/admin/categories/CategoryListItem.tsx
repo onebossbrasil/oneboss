@@ -4,14 +4,14 @@ import { Folder, Trash2, Loader2 } from "lucide-react";
 
 type Props = {
   cat: {
-    id: number | string;
+    id: string; // UUID string only!
     name: string;
     value: string;
     subcategories: { length: number };
   };
   selected: boolean;
   onSelect: () => void;
-  onRemove: (id: number | string) => void;
+  onRemove: (id: string) => void; // Only UUID
   deleting: boolean;
 };
 
@@ -34,7 +34,7 @@ const CategoryListItem = ({ cat, selected, onSelect, onRemove, deleting }: Props
       size="icon"
       onClick={(e) => {
         e.stopPropagation();
-        onRemove(cat.id);
+        onRemove(cat.id); // UUID string
       }}
       disabled={deleting}
       className="text-red-500 hover:text-red-700 hover:bg-red-50"

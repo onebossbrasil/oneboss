@@ -24,11 +24,11 @@ const CategoryList = ({
   const [dialogOpen, setDialogOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [formError, setFormError] = useState<string | null>(null);
-  const [deletingCategory, setDeletingCategory] = useState<number | null>(null);
-  
+  const [deletingCategory, setDeletingCategory] = useState<string | null>(null); // UUID string
+
   const handleAddCategory = async () => {
     if (!newCategoryName || !newCategorySlug) return;
-    
+
     if (categories.some(cat => cat.value === newCategorySlug)) {
       toast({
         title: "Erro ao adicionar categoria",
@@ -37,10 +37,10 @@ const CategoryList = ({
       });
       return;
     }
-    
+
     setIsSubmitting(true);
     setFormError(null);
-    
+
     try {
       await addCategory(newCategoryName, newCategorySlug);
       setNewCategoryName("");
@@ -53,7 +53,7 @@ const CategoryList = ({
     }
   };
 
-  const handleRemoveCategory = async (categoryId: number | string) => {
+  const handleRemoveCategory = async (categoryId: string) => {
     if (window.confirm("Tem certeza que deseja remover esta categoria? Todos os produtos associados a ela ficarão sem categoria.")) {
       const categoryToRemove = categories.find(cat => cat.id === categoryId);
       if (categoryToRemove && categoryToRemove.value === selectedCategory) {
@@ -61,8 +61,8 @@ const CategoryList = ({
         setSelectedSubcategory(null);
       }
       try {
-        setDeletingCategory(Number(categoryId));
-        await removeCategory(Number(categoryId));
+        setDeletingCategory(categoryId);
+        await removeCategory(categoryId);
         toast({
           title: "Categoria removida",
           description: "A categoria foi removida com sucesso.",
@@ -78,7 +78,7 @@ const CategoryList = ({
       }
     }
   };
-  
+
   return (
     <Card className="md:col-span-1">
       <CardContent className="pt-6">
@@ -104,8 +104,8 @@ const CategoryList = ({
                   setSelectedCategory(cat.value);
                   setSelectedSubcategory(null);
                 }}
-                onRemove={handleRemoveCategory}
-                deleting={deletingCategory === Number(cat.id)}
+                onRemove={handleRemoveCategory} // agora espera apenas string
+                deleting={deletingCategory === cat.id}
               />
             ))}
             {categories.length === 0 && (
