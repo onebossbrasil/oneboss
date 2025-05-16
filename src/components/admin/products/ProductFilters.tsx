@@ -16,6 +16,9 @@ interface ProductFiltersProps {
 const ALL_CATEGORIES = "__ALL__";
 const ALL_STATUS = "__ALL__";
 
+// Usamos 'w-[260px]' para garantir que todos fiquem do mesmo tamanho, ajustável conforme necessário.
+const FILTER_WIDTH_CLASS = "w-[260px] min-w-[200px]";
+
 const ProductFilters: React.FC<ProductFiltersProps> = ({
   search,
   onSearchChange,
@@ -31,13 +34,13 @@ const ProductFilters: React.FC<ProductFiltersProps> = ({
       placeholder="Buscar por nome do produto..."
       value={search}
       onChange={e => onSearchChange(e.target.value)}
-      className="flex-1 min-w-0"
+      className={FILTER_WIDTH_CLASS}
     />
     <Select
       value={category === "" ? ALL_CATEGORIES : category}
       onValueChange={v => onCategoryChange(v === ALL_CATEGORIES ? "" : v)}
     >
-      <SelectTrigger className="min-w-[180px]">
+      <SelectTrigger className={FILTER_WIDTH_CLASS}>
         <SelectValue placeholder="Categoria" />
       </SelectTrigger>
       <SelectContent>
@@ -53,7 +56,7 @@ const ProductFilters: React.FC<ProductFiltersProps> = ({
       value={status === "" ? ALL_STATUS : status}
       onValueChange={v => onStatusChange(v === ALL_STATUS ? "" : v)}
     >
-      <SelectTrigger className="min-w-[150px]">
+      <SelectTrigger className={FILTER_WIDTH_CLASS}>
         <SelectValue placeholder="Status" />
       </SelectTrigger>
       <SelectContent>
@@ -66,4 +69,3 @@ const ProductFilters: React.FC<ProductFiltersProps> = ({
 );
 
 export default ProductFilters;
-
