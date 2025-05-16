@@ -1,4 +1,3 @@
-
 import { useState, useEffect, useCallback } from "react";
 import { useProducts } from "@/contexts/ProductContext";
 import ProductEditDialog from "./ProductEditDialog";
@@ -11,7 +10,8 @@ import { useDeleteProduct } from "@/hooks/product/use-delete-product";
 import PaginationArrows from "@/components/ui/PaginationArrows";
 import ProductTable from "./ProductTable";
 import ProductFilters from "./ProductFilters";
-// FIX: Correct import for useCategories
+import ProductCreateButton from "./ProductCreateButton";
+import ConfirmDeleteProductModal from "./ConfirmDeleteProductModal";
 import { useCategories } from "@/contexts/CategoryContext";
 
 const PAGE_SIZE = 10;
@@ -161,23 +161,7 @@ export default function ProductList() {
   return (
     <div className="flex flex-col items-center w-full animate-fade-in">
       {/* Botão flutuante/destaque para cadastrar produto */}
-      <button
-        onClick={() => setShowCreate(true)}
-        aria-label="Cadastrar Produto"
-        className="fixed z-30 bottom-8 right-6 md:static md:ml-auto md:mt-4 mb-3 bg-gold text-white rounded-full p-0 md:p-2 shadow-lg hover:bg-gold/90 transition-all flex items-center justify-center w-14 h-14 md:w-12 md:h-12"
-        style={{
-          position: 'fixed',
-          bottom: 32,
-          right: 24,
-          backgroundColor: "#C9A227",
-          color: "#fff",
-          fontSize: 28,
-          borderRadius: "9999px",
-          boxShadow: "0 4px 12px rgba(0,0,0,0.07)",
-        }}
-      >
-        <Plus size={36} className="m-0 p-0" />
-      </button>
+      <ProductCreateButton onClick={() => setShowCreate(true)} />
 
       {/* Barra de filtros */}
       <div className="w-full flex justify-center mt-4">
@@ -283,26 +267,12 @@ export default function ProductList() {
         onClose={handleDialogClose}
       />
 
-      {confirmDelete && (
-        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-30 z-30">
-          <div className="bg-white rounded shadow-lg p-6 dark:bg-gray-900 flex flex-col gap-4 max-w-md w-full">
-            <h4 className="font-bold text-lg">Confirmar Exclusão</h4>
-            <p>Deseja excluir o produto <b>{confirmDelete.name}</b>?</p>
-            <div className="flex gap-2 justify-end">
-              <Button variant="secondary" onClick={() => setConfirmDelete(null)} disabled={isDeleting}>
-                Cancelar
-              </Button>
-              <Button
-                variant="destructive"
-                onClick={handleConfirmDelete}
-                disabled={isDeleting}
-              >
-                {isDeleting ? "Excluindo..." : "Excluir"}
-              </Button>
-            </div>
-          </div>
-        </div>
-      )}
+      <ConfirmDeleteProductModal
+        product={confirmDelete}
+        isDeleting={isDeleting}
+        onCancel={() => setConfirmDelete(null)}
+        onConfirm={handleConfirmDelete}
+      />
     </div>
   );
 }
