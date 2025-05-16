@@ -24,28 +24,38 @@ const CategoryCard = ({
 }: Props) => (
   <div
     className={`
-      flex flex-col justify-between bg-white rounded-2xl border shadow-md transition-all
+      flex flex-col justify-between bg-white rounded-xl shadow-md transition-all
       hover:shadow-lg hover:border-primary 
-      ${selected ? "border-2 border-primary shadow-xl" : "border border-border"}
+      ${selected ? "border-2 border-primary ring-2 ring-primary/40 shadow-xl z-10" : "border border-border"}
       p-5 cursor-pointer relative group
+      min-h-[134px] max-h-full
+      min-w-[220px] max-w-[370px]
+      box-border
       duration-200 ease-in
-      min-h-[120px]
+      w-full
+      focus:outline-none
     `}
     tabIndex={0}
     aria-selected={selected}
     onClick={onSelect}
-    style={{ minWidth: 0 }}
+    style={{ wordBreak: "break-word" }}
   >
     {/* Ícone e botão de remover */}
-    <div className="flex flex-row justify-between items-center">
-      <div className="flex items-center gap-3">
+    <div className="flex flex-row justify-between items-start mb-1">
+      <div className="flex items-center gap-3 w-full">
         <div className="flex items-center justify-center rounded-full bg-primary/10 p-3">
           <Folder className="h-6 w-6 text-primary flex-shrink-0" />
         </div>
-        <span className="text-base font-semibold text-foreground leading-tight whitespace-normal break-keep"
+        <span
+          className={`text-base font-semibold text-foreground leading-tight w-full`}
           style={{
-            maxWidth: 175,
-            wordBreak: "keep-all"
+            whiteSpace: "normal",
+            wordBreak: "break-word",
+            overflowWrap: "break-word",
+            fontSize: "1.08rem",
+            maxWidth: 180,
+            textAlign: "left",
+            display: "block"
           }}
           title={cat.name}
         >
@@ -72,15 +82,19 @@ const CategoryCard = ({
         )}
       </Button>
     </div>
-    <div className="flex flex-row justify-between items-end mt-4">
+    {/* Contador da subcategoria, sempre ao fundo */}
+    <div className="flex flex-row justify-end items-end mt-7">
       <span className="
-        text-xs px-2 py-1 rounded-md bg-muted text-muted-foreground font-medium tracking-wide
+        text-xs px-2 py-1 rounded-md bg-muted/80 text-muted-foreground font-medium tracking-wide
       ">
         {cat.subcategories.length} {cat.subcategories.length === 1 ? "subcategoria" : "subcategorias"}
       </span>
     </div>
+    {/* Selo de seleção */}
     {selected && (
-      <span className="absolute right-3 top-3 text-primary text-xs font-medium px-2 py-1 bg-primary/20 rounded-md pointer-events-none">Selecionada</span>
+      <span className="absolute right-3 top-3 text-primary text-xs font-medium px-2 py-1 bg-primary/20 rounded-md pointer-events-none shadow">
+        Selecionada
+      </span>
     )}
   </div>
 );

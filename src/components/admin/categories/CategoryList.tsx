@@ -1,9 +1,9 @@
+
 import { useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
 import { useCategories } from "@/contexts/CategoryContext";
 import CategoryListHeader from "./CategoryListHeader";
-import CategoryListItem from "./CategoryListItem";
 import CategoryCard from "./CategoryCard";
 
 interface CategoryListProps {
@@ -46,7 +46,7 @@ const CategoryList = ({
       setNewCategoryName("");
       setNewCategorySlug("");
       setDialogOpen(false);
-      await refreshCategories(); // atualização imediata
+      await refreshCategories();
     } catch (error: any) {
       setFormError(error?.message || "Erro ao adicionar categoria. Tente novamente.");
     } finally {
@@ -64,7 +64,7 @@ const CategoryList = ({
       try {
         setDeletingCategory(categoryId);
         await removeCategory(categoryId);
-        await refreshCategories(); // atualização imediata
+        await refreshCategories();
         toast({
           title: "Categoria removida",
           description: "A categoria foi removida com sucesso.",
@@ -81,7 +81,7 @@ const CategoryList = ({
     }
   };
 
-  // NOVO LAYOUT: grid de cards responsivo, visual moderno
+  // GRID PADRONIZADO E HARMÔNICO
   return (
     <Card
       className="
@@ -111,13 +111,21 @@ const CategoryList = ({
           />
           <div
             className="
-              grid gap-5 
+              grid
+              gap-6
               grid-cols-1
               sm:grid-cols-2 
-              xl:grid-cols-3 
-              2xl:grid-cols-4
-              px-4 pb-2
+              md:grid-cols-2
+              lg:grid-cols-3
+              xl:grid-cols-4
+              2xl:grid-cols-5
+              px-2 sm:px-4
+              pb-2
+              w-full
             "
+            style={{
+              alignItems: "stretch",
+            }}
           >
             {categories.map((cat) => (
               <CategoryCard
