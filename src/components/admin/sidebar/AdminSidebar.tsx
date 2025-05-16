@@ -1,4 +1,3 @@
-
 import { Plus } from "lucide-react";
 import React from "react";
 import { useSidebar } from "@/components/ui/sidebar";
@@ -17,14 +16,13 @@ const sidebarItems = [
 ];
 
 export default function AdminSidebar({ activeTab, onTabChange, onAddProduct }: AdminSidebarProps) {
-  const { state } = useSidebar();
-  const collapsed = state === "collapsed";
+  const { collapsed } = useSidebar();
 
   return (
-    <Sidebar className={collapsed ? "w-14" : "w-60"} collapsible="offcanvas">
+    <Sidebar className={collapsed ? "w-14" : "w-60"} collapsible>
       <SidebarTrigger className="m-2 self-end" />
       <SidebarContent>
-        <SidebarGroup>
+        <SidebarGroup defaultOpen>
           <SidebarGroupLabel>Admin</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
@@ -40,12 +38,15 @@ export default function AdminSidebar({ activeTab, onTabChange, onAddProduct }: A
                     }
                   >
                     <span>
+                      {/* Mostre o label na versão expandida */}
                       {!collapsed && item.label}
+                      {/* Mostre só a letra maiúscula na versão mini */}
                       {collapsed && item.label.slice(0, 1)}
                     </span>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
               ))}
+              {/* Botão Adicionar Produto */}
               <SidebarMenuItem>
                 <SidebarMenuButton
                   onClick={onAddProduct}
