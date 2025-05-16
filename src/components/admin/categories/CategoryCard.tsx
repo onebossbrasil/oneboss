@@ -26,19 +26,20 @@ const CategoryCard = ({
     className={`
       flex flex-col justify-between bg-white rounded-xl shadow-md transition-all
       hover:shadow-lg hover:border-primary 
-      ${selected ? "border-2 border-primary ring-2 ring-primary/40 shadow-xl z-10" : "border border-border"}
-      p-5 cursor-pointer relative group
-      min-h-[134px] max-h-full
-      min-w-[220px] max-w-[370px]
-      box-border
-      duration-200 ease-in
+      ${selected ? "border-2 border-primary bg-primary/10" : "border border-border"}
+      p-4 cursor-pointer relative group
+      min-h-[120px]
       w-full
       focus:outline-none
     `}
     tabIndex={0}
     aria-selected={selected}
     onClick={onSelect}
-    style={{ wordBreak: "break-word" }}
+    style={{
+      wordBreak: "normal",
+      whiteSpace: "normal",
+      overflowWrap: "break-word"
+    }}
   >
     {/* Ícone e botão de remover */}
     <div className="flex flex-row justify-between items-start mb-1">
@@ -47,10 +48,9 @@ const CategoryCard = ({
           <Folder className="h-6 w-6 text-primary flex-shrink-0" />
         </div>
         <span
-          className={`text-base font-semibold text-foreground leading-tight w-full`}
+          className="text-base font-semibold text-foreground leading-tight w-full"
           style={{
             whiteSpace: "normal",
-            wordBreak: "break-word",
             overflowWrap: "break-word",
             fontSize: "1.08rem",
             maxWidth: 180,
@@ -82,8 +82,8 @@ const CategoryCard = ({
         )}
       </Button>
     </div>
-    {/* Contador da subcategoria, sempre ao fundo */}
-    <div className="flex flex-row justify-end items-end mt-7">
+    {/* Contador da subcategoria */}
+    <div className="flex flex-row justify-end items-end mt-6">
       <span className="
         text-xs px-2 py-1 rounded-md bg-muted/80 text-muted-foreground font-medium tracking-wide
       ">

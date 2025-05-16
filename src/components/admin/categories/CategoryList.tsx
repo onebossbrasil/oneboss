@@ -85,7 +85,7 @@ const CategoryList = ({
     <Card
       className="
         w-full md:col-span-1
-        max-w-none min-w-[350px]
+        max-w-none min-w-[320px]
         shadow-lg border px-0 bg-white
         md:mr-1 md:ml-0
       "
@@ -111,38 +111,36 @@ const CategoryList = ({
           <div
             className="
               grid
-              gap-6
+              gap-4
               grid-cols-1
-              sm:grid-cols-2 
-              md:grid-cols-2
+              sm:grid-cols-2
               lg:grid-cols-3
               xl:grid-cols-4
-              2xl:grid-cols-5
               px-2 sm:px-4
-              pb-2
-              w-full
+              pb-2 w-full
             "
             style={{
               alignItems: "stretch",
             }}
           >
             {categories.map((cat) => (
-              <CategoryCard
-                key={String(cat.id)}
-                cat={{
-                  id: String(cat.id),
-                  name: cat.name,
-                  value: cat.value,
-                  subcategories: { length: cat.subcategories.length ?? 0 },
-                }}
-                selected={selectedCategory === cat.value}
-                onSelect={() => {
-                  setSelectedCategory(cat.value);
-                  setSelectedSubcategory(null);
-                }}
-                onRemove={handleRemoveCategory}
-                deleting={deletingCategory === String(cat.id)}
-              />
+              <div key={String(cat.id)} className="flex">
+                <CategoryCard
+                  cat={{
+                    id: String(cat.id),
+                    name: cat.name,
+                    value: cat.value,
+                    subcategories: { length: cat.subcategories.length ?? 0 },
+                  }}
+                  selected={selectedCategory === cat.value}
+                  onSelect={() => {
+                    setSelectedCategory(cat.value);
+                    setSelectedSubcategory(null);
+                  }}
+                  onRemove={handleRemoveCategory}
+                  deleting={deletingCategory === String(cat.id)}
+                />
+              </div>
             ))}
             {categories.length === 0 && (
               <div className="col-span-full">
