@@ -1,33 +1,15 @@
+
 import { useState, useEffect, useCallback } from "react";
 import { useProducts } from "@/contexts/ProductContext";
-import {
-  Table,
-  TableBody,
-  TableHead,
-  TableHeader,
-  TableRow,
-  TableCell,
-} from "@/components/ui/table";
-import ProductTableRow from "./ProductTableRow";
 import ProductEditDialog from "./ProductEditDialog";
 import { Product } from "@/types/product";
 import { useToast } from "@/hooks/use-toast";
 import { Alert, AlertTitle, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
-import { RefreshCw, Trash2, Plus } from "lucide-react";
+import { RefreshCw, Trash2 } from "lucide-react";
 import { useDeleteProduct } from "@/hooks/product/use-delete-product";
-import ProductTableHeader from "./ProductTableHeader";
-import { Checkbox } from "@/components/ui/checkbox";
-import {
-  Pagination,
-  PaginationContent,
-  PaginationEllipsis,
-  PaginationItem,
-  PaginationLink,
-  PaginationNext,
-  PaginationPrevious,
-} from "@/components/ui/pagination";
 import PaginationArrows from "@/components/ui/PaginationArrows";
+import ProductTable from "./ProductTable";
 
 const PAGE_SIZE = 10;
 
@@ -50,23 +32,19 @@ export default function ProductList() {
   const pageCount = Math.ceil(products.length / PAGE_SIZE);
   const paginatedProducts = products.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
 
-  // Debounce proteção para atualizar manualmente
   const [lastRefreshTime, setLastRefreshTime] = useState(0);
   const MIN_REFRESH_INTERVAL = 1500; // ms
 
   useEffect(() => {
-    // Load products ao montar
     refreshProducts();
   }, [refreshProducts]);
 
   useEffect(() => {
-    // Resetar seleção quando recarrega produtos
     setSelectedIds([]);
-    setPage(1); // reseta para a primeira página ao atualizar
+    setPage(1);
   }, [products]);
 
   useEffect(() => {
-    // Toast erro (problema ao carregar)
     if (error) {
       toast({
         title: "Erro ao carregar produtos",
@@ -81,7 +59,6 @@ export default function ProductList() {
     setDialogOpen(true);
   };
 
-  // Corrigir fechamento robusto do modal ao salvar novo produto ou edição
   const handleDialogClose = () => {
     setSelectedProduct(null);
     setDialogOpen(false);
@@ -121,7 +98,6 @@ export default function ProductList() {
   const handleConfirmDelete = async () => {
     let idsToDelete: string[] = [];
 
-    // Se houver seleção em massa, deletar todos os produtos selecionados.
     if (selectedIds.length > 0) {
       idsToDelete = selectedIds;
     } else if (confirmDelete) {
@@ -141,7 +117,6 @@ export default function ProductList() {
     }
   };
 
-  // Marcar/desmarcar todos os produtos
   const handleToggleAll = (checked: boolean) => {
     if (checked) {
       setSelectedIds(products.map(p => p.id));
@@ -150,14 +125,12 @@ export default function ProductList() {
     }
   };
 
-  // Marcar/desmarcar produto individual
   const handleToggleProduct = (id: string, checked: boolean) => {
     setSelectedIds(prev =>
       checked ? [...prev, id] : prev.filter(pid => pid !== id)
     );
   };
 
-  // Paginação handlers
   const handlePageChange = (p: number) => {
     if (p >= 1 && p <= pageCount) setPage(p);
   };
@@ -198,42 +171,21 @@ export default function ProductList() {
       <div className="w-full flex justify-center">
         <div className="border rounded-lg overflow-x-auto bg-white/80 shadow-md w-full max-w-5xl mx-auto">
           <div className="overflow-x-auto">
-            <Table>
-              <TableHeader>
-                <ProductTableHeader
-                  allSelected={allSelected}
-                  onToggleAll={checked => handleToggleAll(!!checked)}
-                />
-              </TableHeader>
-              <TableBody>
-                {paginatedProducts.length === 0 ? (
-                  <TableRow>
-                    <ProductEmptyState />
-                  </TableRow>
-                ) : (
-                  paginatedProducts.map((product) => (
-                    <ProductTableRow
-                      key={product.id}
-                      product={product}
-                      onEditClick={handleEditClick}
-                      onSelectDelete={setConfirmDelete}
-                      isSelectedToDelete={confirmDelete?.id === product.id}
-                      selectionCheckbox={
-                        <Checkbox
-                          checked={selectedIds.includes(product.id)}
-                          onCheckedChange={checked => handleToggleProduct(product.id, !!checked)}
-                        />
-                      }
-                    />
-                  ))
-                )}
-              </TableBody>
-            </Table>
+            <ProductTable
+              products={products}
+              paginatedProducts={paginatedProducts}
+              selectedIds={selectedIds}
+              confirmDelete={confirmDelete}
+              onEditClick={handleEditClick}
+              onSelectDelete={setConfirmDelete}
+              allSelected={allSelected}
+              onToggleAll={handleToggleAll}
+              onToggleProduct={handleToggleProduct}
+            />
           </div>
         </div>
       </div>
 
-      {/* Paginação Bonita */}
       <PaginationArrows
         page={page}
         pageCount={pageCount}
@@ -296,7 +248,6 @@ export default function ProductList() {
         product={selectedProduct}
         open={dialogOpen || showCreate}
         onOpenChange={openState => {
-          // Modal só muda seu estado aberto/fechado, mas reset é sempre pelo handleDialogClose
           if (!openState) {
             handleDialogClose();
           } else {
@@ -307,7 +258,6 @@ export default function ProductList() {
         onClose={handleDialogClose}
       />
 
-      {/* Modal de confirmação de exclusão */}
       {confirmDelete && (
         <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-30 z-30">
           <div className="bg-white rounded shadow-lg p-6 dark:bg-gray-900 flex flex-col gap-4 max-w-md w-full">
@@ -331,10 +281,3 @@ export default function ProductList() {
     </div>
   );
 }
-
-// Adicionando prop selectionCheckbox em ProductTableRow
-const ProductEmptyState = () => (
-  <td colSpan={7} className="text-center py-4 text-muted-foreground">
-    Nenhum produto cadastrado
-  </td>
-);
