@@ -1,4 +1,3 @@
-
 import { useState, useEffect, useCallback } from "react";
 import { useProducts } from "@/contexts/ProductContext";
 import ProductEditDialog from "./ProductEditDialog";
@@ -34,18 +33,20 @@ export default function ProductList() {
   const [filterStatus, setFilterStatus] = useState("");
   const { categories } = useCategories();
 
-  // Filtragem local
-  const filteredProducts = products.filter((product) => {
-    const matchesName = product.name.toLowerCase().includes(search.toLowerCase());
-    const matchesCategory =
-      !filterCategory ||
-      product.categoryId === filterCategory;
-    const matchesStatus =
-      !filterStatus ||
-      (filterStatus === "published" && product.published) ||
-      (filterStatus === "unpublished" && !product.published);
-    return matchesName && matchesCategory && matchesStatus;
-  });
+  // Filtragem local ORDENANDO por nome!
+  const filteredProducts = products
+    .filter((product) => {
+      const matchesName = product.name.toLowerCase().includes(search.toLowerCase());
+      const matchesCategory =
+        !filterCategory ||
+        product.categoryId === filterCategory;
+      const matchesStatus =
+        !filterStatus ||
+        (filterStatus === "published" && product.published) ||
+        (filterStatus === "unpublished" && !product.published);
+      return matchesName && matchesCategory && matchesStatus;
+    })
+    .sort((a, b) => a.name.localeCompare(b.name)); // <-- Ordenação alfabética
 
   // Paginação — importante: declarar ANTES de usar nos cálculos de seleção!
   const [page, setPage] = useState(1);

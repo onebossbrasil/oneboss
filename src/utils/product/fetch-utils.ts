@@ -28,8 +28,8 @@ export const fetchProductsFromSupabase = async (): Promise<{ products: Product[]
     const productsPromise = supabase
       .from('products')
       .select('*')
-      .order('created_at', { ascending: false });
-      
+      .order('name', { ascending: true }); // Ordenar por nome
+
     // Create a proper Promise from the Supabase query
     const productsResult = await fetchWithTimeout(Promise.resolve(productsPromise));
 
