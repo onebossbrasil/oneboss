@@ -1,9 +1,9 @@
-
 import { useToast } from "@/hooks/use-toast";
 import {
   createSubcategory,
   deleteSubcategory,
 } from "@/services/category";
+import { isValidUuid } from "@/utils/validateUuid";
 
 export function useSubcategoryMutations(
   setIsLoading: (loading: boolean) => void,
@@ -11,7 +11,7 @@ export function useSubcategoryMutations(
 ) {
   const { toast } = useToast();
 
-  const addSubcategory = async (categoryId: number, name: string, type: string) => {
+  const addSubcategory = async (categoryId: number | string, name: string, type: string) => {
     try {
       setIsLoading(true);
       await createSubcategory(categoryId, name, type);
@@ -34,10 +34,18 @@ export function useSubcategoryMutations(
     }
   };
 
-  const removeSubcategory = async (categoryId: number, subcategoryId: number) => {
+  const removeSubcategory = async (categoryId: number | string, subcategoryId: number | string) => {
+    if (!isValidUuid(String(subcategoryId))) {
+      toast({
+        title: "ID de subcategoria inválido",
+        description: `O identificador recebido (${subcategoryId}) não está no formato UUID válido.`,
+        variant: "destructive"
+      });
+      return;
+    }
     try {
       setIsLoading(true);
-      await deleteSubcategory(subcategoryId);
+      await deleteSubcategory(subcategoryId as any);
       await fetchCategories();
       
       toast({
