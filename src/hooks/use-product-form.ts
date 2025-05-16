@@ -138,23 +138,25 @@ export const useProductForm = () => {
       
       // Save product to Supabase
       await addProduct(productData, images);
-      
-      // Reset form
-      setFormData({
-        name: "",
-        shortDescription: "",
-        description: "",
-        price: "",
-        salePrice: "",
-        stockQuantity: "1",
-        published: true,
-        featured: false
-      });
-      setSelectedCategory("");
-      setSubcategoryValues({});
-      setImages([]);
-      setImagePreviewUrls([]);
-      setIsOpen(false);
+
+      // ADICIONADO: aguarda curto delay antes de fechar o modal para garantir exibição do toast
+      setTimeout(() => {
+        setFormData({
+          name: "",
+          shortDescription: "",
+          description: "",
+          price: "",
+          salePrice: "",
+          stockQuantity: "1",
+          published: true,
+          featured: false
+        });
+        setSelectedCategory("");
+        setSubcategoryValues({});
+        setImages([]);
+        setImagePreviewUrls([]);
+        setIsOpen(false);
+      }, 800); // 0.8 segundos para garantir visualização do toast pelo usuário
     } catch (error) {
       console.error("Error saving product:", error);
       toast({
