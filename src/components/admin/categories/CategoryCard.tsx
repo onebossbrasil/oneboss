@@ -25,11 +25,13 @@ const CategoryCard = ({
   <div
     className={`
       flex flex-col justify-between bg-white rounded-xl shadow-md transition-all
-      hover:shadow-lg hover:border-primary 
+      hover:shadow-lg hover:border-primary
       ${selected ? "border-2 border-primary bg-primary/10" : "border border-border"}
       p-4 cursor-pointer relative group
-      min-h-[120px]
+      min-h-[110px]
+      max-w-[330px]
       w-full
+      box-border
       focus:outline-none
     `}
     tabIndex={0}
@@ -41,21 +43,18 @@ const CategoryCard = ({
       overflowWrap: "break-word"
     }}
   >
-    {/* Ícone e botão de remover */}
+    {/* Top: ícone + nome + botão de deletar */}
     <div className="flex flex-row justify-between items-start mb-1">
-      <div className="flex items-center gap-3 w-full">
+      <div className="flex items-center gap-3 w-full min-w-0">
         <div className="flex items-center justify-center rounded-full bg-primary/10 p-3">
           <Folder className="h-6 w-6 text-primary flex-shrink-0" />
         </div>
         <span
-          className="text-base font-semibold text-foreground leading-tight w-full"
+          className="text-base font-semibold text-foreground leading-tight truncate block"
           style={{
-            whiteSpace: "normal",
-            overflowWrap: "break-word",
             fontSize: "1.08rem",
-            maxWidth: 180,
-            textAlign: "left",
-            display: "block"
+            maxWidth: 160,
+            textAlign: "left"
           }}
           title={cat.name}
         >
@@ -72,7 +71,7 @@ const CategoryCard = ({
           onRemove(cat.id);
         }}
         disabled={deleting}
-        className="text-red-500 hover:text-red-700 hover:bg-red-50 invisible group-hover:visible transition"
+        className="text-red-500 hover:text-red-700 hover:bg-red-50 opacity-60 group-hover:opacity-100 transition"
         aria-label="Excluir categoria"
       >
         {deleting ? (
@@ -82,7 +81,7 @@ const CategoryCard = ({
         )}
       </Button>
     </div>
-    {/* Contador da subcategoria */}
+    {/* Subcategoria contador */}
     <div className="flex flex-row justify-end items-end mt-6">
       <span className="
         text-xs px-2 py-1 rounded-md bg-muted/80 text-muted-foreground font-medium tracking-wide
@@ -90,7 +89,7 @@ const CategoryCard = ({
         {cat.subcategories.length} {cat.subcategories.length === 1 ? "subcategoria" : "subcategorias"}
       </span>
     </div>
-    {/* Selo de seleção */}
+    {/* Selecionada */}
     {selected && (
       <span className="absolute right-3 top-3 text-primary text-xs font-medium px-2 py-1 bg-primary/20 rounded-md pointer-events-none shadow">
         Selecionada
@@ -100,3 +99,4 @@ const CategoryCard = ({
 );
 
 export default CategoryCard;
+

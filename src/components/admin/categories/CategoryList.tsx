@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
@@ -80,21 +81,9 @@ const CategoryList = ({
     }
   };
 
-  // Layout ORIGINAL: grid responsivo tradicional, sem alterações "modernas"
+  // Grid clean: até 3 colunas no desktop, responsivo, cada card respeitando limites
   return (
-    <Card
-      className="
-        w-full md:col-span-1
-        max-w-none min-w-[320px]
-        shadow-lg border px-0 bg-white
-        md:mr-1 md:ml-0
-      "
-      style={{
-        marginLeft: 0,
-        marginRight: 0,
-        marginTop: 0,
-      }}
-    >
+    <Card className="w-full max-w-none min-w-[300px] shadow-lg bg-white border">
       <CardContent className="pt-6 pb-4 px-0">
         <div className="space-y-6">
           <CategoryListHeader
@@ -108,14 +97,13 @@ const CategoryList = ({
             isSubmitting={isSubmitting}
             formError={formError}
           />
+
           <div
             className="
-              grid
-              gap-4
+              grid gap-5
               grid-cols-1
               sm:grid-cols-2
               lg:grid-cols-3
-              xl:grid-cols-4
               px-2 sm:px-4
               pb-2 w-full
             "
@@ -124,23 +112,22 @@ const CategoryList = ({
             }}
           >
             {categories.map((cat) => (
-              <div key={String(cat.id)} className="flex">
-                <CategoryCard
-                  cat={{
-                    id: String(cat.id),
-                    name: cat.name,
-                    value: cat.value,
-                    subcategories: { length: cat.subcategories.length ?? 0 },
-                  }}
-                  selected={selectedCategory === cat.value}
-                  onSelect={() => {
-                    setSelectedCategory(cat.value);
-                    setSelectedSubcategory(null);
-                  }}
-                  onRemove={handleRemoveCategory}
-                  deleting={deletingCategory === String(cat.id)}
-                />
-              </div>
+              <CategoryCard
+                key={String(cat.id)}
+                cat={{
+                  id: String(cat.id),
+                  name: cat.name,
+                  value: cat.value,
+                  subcategories: { length: cat.subcategories.length ?? 0 },
+                }}
+                selected={selectedCategory === cat.value}
+                onSelect={() => {
+                  setSelectedCategory(cat.value);
+                  setSelectedSubcategory(null);
+                }}
+                onRemove={handleRemoveCategory}
+                deleting={deletingCategory === String(cat.id)}
+              />
             ))}
             {categories.length === 0 && (
               <div className="col-span-full">
@@ -157,3 +144,4 @@ const CategoryList = ({
 };
 
 export default CategoryList;
+
