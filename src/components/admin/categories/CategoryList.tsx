@@ -3,8 +3,7 @@ import { useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
 import { useCategories } from "@/contexts/CategoryContext";
-import CategoryListHeader from "./CategoryListHeader";
-import CategoryCard from "./CategoryCard";
+import CategoryListItem from "./CategoryListItem";
 
 interface CategoryListProps {
   selectedCategory: string | null;
@@ -15,48 +14,19 @@ interface CategoryListProps {
 const CategoryList = ({
   selectedCategory,
   setSelectedCategory,
-  setSelectedSubcategory
+  setSelectedSubcategory,
 }: CategoryListProps) => {
   const { toast } = useToast();
   const { categories, addCategory, removeCategory, refreshCategories } = useCategories();
-  const [newCategoryName, setNewCategoryName] = useState("");
-  const [newCategorySlug, setNewCategorySlug] = useState("");
-  const [dialogOpen, setDialogOpen] = useState(false);
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [formError, setFormError] = useState<string | null>(null);
   const [deletingCategory, setDeletingCategory] = useState<string | null>(null);
 
-  const handleAddCategory = async () => {
-    if (!newCategoryName || !newCategorySlug) return;
-
-    if (categories.some(cat => cat.value === newCategorySlug)) {
-      toast({
-        title: "Erro ao adicionar categoria",
-        description: "Já existe uma categoria com esse identificador.",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    setIsSubmitting(true);
-    setFormError(null);
-
-    try {
-      await addCategory(newCategoryName, newCategorySlug);
-      setNewCategoryName("");
-      setNewCategorySlug("");
-      setDialogOpen(false);
-      await refreshCategories();
-    } catch (error: any) {
-      setFormError(error?.message || "Erro ao adicionar categoria. Tente novamente.");
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
-
   const handleRemoveCategory = async (categoryId: string) => {
-    if (window.confirm("Tem certeza que deseja remover esta categoria? Todos os produtos associados a ela ficarão sem categoria.")) {
-      const categoryToRemove = categories.find(cat => String(cat.id) === categoryId);
+    if (
+      window.confirm(
+        "Tem certeza que deseja remover esta categoria? Todos os produtos associados a ela ficarão sem categoria."
+      )
+    ) {
+      const categoryToRemove = categories.find((cat) => String(cat.id) === categoryId);
       if (categoryToRemove && categoryToRemove.value === selectedCategory) {
         setSelectedCategory(null);
         setSelectedSubcategory(null);
@@ -72,7 +42,9 @@ const CategoryList = ({
       } catch (error: any) {
         toast({
           title: "Erro ao remover categoria",
-          description: error?.message || "Ocorreu um erro ao tentar remover a categoria. Tente novamente.",
+          description:
+            error?.message ||
+            "Ocorreu um erro ao tentar remover a categoria. Tente novamente.",
           variant: "destructive",
         });
       } finally {
@@ -81,59 +53,35 @@ const CategoryList = ({
     }
   };
 
-  // Grid clean: até 3 colunas no desktop, responsivo, cada card respeitando limites
   return (
-    <Card className="w-full max-w-none min-w-[300px] shadow-lg bg-white border">
-      <CardContent className="pt-6 pb-4 px-0">
-        <div className="space-y-6">
-          <CategoryListHeader
-            open={dialogOpen}
-            onOpenChange={setDialogOpen}
-            newCategoryName={newCategoryName}
-            setNewCategoryName={setNewCategoryName}
-            newCategorySlug={newCategorySlug}
-            setNewCategorySlug={setNewCategorySlug}
-            onAdd={handleAddCategory}
-            isSubmitting={isSubmitting}
-            formError={formError}
-          />
+    <Card className="md:col-span-1">
+      <CardContent className="pt-6">
+        <div className="space-y-4">
+          <h3 className="text-lg font-medium mb-0 pl-1">Categorias</h3>
 
-          <div
-            className="
-              grid gap-5
-              grid-cols-1
-              sm:grid-cols-2
-              lg:grid-cols-3
-              px-2 sm:px-4
-              pb-2 w-full
-            "
-            style={{
-              alignItems: "stretch",
-            }}
-          >
-            {categories.map((cat) => (
-              <CategoryCard
-                key={String(cat.id)}
-                cat={{
-                  id: String(cat.id),
-                  name: cat.name,
-                  value: cat.value,
-                  subcategories: { length: cat.subcategories.length ?? 0 },
-                }}
-                selected={selectedCategory === cat.value}
-                onSelect={() => {
-                  setSelectedCategory(cat.value);
-                  setSelectedSubcategory(null);
-                }}
-                onRemove={handleRemoveCategory}
-                deleting={deletingCategory === String(cat.id)}
-              />
-            ))}
-            {categories.length === 0 && (
-              <div className="col-span-full">
-                <p className="text-sm text-muted-foreground py-2 text-center">
-                  Nenhuma categoria encontrada. Adicione uma nova categoria para começar.
-                </p>
+          <div className="space-y-2">
+            {categories.length > 0 ? (
+              categories.map((cat) => (
+                <CategoryListItem
+                  key={String(cat.id)}
+                  cat={{
+                    id: String(cat.id),
+                    name: cat.name,
+                    value: cat.value,
+                    subcategories: { length: cat.subcategories.length ?? 0 },
+                  }}
+                  selected={selectedCategory === cat.value}
+                  onSelect={() => {
+                    setSelectedCategory(cat.value);
+                    setSelectedSubcategory(null);
+                  }}
+                  onRemove={handleRemoveCategory}
+                  deleting={deletingCategory === String(cat.id)}
+                />
+              ))
+            ) : (
+              <div className="py-2 text-center text-muted-foreground text-sm">
+                Nenhuma categoria encontrada. Adicione uma nova categoria para começar.
               </div>
             )}
           </div>
