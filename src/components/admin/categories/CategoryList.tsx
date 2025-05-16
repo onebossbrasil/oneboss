@@ -24,7 +24,7 @@ const CategoryList = ({
   const [dialogOpen, setDialogOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [formError, setFormError] = useState<string | null>(null);
-  const [deletingCategory, setDeletingCategory] = useState<string | null>(null); // UUID string
+  const [deletingCategory, setDeletingCategory] = useState<string | null>(null);
 
   const handleAddCategory = async () => {
     if (!newCategoryName || !newCategorySlug) return;
@@ -81,10 +81,10 @@ const CategoryList = ({
     }
   };
 
-  // Ajuste de layout!
+  // Novo layout: cards maiores, margens internas menores, gap lateral menor
   return (
-    <Card className="md:col-span-1 w-full max-w-[340px] min-w-[300px] mx-auto shadow-lg">
-      <CardContent className="pt-6">
+    <Card className="md:col-span-1 w-full max-w-[400px] min-w-[320px] shadow-lg border px-2 bg-white" style={{ marginLeft: 0, marginRight: 0 }}>
+      <CardContent className="pt-6 pb-2 px-0">
         <div className="space-y-4">
           <CategoryListHeader
             open={dialogOpen}
@@ -97,7 +97,7 @@ const CategoryList = ({
             isSubmitting={isSubmitting}
             formError={formError}
           />
-          <div className="space-y-2">
+          <div className="flex flex-col gap-2">
             {categories.map((cat) => (
               <CategoryListItem
                 key={String(cat.id)}
@@ -129,4 +129,3 @@ const CategoryList = ({
 };
 
 export default CategoryList;
-
