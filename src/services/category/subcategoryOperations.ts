@@ -34,14 +34,14 @@ export const deleteSubcategory = async (subcategoryId: number) => {
   try {
     logServiceAction("Deletando subcategoria", subcategoryId);
     
-    // Primeiro, remover todos os valores associados a esta subcategoria
+    // Primeiro, remover todos os atributos associados a esta subcategoria
     const { error: valuesError } = await supabase
-      .from('subcategory_values')
+      .from('subcategory_attributes')
       .delete()
       .eq('subcategory_id', subcategoryId.toString());
       
     if (valuesError) {
-      console.error("Erro ao deletar valores da subcategoria:", valuesError);
+      console.error("Erro ao deletar atributos da subcategoria:", valuesError);
       throw valuesError;
     }
     

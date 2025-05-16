@@ -28,13 +28,13 @@ export const fetchCategoriesData = async () => {
       throw subcategoriesError;
     }
 
-    // Fetch subcategory values
+    // Fetch subcategory attributes
     const { data: valuesData, error: valuesError } = await supabase
-      .from('subcategory_values')
+      .from('subcategory_attributes')
       .select('*');
 
     if (valuesError) {
-      console.error("Erro ao buscar valores de subcategorias:", valuesError);
+      console.error("Erro ao buscar atributos de subcategorias:", valuesError);
       throw valuesError;
     }
 
@@ -123,16 +123,16 @@ export const deleteCategory = async (categoryId: string) => {
     
     // Delete subcategory values first
     if (subcategoriesData && subcategoriesData.length > 0) {
-      logServiceAction(`Removendo valores de ${subcategoriesData.length} subcategorias`);
+      logServiceAction(`Removendo atributos de ${subcategoriesData.length} subcategorias`);
       
       for (const subcat of subcategoriesData) {
         const { error: valuesError } = await supabase
-          .from('subcategory_values')
+          .from('subcategory_attributes')
           .delete()
           .eq('subcategory_id', subcat.id);
           
         if (valuesError) {
-          console.error(`Erro ao deletar valores da subcategoria ${subcat.id}:`, valuesError);
+          console.error(`Erro ao deletar atributos da subcategoria ${subcat.id}:`, valuesError);
           throw valuesError;
         }
       }
