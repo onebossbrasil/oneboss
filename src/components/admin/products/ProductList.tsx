@@ -1,3 +1,4 @@
+
 import { useState, useEffect, useCallback } from "react";
 import { useProducts } from "@/contexts/ProductContext";
 import {
@@ -142,7 +143,7 @@ export default function ProductList() {
   return (
     <div className="flex flex-col items-center w-full">
       <div className="w-full flex justify-center mb-8">
-        <div className="bg-[#fcf8ed] border border-gold px-8 py-6 rounded-lg shadow-md w-[70%] flex flex-col sm:flex-row sm:items-center sm:justify-between gap-6 animate-fade-in">
+        <div className="bg-[#fcf8ed] border border-gold px-6 sm:px-8 py-6 rounded-lg shadow-md w-full max-w-5xl flex flex-col sm:flex-row sm:items-center sm:justify-between gap-6 animate-fade-in mx-auto">
           <div>
             <h2 className="text-xl font-bold mb-2 text-gold" style={{ color: "#C9A227" }}>
               Cadastre um novo produto!
@@ -172,7 +173,7 @@ export default function ProductList() {
       </div>
 
       <div className="w-full flex justify-center">
-        <div className="border rounded-md overflow-hidden bg-white dark:bg-gray-900 shadow-sm w-full max-w-5xl" style={{ width: "70%" }}>
+        <div className="border rounded-md overflow-x-auto bg-white dark:bg-gray-900 shadow-sm w-full max-w-5xl mx-auto">
           <div className="overflow-x-auto">
             <Table>
               <TableHeader>
@@ -209,7 +210,7 @@ export default function ProductList() {
         </div>
       </div>
 
-      <div className="flex flex-col sm:flex-row justify-between items-center gap-2 mt-6 mb-4 w-full max-w-5xl" style={{ width: "70%" }}>
+      <div className="flex flex-col sm:flex-row justify-between items-center gap-2 mt-6 mb-4 w-full max-w-5xl mx-auto">
         <h3 className="text-lg font-medium">Produtos Cadastrados</h3>
         <div className="flex gap-2">
           <Button
@@ -237,7 +238,7 @@ export default function ProductList() {
       </div>
 
       {error && (
-        <Alert variant="destructive" className="mb-4 w-full max-w-5xl" style={{ width: "70%" }}>
+        <Alert variant="destructive" className="mb-4 w-full max-w-5xl mx-auto">
           <AlertTitle>Problema de conexão</AlertTitle>
           <AlertDescription className="flex flex-col gap-2">
             <p>{error}</p>
