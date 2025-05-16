@@ -10,8 +10,8 @@ import { useCategories, CategoryType } from "@/contexts/CategoryContext";
 
 type SubcategoryListProps = {
   selectedCategory: string | null;
-  selectedSubcategory: number | null;
-  setSelectedSubcategory: (id: number | null) => void;
+  selectedSubcategory: string | null; // string
+  setSelectedSubcategory: (id: string | null) => void;
 };
 
 const SubcategoryList = ({
@@ -43,7 +43,7 @@ const SubcategoryList = ({
       });
       return;
     }
-    addSubcategory(Number(category.id), newSubcategoryName, newSubcategoryType);
+    addSubcategory(category.id, newSubcategoryName, newSubcategoryType);
     setNewSubcategoryName("");
     setNewSubcategoryType("");
     setDialogOpen(false);
@@ -53,13 +53,13 @@ const SubcategoryList = ({
     });
   };
   
-  const handleRemoveSubcategory = (subcategoryId: number | string) => {
+  const handleRemoveSubcategory = (subcategoryId: string) => {
     if (!selectedCategory) return;
     const category = getCurrentCategory();
     if (!category) return;
     if (window.confirm("Tem certeza que deseja remover esta subcategoria?")) {
-      removeSubcategory(Number(category.id), Number(subcategoryId));
-      if (selectedSubcategory === Number(subcategoryId)) {
+      removeSubcategory(category.id, subcategoryId);
+      if (selectedSubcategory === subcategoryId) {
         setSelectedSubcategory(null);
       }
       toast({
@@ -132,12 +132,12 @@ const SubcategoryList = ({
                   <div
                     key={subcat.id}
                     className={`flex items-center justify-between w-full p-2 rounded-md hover:bg-accent ${
-                      selectedSubcategory === Number(subcat.id) ? 'bg-accent' : ''
+                      selectedSubcategory === subcat.id ? 'bg-accent' : ''
                     }`}
                   >
                     <button
                       className="flex items-center flex-1 text-left"
-                      onClick={() => setSelectedSubcategory(Number(subcat.id))}
+                      onClick={() => setSelectedSubcategory(subcat.id)}
                     >
                       <List className="h-4 w-4 mr-2" />
                       <span className="text-sm">{subcat.name}</span>
@@ -150,7 +150,7 @@ const SubcategoryList = ({
                       size="icon" 
                       onClick={(e) => {
                         e.stopPropagation();
-                        handleRemoveSubcategory(Number(subcat.id));
+                        handleRemoveSubcategory(subcat.id);
                       }}
                     >
                       <Trash2 className="h-4 w-4 text-red-500" />

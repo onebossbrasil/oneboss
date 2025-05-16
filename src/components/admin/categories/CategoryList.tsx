@@ -9,7 +9,7 @@ import { Folder, Trash2, Loader2, List } from "lucide-react";
 interface CategoryListProps {
   selectedCategory: string | null;
   setSelectedCategory: (value: string | null) => void;
-  setSelectedSubcategory: (value: number | null) => void;
+  setSelectedSubcategory: (value: string | null) => void; // Usar string
 }
 
 const CategoryList = ({
@@ -27,7 +27,7 @@ const CategoryList = ({
         "Tem certeza que deseja remover esta categoria? Todos os produtos associados a ela ficarão sem categoria."
       )
     ) {
-      const categoryToRemove = categories.find((cat) => String(cat.id) === categoryId);
+      const categoryToRemove = categories.find((cat) => cat.id === categoryId);
       if (categoryToRemove && categoryToRemove.value === selectedCategory) {
         setSelectedCategory(null);
         setSelectedSubcategory(null);
@@ -63,7 +63,7 @@ const CategoryList = ({
             {categories.length > 0 ? (
               categories.map((cat) => (
                 <div
-                  key={String(cat.id)}
+                  key={cat.id}
                   className={`flex items-center justify-between w-full p-2 rounded-md border hover:bg-accent transition-colors ${
                     selectedCategory === cat.value ? "bg-accent border-primary" : "bg-white border"
                   }`}
@@ -92,13 +92,13 @@ const CategoryList = ({
                     size="icon"
                     onClick={e => {
                       e.stopPropagation();
-                      handleRemoveCategory(String(cat.id));
+                      handleRemoveCategory(cat.id);
                     }}
-                    disabled={deletingCategory === String(cat.id)}
+                    disabled={deletingCategory === cat.id}
                     className="text-red-500 hover:text-red-700 hover:bg-red-50 ml-1"
                     aria-label="Excluir categoria"
                   >
-                    {deletingCategory === String(cat.id) ? (
+                    {deletingCategory === cat.id ? (
                       <Loader2 className="h-5 w-5 animate-spin" />
                     ) : (
                       <Trash2 className="h-5 w-5" />

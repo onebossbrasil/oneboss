@@ -1,4 +1,3 @@
-
 import { CategoryType, SubcategoryType } from "@/types/category";
 
 // Group subcategories by category ID
@@ -29,7 +28,7 @@ export const groupValuesBySubcategory = (valuesData: any[]) => {
   return valuesBySubcategory;
 };
 
-// Format categories data into the expected structure
+// Format categories data into the expected structure (IDs sempre string)
 export const formatCategoriesData = (
   categoriesData: any[], 
   subcategoriesByCategory: Record<string, any[]>,
@@ -37,13 +36,12 @@ export const formatCategoriesData = (
 ): CategoryType[] => {
   return categoriesData.map((category: any) => {
     const categorySubcategories = subcategoriesByCategory[category.id] || [];
-    
     return {
-      id: parseInt(category.id.toString(), 10),
+      id: category.id.toString(), // manter ID como string
       name: category.name,
       value: category.value,
       subcategories: categorySubcategories.map((subcategory: any) => ({
-        id: parseInt(subcategory.id.toString(), 10),
+        id: subcategory.id.toString(), // manter ID como string
         name: subcategory.name,
         type: subcategory.type,
         values: valuesBySubcategory[subcategory.id] || []
@@ -52,16 +50,16 @@ export const formatCategoriesData = (
   });
 };
 
-// Find category by ID
-export const findCategoryById = (categories: CategoryType[], categoryId: number): CategoryType | undefined => {
+// Find category by ID (id: string)
+export const findCategoryById = (categories: CategoryType[], categoryId: string): CategoryType | undefined => {
   return categories.find(cat => cat.id === categoryId);
 };
 
-// Find subcategory by ID
+// Find subcategory by ID (ids sempre string)
 export const findSubcategoryById = (
   categories: CategoryType[], 
-  categoryId: number, 
-  subcategoryId: number
+  categoryId: string, 
+  subcategoryId: string
 ): SubcategoryType | undefined => {
   const category = findCategoryById(categories, categoryId);
   return category?.subcategories.find(sub => sub.id === subcategoryId);

@@ -1,13 +1,13 @@
 
 export type SubcategoryType = {
-  id: number | string;
+  id: string; // Apenas string UUID
   name: string;
   type: string;
   values: string[];
 };
 
 export type CategoryType = {
-  id: number | string;
+  id: string; // Apenas string UUID
   name: string;
   value: string;
   subcategories: SubcategoryType[];

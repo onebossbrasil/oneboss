@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -9,7 +8,7 @@ import { useCategories, CategoryType, SubcategoryType } from "@/contexts/Categor
 
 type ValueListProps = {
   selectedCategory: string | null;
-  selectedSubcategory: number | null;
+  selectedSubcategory: string | null;
 };
 
 const ValueList = ({
@@ -26,15 +25,15 @@ const ValueList = ({
   
   const getCurrentSubcategory = (): SubcategoryType | null => {
     const category = getCurrentCategory();
-    if (!category || selectedSubcategory === null) return null;
-    return category.subcategories.find(subcat => Number(subcat.id) === selectedSubcategory) || null;
+    if (!category || !selectedSubcategory) return null;
+    return category.subcategories.find(subcat => subcat.id === selectedSubcategory) || null;
   };
   
   const category = getCurrentCategory();
   const subcategory = getCurrentSubcategory();
   
   const handleAddValue = () => {
-    if (!selectedCategory || selectedSubcategory === null || !newValueName) return;
+    if (!selectedCategory || !selectedSubcategory || !newValueName) return;
     
     const category = getCurrentCategory();
     const subcategory = getCurrentSubcategory();
@@ -51,7 +50,7 @@ const ValueList = ({
       return;
     }
     
-    addSubcategoryValue(Number(category.id), Number(subcategory.id), newValueName);
+    addSubcategoryValue(category.id, subcategory.id, newValueName);
     setNewValueName("");
     
     toast({
@@ -61,14 +60,14 @@ const ValueList = ({
   };
   
   const handleRemoveValue = (value: string) => {
-    if (!selectedCategory || selectedSubcategory === null) return;
+    if (!selectedCategory || !selectedSubcategory) return;
     
     const category = getCurrentCategory();
     const subcategory = getCurrentSubcategory();
     
     if (!category || !subcategory) return;
     
-    removeSubcategoryValue(Number(category.id), Number(subcategory.id), value);
+    removeSubcategoryValue(category.id, subcategory.id, value);
     
     toast({
       title: "Valor removido",
