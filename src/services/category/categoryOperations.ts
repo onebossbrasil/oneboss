@@ -1,4 +1,3 @@
-
 import { supabase } from "@/integrations/supabase/client";
 import { logServiceAction } from "./baseService";
 
@@ -77,15 +76,15 @@ export const createCategory = async (name: string, value: string) => {
 };
 
 // Delete a category
-export const deleteCategory = async (categoryId: number) => {
+export const deleteCategory = async (categoryId: string) => {
   try {
     logServiceAction("Deletando categoria", categoryId);
-    
-    // Identify the category first to get its UUID format
+
+    // Identify the category first to get its UUID format (optional, but ensures it exists)
     const { data: categoryData, error: findError } = await supabase
       .from('categories')
       .select('id')
-      .eq('id', categoryId.toString());
+      .eq('id', categoryId);
       
     if (findError) {
       console.error("Erro ao encontrar categoria:", findError);
