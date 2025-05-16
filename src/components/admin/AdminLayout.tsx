@@ -22,11 +22,10 @@ export default function AdminLayout({
       <AdminHeaderBar onLogout={onLogout} />
       <div className="flex w-full min-h-screen">
         <AdminSidebar activeTab={activeTab} onTabChange={onTabChange} />
-        {/* Sessão principal centralizada */}
-        <div className="flex-1 min-h-screen pl-[88px] md:pl-[350px] pt-32 flex flex-col items-center">
-          {/* pt-32 ajusta padding-top extra para header aumentado, pl-[350px] sidebar maior */}
+        {/* Sessão principal */}
+        <div className="flex-1 min-h-screen pl-14 md:pl-56 pt-20">
           <AdminTabsNav activeTab={activeTab} onTabChange={onTabChange} />
-          <main className="flex flex-col items-center w-full max-w-5xl p-2 md:p-4">
+          <main className="flex-1 w-full max-w-full p-2 md:p-4">
             {children}
           </main>
         </div>

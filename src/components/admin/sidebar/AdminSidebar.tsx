@@ -28,26 +28,16 @@ const sidebarTabs = [
 const AdminSidebar = ({ activeTab, onTabChange }: AdminSidebarProps) => {
   const { state } = useSidebar();
 
-  // Altera a largura: colapsado w-14->w-21 (56px->84px), aberto w-56->w-84 (224px->336px)
-  const sidebarWidth = state === "collapsed" ? "w-21" : "w-84";
-  // Classes utilitárias tailwind: w-21 (84px) e w-84 (336px) devem estar definidas via tailwind.config (funciona para w-[84px], w-[336px]).
-
   return (
     <Sidebar
       className={`
-        ${sidebarWidth}
+        ${state === "collapsed" ? "w-14" : "w-56"}
         min-h-screen bg-[#F6F6F7] border-r border-gray-200
         flex-shrink-0
-        pt-24 fixed left-0 top-0 z-30
+        pt-20 fixed left-0 top-0 z-30
         transition-all
       `}
       collapsible="icon"
-      style={{
-        // Sobrescrita direta para garantir sem precisar editar tailwind.config.
-        width: state === "collapsed" ? 84 : 336,
-        minWidth: state === "collapsed" ? 84 : 336,
-        maxWidth: state === "collapsed" ? 84 : 336,
-      }}
     >
       <SidebarTrigger className="m-2 self-end" />
       <SidebarContent>

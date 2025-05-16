@@ -22,32 +22,34 @@ const AdminHeaderBar = ({ onLogout }: AdminHeaderBarProps) => {
       : "A");
 
   return (
-    <header className="w-full bg-white border-b-2 border-gold shadow-sm fixed z-40 left-0 top-0 h-24 flex items-center px-8" style={{ paddingBottom: "1.2rem" }}>
+    <header className="w-full bg-white border-b-2 border-gold shadow-sm fixed z-40 left-0 top-0 h-20 flex items-center px-8">
       <div className="flex justify-between items-center w-full">
-        {/* Apenas a logo (ajustada conforme solicitado) */}
-        <img
-          src="/lovable-uploads/2a698565-9407-42ad-b71a-64ed1cb69ddd.png"
-          alt="OneBoss"
-          className="h-14 w-auto"
-        />
-        <div className="flex gap-6 items-center">
-          {/* E-mail maior */}
-          <span className="text-right text-base md:text-lg text-gray-700 pr-2 font-semibold">
-            {user?.email}
+        <div className="flex items-center">
+          {/* LOGO */}
+          <img
+            src="/lovable-uploads/cc202675-942c-4f4f-9e0c-0ba81e060e33.png"
+            alt="OneBoss"
+            className="h-12 w-auto mr-3"
+          />
+          <span className="font-playfair text-2xl text-[#C9A227] font-bold tracking-tight">
+            One<span className="text-gray-800">Boss</span>
           </span>
-          {/* Avatar maior */}
-          <Avatar className="h-14 w-14">
+          <span className="ml-3 text-md font-medium text-gray-500">Premium Panel</span>
+        </div>
+        <div className="flex gap-4 items-center">
+          <span className="text-right text-xs text-gray-500 pr-2">{user?.email}</span>
+          <Avatar>
             <AvatarImage src={avatarUrl} alt={user?.email || "Admin"} />
-            <AvatarFallback className="text-xl">{avatarFallback}</AvatarFallback>
+            <AvatarFallback>{avatarFallback}</AvatarFallback>
           </Avatar>
           <Button
             size="icon"
             variant="outline"
             title="Sair"
             onClick={onLogout}
-            className="ml-2 hover:bg-gold/20 border-gold h-14 w-14"
+            className="ml-2 hover:bg-gold/20 border-gold"
           >
-            <LogOut className="h-7 w-7 text-gold" />
+            <LogOut className="h-5 w-5 text-gold" />
           </Button>
         </div>
       </div>

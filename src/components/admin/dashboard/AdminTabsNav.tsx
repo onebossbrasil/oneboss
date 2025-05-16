@@ -1,3 +1,4 @@
+
 import React from "react";
 import { cn } from "@/lib/utils";
 
@@ -15,7 +16,7 @@ const TABS = [
 function AdminTabsNav({ activeTab, onTabChange }: AdminTabsNavProps) {
   return (
     <nav
-      className="w-full flex justify-center items-center py-3 px-4 bg-[#F1F1F1] border-b border-gray-200 sticky top-24 z-30"
+      className="w-full flex items-center py-3 px-4 bg-[#F1F1F1] border-b border-gray-200 sticky top-20 z-30"
       style={{ minHeight: 56 }}
     >
       <div className="flex mx-auto gap-2">
