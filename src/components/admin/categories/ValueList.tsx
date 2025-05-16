@@ -1,7 +1,8 @@
+
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { Plus, Trash2, Pencil, Save, X } from "lucide-react";
+import { Plus, Trash2, Pencil } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
 import { useCategories, CategoryType, SubcategoryType } from "@/contexts/CategoryContext";
@@ -20,6 +21,7 @@ const AttributeList = ({
   const { toast } = useToast();
   const { categories, addSubcategoryValue, removeSubcategoryValue } = useCategories();
   const [newAttributeName, setNewAttributeName] = useState("");
+  const [adding, setAdding] = useState(false);
   const [editIndex, setEditIndex] = useState<number | null>(null);
   const [editValue, setEditValue] = useState("");
   const [savingEdit, setSavingEdit] = useState(false);
@@ -37,10 +39,8 @@ const AttributeList = ({
   const category = getCurrentCategory();
   const subcategory = getCurrentSubcategory();
 
-  const handleAddAttribute = () => {
+  const handleAddAttribute = async () => {
     if (!selectedCategory || !selectedSubcategory || !newAttributeName) return;
-    const category = getCurrentCategory();
-    const subcategory = getCurrentSubcategory();
     if (!category || !subcategory) return;
     if (subcategory.values.includes(newAttributeName)) {
       toast({
@@ -50,36 +50,47 @@ const AttributeList = ({
       });
       return;
     }
-    addSubcategoryValue(category.id, subcategory.id, newAttributeName);
-    setNewAttributeName("");
-    toast({
-      title: "Atributo adicionado",
-      description: `${newAttributeName} foi adicionado com sucesso.`,
-    });
+    try {
+      await addSubcategoryValue(category.id, subcategory.id, newAttributeName);
+      toast({
+        title: "Atributo adicionado",
+        description: `${newAttributeName} foi adicionado com sucesso.`,
+      });
+      setNewAttributeName("");
+      setAdding(false);
+    } catch (e: any) {
+      toast({
+        title: "Erro ao adicionar atributo",
+        description: e?.message || String(e),
+        variant: "destructive",
+      });
+    }
   };
 
-  const handleRemoveAttribute = (value: string) => {
+  const handleRemoveAttribute = async (value: string) => {
     if (!selectedCategory || !selectedSubcategory) return;
-    const category = getCurrentCategory();
-    const subcategory = getCurrentSubcategory();
     if (!category || !subcategory) return;
-    removeSubcategoryValue(category.id, subcategory.id, value);
-    toast({
-      title: "Atributo removido",
-      description: `${value} foi removido com sucesso.`,
-    });
+    try {
+      await removeSubcategoryValue(category.id, subcategory.id, value);
+      toast({
+        title: "Atributo removido",
+        description: `${value} foi removido com sucesso.`,
+      });
+    } catch (e: any) {
+      toast({
+        title: "Erro ao remover atributo",
+        description: e?.message || String(e),
+        variant: "destructive",
+      });
+    }
   };
 
   const handleEditAttribute = async (oldValue: string) => {
     if (!selectedCategory || !selectedSubcategory) return;
-    const category = getCurrentCategory();
-    const subcategory = getCurrentSubcategory();
     if (!category || !subcategory) return;
-
     setSavingEdit(true);
     try {
       await updateSubcategoryValue(subcategory.id, oldValue, editValue);
-      await new Promise((r) => setTimeout(r, 150));
       toast({
         title: "Atributo atualizado",
         description: `${editValue} editado com sucesso.`,
@@ -105,26 +116,48 @@ const AttributeList = ({
               {subcategory ? `Atributos: ${subcategory.name}` : 'Atributos'}
             </h3>
             {subcategory && (
-              <div className="flex gap-2 items-center">
-                <Input
-                  placeholder="Novo atributo..."
-                  value={newAttributeName}
-                  onChange={(e) => setNewAttributeName(e.target.value)}
-                  className="h-9 w-full md:w-40"
-                />
+              <>
                 <Button
                   variant="outline"
                   size="sm"
-                  onClick={handleAddAttribute}
-                  disabled={!newAttributeName}
+                  onClick={() => setAdding(!adding)}
                   className="h-9"
                 >
-                  <Plus className="h-4 w-4" />
+                  <Plus className="h-4 w-4 mr-1" /> Novo
                 </Button>
-              </div>
+              </>
             )}
           </div>
-
+          {adding && subcategory && (
+            <div className="flex gap-2 items-center mb-1">
+              <Input
+                placeholder="Novo atributo..."
+                value={newAttributeName}
+                onChange={(e) => setNewAttributeName(e.target.value)}
+                className="h-9 w-full md:w-40"
+              />
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={handleAddAttribute}
+                disabled={!newAttributeName}
+                className="h-9"
+              >
+                <span className="text-green-600 font-bold">✔</span>
+              </Button>
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => {
+                  setAdding(false);
+                  setNewAttributeName("");
+                }}
+                className="h-9"
+              >
+                <span className="text-muted-foreground font-bold">✗</span>
+              </Button>
+            </div>
+          )}
           {subcategory ? (
             <div className="space-y-2">
               {subcategory.values.length > 0 ? (
@@ -186,3 +219,4 @@ const AttributeList = ({
 };
 
 export default AttributeList;
+

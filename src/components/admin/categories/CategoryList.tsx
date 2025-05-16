@@ -20,12 +20,18 @@ const CategoryList = ({
   setSelectedSubcategory,
 }: CategoryListProps) => {
   const { toast } = useToast();
-  const { categories, removeCategory, refreshCategories } = useCategories();
+  const { categories, addCategory, removeCategory, refreshCategories } = useCategories();
   const [deletingCategory, setDeletingCategory] = useState<string | null>(null);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editName, setEditName] = useState("");
   const [editValue, setEditValue] = useState("");
   const [savingEdit, setSavingEdit] = useState(false);
+
+  // Novo: estados para adicionar nova categoria
+  const [addingCategory, setAddingCategory] = useState(false);
+  const [newCategoryName, setNewCategoryName] = useState("");
+  const [newCategorySlug, setNewCategorySlug] = useState("");
+  const [addingLoading, setAddingLoading] = useState(false);
 
   const handleRemoveCategory = async (categoryId: string) => {
     if (
@@ -87,11 +93,88 @@ const CategoryList = ({
     }
   };
 
+  // Novo: adicionar categoria
+  const handleAddCategory = async () => {
+    if (!newCategoryName || !newCategorySlug) return;
+    setAddingLoading(true);
+    try {
+      await addCategory(newCategoryName, newCategorySlug);
+      await refreshCategories();
+      toast({
+        title: "Categoria criada",
+        description: "Categoria adicionada com sucesso.",
+      });
+      setNewCategoryName("");
+      setNewCategorySlug("");
+      setAddingCategory(false);
+    } catch (error: any) {
+      toast({
+        title: "Erro ao criar categoria",
+        description: error?.message || "Erro ao criar categoria.",
+        variant: "destructive",
+      });
+    } finally {
+      setAddingLoading(false);
+    }
+  };
+
   return (
     <Card className="md:col-span-1 w-full md:w-[120%]">
       <CardContent className="pt-6">
         <div className="space-y-4">
-          <h3 className="text-lg font-medium mb-0 pl-1">Categorias</h3>
+          <div className="flex items-center justify-between mb-0 pl-1">
+            <h3 className="text-lg font-medium mb-0">Categorias</h3>
+            <Button
+              variant="outline"
+              size="sm"
+              className="h-8 px-3"
+              onClick={() => setAddingCategory(true)}
+              disabled={addingCategory}
+            >
+              <span className="mr-1">+</span> Nova
+            </Button>
+          </div>
+          {addingCategory && (
+            <div className="flex gap-2 items-center py-1">
+              <input
+                className="border rounded w-28 px-2 py-1 text-sm outline-none focus:ring-2 focus:ring-primary"
+                placeholder="Nome"
+                value={newCategoryName}
+                onChange={e => setNewCategoryName(e.target.value)}
+                disabled={addingLoading}
+                autoFocus
+              />
+              <input
+                className="border rounded w-24 px-2 py-1 text-sm outline-none focus:ring-2 focus:ring-primary"
+                placeholder="Slug"
+                value={newCategorySlug}
+                onChange={e => setNewCategorySlug(e.target.value)}
+                disabled={addingLoading}
+              />
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={handleAddCategory}
+                disabled={!newCategoryName || !newCategorySlug || addingLoading}
+                aria-label="Salvar nova categoria"
+              >
+                <span className="text-green-600 font-bold">✔</span>
+              </Button>
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => {
+                  setAddingCategory(false);
+                  setNewCategoryName("");
+                  setNewCategorySlug("");
+                }}
+                aria-label="Cancelar"
+                disabled={addingLoading}
+              >
+                <span className="text-muted-foreground font-bold">✗</span>
+              </Button>
+            </div>
+          )}
           <div className="space-y-2">
             {categories.length > 0 ? (
               categories.map((cat) => (
