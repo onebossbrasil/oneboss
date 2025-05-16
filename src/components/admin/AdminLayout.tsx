@@ -1,4 +1,4 @@
-import { ReactNode } from "react";
+import React, { ReactNode } from "react";
 import AdminSidebar from "./sidebar/AdminSidebar";
 import AdminHeaderBar from "./AdminHeaderBar";
 import AdminTabsNav from "./dashboard/AdminTabsNav";
