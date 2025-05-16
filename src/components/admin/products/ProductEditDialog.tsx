@@ -1,3 +1,4 @@
+
 import { Product } from "@/types/product";
 import {
   Dialog,
@@ -42,7 +43,7 @@ const ProductEditDialog = ({ product, open, onOpenChange, onClose }: ProductEdit
     handleSubcategoryChange,
     handleImageChange,
     handleRemoveImage,
-    handleUpdateProduct
+    handleSubmit // USAR ESSE SEMPRE (edit ou add)
   } = useProductEdit(freshProduct, handleDialogClose);
 
   return (
@@ -52,7 +53,7 @@ const ProductEditDialog = ({ product, open, onOpenChange, onClose }: ProductEdit
     }}>
       <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>Editar Produto</DialogTitle>
+          <DialogTitle>{freshProduct ? "Editar Produto" : "Cadastrar Produto"}</DialogTitle>
         </DialogHeader>
 
         {isLoading ? (
@@ -61,7 +62,7 @@ const ProductEditDialog = ({ product, open, onOpenChange, onClose }: ProductEdit
             <span className="ml-4 text-muted-foreground">Carregando dados do produto...</span>
           </div>
         ) : (
-          <form onSubmit={handleUpdateProduct} className="space-y-6">
+          <form onSubmit={handleSubmit} className="space-y-6">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="space-y-4">
                 <ProductDetailsForm 

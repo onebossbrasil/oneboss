@@ -4,6 +4,7 @@ import { useFormState } from "@/hooks/product-edit/use-form-state";
 import { useCategorySelection } from "@/hooks/product-edit/use-category-selection";
 import { useImageManagement } from "@/hooks/product-edit/use-image-management";
 import { useProductSubmit } from "@/hooks/product-edit/use-product-submit";
+import { useProductAdd } from "@/hooks/product-edit/use-product-add"; // NOVO IMPORT
 
 export const useProductEdit = (
   product: Product | null,
@@ -30,7 +31,8 @@ export const useProductEdit = (
   } = useImageManagement(product);
   
   // Form submission
-  const { isSubmitting, handleUpdateProduct } = useProductSubmit(
+  // Dois hooks, um para editar, outro para adicionar:
+  const { isSubmitting: isUpdating, handleUpdateProduct } = useProductSubmit(
     product,
     formData,
     selectedCategory,
@@ -39,6 +41,19 @@ export const useProductEdit = (
     deletedImageIds,
     onClose
   );
+
+  const { isSubmitting: isAdding, handleAddProduct } = useProductAdd(
+    formData,
+    selectedCategory,
+    subcategoryValues,
+    images,
+    onClose
+  );
+
+  // Decide qual handler usar: edição ou cadastro
+  const isEditMode = !!product;
+  const isSubmitting = isEditMode ? isUpdating : isAdding;
+  const handleSubmit = isEditMode ? handleUpdateProduct : handleAddProduct;
 
   return {
     formData,
@@ -52,6 +67,6 @@ export const useProductEdit = (
     handleSubcategoryChange,
     handleImageChange,
     handleRemoveImage,
-    handleUpdateProduct
+    handleSubmit // Sempre usar este para <form onSubmit>
   };
 };
