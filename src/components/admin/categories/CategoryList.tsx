@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
@@ -81,7 +80,7 @@ const CategoryList = ({
     }
   };
 
-  // GRID PADRONIZADO E HARMÔNICO
+  // Layout ORIGINAL: grid responsivo tradicional, sem alterações "modernas"
   return (
     <Card
       className="
