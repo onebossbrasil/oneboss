@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -11,7 +10,7 @@ import { useCategories, CategoryType } from "@/contexts/CategoryContext";
 
 type SubcategoryListProps = {
   selectedCategory: string | null;
-  selectedSubcategory: string | null; // string
+  selectedSubcategory: string | null;
   setSelectedSubcategory: (id: string | null) => void;
 };
 
@@ -25,13 +24,13 @@ const SubcategoryList = ({
   const [dialogOpen, setDialogOpen] = useState(false);
   const [newSubcategoryName, setNewSubcategoryName] = useState("");
   const [newSubcategoryType, setNewSubcategoryType] = useState("");
-  
+
   const getCurrentCategory = (): CategoryType | null => {
     return categories.find(cat => cat.value === selectedCategory) || null;
   };
-  
+
   const category = getCurrentCategory();
-  
+
   const handleAddSubcategory = () => {
     if (!selectedCategory || !newSubcategoryName || !newSubcategoryType) return;
     const category = getCurrentCategory();
@@ -53,7 +52,7 @@ const SubcategoryList = ({
       description: `${newSubcategoryName} foi adicionada com sucesso.`,
     });
   };
-  
+
   const handleRemoveSubcategory = (subcategoryId: string) => {
     if (!selectedCategory) return;
     const category = getCurrentCategory();
@@ -69,7 +68,7 @@ const SubcategoryList = ({
       });
     }
   };
-  
+
   return (
     <Card className="md:col-span-1 w-full md:w-[120%]">
       <CardContent className="pt-6">

@@ -34,13 +34,9 @@ const ValueList = ({
   
   const handleAddValue = () => {
     if (!selectedCategory || !selectedSubcategory || !newValueName) return;
-    
     const category = getCurrentCategory();
     const subcategory = getCurrentSubcategory();
-    
     if (!category || !subcategory) return;
-    
-    // Verifica se o valor já existe
     if (subcategory.values.includes(newValueName)) {
       toast({
         title: "Valor duplicado",
@@ -49,10 +45,9 @@ const ValueList = ({
       });
       return;
     }
-    
+    // Both IDs must be string (UUID)
     addSubcategoryValue(category.id, subcategory.id, newValueName);
     setNewValueName("");
-    
     toast({
       title: "Valor adicionado",
       description: `${newValueName} foi adicionado com sucesso.`,
@@ -61,14 +56,10 @@ const ValueList = ({
   
   const handleRemoveValue = (value: string) => {
     if (!selectedCategory || !selectedSubcategory) return;
-    
     const category = getCurrentCategory();
     const subcategory = getCurrentSubcategory();
-    
     if (!category || !subcategory) return;
-    
     removeSubcategoryValue(category.id, subcategory.id, value);
-    
     toast({
       title: "Valor removido",
       description: `${value} foi removido com sucesso.`,
