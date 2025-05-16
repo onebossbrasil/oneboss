@@ -1,4 +1,3 @@
-
 import { useState, useEffect, useCallback } from "react";
 import { useProducts } from "@/contexts/ProductContext";
 import {
@@ -28,6 +27,7 @@ import {
   PaginationNext,
   PaginationPrevious,
 } from "@/components/ui/pagination";
+import PaginationArrows from "@/components/ui/PaginationArrows";
 
 const PAGE_SIZE = 10;
 
@@ -163,9 +163,9 @@ export default function ProductList() {
   };
 
   return (
-    <div className="flex flex-col items-center w-full">
+    <div className="flex flex-col items-center w-full animate-fade-in">
       <div className="w-full flex justify-center mb-8">
-        <div className="bg-[#fcf8ed] border border-gold px-6 sm:px-8 py-6 rounded-lg shadow-md w-full max-w-5xl flex flex-col sm:flex-row sm:items-center sm:justify-between gap-6 animate-fade-in mx-auto">
+        <div className="bg-[#FAFAFA] border border-gold px-6 sm:px-8 py-6 rounded-lg shadow-lg w-full max-w-5xl flex flex-col sm:flex-row sm:items-center sm:justify-between gap-6 mx-auto">
           <div>
             <h2 className="text-xl font-bold mb-2 text-gold" style={{ color: "#C9A227" }}>
               Cadastre um novo produto!
@@ -194,8 +194,9 @@ export default function ProductList() {
         </div>
       </div>
 
+      {/* Lista de Produtos */}
       <div className="w-full flex justify-center">
-        <div className="border rounded-md overflow-x-auto bg-white dark:bg-gray-900 shadow-sm w-full max-w-5xl mx-auto">
+        <div className="border rounded-lg overflow-x-auto bg-white/80 shadow-md w-full max-w-5xl mx-auto">
           <div className="overflow-x-auto">
             <Table>
               <TableHeader>
@@ -232,39 +233,13 @@ export default function ProductList() {
         </div>
       </div>
 
-      {/* Paginação */}
-      {pageCount > 1 && (
-        <Pagination className="my-6 w-full justify-center">
-          <PaginationContent>
-            <PaginationItem>
-              <PaginationPrevious
-                onClick={() => handlePageChange(page - 1)}
-                aria-disabled={page === 1}
-                tabIndex={page === 1 ? -1 : 0}
-                className={page === 1 ? "pointer-events-none opacity-40" : ""}
-              />
-            </PaginationItem>
-            {Array.from({ length: pageCount }).map((_, i) => (
-              <PaginationItem key={i}>
-                <PaginationLink
-                  isActive={page === i + 1}
-                  onClick={() => handlePageChange(i + 1)}
-                >
-                  {i + 1}
-                </PaginationLink>
-              </PaginationItem>
-            ))}
-            <PaginationItem>
-              <PaginationNext
-                onClick={() => handlePageChange(page + 1)}
-                aria-disabled={page === pageCount}
-                tabIndex={page === pageCount ? -1 : 0}
-                className={page === pageCount ? "pointer-events-none opacity-40" : ""}
-              />
-            </PaginationItem>
-          </PaginationContent>
-        </Pagination>
-      )}
+      {/* Paginação Bonita */}
+      <PaginationArrows
+        page={page}
+        pageCount={pageCount}
+        onPageChange={handlePageChange}
+        className="my-8"
+      />
 
       <div className="flex flex-col sm:flex-row justify-between items-center gap-2 mt-6 mb-4 w-full max-w-5xl mx-auto">
         <h3 className="text-lg font-medium">Produtos Cadastrados</h3>
