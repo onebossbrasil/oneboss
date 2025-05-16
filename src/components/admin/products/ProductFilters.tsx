@@ -13,6 +13,9 @@ interface ProductFiltersProps {
   onStatusChange: (value: string) => void;
 }
 
+const ALL_CATEGORIES = "__ALL__";
+const ALL_STATUS = "__ALL__";
+
 const ProductFilters: React.FC<ProductFiltersProps> = ({
   search,
   onSearchChange,
@@ -30,12 +33,15 @@ const ProductFilters: React.FC<ProductFiltersProps> = ({
       onChange={e => onSearchChange(e.target.value)}
       className="flex-1 min-w-0"
     />
-    <Select value={category} onValueChange={onCategoryChange}>
+    <Select
+      value={category === "" ? ALL_CATEGORIES : category}
+      onValueChange={v => onCategoryChange(v === ALL_CATEGORIES ? "" : v)}
+    >
       <SelectTrigger className="min-w-[180px]">
         <SelectValue placeholder="Categoria" />
       </SelectTrigger>
       <SelectContent>
-        <SelectItem value="">Todas categorias</SelectItem>
+        <SelectItem value={ALL_CATEGORIES}>Todas categorias</SelectItem>
         {categoryOptions.map(cat => (
           <SelectItem key={cat.id} value={cat.id}>
             {cat.name}
@@ -43,12 +49,15 @@ const ProductFilters: React.FC<ProductFiltersProps> = ({
         ))}
       </SelectContent>
     </Select>
-    <Select value={status} onValueChange={onStatusChange}>
+    <Select
+      value={status === "" ? ALL_STATUS : status}
+      onValueChange={v => onStatusChange(v === ALL_STATUS ? "" : v)}
+    >
       <SelectTrigger className="min-w-[150px]">
         <SelectValue placeholder="Status" />
       </SelectTrigger>
       <SelectContent>
-        <SelectItem value="">Todos status</SelectItem>
+        <SelectItem value={ALL_STATUS}>Todos status</SelectItem>
         <SelectItem value="published">Publicado</SelectItem>
         <SelectItem value="unpublished">Não publicado</SelectItem>
       </SelectContent>
@@ -57,3 +66,4 @@ const ProductFilters: React.FC<ProductFiltersProps> = ({
 );
 
 export default ProductFilters;
+
