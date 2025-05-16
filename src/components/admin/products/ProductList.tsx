@@ -1,4 +1,3 @@
-
 import { useState, useEffect, useCallback } from "react";
 import { useProducts } from "@/contexts/ProductContext";
 import ProductEditDialog from "./ProductEditDialog";
@@ -6,10 +5,12 @@ import { Product } from "@/types/product";
 import { useToast } from "@/hooks/use-toast";
 import { Alert, AlertTitle, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
-import { RefreshCw, Trash2 } from "lucide-react";
+import { RefreshCw, Trash2, Plus } from "lucide-react";
 import { useDeleteProduct } from "@/hooks/product/use-delete-product";
 import PaginationArrows from "@/components/ui/PaginationArrows";
 import ProductTable from "./ProductTable";
+import ProductFilters from "./ProductFilters";
+import { useCategories } from "@/hooks/category";
 
 const PAGE_SIZE = 10;
 
@@ -23,14 +24,34 @@ export default function ProductList() {
   const { isLoading: isDeleting, deleteProduct } = useDeleteProduct();
   const [showCreate, setShowCreate] = useState(false);
 
+  // Filtros
+  const [search, setSearch] = useState("");
+  const [filterCategory, setFilterCategory] = useState("");
+  const [filterStatus, setFilterStatus] = useState("");
+  const { categories } = useCategories ? useCategories() : { categories: [] };
+
+  // Filtragem local dos produtos
+  const filteredProducts = products.filter((product) => {
+    const matchesName = product.name.toLowerCase().includes(search.toLowerCase());
+    const matchesCategory =
+      !filterCategory ||
+      product.categoryId === filterCategory ||
+      (product.category && product.category.id === filterCategory);
+    const matchesStatus =
+      !filterStatus ||
+      (filterStatus === "published" && product.published) ||
+      (filterStatus === "unpublished" && !product.published);
+    return matchesName && matchesCategory && matchesStatus;
+  });
+
   // Seleção em massa
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
-  const allSelected = products.length > 0 && selectedIds.length === products.length;
+  const allSelected = filteredProducts.length > 0 && selectedIds.length === filteredProducts.length;
 
   // Paginação
   const [page, setPage] = useState(1);
-  const pageCount = Math.ceil(products.length / PAGE_SIZE);
-  const paginatedProducts = products.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
+  const pageCount = Math.ceil(filteredProducts.length / PAGE_SIZE);
+  const paginatedProducts = filteredProducts.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
 
   const [lastRefreshTime, setLastRefreshTime] = useState(0);
   const MIN_REFRESH_INTERVAL = 1500; // ms
@@ -119,7 +140,7 @@ export default function ProductList() {
 
   const handleToggleAll = (checked: boolean) => {
     if (checked) {
-      setSelectedIds(products.map(p => p.id));
+      setSelectedIds(filteredProducts.map(p => p.id));
     } else {
       setSelectedIds([]);
     }
@@ -137,34 +158,36 @@ export default function ProductList() {
 
   return (
     <div className="flex flex-col items-center w-full animate-fade-in">
-      <div className="w-full flex justify-center mb-8">
-        <div className="bg-[#FAFAFA] border border-gold px-6 sm:px-8 py-6 rounded-lg shadow-lg w-full max-w-5xl flex flex-col sm:flex-row sm:items-center sm:justify-between gap-6 mx-auto">
-          <div>
-            <h2 className="text-xl font-bold mb-2 text-gold" style={{ color: "#C9A227" }}>
-              Cadastre um novo produto!
-            </h2>
-            <p className="text-muted-foreground mb-2">
-              Clique no botão ao lado para adicionar rapidamente um novo item à loja.
-            </p>
-          </div>
-          <Button
-            variant="default"
-            className="flex items-center font-bold px-6 py-3 text-base shadow border border-gold bg-gold hover:bg-gold/80 text-white"
-            onClick={() => setShowCreate(true)}
-            style={{
-              backgroundColor: "#C9A227",
-              borderColor: "#C9A227",
-              color: "#fff"
-            }}
-          >
-            <span className="mr-2">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"
-                strokeLinecap="round" strokeLinejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5"
-                  y1="12" x2="19" y2="12"></line></svg>
-            </span>
-            Cadastrar Produto
-          </Button>
-        </div>
+      {/* Botão flutuante/destaque para cadastrar produto */}
+      <button
+        onClick={() => setShowCreate(true)}
+        aria-label="Cadastrar Produto"
+        className="fixed z-30 bottom-8 right-6 md:static md:ml-auto md:mt-4 mb-3 bg-gold text-white rounded-full p-0 md:p-2 shadow-lg hover:bg-gold/90 transition-all flex items-center justify-center w-14 h-14 md:w-12 md:h-12"
+        style={{
+          position: 'fixed',
+          bottom: 32,
+          right: 24,
+          backgroundColor: "#C9A227",
+          color: "#fff",
+          fontSize: 28,
+          borderRadius: "9999px",
+          boxShadow: "0 4px 12px rgba(0,0,0,0.07)",
+        }}
+      >
+        <Plus size={36} className="m-0 p-0" />
+      </button>
+
+      {/* Barra de filtros */}
+      <div className="w-full flex justify-center mt-4">
+        <ProductFilters
+          search={search}
+          onSearchChange={setSearch}
+          category={filterCategory}
+          onCategoryChange={setFilterCategory}
+          categoryOptions={categories || []}
+          status={filterStatus}
+          onStatusChange={setFilterStatus}
+        />
       </div>
 
       {/* Lista de Produtos */}
@@ -172,7 +195,7 @@ export default function ProductList() {
         <div className="border rounded-lg overflow-x-auto bg-white/80 shadow-md w-full max-w-5xl mx-auto">
           <div className="overflow-x-auto">
             <ProductTable
-              products={products}
+              products={filteredProducts}
               paginatedProducts={paginatedProducts}
               selectedIds={selectedIds}
               confirmDelete={confirmDelete}

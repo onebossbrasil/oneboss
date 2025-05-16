@@ -53,15 +53,24 @@ const ProductTableRow = ({
           <img
             src={product.images[0].url}
             alt={product.name}
-            className="w-10 h-10 object-cover rounded-md"
+            className="w-16 h-16 object-cover rounded-lg"
+            style={{ minWidth: 52, minHeight: 52 }}
           />
         ) : (
-          <div className="w-10 h-10 bg-muted rounded-md flex items-center justify-center text-xs text-muted-foreground">
+          <div className="w-16 h-16 bg-muted rounded-lg flex items-center justify-center text-xs text-muted-foreground">
             Sem imagem
           </div>
         )}
       </TableCell>
-      <TableCell className="font-medium">{product.name}</TableCell>
+      <TableCell className="font-medium max-w-[240px] whitespace-nowrap overflow-hidden text-ellipsis group relative">
+        <span 
+          title={product.name}
+          className="block overflow-hidden text-ellipsis"
+          style={{ maxWidth: 220, display: "inline-block"}}
+        >
+          {product.name}
+        </span>
+      </TableCell>
       <TableCell>
         {new Intl.NumberFormat("pt-BR", {
           style: "currency",
