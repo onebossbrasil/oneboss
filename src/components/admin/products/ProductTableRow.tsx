@@ -1,4 +1,3 @@
-
 import { Eye, EyeOff, Edit, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { TableCell, TableRow } from "@/components/ui/table";
@@ -6,6 +5,7 @@ import { Product } from "@/types/product";
 import { useProducts } from "@/contexts/ProductContext";
 import { useToast } from "@/hooks/use-toast";
 import { ReactNode } from "react";
+import ProductVisibilityButton from "./ProductVisibilityButton";
 
 interface ProductTableRowProps {
   product: Product;
@@ -90,14 +90,10 @@ const ProductTableRow = ({
       </TableCell>
       <TableCell className="text-right">
         <div className="flex justify-end gap-2">
-          <Button
-            variant="outline"
-            size="icon"
+          <ProductVisibilityButton
+            published={product.published}
             onClick={() => handleVisibilityToggle(product)}
-            title={product.published ? "Ocultar produto" : "Publicar produto"}
-          >
-            {product.published ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-          </Button>
+          />
           <Button
             variant="outline"
             size="icon"
