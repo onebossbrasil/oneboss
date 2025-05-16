@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -69,8 +68,8 @@ const CategoryList = ({
       }
       
       try {
-        setDeletingCategory(typeof categoryId === 'string' ? parseInt(categoryId) : categoryId);
-        await removeCategory(Number(categoryId));
+        setDeletingCategory(categoryId);
+        await removeCategory(categoryId);
         toast({
           title: "Categoria removida",
           description: "A categoria foi removida com sucesso.",

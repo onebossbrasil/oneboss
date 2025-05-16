@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -34,11 +33,8 @@ const SubcategoryList = ({
   
   const handleAddSubcategory = () => {
     if (!selectedCategory || !newSubcategoryName || !newSubcategoryType) return;
-    
     const category = getCurrentCategory();
     if (!category) return;
-    
-    // Verifica se já existe uma subcategoria com esse tipo na categoria atual
     if (category.subcategories.some(sc => sc.type === newSubcategoryType)) {
       toast({
         title: "Erro ao adicionar subcategoria",
@@ -47,32 +43,25 @@ const SubcategoryList = ({
       });
       return;
     }
-    
-    addSubcategory(Number(category.id), newSubcategoryName, newSubcategoryType);
-    
+    addSubcategory(category.id, newSubcategoryName, newSubcategoryType);
     setNewSubcategoryName("");
     setNewSubcategoryType("");
     setDialogOpen(false);
-    
     toast({
       title: "Subcategoria adicionada",
       description: `${newSubcategoryName} foi adicionada com sucesso.`,
     });
   };
   
-  const handleRemoveSubcategory = (subcategoryId: number) => {
+  const handleRemoveSubcategory = (subcategoryId: number | string) => {
     if (!selectedCategory) return;
-    
     const category = getCurrentCategory();
     if (!category) return;
-    
     if (window.confirm("Tem certeza que deseja remover esta subcategoria?")) {
-      removeSubcategory(Number(category.id), subcategoryId);
-      
+      removeSubcategory(category.id, subcategoryId);
       if (selectedSubcategory === subcategoryId) {
         setSelectedSubcategory(null);
       }
-      
       toast({
         title: "Subcategoria removida",
         description: "A subcategoria foi removida com sucesso.",
