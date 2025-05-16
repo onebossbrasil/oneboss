@@ -170,3 +170,23 @@ export const deleteCategory = async (categoryId: string) => {
     throw err;
   }
 };
+
+// Update a category
+export const updateCategory = async (id: string, newName: string, newValue: string) => {
+  try {
+    logServiceAction("Atualizando categoria", { id, newName, newValue });
+    const { error } = await supabase
+      .from('categories')
+      .update({ name: newName, value: newValue })
+      .eq('id', id);
+
+    if (error) {
+      console.error("Erro ao atualizar categoria:", error);
+      throw error;
+    }
+    logServiceAction("Categoria atualizada com sucesso");
+  } catch (err) {
+    console.error("Exceção ao atualizar categoria:", err);
+    throw err;
+  }
+};

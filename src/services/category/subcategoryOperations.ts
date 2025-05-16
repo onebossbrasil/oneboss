@@ -62,3 +62,23 @@ export const deleteSubcategory = async (subcategoryId: number) => {
     throw err;
   }
 };
+
+// Update a subcategory
+export const updateSubcategory = async (id: string, newName: string, newType: string) => {
+  try {
+    logServiceAction("Atualizando subcategoria", { id, newName, newType });
+    const { error } = await supabase
+      .from('subcategories')
+      .update({ name: newName, type: newType })
+      .eq('id', id);
+
+    if (error) {
+      console.error("Erro ao atualizar subcategoria:", error);
+      throw error;
+    }
+    logServiceAction("Subcategoria atualizada com sucesso");
+  } catch (err) {
+    console.error("Exceção ao atualizar subcategoria:", err);
+    throw err;
+  }
+};

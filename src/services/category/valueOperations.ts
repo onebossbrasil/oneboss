@@ -1,4 +1,3 @@
-
 import { supabase } from "@/integrations/supabase/client";
 import { logServiceAction } from "./baseService";
 
@@ -65,6 +64,41 @@ export const removeSubcategoryValue = async (subcategoryId: number | string, att
     logServiceAction("Atributo removido com sucesso da subcategoria");
   } catch (err) {
     console.error("Exceção ao remover atributo da subcategoria:", err);
+    throw err;
+  }
+};
+
+export const updateSubcategoryValue = async (
+  subcategoryId: string,
+  oldAttribute: string,
+  newAttribute: string
+) => {
+  try {
+    logServiceAction("Atualizando atributo da subcategoria", { subcategoryId, oldAttribute, newAttribute });
+    // Encontrar ID do atributo antigo
+    const { data: attrData, error: findError } = await supabase
+      .from('subcategory_attributes')
+      .select('id')
+      .eq('subcategory_id', subcategoryId)
+      .eq('attribute', oldAttribute)
+      .maybeSingle();
+
+    if (findError || !attrData) {
+      throw findError || new Error("Atributo não encontrado");
+    }
+    // Atualizar atributo
+    const { error } = await supabase
+      .from('subcategory_attributes')
+      .update({ attribute: newAttribute })
+      .eq('id', attrData.id);
+
+    if (error) {
+      console.error("Erro ao atualizar atributo:", error);
+      throw error;
+    }
+    logServiceAction("Atributo da subcategoria atualizado com sucesso");
+  } catch (err) {
+    console.error("Exceção ao atualizar atributo da subcategoria:", err);
     throw err;
   }
 };

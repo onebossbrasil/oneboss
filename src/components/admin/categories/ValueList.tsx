@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -6,6 +5,8 @@ import { Plus, Trash2, Pencil, Save, X } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
 import { useCategories, CategoryType, SubcategoryType } from "@/contexts/CategoryContext";
+import InlineEditInput from "./InlineEditInput";
+import { updateSubcategoryValue } from "@/services/category/valueOperations";
 
 type AttributeListProps = {
   selectedCategory: string | null;
@@ -19,9 +20,9 @@ const AttributeList = ({
   const { toast } = useToast();
   const { categories, addSubcategoryValue, removeSubcategoryValue } = useCategories();
   const [newAttributeName, setNewAttributeName] = useState("");
-  // Edição do atributo
   const [editIndex, setEditIndex] = useState<number | null>(null);
   const [editValue, setEditValue] = useState("");
+  const [savingEdit, setSavingEdit] = useState(false);
 
   const getCurrentCategory = (): CategoryType | null => {
     return categories.find(cat => cat.value === selectedCategory) || null;
@@ -69,8 +70,31 @@ const AttributeList = ({
     });
   };
 
-  // (Em breve) Função para editar atributo:
-  // const handleEditAttribute = ...
+  const handleEditAttribute = async (oldValue: string) => {
+    if (!selectedCategory || !selectedSubcategory) return;
+    const category = getCurrentCategory();
+    const subcategory = getCurrentSubcategory();
+    if (!category || !subcategory) return;
+
+    setSavingEdit(true);
+    try {
+      await updateSubcategoryValue(subcategory.id, oldValue, editValue);
+      await new Promise((r) => setTimeout(r, 150));
+      toast({
+        title: "Atributo atualizado",
+        description: `${editValue} editado com sucesso.`,
+      });
+      setEditIndex(null);
+    } catch (e: any) {
+      toast({
+        title: "Erro ao editar atributo",
+        description: e?.message || String(e),
+        variant: "destructive"
+      });
+    } finally {
+      setSavingEdit(false);
+    }
+  };
 
   return (
     <Card className="md:col-span-1 w-full md:w-[120%]">
@@ -110,30 +134,14 @@ const AttributeList = ({
                     className="flex items-center justify-between w-full p-2 rounded-md hover:bg-accent"
                   >
                     {editIndex === index ? (
-                      <>
-                        <Input
-                          value={editValue}
-                          onChange={e => setEditValue(e.target.value)}
-                          className="h-8 w-32"
-                        />
-                        <div className="flex gap-1">
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            onClick={() => setEditIndex(null)}
-                          >
-                            <X className="h-4 w-4 text-muted-foreground" />
-                          </Button>
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            // onClick={() => handleEditAttribute(value, editValue)}
-                            disabled={editValue.trim() === ""}
-                          >
-                            <Save className="h-4 w-4 text-green-600" />
-                          </Button>
-                        </div>
-                      </>
+                      <InlineEditInput
+                        value={editValue}
+                        onChange={setEditValue}
+                        onSave={() => handleEditAttribute(value)}
+                        onCancel={() => setEditIndex(null)}
+                        loading={savingEdit}
+                        className="mr-2"
+                      />
                     ) : (
                       <>
                         <span className="text-sm">{value}</span>

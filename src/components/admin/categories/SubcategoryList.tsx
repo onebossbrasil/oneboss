@@ -1,12 +1,14 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { List, Plus, Trash2 } from "lucide-react";
+import { List, Plus, Trash2, Edit } from "lucide-react";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { useCategories, CategoryType } from "@/contexts/CategoryContext";
+import InlineEditInput from "./InlineEditInput";
+import { updateSubcategory } from "@/services/category/subcategoryOperations";
 
 type SubcategoryListProps = {
   selectedCategory: string | null;
@@ -24,6 +26,10 @@ const SubcategoryList = ({
   const [dialogOpen, setDialogOpen] = useState(false);
   const [newSubcategoryName, setNewSubcategoryName] = useState("");
   const [newSubcategoryType, setNewSubcategoryType] = useState("");
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [editName, setEditName] = useState("");
+  const [editType, setEditType] = useState("");
+  const [savingEdit, setSavingEdit] = useState(false);
 
   const getCurrentCategory = (): CategoryType | null => {
     return categories.find(cat => cat.value === selectedCategory) || null;
@@ -68,6 +74,39 @@ const SubcategoryList = ({
       });
     }
   };
+
+  const handleEditSubcategory = (subcat: any) => {
+    setEditingId(subcat.id);
+    setEditName(subcat.name);
+    setEditType(subcat.type);
+  };
+
+  const handleSaveEdit = async (subcatId: string) => {
+    setSavingEdit(true);
+    try {
+      await updateSubcategory(subcatId, editName, editType);
+      setEditingId(null);
+      await category && setTimeout(refreshCategory, 300); // triggers recarregar
+      toast({
+        title: "Subcategoria atualizada",
+        description: "Subcategoria editada com sucesso."
+      });
+    } catch (error: any) {
+      toast({
+        title: "Erro ao editar subcategoria",
+        description: error?.message || "Erro ao editar subcategoria",
+        variant: "destructive",
+      });
+    } finally {
+      setSavingEdit(false);
+    }
+  };
+
+  // Forçar refresh da categoria atual ao editar
+  function refreshCategory() {
+    // Simples: só forçar um clique, ou use useCategories().refreshCategories(), se disponível
+    window?.dispatchEvent(new CustomEvent('refreshCurrentCategory'));
+  }
 
   return (
     <Card className="md:col-span-1 w-full md:w-[120%]">
@@ -135,26 +174,51 @@ const SubcategoryList = ({
                       selectedSubcategory === subcat.id ? 'bg-accent' : ''
                     }`}
                   >
-                    <button
-                      className="flex items-center flex-1 text-left"
-                      onClick={() => setSelectedSubcategory(subcat.id)}
-                    >
-                      <List className="h-4 w-4 mr-2" />
-                      <span className="text-sm">{subcat.name}</span>
-                      <span className="ml-2 text-xs text-muted-foreground">
-                        ({subcat.values.length})
-                      </span>
-                    </button>
-                    <Button 
-                      variant="ghost" 
-                      size="icon" 
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleRemoveSubcategory(subcat.id);
-                      }}
-                    >
-                      <Trash2 className="h-4 w-4 text-red-500" />
-                    </Button>
+                    {editingId === subcat.id ? (
+                      <InlineEditInput
+                        value={editName}
+                        onChange={setEditName}
+                        onSave={() => handleSaveEdit(subcat.id)}
+                        onCancel={() => setEditingId(null)}
+                        loading={savingEdit}
+                        className="mr-2"
+                      />
+                    ) : (
+                      <>
+                        <button
+                          className="flex items-center flex-1 text-left"
+                          onClick={() => setSelectedSubcategory(subcat.id)}
+                        >
+                          <List className="h-4 w-4 mr-2" />
+                          <span className="text-sm">{subcat.name}</span>
+                          <span className="ml-2 text-xs text-muted-foreground">
+                            ({subcat.values.length})
+                          </span>
+                        </button>
+                        <div className="flex gap-1">
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            onClick={e => {
+                              e.stopPropagation();
+                              handleEditSubcategory(subcat);
+                            }}
+                          >
+                            <Edit className="h-4 w-4 text-primary" />
+                          </Button>
+                          <Button 
+                            variant="ghost" 
+                            size="icon" 
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleRemoveSubcategory(subcat.id);
+                            }}
+                          >
+                            <Trash2 className="h-4 w-4 text-red-500" />
+                          </Button>
+                        </div>
+                      </>
+                    )}
                   </div>
                 ))
               ) : (
