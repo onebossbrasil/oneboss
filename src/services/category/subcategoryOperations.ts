@@ -1,9 +1,8 @@
-
 import { supabase } from "@/integrations/supabase/client";
 import { logServiceAction } from "./baseService";
 
 // Create a subcategory
-export const createSubcategory = async (categoryId: number, name: string, type: string) => {
+export const createSubcategory = async (categoryId: number | string, name: string, type: string) => {
   try {
     logServiceAction("Criando subcategoria", { categoryId, name, type });
     
