@@ -1,10 +1,10 @@
-
 import { useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
 import { useCategories } from "@/contexts/CategoryContext";
 import CategoryListHeader from "./CategoryListHeader";
 import CategoryListItem from "./CategoryListItem";
+import CategoryCard from "./CategoryCard";
 
 interface CategoryListProps {
   selectedCategory: string | null;
@@ -81,14 +81,13 @@ const CategoryList = ({
     }
   };
 
-  // Refatoração: cards maiores, sem limites sufocantes, gap consistente, sem excesso de margem lateral
+  // NOVO LAYOUT: grid de cards responsivo, visual moderno
   return (
     <Card
       className="
-        md:col-span-1 w-full
-        max-w-none min-w-[340px]
-        shadow-lg border
-        px-0 bg-white
+        w-full md:col-span-1
+        max-w-none min-w-[350px]
+        shadow-lg border px-0 bg-white
         md:mr-1 md:ml-0
       "
       style={{
@@ -97,8 +96,8 @@ const CategoryList = ({
         marginTop: 0,
       }}
     >
-      <CardContent className="pt-6 pb-2 px-0">
-        <div className="space-y-4">
+      <CardContent className="pt-6 pb-4 px-0">
+        <div className="space-y-6">
           <CategoryListHeader
             open={dialogOpen}
             onOpenChange={setDialogOpen}
@@ -110,9 +109,18 @@ const CategoryList = ({
             isSubmitting={isSubmitting}
             formError={formError}
           />
-          <div className="flex flex-col gap-4">
+          <div
+            className="
+              grid gap-5 
+              grid-cols-1
+              sm:grid-cols-2 
+              xl:grid-cols-3 
+              2xl:grid-cols-4
+              px-4 pb-2
+            "
+          >
             {categories.map((cat) => (
-              <CategoryListItem
+              <CategoryCard
                 key={String(cat.id)}
                 cat={{
                   id: String(cat.id),
@@ -130,9 +138,11 @@ const CategoryList = ({
               />
             ))}
             {categories.length === 0 && (
-              <p className="text-sm text-muted-foreground py-2">
-                Nenhuma categoria encontrada. Adicione uma nova categoria para começar.
-              </p>
+              <div className="col-span-full">
+                <p className="text-sm text-muted-foreground py-2 text-center">
+                  Nenhuma categoria encontrada. Adicione uma nova categoria para começar.
+                </p>
+              </div>
             )}
           </div>
         </div>
