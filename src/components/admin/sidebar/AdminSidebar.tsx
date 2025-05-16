@@ -1,67 +1,69 @@
-import { Plus } from "lucide-react";
+
 import React from "react";
-import { useSidebar } from "@/components/ui/sidebar";
-import { Sidebar, SidebarContent, SidebarGroup, SidebarGroupLabel, SidebarGroupContent, SidebarMenu, SidebarMenuItem, SidebarMenuButton, SidebarTrigger } from "@/components/ui/sidebar";
+import {
+  Sidebar,
+  SidebarContent,
+  SidebarMenu,
+  SidebarMenuItem,
+  SidebarMenuButton,
+  SidebarGroup,
+  SidebarGroupContent,
+  SidebarGroupLabel,
+  SidebarTrigger,
+  useSidebar,
+} from "@/components/ui/sidebar";
+import { User, Box, ArrowLeft } from "lucide-react";
 
 interface AdminSidebarProps {
   activeTab: string;
-  onTabChange: (value: string) => void;
-  onAddProduct?: () => void;
+  onTabChange: (tab: string) => void;
 }
 
-const sidebarItems = [
-  { key: "produtos", label: "Produtos" },
-  { key: "categorias", label: "Categorias" },
-  { key: "leads", label: "Leads" },
+const sidebarTabs = [
+  { key: "produtos", label: "Produtos", icon: <Box className="h-5 w-5" /> },
+  { key: "categorias", label: "Categorias", icon: <ArrowLeft className="h-5 w-5" /> },
+  { key: "leads", label: "Leads", icon: <User className="h-5 w-5" /> },
 ];
 
-export default function AdminSidebar({ activeTab, onTabChange, onAddProduct }: AdminSidebarProps) {
-  const { collapsed } = useSidebar();
+const AdminSidebar = ({ activeTab, onTabChange }: AdminSidebarProps) => {
+  const { state } = useSidebar();
 
   return (
-    <Sidebar className={collapsed ? "w-14" : "w-60"} collapsible>
+    <Sidebar
+      className={`
+        ${state === "collapsed" ? "w-14" : "w-56"}
+        min-h-screen bg-[#F6F6F7] border-r border-gray-200
+        flex-shrink-0
+        pt-20 fixed left-0 top-0 z-30
+        transition-all
+      `}
+      collapsible="icon"
+    >
       <SidebarTrigger className="m-2 self-end" />
       <SidebarContent>
-        <SidebarGroup defaultOpen>
-          <SidebarGroupLabel>Admin</SidebarGroupLabel>
+        <SidebarGroup>
+          <SidebarGroupLabel>Painel</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
-              {sidebarItems.map(item => (
-                <SidebarMenuItem key={item.key}>
+              {sidebarTabs.map(tab => (
+                <SidebarMenuItem key={tab.key}>
                   <SidebarMenuButton
-                    asChild
-                    onClick={() => onTabChange(item.key)}
-                    className={
-                      activeTab === item.key
-                        ? "bg-muted text-primary font-medium"
-                        : "hover:bg-muted/50"
-                    }
+                    className={`w-full flex items-center font-medium ${activeTab === tab.key
+                      ? "bg-gold/90 text-gray-900 font-bold shadow"
+                      : "hover:bg-gold/10 text-gray-800"
+                    }`}
+                    onClick={() => onTabChange(tab.key)}
                   >
-                    <span>
-                      {/* Mostre o label na versão expandida */}
-                      {!collapsed && item.label}
-                      {/* Mostre só a letra maiúscula na versão mini */}
-                      {collapsed && item.label.slice(0, 1)}
-                    </span>
+                    {tab.icon}
+                    {state !== "collapsed" && <span className="ml-3">{tab.label}</span>}
                   </SidebarMenuButton>
                 </SidebarMenuItem>
               ))}
-              {/* Botão Adicionar Produto */}
-              <SidebarMenuItem>
-                <SidebarMenuButton
-                  onClick={onAddProduct}
-                  className="flex items-center gap-2 font-medium text-gold hover:bg-gold/10 py-2"
-                  asChild={false}
-                >
-                  <>
-                    <Plus size={18} /> {!collapsed && "Cadastrar Produto"}
-                  </>
-                </SidebarMenuButton>
-              </SidebarMenuItem>
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
       </SidebarContent>
     </Sidebar>
   );
-}
+};
+export default AdminSidebar;

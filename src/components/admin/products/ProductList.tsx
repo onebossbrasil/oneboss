@@ -158,13 +158,10 @@ export default function ProductList() {
     if (p >= 1 && p <= pageCount) setPage(p);
   };
 
-  // Novo: handler para também acionar pelo sidebar
-  const handleCreate = () => setShowCreate(true);
-
   return (
-    <div className="flex flex-col items-center w-full animate-fade-in relative">
-      {/* Botão fixo topo direito */}
-      <ProductCreateButton onClick={handleCreate} />
+    <div className="flex flex-col items-center w-full animate-fade-in">
+      {/* Botão flutuante/destaque para cadastrar produto */}
+      <ProductCreateButton onClick={() => setShowCreate(true)} />
 
       {/* Barra de filtros */}
       <div className="w-full flex justify-center mt-4">
