@@ -77,7 +77,7 @@ const ValueList = ({
   };
   
   return (
-    <Card className="md:col-span-1 w-full md:w-[120%]">
+    <Card className="w-full md:w-[calc(40%)] transition-all">
       <CardContent className="pt-6">
         <div className="space-y-4">
           <div className="flex justify-between items-center flex-wrap gap-2">

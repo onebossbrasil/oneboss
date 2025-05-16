@@ -53,7 +53,7 @@ const CategoryList = ({
   };
 
   return (
-    <Card className="md:col-span-1 w-full md:w-[120%]">
+    <Card className="w-full md:w-[calc(40%)] transition-all">
       <CardContent className="pt-6">
         <div className="space-y-4">
           <h3 className="text-lg font-medium mb-0 pl-1">Categorias</h3>
