@@ -2,69 +2,69 @@
 import { supabase } from "@/integrations/supabase/client";
 import { logServiceAction } from "./baseService";
 
-// Add a value to a subcategory
-export const addSubcategoryValue = async (subcategoryId: number | string, value: string, categoryId: number | string) => {
+// Add an attribute to a subcategory
+export const addSubcategoryValue = async (subcategoryId: number | string, attribute: string, categoryId: number | string) => {
   try {
-    logServiceAction("Adicionando valor à subcategoria", { subcategoryId, value, categoryId });
-    
+    logServiceAction("Adicionando atributo à subcategoria", { subcategoryId, attribute, categoryId });
+
     const { error } = await supabase
-      .from('subcategory_values')
-      .insert({ 
+      .from('subcategory_attributes')
+      .insert({
         subcategory_id: subcategoryId.toString(),
-        value
+        attribute
       });
-      
+
     if (error) {
-      console.error("Erro ao adicionar valor à subcategoria:", error);
+      console.error("Erro ao adicionar atributo à subcategoria:", error);
       throw error;
     }
-    
-    logServiceAction("Valor adicionado com sucesso à subcategoria");
+
+    logServiceAction("Atributo adicionado com sucesso à subcategoria");
   } catch (err) {
-    console.error("Exceção ao adicionar valor à subcategoria:", err);
+    console.error("Exceção ao adicionar atributo à subcategoria:", err);
     throw err;
   }
 };
 
-// Remove a value from a subcategory
-export const removeSubcategoryValue = async (subcategoryId: number | string, value: string, categoryId: number | string) => {
+// Remove an attribute from a subcategory
+export const removeSubcategoryValue = async (subcategoryId: number | string, attribute: string, categoryId: number | string) => {
   try {
-    logServiceAction("Removendo valor da subcategoria", { subcategoryId, value });
-    
-    // Find the value first
-    const { data: valueData, error: findError } = await supabase
-      .from('subcategory_values')
+    logServiceAction("Removendo atributo da subcategoria", { subcategoryId, attribute });
+
+    // Find the attribute first
+    const { data: attributeData, error: findError } = await supabase
+      .from('subcategory_attributes')
       .select('id')
       .eq('subcategory_id', subcategoryId.toString())
-      .eq('value', value)
+      .eq('attribute', attribute)
       .single();
-      
+
     if (findError) {
-      console.error("Erro ao buscar valor da subcategoria:", findError);
+      console.error("Erro ao buscar atributo da subcategoria:", findError);
       throw findError;
     }
-    
-    if (!valueData) {
-      console.error("Valor não encontrado");
-      throw new Error('Valor não encontrado');
+
+    if (!attributeData) {
+      console.error("Atributo não encontrado");
+      throw new Error('Atributo não encontrado');
     }
-    
-    logServiceAction("Valor encontrado, ID:", valueData.id);
-    
-    // Delete the value
+
+    logServiceAction("Atributo encontrado, ID:", attributeData.id);
+
+    // Delete the attribute
     const { error } = await supabase
-      .from('subcategory_values')
+      .from('subcategory_attributes')
       .delete()
-      .eq('id', valueData.id);
-      
+      .eq('id', attributeData.id);
+
     if (error) {
-      console.error("Erro ao deletar valor da subcategoria:", error);
+      console.error("Erro ao deletar atributo da subcategoria:", error);
       throw error;
     }
-    
-    logServiceAction("Valor removido com sucesso da subcategoria");
+
+    logServiceAction("Atributo removido com sucesso da subcategoria");
   } catch (err) {
-    console.error("Exceção ao remover valor da subcategoria:", err);
+    console.error("Exceção ao remover atributo da subcategoria:", err);
     throw err;
   }
 };

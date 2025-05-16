@@ -234,28 +234,28 @@ export type Database = {
           },
         ]
       }
-      subcategory_values: {
+      subcategory_attributes: {
         Row: {
+          attribute: string
           created_at: string | null
           id: string
           subcategory_id: string | null
-          value: string
         }
         Insert: {
+          attribute: string
           created_at?: string | null
           id?: string
           subcategory_id?: string | null
-          value: string
         }
         Update: {
+          attribute?: string
           created_at?: string | null
           id?: string
           subcategory_id?: string | null
-          value?: string
         }
         Relationships: [
           {
-            foreignKeyName: "subcategory_values_subcategory_id_fkey"
+            foreignKeyName: "subcategory_attributes_subcategory_id_fkey"
             columns: ["subcategory_id"]
             isOneToOne: false
             referencedRelation: "subcategories"

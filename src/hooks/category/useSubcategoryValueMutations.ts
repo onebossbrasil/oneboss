@@ -11,21 +11,21 @@ export function useSubcategoryValueMutations(
 ) {
   const { toast } = useToast();
 
-  const addSubcategoryValue = async (categoryId: number | string, subcategoryId: number | string, value: string) => {
+  const addSubcategoryValue = async (categoryId: string, subcategoryId: string, value: string) => {
     try {
       setIsLoading(true);
       await addSubcategoryValueService(subcategoryId, value, categoryId);
       await fetchCategories();
-      
+
       toast({
-        title: 'Valor adicionado',
+        title: 'Atributo adicionado',
         description: `${value} foi adicionado com sucesso.`,
       });
     } catch (err: any) {
-      console.error('Error adding subcategory value:', err);
+      console.error('Error adding subcategory attribute:', err);
       toast({
-        title: 'Erro ao adicionar valor',
-        description: err.message || "Erro ao adicionar valor",
+        title: 'Erro ao adicionar atributo',
+        description: err.message || "Erro ao adicionar atributo",
         variant: 'destructive',
       });
       throw err;
@@ -34,7 +34,7 @@ export function useSubcategoryValueMutations(
     }
   };
 
-  const removeSubcategoryValue = async (categoryId: number | string, subcategoryId: number | string, value: string) => {
+  const removeSubcategoryValue = async (categoryId: string, subcategoryId: string, value: string) => {
     if (!isValidUuid(String(subcategoryId))) {
       toast({
         title: "ID de subcategoria inválido",
@@ -47,16 +47,16 @@ export function useSubcategoryValueMutations(
       setIsLoading(true);
       await removeSubcategoryValueService(subcategoryId as any, value, categoryId as any);
       await fetchCategories();
-      
+
       toast({
-        title: 'Valor removido',
+        title: 'Atributo removido',
         description: `${value} foi removido com sucesso.`,
       });
     } catch (err: any) {
-      console.error('Error removing subcategory value:', err);
+      console.error('Error removing subcategory attribute:', err);
       toast({
-        title: 'Erro ao remover valor',
-        description: err.message || "Erro ao remover valor",
+        title: 'Erro ao remover atributo',
+        description: err.message || "Erro ao remover atributo",
         variant: 'destructive',
       });
       throw err;

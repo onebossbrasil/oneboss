@@ -13,4 +13,3 @@ export interface CategoryContextType {
   removeSubcategoryValue: (categoryId: string, subcategoryId: string, value: string) => Promise<void>;
   refreshCategories: () => Promise<void>;
 }
-

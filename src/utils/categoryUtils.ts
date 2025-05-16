@@ -14,37 +14,37 @@ export const groupSubcategoriesByCategory = (subcategoriesData: any[]) => {
   return subcategoriesByCategory;
 };
 
-// Group values by subcategory ID
-export const groupValuesBySubcategory = (valuesData: any[]) => {
-  const valuesBySubcategory: Record<string, string[]> = {};
-  
-  valuesData.forEach((value: any) => {
-    if (!valuesBySubcategory[value.subcategory_id]) {
-      valuesBySubcategory[value.subcategory_id] = [];
+// Group attributes by subcategory ID
+export const groupValuesBySubcategory = (attributesData: any[]) => {
+  const attributesBySubcategory: Record<string, string[]> = {};
+
+  attributesData.forEach((row: any) => {
+    if (!attributesBySubcategory[row.subcategory_id]) {
+      attributesBySubcategory[row.subcategory_id] = [];
     }
-    valuesBySubcategory[value.subcategory_id].push(value.value);
+    attributesBySubcategory[row.subcategory_id].push(row.attribute);
   });
-  
-  return valuesBySubcategory;
+
+  return attributesBySubcategory;
 };
 
 // Format categories data into the expected structure (IDs sempre string)
 export const formatCategoriesData = (
-  categoriesData: any[], 
+  categoriesData: any[],
   subcategoriesByCategory: Record<string, any[]>,
-  valuesBySubcategory: Record<string, string[]>
+  attributesBySubcategory: Record<string, string[]>
 ): CategoryType[] => {
   return categoriesData.map((category: any) => {
     const categorySubcategories = subcategoriesByCategory[category.id] || [];
     return {
-      id: category.id.toString(), // manter ID como string
+      id: category.id.toString(),
       name: category.name,
       value: category.value,
       subcategories: categorySubcategories.map((subcategory: any) => ({
-        id: subcategory.id.toString(), // manter ID como string
+        id: subcategory.id.toString(),
         name: subcategory.name,
         type: subcategory.type,
-        values: valuesBySubcategory[subcategory.id] || []
+        values: attributesBySubcategory[subcategory.id] || []
       }))
     };
   });
