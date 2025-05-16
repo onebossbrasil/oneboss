@@ -70,7 +70,7 @@ const SubcategoryList = ({
   };
   
   return (
-    <Card className="md:col-span-1">
+    <Card className="md:col-span-1 w-full md:w-[120%]">
       <CardContent className="pt-6">
         <div className="space-y-4">
           <div className="flex justify-between items-center">
