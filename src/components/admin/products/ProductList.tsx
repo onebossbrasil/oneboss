@@ -1,3 +1,4 @@
+
 import { useState, useEffect, useCallback } from "react";
 import { useProducts } from "@/contexts/ProductContext";
 import ProductEditDialog from "./ProductEditDialog";
@@ -10,7 +11,8 @@ import { useDeleteProduct } from "@/hooks/product/use-delete-product";
 import PaginationArrows from "@/components/ui/PaginationArrows";
 import ProductTable from "./ProductTable";
 import ProductFilters from "./ProductFilters";
-import { useCategories } from "@/hooks/category";
+// FIX: Correct import for useCategories
+import { useCategories } from "@/contexts/CategoryContext";
 
 const PAGE_SIZE = 10;
 
@@ -28,15 +30,15 @@ export default function ProductList() {
   const [search, setSearch] = useState("");
   const [filterCategory, setFilterCategory] = useState("");
   const [filterStatus, setFilterStatus] = useState("");
-  const { categories } = useCategories ? useCategories() : { categories: [] };
+  // FIX: Directly destructure categories from context
+  const { categories } = useCategories();
 
   // Filtragem local dos produtos
   const filteredProducts = products.filter((product) => {
     const matchesName = product.name.toLowerCase().includes(search.toLowerCase());
     const matchesCategory =
       !filterCategory ||
-      product.categoryId === filterCategory ||
-      (product.category && product.category.id === filterCategory);
+      product.categoryId === filterCategory;
     const matchesStatus =
       !filterStatus ||
       (filterStatus === "published" && product.published) ||
