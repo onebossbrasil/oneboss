@@ -70,12 +70,13 @@ export default function AdminLayout({
       : "A");
 
   return (
-    <div className="flex flex-row w-full min-h-screen bg-gray-50 dark:bg-gray-900">
-      {/* Sidebar fixada no topo, z-30 para ficar acima, sem margem extra */}
+    <div className="flex w-full min-h-screen bg-gray-50 dark:bg-gray-900">
+      {/* Sidebar sem gap acima e alinhada ao topo */}
       <Sidebar
         className={`
           ${state === "collapsed" ? "w-14" : "w-56"}
-          h-screen sticky top-0 z-30
+          min-h-screen
+          fixed top-0 left-0 z-30
           md:relative md:h-auto
           flex-shrink-0
           bg-sidebar
@@ -126,10 +127,18 @@ export default function AdminLayout({
         </SidebarContent>
       </Sidebar>
 
-      {/* Conteúdo principal ocupa todo espaço disponível, sem margem superior */}
-      <main className="flex-1 w-full max-w-full p-2 md:p-4 overflow-x-auto">
-        {children}
-      </main>
+      {/* Espaço do sidebar na main */}
+      <div
+        className={`
+          flex-1 flex flex-col w-full max-w-full pl-14 md:pl-56
+          transition-all duration-200
+        `}
+      >
+        {/* Aqui você pode garantir que o header fique acima, ajustando o z-index do header também se necessário */}
+        <main className="flex-1 w-full max-w-full p-2 md:p-4 overflow-x-auto">
+          {children}
+        </main>
+      </div>
     </div>
   );
 }

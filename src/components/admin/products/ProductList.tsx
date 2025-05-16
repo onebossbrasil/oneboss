@@ -19,6 +19,17 @@ import { RefreshCw, Trash2, Plus } from "lucide-react";
 import { useDeleteProduct } from "@/hooks/product/use-delete-product";
 import ProductTableHeader from "./ProductTableHeader";
 import { Checkbox } from "@/components/ui/checkbox";
+import {
+  Pagination,
+  PaginationContent,
+  PaginationEllipsis,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
+} from "@/components/ui/pagination";
+
+const PAGE_SIZE = 10;
 
 export default function ProductList() {
   const { products, refreshProducts, isLoading, error } = useProducts();
@@ -34,6 +45,11 @@ export default function ProductList() {
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
   const allSelected = products.length > 0 && selectedIds.length === products.length;
 
+  // Paginação
+  const [page, setPage] = useState(1);
+  const pageCount = Math.ceil(products.length / PAGE_SIZE);
+  const paginatedProducts = products.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
+
   // Debounce proteção para atualizar manualmente
   const [lastRefreshTime, setLastRefreshTime] = useState(0);
   const MIN_REFRESH_INTERVAL = 1500; // ms
@@ -46,6 +62,7 @@ export default function ProductList() {
   useEffect(() => {
     // Resetar seleção quando recarrega produtos
     setSelectedIds([]);
+    setPage(1); // reseta para a primeira página ao atualizar
   }, [products]);
 
   useEffect(() => {
@@ -140,6 +157,11 @@ export default function ProductList() {
     );
   };
 
+  // Paginação handlers
+  const handlePageChange = (p: number) => {
+    if (p >= 1 && p <= pageCount) setPage(p);
+  };
+
   return (
     <div className="flex flex-col items-center w-full">
       <div className="w-full flex justify-center mb-8">
@@ -183,12 +205,12 @@ export default function ProductList() {
                 />
               </TableHeader>
               <TableBody>
-                {products.length === 0 ? (
+                {paginatedProducts.length === 0 ? (
                   <TableRow>
                     <ProductEmptyState />
                   </TableRow>
                 ) : (
-                  products.map((product) => (
+                  paginatedProducts.map((product) => (
                     <ProductTableRow
                       key={product.id}
                       product={product}
@@ -209,6 +231,40 @@ export default function ProductList() {
           </div>
         </div>
       </div>
+
+      {/* Paginação */}
+      {pageCount > 1 && (
+        <Pagination className="my-6 w-full justify-center">
+          <PaginationContent>
+            <PaginationItem>
+              <PaginationPrevious
+                onClick={() => handlePageChange(page - 1)}
+                aria-disabled={page === 1}
+                tabIndex={page === 1 ? -1 : 0}
+                className={page === 1 ? "pointer-events-none opacity-40" : ""}
+              />
+            </PaginationItem>
+            {Array.from({ length: pageCount }).map((_, i) => (
+              <PaginationItem key={i}>
+                <PaginationLink
+                  isActive={page === i + 1}
+                  onClick={() => handlePageChange(i + 1)}
+                >
+                  {i + 1}
+                </PaginationLink>
+              </PaginationItem>
+            ))}
+            <PaginationItem>
+              <PaginationNext
+                onClick={() => handlePageChange(page + 1)}
+                aria-disabled={page === pageCount}
+                tabIndex={page === pageCount ? -1 : 0}
+                className={page === pageCount ? "pointer-events-none opacity-40" : ""}
+              />
+            </PaginationItem>
+          </PaginationContent>
+        </Pagination>
+      )}
 
       <div className="flex flex-col sm:flex-row justify-between items-center gap-2 mt-6 mb-4 w-full max-w-5xl mx-auto">
         <h3 className="text-lg font-medium">Produtos Cadastrados</h3>
