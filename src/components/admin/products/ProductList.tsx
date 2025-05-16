@@ -13,6 +13,7 @@ import ProductFilters from "./ProductFilters";
 import ProductCreateButton from "./ProductCreateButton";
 import ConfirmDeleteProductModal from "./ConfirmDeleteProductModal";
 import { useCategories } from "@/contexts/CategoryContext";
+import BulkActionBar from "./BulkActionBar";
 
 const PAGE_SIZE = 20;
 
@@ -46,9 +47,12 @@ export default function ProductList() {
     return matchesName && matchesCategory && matchesStatus;
   });
 
-  // Seleção em massa
+  // Seleção em massa (ajustar para considerar apenas produtos da página atual)
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
-  const allSelected = filteredProducts.length > 0 && selectedIds.length === filteredProducts.length;
+  // Novo: Computa os IDs dos produtos visíveis na página atual
+  const paginatedIds = paginatedProducts.map(p => p.id);
+  // Novo: seleciona todos se todos os da página estão selecionados
+  const allSelected = paginatedIds.length > 0 && paginatedIds.every(id => selectedIds.includes(id));
 
   // Paginação
   const [page, setPage] = useState(1);
@@ -142,9 +146,14 @@ export default function ProductList() {
 
   const handleToggleAll = (checked: boolean) => {
     if (checked) {
-      setSelectedIds(filteredProducts.map(p => p.id));
+      // Seleciona TODOS da página atual (sem repeti-los)
+      setSelectedIds(prev => [
+        ...prev,
+        ...paginatedIds.filter(id => !prev.includes(id)),
+      ]);
     } else {
-      setSelectedIds([]);
+      // Desmarca TODOS da página atual (mantém outros possivelmente selecionados de pages anteriores)
+      setSelectedIds(prev => prev.filter(id => !paginatedIds.includes(id)));
     }
   };
 
@@ -154,12 +163,65 @@ export default function ProductList() {
     );
   };
 
+  const handleUnselectPage = () => {
+    setSelectedIds(prev => prev.filter(id => !paginatedIds.includes(id)));
+  };
+
+  const handleBulkDelete = async () => {
+    if (paginatedIds.length === 0) return;
+
+    try {
+      for (const id of paginatedIds) {
+        if (selectedIds.includes(id)) {
+          await deleteProduct(id);
+        }
+      }
+      setSelectedIds(prev => prev.filter(id => !paginatedIds.includes(id)));
+      refreshProducts(true);
+    } catch (error) {
+      // mensagem já tratada no hook
+    }
+  };
+
+  const handleBulkPublish = async () => {
+    for (const id of paginatedIds) {
+      if (selectedIds.includes(id)) {
+        const product = products.find(p => p.id === id);
+        if (product && !product.published) {
+          await updateProduct(product.id, { published: true });
+        }
+      }
+    }
+    refreshProducts(true);
+    setSelectedIds(prev => prev.filter(id => !paginatedIds.includes(id)));
+  };
+  const handleBulkUnpublish = async () => {
+    for (const id of paginatedIds) {
+      if (selectedIds.includes(id)) {
+        const product = products.find(p => p.id === id);
+        if (product && product.published) {
+          await updateProduct(product.id, { published: false });
+        }
+      }
+    }
+    refreshProducts(true);
+    setSelectedIds(prev => prev.filter(id => !paginatedIds.includes(id)));
+  };
+
   const handlePageChange = (p: number) => {
     if (p >= 1 && p <= pageCount) setPage(p);
   };
 
   return (
     <div className="flex flex-col items-center w-full animate-fade-in">
+      {/* Barra de ações em massa (visível somente quando houver seleção nesta página) */}
+      <BulkActionBar
+        selectedCount={paginatedIds.filter(id => selectedIds.includes(id)).length}
+        onUnselectAll={handleUnselectPage}
+        onDeleteSelected={handleBulkDelete}
+        onPublishSelected={handleBulkPublish}
+        onUnpublishSelected={handleBulkUnpublish}
+      />
       {/* Botão flutuante/destaque para cadastrar produto */}
       <ProductCreateButton onClick={() => setShowCreate(true)} />
 
