@@ -47,7 +47,12 @@ const getTabIcon = (key: string) => {
   }
 };
 
-export default function AdminLayout({ children, activeTab, onTabChange, onLogout }: AdminLayoutProps) {
+export default function AdminLayout({
+  children,
+  activeTab,
+  onTabChange,
+  onLogout,
+}: AdminLayoutProps) {
   const { user } = useAuth();
   const { state } = useSidebar();
   const location = useLocation();
@@ -64,11 +69,18 @@ export default function AdminLayout({ children, activeTab, onTabChange, onLogout
       ? user.user_metadata.name[0]?.toUpperCase()
       : "A");
 
-  // Remove SidebarProvider from here; assume it's wrapped above.
   return (
-    <div className="min-h-screen flex bg-gray-50 dark:bg-gray-900 w-full">
+    <div className="min-h-screen flex flex-col md:flex-row bg-gray-50 dark:bg-gray-900 w-full max-w-full">
       {/* Sidebar */}
-      <Sidebar className={state === "collapsed" ? "w-14" : "w-56"} collapsible="icon">
+      <Sidebar
+        className={`${
+          // Sidebar largura responsiva: fixa no desktop e overlay/colapsável no mobile
+          state === "collapsed"
+            ? "w-14"
+            : "w-56"
+        } md:relative md:h-auto h-auto`}
+        collapsible="icon"
+      >
         <SidebarTrigger className="m-2 self-end" />
         <SidebarContent>
           <SidebarGroup>
@@ -113,8 +125,8 @@ export default function AdminLayout({ children, activeTab, onTabChange, onLogout
         </SidebarContent>
       </Sidebar>
 
-      {/* Conteúdo */}
-      <main className="flex-1 p-4">{children}</main>
+      {/* Conteúdo principal: responsivo para ocupar todo espaço em telas menores */}
+      <main className="flex-1 p-2 md:p-4 w-full max-w-full">{children}</main>
     </div>
   );
 }
