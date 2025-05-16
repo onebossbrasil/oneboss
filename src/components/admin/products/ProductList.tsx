@@ -1,3 +1,4 @@
+
 import { useState, useEffect, useCallback } from "react";
 import { useProducts } from "@/contexts/ProductContext";
 import ProductEditDialog from "./ProductEditDialog";
@@ -18,7 +19,7 @@ import BulkActionBar from "./BulkActionBar";
 const PAGE_SIZE = 20;
 
 export default function ProductList() {
-  const { products, refreshProducts, isLoading, error } = useProducts();
+  const { products, refreshProducts, isLoading, error, updateProduct } = useProducts();
   const { toast } = useToast();
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const [dialogOpen, setDialogOpen] = useState(false);
@@ -31,10 +32,9 @@ export default function ProductList() {
   const [search, setSearch] = useState("");
   const [filterCategory, setFilterCategory] = useState("");
   const [filterStatus, setFilterStatus] = useState("");
-  // FIX: Directly destructure categories from context
   const { categories } = useCategories();
 
-  // Filtragem local dos produtos
+  // Filtragem local
   const filteredProducts = products.filter((product) => {
     const matchesName = product.name.toLowerCase().includes(search.toLowerCase());
     const matchesCategory =
@@ -47,17 +47,15 @@ export default function ProductList() {
     return matchesName && matchesCategory && matchesStatus;
   });
 
-  // Seleção em massa (ajustar para considerar apenas produtos da página atual)
-  const [selectedIds, setSelectedIds] = useState<string[]>([]);
-  // Novo: Computa os IDs dos produtos visíveis na página atual
-  const paginatedIds = paginatedProducts.map(p => p.id);
-  // Novo: seleciona todos se todos os da página estão selecionados
-  const allSelected = paginatedIds.length > 0 && paginatedIds.every(id => selectedIds.includes(id));
-
-  // Paginação
+  // Paginação — importante: declarar ANTES de usar nos cálculos de seleção!
   const [page, setPage] = useState(1);
   const pageCount = Math.ceil(filteredProducts.length / PAGE_SIZE);
   const paginatedProducts = filteredProducts.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
+
+  // Seleção em massa para produtos da página atual
+  const [selectedIds, setSelectedIds] = useState<string[]>([]);
+  const paginatedIds = paginatedProducts.map(p => p.id);
+  const allSelected = paginatedIds.length > 0 && paginatedIds.every(id => selectedIds.includes(id));
 
   const [lastRefreshTime, setLastRefreshTime] = useState(0);
   const MIN_REFRESH_INTERVAL = 1500; // ms
@@ -144,15 +142,14 @@ export default function ProductList() {
     }
   };
 
+  // Selecionar/Desselecionar apenas os produtos da página
   const handleToggleAll = (checked: boolean) => {
     if (checked) {
-      // Seleciona TODOS da página atual (sem repeti-los)
       setSelectedIds(prev => [
         ...prev,
         ...paginatedIds.filter(id => !prev.includes(id)),
       ]);
     } else {
-      // Desmarca TODOS da página atual (mantém outros possivelmente selecionados de pages anteriores)
       setSelectedIds(prev => prev.filter(id => !paginatedIds.includes(id)));
     }
   };
@@ -167,6 +164,7 @@ export default function ProductList() {
     setSelectedIds(prev => prev.filter(id => !paginatedIds.includes(id)));
   };
 
+  // Exclui selecionados da página atual
   const handleBulkDelete = async () => {
     if (paginatedIds.length === 0) return;
 
@@ -183,6 +181,7 @@ export default function ProductList() {
     }
   };
 
+  // Publica todos selecionados na página
   const handleBulkPublish = async () => {
     for (const id of paginatedIds) {
       if (selectedIds.includes(id)) {
@@ -195,6 +194,7 @@ export default function ProductList() {
     refreshProducts(true);
     setSelectedIds(prev => prev.filter(id => !paginatedIds.includes(id)));
   };
+  // Oculta todos selecionados na página
   const handleBulkUnpublish = async () => {
     for (const id of paginatedIds) {
       if (selectedIds.includes(id)) {
@@ -214,7 +214,6 @@ export default function ProductList() {
 
   return (
     <div className="flex flex-col items-center w-full animate-fade-in">
-      {/* Barra de ações em massa (visível somente quando houver seleção nesta página) */}
       <BulkActionBar
         selectedCount={paginatedIds.filter(id => selectedIds.includes(id)).length}
         onUnselectAll={handleUnselectPage}
