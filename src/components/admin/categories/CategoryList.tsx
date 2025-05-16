@@ -68,8 +68,8 @@ const CategoryList = ({
       }
       
       try {
-        setDeletingCategory(categoryId);
-        await removeCategory(categoryId);
+        setDeletingCategory(Number(categoryId));
+        await removeCategory(Number(categoryId));
         toast({
           title: "Categoria removida",
           description: "A categoria foi removida com sucesso.",

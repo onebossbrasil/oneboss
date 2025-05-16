@@ -43,7 +43,7 @@ const SubcategoryList = ({
       });
       return;
     }
-    addSubcategory(category.id, newSubcategoryName, newSubcategoryType);
+    addSubcategory(Number(category.id), newSubcategoryName, newSubcategoryType);
     setNewSubcategoryName("");
     setNewSubcategoryType("");
     setDialogOpen(false);
@@ -58,8 +58,8 @@ const SubcategoryList = ({
     const category = getCurrentCategory();
     if (!category) return;
     if (window.confirm("Tem certeza que deseja remover esta subcategoria?")) {
-      removeSubcategory(category.id, subcategoryId);
-      if (selectedSubcategory === subcategoryId) {
+      removeSubcategory(Number(category.id), Number(subcategoryId));
+      if (selectedSubcategory === Number(subcategoryId)) {
         setSelectedSubcategory(null);
       }
       toast({
