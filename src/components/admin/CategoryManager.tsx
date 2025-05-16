@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { useCategories } from "@/contexts/CategoryContext";
 import CategoryList from "./categories/CategoryList";
@@ -10,7 +11,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 const CategoryManager = () => {
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
-  const [selectedSubcategory, setSelectedSubcategory] = useState<number | null>(null);
+  const [selectedSubcategory, setSelectedSubcategory] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<string>("categories");
   const { isLoading, error, refreshCategories } = useCategories();
 
@@ -96,10 +97,9 @@ const CategoryManager = () => {
     );
   };
 
-  // Desktop view (three panels side by side)
+  // Desktop view (three panels side by side, increased gap)
   const desktopView = (
-    <div className="hidden md:grid md:grid-cols-3 gap-10">
-      {/* Aumentado de gap-6 para gap-10 para dar mais espaço entre os cards */}
+    <div className="hidden md:grid md:grid-cols-3 gap-12">
       <CategoryList 
         selectedCategory={selectedCategory}
         setSelectedCategory={setSelectedCategory}
