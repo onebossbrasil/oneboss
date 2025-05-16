@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
@@ -54,7 +53,7 @@ const CategoryList = ({
   };
 
   return (
-    <Card className="md:col-span-1">
+    <Card className="w-full md:w-[calc(40%)] transition-all">
       <CardContent className="pt-6">
         <div className="space-y-4">
           <h3 className="text-lg font-medium mb-0 pl-1">Categorias</h3>
@@ -92,4 +91,3 @@ const CategoryList = ({
 };
 
 export default CategoryList;
-
