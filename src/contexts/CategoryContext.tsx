@@ -1,4 +1,3 @@
-
 import React, { createContext, useContext, useCallback, useMemo } from "react";
 import { CategoryType, SubcategoryType } from "@/types/category";
 import { CategoryContextType } from "@/types/categoryContext";
@@ -13,7 +12,7 @@ export const CategoryProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     error,
     fetchCategories,
     addCategory,
-    removeCategory,
+    removeCategory, // agora é string
     addSubcategory,
     removeSubcategory,
     addSubcategoryValue,
@@ -32,7 +31,7 @@ export const CategoryProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     isLoading,
     error,
     addCategory,
-    removeCategory,
+    removeCategory, // tipo correto: string
     addSubcategory,
     removeSubcategory,
     addSubcategoryValue,

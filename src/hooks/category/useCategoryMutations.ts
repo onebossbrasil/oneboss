@@ -36,7 +36,8 @@ export function useCategoryMutations(
     }
   };
 
-  const removeCategory = async (categoryId: number) => {
+  // Corrigir para aceitar string (UUID)
+  const removeCategory = async (categoryId: string) => {
     if (isDeleting) {
       console.log("Deletion already in progress, ignoring request");
       return;
@@ -46,7 +47,7 @@ export function useCategoryMutations(
       setIsDeleting(true);
       setIsLoading(true);
       console.log(`Deleting category with ID: ${categoryId}`);
-      await deleteCategory(categoryId);
+      await deleteCategory(categoryId); // categoryId agora é string
       await fetchCategories();
       
       toast({
@@ -73,3 +74,4 @@ export function useCategoryMutations(
     isDeleting
   };
 }
+

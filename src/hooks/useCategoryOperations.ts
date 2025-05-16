@@ -11,6 +11,7 @@ export function useCategoryOperations() {
     fetchCategories
   } = useCategoryData();
 
+  // Os hooks agora recebem e retornam só string para categoria (UUID)
   const {
     addCategory,
     removeCategory
@@ -61,10 +62,11 @@ export function useCategoryOperations() {
     error,
     fetchCategories: refreshCategoriesCallback,
     addCategory,
-    removeCategory,
+    removeCategory, // agora espera string
     addSubcategory,
     removeSubcategory,
     addSubcategoryValue,
     removeSubcategoryValue,
   };
 }
+
