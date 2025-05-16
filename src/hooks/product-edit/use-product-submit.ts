@@ -32,12 +32,22 @@ export const useProductSubmit = (
 
   const handleUpdateProduct = async (e: React.FormEvent) => {
     e.preventDefault();
-    
-    if (!product) return;
-    
+
+    console.log("EditSubmit: handleUpdateProduct chamado."); // Diagnóstico
+
+    if (!product) {
+      toast({
+        title: "Nenhum produto selecionado",
+        description: "Não foi possível encontrar o produto para atualização.",
+        variant: "destructive"
+      });
+      setIsSubmitting(false);
+      return;
+    }
+
     try {
       setIsSubmitting(true);
-      
+
       // Validate form data
       const isValid = validateProductData(
         formData.name,
@@ -46,21 +56,26 @@ export const useProductSubmit = (
         formData.stockQuantity,
         selectedCategory
       );
-      
+
       if (!isValid) {
         setIsSubmitting(false);
+        toast({
+          title: "Erro de validação",
+          description: "Verifique os campos obrigatórios e tente novamente.",
+          variant: "destructive"
+        });
         return;
       }
-      
+
       // Convert price to a number
       const price = convertPriceToNumber(formData.price);
-      
+
       // Convert sale price to a number if provided
       let salePrice = undefined;
       if (formData.salePrice) {
         salePrice = convertPriceToNumber(formData.salePrice);
       }
-      
+
       // Convert stock quantity to a number
       const stockQuantity = parseInt(formData.stockQuantity, 10);
 
@@ -78,10 +93,19 @@ export const useProductSubmit = (
         stockQuantity,
         deletedImageIds: deletedImageIds // Pass the deleted image IDs to updateProduct
       };
-      
+
+      console.log("EditSubmit: enviando productData", productData);
+
       // Update product
       await updateProduct(product.id, productData, images.length > 0 ? images : undefined);
-      
+
+      // Feedback de sucesso
+      toast({
+        title: "Produto atualizado",
+        description: "As alterações foram salvas com sucesso!",
+        variant: "default"
+      });
+
       // Close dialog
       onSuccess();
     } catch (error) {
