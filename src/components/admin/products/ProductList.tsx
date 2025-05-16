@@ -1,4 +1,3 @@
-
 import { useState, useEffect, useCallback } from "react";
 import { useProducts } from "@/contexts/ProductContext";
 import {
@@ -64,9 +63,11 @@ export default function ProductList() {
     setDialogOpen(true);
   };
 
+  // Corrigir: fechar ambos os estados ao fechar o modal (edição/criação)
   const handleDialogClose = () => {
     setSelectedProduct(null);
     setDialogOpen(false);
+    setShowCreate(false);
   };
 
   const handleManualRefresh = useCallback(async () => {
@@ -262,11 +263,15 @@ export default function ProductList() {
       <ProductEditDialog
         product={selectedProduct}
         open={dialogOpen || showCreate}
-        onOpenChange={setDialogOpen}
-        onClose={() => {
-          setShowCreate(false);
-          handleDialogClose();
+        onOpenChange={(openState: boolean) => {
+          // Fechar ambos os estados ao fechar o modal
+          setDialogOpen(openState && !!selectedProduct);
+          setShowCreate(openState && !selectedProduct);
+          if (!openState) {
+            handleDialogClose();
+          }
         }}
+        onClose={handleDialogClose}
       />
 
       {/* Modal de confirmação de exclusão */}
