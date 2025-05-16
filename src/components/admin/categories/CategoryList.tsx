@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
@@ -80,24 +81,23 @@ const CategoryList = ({
     }
   };
 
-  // Refatorado: cards mais largos, menos margem lateral, gap consistente
+  // Refatoração: cards maiores, sem limites sufocantes, gap consistente, sem excesso de margem lateral
   return (
     <Card
       className="
-        md:col-span-1 w-full 
-        max-w-[540px] min-w-[320px] 
-        shadow-lg border 
+        md:col-span-1 w-full
+        max-w-none min-w-[340px]
+        shadow-lg border
         px-0 bg-white
-        md:mr-2 
+        md:mr-1 md:ml-0
       "
       style={{
         marginLeft: 0,
         marginRight: 0,
-        // Pequena margem para separar da sidebar
         marginTop: 0,
       }}
     >
-      <CardContent className="pt-6 pb-2 px-1">
+      <CardContent className="pt-6 pb-2 px-0">
         <div className="space-y-4">
           <CategoryListHeader
             open={dialogOpen}
@@ -110,7 +110,7 @@ const CategoryList = ({
             isSubmitting={isSubmitting}
             formError={formError}
           />
-          <div className="flex flex-col gap-3">
+          <div className="flex flex-col gap-4">
             {categories.map((cat) => (
               <CategoryListItem
                 key={String(cat.id)}

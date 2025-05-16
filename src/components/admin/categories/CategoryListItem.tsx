@@ -15,36 +15,60 @@ type Props = {
   deleting: boolean;
 };
 
-// Refatorado: layout flexível, nome e quantidade SEM limite de largura visível
+// Card: ocupa horizontalmente, nome NÃO quebra no meio, ícone > nome > quantidade, layout limpo
 const CategoryListItem = ({ cat, selected, onSelect, onRemove, deleting }: Props) => (
   <div
     className={`
-      flex flex-row items-center justify-between w-full
-      rounded-xl shadow-sm border
+      flex items-center w-full
+      rounded-xl shadow-sm border bg-white
       transition-all hover:shadow-md
-      ${selected ? "border-primary bg-primary/10" : "bg-white"}
-      px-5 py-3
+      ${selected ? "border-primary bg-primary/10" : ""}
+      px-6 py-4
       cursor-pointer
+      min-h-[60px]
+      group
     `}
     style={{
-      minHeight: 64,
       minWidth: 0,
     }}
     onClick={onSelect}
     tabIndex={0}
     aria-selected={selected}
   >
-    <div className="flex flex-row items-center gap-4 flex-1 min-w-0">
-      <Folder className="h-6 w-6 text-primary flex-shrink-0" />
-      <span className="text-base font-semibold text-foreground break-words whitespace-pre-line flex-1 min-w-0">
-        {cat.name}
-      </span>
-    </div>
-    <span className="ml-6 text-sm text-muted-foreground flex-shrink-0">
+    <Folder className="h-6 w-6 text-primary mr-5 flex-shrink-0" />
+    <span
+      className="
+        text-base font-semibold text-foreground 
+        flex-1 min-w-0 
+        whitespace-normal break-keep
+        leading-snug
+        pr-2
+        overflow-visible
+      "
+      style={{
+        // Máximo de 36 caracteres antes de truncar, mas só quebrar entre palavras
+        maxWidth: "60%",
+        wordBreak: "keep-all"
+      }}
+      title={cat.name}
+    >
+      {cat.name}
+    </span>
+    <span
+      className="
+        text-sm text-muted-foreground
+        ml-3 flex-shrink-0
+        whitespace-nowrap
+        font-normal
+      "
+      style={{
+        maxWidth: 150,
+      }}
+    >
       {cat.subcategories.length} {cat.subcategories.length === 1 ? "subcategoria" : "subcategorias"}
     </span>
-    <Button 
-      variant="ghost" 
+    <Button
+      variant="ghost"
       size="icon"
       onClick={e => {
         e.stopPropagation();
