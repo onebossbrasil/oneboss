@@ -3,19 +3,30 @@ import React from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { cn } from "@/lib/utils";
 
-// Adapted to https://stackoverflow.com/a/51929524 for condensed pagination
+// Novo algoritmo de páginação — evita repetição dos números
 function getPages(current: number, total: number) {
-  let delta = 2, range = [], rangeWithDots = [], l: number;
+  // Mostra sempre a primeira e última página, as 2 ao redor da atual, e usa "..." quando necessário
+  if (total <= 7) {
+    // Se tem poucas páginas, mostra todas
+    return Array.from({ length: total }, (_, i) => i + 1);
+  }
+  const pages: (number | string)[] = [];
+  pages.push(1);
 
-  for (let i = Math.max(2, current - delta); i <= Math.min(total - 1, current + delta); i++) {
-    range.push(i);
+  if (current > 4) pages.push("...");
+
+  // Determina o range central
+  const start = Math.max(2, current - 1);
+  const end = Math.min(total - 1, current + 1);
+  for (let i = start; i <= end; i++) {
+    pages.push(i);
   }
 
-  if (current - delta > 2) rangeWithDots.push("...");
-  rangeWithDots = [...rangeWithDots, ...range];
-  if (current + delta < total - 1) rangeWithDots.push("...");
+  if (current < total - 3) pages.push("...");
 
-  return [1, ...rangeWithDots, total].filter((v, i, a) => !a.includes(v, i + 1));
+  pages.push(total);
+
+  return pages;
 }
 
 type Props = {
@@ -36,21 +47,23 @@ const PaginationArrows = ({ page, pageCount, onPageChange, className = "" }: Pro
         disabled={page === 1}
         onClick={() => onPageChange(page - 1)}
         aria-label="Página anterior"
+        type="button"
       >
         <ChevronLeft className="w-5 h-5" />
       </button>
       {pages.map((p, i) =>
         p === "..." ? (
-          <span key={i} className="px-2 text-gray-400">...</span>
+          <span key={`dots-${i}`} className="px-2 text-gray-400">...</span>
         ) : (
           <button
-            key={p}
+            key={`page-${p}`}
             className={cn(
               "px-3 py-1 rounded font-bold transition-all",
               p === page ? "bg-gold text-white shadow" : "text-gray-700 hover:bg-gray-100"
             )}
             onClick={() => onPageChange(Number(p))}
             disabled={p === page}
+            type="button"
           >
             {p}
           </button>
@@ -61,6 +74,7 @@ const PaginationArrows = ({ page, pageCount, onPageChange, className = "" }: Pro
         disabled={page === pageCount}
         onClick={() => onPageChange(page + 1)}
         aria-label="Próxima página"
+        type="button"
       >
         <ChevronRight className="w-5 h-5" />
       </button>
