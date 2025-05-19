@@ -42,7 +42,7 @@ const StoreBanner = () => {
   }, [api, activeIndex]);
 
   return (
-    <div className="relative h-[45vh] md:h-[65vh] min-h-[350px] md:min-h-[480px] w-full overflow-hidden">
+    <div className="relative h-[45vh] md:h-[65vh] min-h-[250px] md:min-h-[250px] w-full overflow-hidden">
       {/* Carrossel de fundos */}
       <Carousel className="absolute inset-0 w-full h-full" setApi={setApi} opts={{ loop: true }}>
         <CarouselContent className="h-full w-full m-0 p-0">
