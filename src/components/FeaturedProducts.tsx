@@ -1,4 +1,3 @@
-
 import { useProducts } from "@/contexts/ProductContext";
 import ProductSlider from "./featured/ProductSlider";
 import { useCategories } from "@/contexts/CategoryContext";
@@ -7,6 +6,15 @@ import { FormattedProduct } from "@/types/product";
 const FeaturedProducts = () => {
   const { featuredProducts, isLoading } = useProducts();
   const { categories } = useCategories();
+
+  // Adiciona log de diagnóstico da home
+  if (featuredProducts && featuredProducts.length > 0) {
+    console.log("[Home] Produtos em destaque recebidos:", featuredProducts.map((p) => ({
+      id: p.id, nome: p.name, published: p.published, featured: p.featured
+    })));
+  } else {
+    console.log("[Home] Nenhum produto em destaque foi recebido.");
+  }
 
   // Format products for the slider
   const formattedProducts: FormattedProduct[] = featuredProducts.map(product => ({

@@ -1,4 +1,3 @@
-
 import { useState, useCallback, useRef, useEffect } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { Product } from "@/types/product";
@@ -102,8 +101,23 @@ export const useProductData = () => {
       isFetchingRef.current = false;
     }
   }, [toast, retryCount, session, user]);
+  
+  // Adiciona diagnóstico para depurar featured/published real vindo do banco
+  useEffect(() => {
+    if (products && products.length > 0) {
+      console.log("[Diagnóstico Produtos]:");
+      products.forEach((p) => {
+        console.log(
+          `[Produto] id=${p.id} nome=${p.name} published=${String(p.published)} featured=${String(p.featured)}`
+        );
+      });
+    }
+  }, [products]);
 
-  const featuredProducts = products.filter(product => product.featured && product.published);
+  // Improved: robustez no filtro featuredProducts para só aceitar true explícito
+  const featuredProducts = products.filter(
+    (product) => product.featured === true && product.published === true
+  );
 
   return {
     products,
