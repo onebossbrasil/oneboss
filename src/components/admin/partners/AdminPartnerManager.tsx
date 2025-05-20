@@ -34,6 +34,7 @@ export default function AdminPartnerManager() {
   const [fetchError, setFetchError] = useState<string | null>(null);
   const { toast } = useToast();
 
+  // Busca lista de parceiros mais atualizada possível
   const fetchPartners = async () => {
     setLoading(true);
     const { data, error } = await supabase
@@ -118,10 +119,14 @@ export default function AdminPartnerManager() {
     }
     try {
       if (editingId) {
-        const { error } = await supabase.from("partners").update({
+        const { error, data } = await supabase.from("partners").update({
           ...form,
-        }).eq("id", editingId);
+        }).eq("id", editingId).select();
+        console.log("[AdminPartnerManager] UPDATE ->", { error, data });
         if (error) throw error;
+        if (!data || data.length === 0) {
+          throw new Error("Nada foi alterado. Verifique se você tem permissão de admin.");
+        }
         toast({
           title: "Parceiro atualizado",
           description: "As alterações foram salvas com sucesso!",
@@ -129,19 +134,23 @@ export default function AdminPartnerManager() {
         });
       } else {
         const maxOrder = Math.max(0, ...partners.map((p) => p.order_index ?? 0));
-        const { error } = await supabase.from("partners").insert({
+        const { error, data } = await supabase.from("partners").insert({
           ...form,
           order_index: maxOrder + 1,
           visible: true,
-        });
+        }).select();
+        console.log("[AdminPartnerManager] INSERT ->", { error, data });
         if (error) throw error;
+        if (!data || data.length === 0) {
+          throw new Error("Nada foi inserido. Você é admin?");
+        }
         toast({
           title: "Parceiro cadastrado",
           description: "O parceiro foi cadastrado com sucesso!",
           variant: "default",
         });
       }
-      fetchPartners();
+      await fetchPartners();
       setShowForm(false);
       setEditingId(null);
       setForm(initialForm);
@@ -171,14 +180,18 @@ export default function AdminPartnerManager() {
     if (!window.confirm("Tem certeza que deseja excluir este parceiro?")) return;
     setLoading(true);
     try {
-      const { error } = await supabase.from("partners").delete().eq("id", id);
+      const { error, data } = await supabase.from("partners").delete().eq("id", id).select();
+      console.log("[AdminPartnerManager] DELETE ->", { error, data });
       if (error) throw error;
+      if (!data || data.length === 0) {
+        throw new Error("Nada foi excluído. Talvez você não seja admin ou já foi removido.");
+      }
       toast({
         title: "Parceiro excluído",
         description: "O parceiro foi excluído com sucesso!",
         variant: "default",
       });
-      fetchPartners();
+      await fetchPartners();
     } catch (error: any) {
       toast({
         title: "Erro ao excluir parceiro",
@@ -195,17 +208,30 @@ export default function AdminPartnerManager() {
       (index === partners.length - 1 && delta > 0)
     )
       return;
+    setLoading(true);
     const newPartners = [...partners];
     const [removed] = newPartners.splice(index, 1);
     newPartners.splice(index + delta, 0, removed);
-    for (let i = 0; i < newPartners.length; i++) {
-      newPartners[i].order_index = i;
-      await supabase
-        .from("partners")
-        .update({ order_index: i })
-        .eq("id", newPartners[i].id);
+    try {
+      for (let i = 0; i < newPartners.length; i++) {
+        newPartners[i].order_index = i;
+        const { error } = await supabase
+          .from("partners")
+          .update({ order_index: i })
+          .eq("id", newPartners[i].id);
+        if (error) {
+          throw error;
+        }
+      }
+      await fetchPartners();
+    } catch (error: any) {
+      toast({
+        title: "Erro ao reordenar parceiros",
+        description: error?.message || "Erro desconhecido ao reordenar parceiros.",
+        variant: "destructive",
+      });
     }
-    fetchPartners();
+    setLoading(false);
   }
 
   return (
@@ -294,10 +320,10 @@ export default function AdminPartnerManager() {
                 <span className="text-sm text-muted-foreground">{partner.description}</span>
               </div>
               <div className="flex gap-2">
-                <Button size="sm" variant="outline" onClick={() => move(idx, -1)} disabled={idx === 0}>↑</Button>
-                <Button size="sm" variant="outline" onClick={() => move(idx, 1)} disabled={idx === partners.length - 1}>↓</Button>
-                <Button size="sm" onClick={() => handleEdit(partner)}>Editar</Button>
-                <Button size="sm" variant="destructive" onClick={() => handleDelete(partner.id)}>Excluir</Button>
+                <Button size="sm" variant="outline" onClick={() => move(idx, -1)} disabled={idx === 0 || loading}>↑</Button>
+                <Button size="sm" variant="outline" onClick={() => move(idx, 1)} disabled={idx === partners.length - 1 || loading}>↓</Button>
+                <Button size="sm" onClick={() => handleEdit(partner)} disabled={loading}>Editar</Button>
+                <Button size="sm" variant="destructive" onClick={() => handleDelete(partner.id)} disabled={loading}>Excluir</Button>
               </div>
             </li>
           ))}
