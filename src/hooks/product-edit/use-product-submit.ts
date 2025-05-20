@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { useProducts } from "@/contexts/ProductContext";
 import { useToast } from "@/hooks/use-toast";
@@ -47,6 +48,11 @@ export const useProductSubmit = (
     try {
       setIsSubmitting(true);
 
+      // Logs detalhados para depuração de categoria/subcategoria
+      console.log("[Diagnóstico Edição] Produto sendo editado:", product.id);
+      console.log("[Diagnóstico Edição] selectedCategory (esperado UUID):", selectedCategory);
+      console.log("[Diagnóstico Edição] subcategoryValues:", subcategoryValues);
+
       // Validate form data
       const isValid = validateProductData(
         formData.name,
@@ -85,27 +91,30 @@ export const useProductSubmit = (
         description: formData.description,
         price,
         salePrice: salePrice || null,
-        categoryId: selectedCategory, // uuid
-        subcategoryValues,
+        categoryId: selectedCategory, // uuid (deve ser preenchido!)
+        subcategoryValues: subcategoryValues, // deve ser objeto correto!
         published: formData.published,
         featured: formData.featured,
         stockQuantity,
         deletedImageIds: deletedImageIds // Pass the deleted image IDs to updateProduct
       };
 
-      console.log("EditSubmit: enviando productData", productData);
+      // LOG explícito do objeto enviado
+      console.log("[Diagnóstico Edição] ENVIANDO PARA updateProduct:", {
+        id: product.id,
+        ...productData,
+        imagesLength: images?.length
+      });
 
       // Update product
       await updateProduct(product.id, productData, images.length > 0 ? images : undefined);
 
-      // Feedback de sucesso
       toast({
         title: "Produto atualizado",
         description: "As alterações foram salvas com sucesso!",
         variant: "default"
       });
 
-      // Close dialog
       onSuccess();
     } catch (error) {
       console.error("Error updating product:", error);
