@@ -1,11 +1,14 @@
+
 import { useCategories } from "@/contexts/CategoryContext";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Label } from "@/components/ui/label";
 import { useState, useEffect } from "react";
 
+// Novo tipo: permite controlar valor inicial da subcategoria
 type CategorySelectorProps = {
   selectedCategory: string;
   subcategoryValues: Record<string, string>;
+  selectedSubcategoryId?: string | null; // NOVO!
   onCategoryChange: (value: string) => void;
   onSubcategoryChange: (type: string, value: string) => void;
   onSubcategoryIdChange?: (subcategoryId: string | null) => void;
@@ -15,6 +18,7 @@ type CategorySelectorProps = {
 const CategorySelectorContent = ({
   selectedCategory,
   subcategoryValues,
+  selectedSubcategoryId, // novo
   onCategoryChange,
   onSubcategoryChange,
   onSubcategoryIdChange,
@@ -29,28 +33,32 @@ const CategorySelectorContent = ({
 
   const category = categories.find(cat => cat.id === selectedCategory);
 
+  // Mapear subcategoryId recebido para subcategoryType
+  useEffect(() => {
+    if (selectedSubcategoryId && category) {
+      const obj = category.subcategories.find(sc => sc.id === selectedSubcategoryId);
+      if (obj) setActiveSubcategoryType(obj.type);
+    }
+    // eslint-disable-next-line
+  }, [selectedSubcategoryId, category?.id]);
+
   // Buscar objeto da subcategoria pela type
   const activeSubcatObj = category?.subcategories.find(
     sc => sc.type === activeSubcategoryType
   );
 
-  // Atualizar subcategoriaId ao selecionar subcategoria
   useEffect(() => {
     if (onSubcategoryIdChange) {
-      // Quando subcategoria mudar, envia o ID para o pai/hook
       onSubcategoryIdChange(activeSubcatObj?.id || null);
-      console.log("[CategorySelector] Subcategoria selecionada:", activeSubcatObj?.id || null);
     }
     // eslint-disable-next-line
   }, [activeSubcatObj?.id]);
 
-  // Atualizar atributoId ao selecionar atributo
   useEffect(() => {
     if (onAttributeIdChange && activeSubcatObj && subcategoryValues[activeSubcategoryType || ""]) {
       const attributeSelected = subcategoryValues[activeSubcategoryType];
       if (attributeSelected) onAttributeIdChange(attributeSelected);
       else onAttributeIdChange(null);
-      console.log("[CategorySelector] Atributo selecionado:", attributeSelected);
     } else if (onAttributeIdChange && !subcategoryValues[activeSubcategoryType || ""]) {
       onAttributeIdChange(null);
     }
@@ -72,7 +80,6 @@ const CategorySelectorContent = ({
         <Select 
           onValueChange={(catId) => {
             onCategoryChange(catId);
-            // Ao mudar categoria, limpa subcategoria
             setActiveSubcategoryType(null);
           }}
           value={selectedCategory}
@@ -103,10 +110,8 @@ const CategorySelectorContent = ({
               // Ache o id da subcategoria ao selecionar (garante sincronia)
               const obj = category?.subcategories.find(sc => sc.type === type);
               if (onSubcategoryIdChange) {
-                // Agora envia o UUID
                 onSubcategoryIdChange(obj?.id || null);
               }
-              // Também limpa atributo ao trocar subcategoria
               if (onAttributeIdChange) {
                 onAttributeIdChange(null);
               }
@@ -137,7 +142,6 @@ const CategorySelectorContent = ({
           <Select 
             onValueChange={(attributeId) => {
               onSubcategoryChange(activeSubcategoryType, attributeId);
-              // Envia o UUID do atributo
               if (onAttributeIdChange) {
                 onAttributeIdChange(attributeId);
               }
@@ -152,7 +156,6 @@ const CategorySelectorContent = ({
             </SelectTrigger>
             <SelectContent>
               {activeSubcatObj.attributes
-                // aqui assumimos que attributes é array de objetos com id/nome
                 ? activeSubcatObj.attributes.map((attr: any) => (
                     <SelectItem key={attr.id} value={attr.id}>
                       {attr.name ?? attr}

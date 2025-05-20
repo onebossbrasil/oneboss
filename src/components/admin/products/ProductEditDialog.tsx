@@ -1,3 +1,4 @@
+
 import { Product } from "@/types/product";
 import {
   Dialog,
@@ -136,6 +137,7 @@ const ProductEditDialog = ({ product, open, onOpenChange, onClose }: ProductEdit
                 <CategorySelector
                   selectedCategory={selectedCategory}
                   subcategoryValues={subcategoryValues}
+                  selectedSubcategoryId={selectedSubcategoryId} // CONTROLADO!
                   onCategoryChange={(categoryId) => {
                     console.log("[Modal] Categoria alterada:", categoryId);
                     handleCategoryChange(categoryId);
@@ -164,7 +166,6 @@ const ProductEditDialog = ({ product, open, onOpenChange, onClose }: ProductEdit
                 />
               </div>
             </div>
-
             <ProductEditActions 
               onCancel={handleDialogClose} 
               isSubmitting={isSubmitting} 
