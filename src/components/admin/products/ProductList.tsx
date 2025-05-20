@@ -218,26 +218,23 @@ export default function ProductList() {
   };
 
   return (
-    <div className="flex flex-col items-center w-full animate-fade-in">
-      <BulkActionBar
-        selectedCount={paginatedIds.filter(id => selectedIds.includes(id)).length}
-        onUnselectAll={handleUnselectPage}
-        onDeleteSelected={handleBulkDelete}
-        onPublishSelected={handleBulkPublish}
-        onUnpublishSelected={handleBulkUnpublish}
-      />
-      {/* Botão para cadastrar/ou criar produto */}
-      <ProductCreateButton onClick={() => setShowCreate(true)} />
-
-      {/* Linha com total de produtos */}
+    <div className="flex flex-col items-center w-full animate-fade-in px-0 sm:px-2">
+      {/* MOBILE: botão fixo no rodapé */}
+      <div className="sm:hidden fixed bottom-6 right-6 z-40">
+        <ProductCreateButton onClick={() => setShowCreate(true)} />
+      </div>
+      {/* DESKTOP: botão normal na área */}
+      <div className="hidden sm:block w-full">
+        <ProductCreateButton onClick={() => setShowCreate(true)} />
+      </div>
+      {/* Total de produtos */}
       <div className="w-full flex justify-center mt-2">
         <span className="text-xs text-muted-foreground">
           Total de produtos: <strong>{filteredProducts.length}</strong>
         </span>
       </div>
-
-      {/* Barra de filtros */}
-      <div className="w-full flex justify-center mt-4">
+      {/* Filtros responsivos */}
+      <div className="w-full flex flex-col sm:flex-row justify-center gap-2 mt-4 px-2">
         <ProductFilters
           search={search}
           onSearchChange={setSearch}
@@ -248,7 +245,6 @@ export default function ProductList() {
           onStatusChange={setFilterStatus}
         />
       </div>
-
       {/* Lista de Produtos */}
       <div className="w-full flex justify-center">
         <div className="border rounded-lg overflow-x-auto bg-white/80 shadow-md w-full max-w-5xl mx-auto">
@@ -267,13 +263,11 @@ export default function ProductList() {
           </div>
         </div>
       </div>
-
       <ProductListPagination
         page={page}
         pageCount={pageCount}
         onPageChange={handlePageChange}
       />
-
       <ProductListToolbar
         onRefresh={handleManualRefresh}
         onDelete={handleConfirmDelete}
@@ -281,7 +275,6 @@ export default function ProductList() {
         isDeleting={isDeleting}
         disableDelete={(!confirmDelete && selectedIds.length === 0)}
       />
-
       {error && (
         <Alert variant="destructive" className="mb-4 w-full max-w-5xl mx-auto">
           <AlertTitle>Problema de conexão</AlertTitle>
@@ -299,13 +292,11 @@ export default function ProductList() {
           </AlertDescription>
         </Alert>
       )}
-
       {isLoading ? (
         <div className="flex justify-center py-8 w-full">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900"></div>
         </div>
       ) : null}
-
       <ProductEditDialog
         product={selectedProduct}
         open={dialogOpen || showCreate}
@@ -319,7 +310,6 @@ export default function ProductList() {
         }}
         onClose={handleDialogClose}
       />
-
       <ConfirmDeleteProductModal
         product={confirmDelete}
         isDeleting={isDeleting}
