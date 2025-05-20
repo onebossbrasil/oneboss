@@ -170,7 +170,7 @@ const Store = () => {
             </div>
           </div>
         </div>
-        {/* Sessão de Produtos em Destaque: agora abaixo da lista e antes do rodapé */}
+        {/* Mover sessão de destaque EXATAMENTE antes do Footer, fora do container da loja */}
         <FeaturedProductsSection
           title="Produtos em Destaque"
           className="bg-zinc-50 dark:bg-zinc-900/50"

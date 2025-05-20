@@ -1,4 +1,3 @@
-
 import React from "react";
 import { useProducts } from "@/contexts/ProductContext";
 import { useCategories } from "@/contexts/CategoryContext";
@@ -51,11 +50,11 @@ const FeaturedProductsSection: React.FC<FeaturedProductsSectionProps> = ({
           </div>
         ) : formattedProducts.length > 0 ? (
           <>
-            {/* Só um título! */}
+            {/* Garante título único */}
             <div className="flex justify-between items-end mb-6">
               <h2 className="font-playfair text-3xl font-bold">{title}</h2>
             </div>
-            <ProductSlider products={formattedProducts} hideTitle />
+            <ProductSlider products={formattedProducts} hideTitle={true} />
           </>
         ) : (
           <div className="text-center py-12">
