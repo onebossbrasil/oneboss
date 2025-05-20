@@ -5,6 +5,7 @@ import { useCategorySelection } from "@/hooks/product-edit/use-category-selectio
 import { useImageManagement } from "@/hooks/product-edit/use-image-management";
 import { useProductSubmit } from "@/hooks/product-edit/use-product-submit";
 import { useProductAdd } from "@/hooks/product-edit/use-product-add"; // NOVO IMPORT
+import { useState } from "react";
 
 export const useProductEdit = (
   product: Product | null,
@@ -22,6 +23,16 @@ export const useProductEdit = (
     setSelectedCategory,
     setSubcategoryValues
   } = useCategorySelection(product);
+
+  // States para subcategoria e atributo
+  const [selectedSubcategoryId, setSelectedSubcategoryId] = useState<string | null>(product?.subcategoryId ?? null);
+  const [selectedAttributeId, setSelectedAttributeId] = useState<string | null>(product?.attributeId ?? null);
+
+  // A cada abertura de produto, manter sincronizado os ids com o produto carregado
+  React.useEffect(() => {
+    setSelectedSubcategoryId(product?.subcategoryId ?? null);
+    setSelectedAttributeId(product?.attributeId ?? null);
+  }, [product?.id]);
 
   // Image management
   const {
@@ -43,7 +54,9 @@ export const useProductEdit = (
     subcategoryValues,
     images,
     deletedImageIds,
-    onClose
+    onClose,
+    selectedSubcategoryId,
+    selectedAttributeId
   );
 
   const { isSubmitting: isAdding, handleAddProduct } = useProductAdd(
@@ -51,7 +64,9 @@ export const useProductEdit = (
     selectedCategory,
     subcategoryValues,
     images,
-    onClose
+    onClose,
+    selectedSubcategoryId,
+    selectedAttributeId
   );
 
   // Decide qual handler usar: edição ou cadastro
@@ -59,10 +74,16 @@ export const useProductEdit = (
   const isSubmitting = isEditMode ? isUpdating : isAdding;
   const handleSubmit = isEditMode ? handleUpdateProduct : handleAddProduct;
 
-  // Sempre que o produto for aberto para edição, resetar campos do formulário, categorias e imagens
-  // Útil para reidratar valores caso modal seja reaberto em produto diferente
-  // (Este effect é seguro porque hooks de estado já são sincronizados pelos outros hooks)
-  // ... mas se complementarmente quiser resetar algum hook particular, pode fazer aqui
+  // Novo: Receber os handlers para CategorySelector
+  const handleSubcategoryIdChange = (subcategoryId: string | null) => {
+    setSelectedSubcategoryId(subcategoryId);
+    // Ao trocar subcategoria, limpamos o atributo
+    setSelectedAttributeId(null);
+  };
+
+  const handleAttributeChange = (attributeId: string | null) => {
+    setSelectedAttributeId(attributeId);
+  };
 
   return {
     formData,
@@ -81,6 +102,10 @@ export const useProductEdit = (
     setSubcategoryValues,
     setImages,
     setImagePreviewUrls,
-    setDeletedImageIds
+    setDeletedImageIds,
+    selectedSubcategoryId,
+    selectedAttributeId,
+    handleAttributeChange,
+    handleSubcategoryChange: handleSubcategoryIdChange
   };
 };

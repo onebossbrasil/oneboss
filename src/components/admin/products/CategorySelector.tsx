@@ -1,3 +1,4 @@
+
 import { useCategories } from "@/contexts/CategoryContext";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Label } from "@/components/ui/label";
@@ -29,7 +30,7 @@ const CategorySelectorContent = ({
   
   const category = categories.find(cat => cat.id === selectedCategory);
 
-  // Adicional: buscar subcategoria ativa como objeto, não só type
+  // Buscar objeto da subcategoria pela type
   const activeSubcatObj = category?.subcategories.find(
     sc => sc.type === activeSubcategoryType
   );
@@ -39,19 +40,17 @@ const CategorySelectorContent = ({
     if (onSubcategoryIdChange) {
       onSubcategoryIdChange(activeSubcatObj?.id || null);
     }
-    // eslint-disable-next-line
   }, [activeSubcatObj?.id]);
 
   // Atualizar atributoId ao selecionar atributo
   useEffect(() => {
     if (onAttributeIdChange && activeSubcatObj && subcategoryValues[activeSubcategoryType || ""]) {
-      // Encontrar o atributoId correspondente ao atributo selecionado
+      // Procurar índice na lista de attributes
       const attributeSelected = subcategoryValues[activeSubcategoryType];
-      // Procurar ID do atributo a partir do nome/valor
-      const attributeObj = activeSubcatObj?.attributesData?.find(
-        (a: any) => a.attribute === attributeSelected
-      );
-      if (attributeObj) onAttributeIdChange(attributeObj.id);
+      // No modelo atual, attributes é um array de string, então buscamos pelo valor
+      // Se o valor existe em attributes, simulamos um "id" por índice ou pelo próprio valor
+      // MAS na tabela attribute_id, salvamos o valor correto ao editar/criar. Aqui passamos o valor
+      if (attributeSelected) onAttributeIdChange(attributeSelected); // Passa o valor como id
       else onAttributeIdChange(null);
     } else if (onAttributeIdChange && !subcategoryValues[activeSubcategoryType || ""]) {
       onAttributeIdChange(null);
@@ -131,10 +130,10 @@ const CategorySelectorContent = ({
               } />
             </SelectTrigger>
             <SelectContent>
-              {activeSubcatObj.attributesData
-                ? activeSubcatObj.attributesData.map((option: any) => (
-                    <SelectItem key={option.id} value={option.attribute}>
-                      {option.attribute}
+              {activeSubcatObj.attributes
+                ? activeSubcatObj.attributes.map((option: string) => (
+                    <SelectItem key={option} value={option}>
+                      {option}
                     </SelectItem>
                   ))
                 : null}
@@ -151,3 +150,4 @@ const CategorySelector = (props: CategorySelectorProps) => {
 };
 
 export default CategorySelector;
+

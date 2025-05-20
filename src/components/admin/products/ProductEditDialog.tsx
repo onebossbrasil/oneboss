@@ -98,6 +98,8 @@ const ProductEditDialog = ({ product, open, onOpenChange, onClose }: ProductEdit
       subcategoryValues,
       images,
       imagePreviewUrls,
+      selectedSubcategoryId,
+      selectedAttributeId
     });
     handleSubmit(e);
   };
