@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { Product } from "@/types/product";
 import { useFormState } from "@/hooks/product-edit/use-form-state";
@@ -33,6 +32,13 @@ export const useProductEdit = (
     setSelectedSubcategoryId(product?.subcategoryId ?? null);
     setSelectedAttributeId(product?.attributeId ?? null);
   }, [product?.id]);
+
+  // Diagnóstico para sincronização dos ids (LOG)
+  React.useEffect(() => {
+    console.log("[useProductEdit] selectedCategory:", selectedCategory);
+    console.log("[useProductEdit] selectedSubcategoryId:", selectedSubcategoryId);
+    console.log("[useProductEdit] selectedAttributeId:", selectedAttributeId);
+  }, [selectedCategory, selectedSubcategoryId, selectedAttributeId]);
 
   // Image management
   const {
@@ -77,11 +83,14 @@ export const useProductEdit = (
   // Handler para CategorySelector para atualizar selectedSubcategoryId
   const handleSubcategoryIdChange = (subcategoryId: string | null) => {
     setSelectedSubcategoryId(subcategoryId);
-    setSelectedAttributeId(null); // Ao trocar subcategoria, limpamos o atributo
+    setSelectedAttributeId(null);
+    console.log("[useProductEdit] setSelectedSubcategoryId:", subcategoryId);
   };
 
+  // Handler para atributo (pode ser string id/texto)
   const handleAttributeChange = (attributeId: string | null) => {
     setSelectedAttributeId(attributeId);
+    console.log("[useProductEdit] setSelectedAttributeId:", attributeId);
   };
 
   return {
@@ -105,6 +114,6 @@ export const useProductEdit = (
     selectedSubcategoryId,
     selectedAttributeId,
     handleAttributeChange,
-    handleSubcatIdChange: handleSubcategoryIdChange // Fornecemos um alias claro para o prop do componente
+    handleSubcatIdChange: handleSubcategoryIdChange
   };
 };

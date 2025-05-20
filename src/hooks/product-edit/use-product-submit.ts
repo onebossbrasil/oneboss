@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { useProducts } from "@/contexts/ProductContext";
 import { useToast } from "@/hooks/use-toast";
@@ -48,7 +47,7 @@ export const useProductSubmit = (
     try {
       setIsSubmitting(true);
 
-      // LOGs de diagnóstico essenciais para debug
+      // LOGs de diagnóstico avançado
       console.log("[SUBMIT] Salvar produto");
       console.log("[SUBMIT] selectedCategory:", selectedCategory);
       console.log("[SUBMIT] selectedSubcategoryId:", selectedSubcategoryId);
@@ -72,15 +71,11 @@ export const useProductSubmit = (
         return;
       }
 
-      // Agora subcategoria e atributo são opcionais.
-      // Eles serão salvos só se passados (pode ser null)
       const price = convertPriceToNumber(formData.price);
-
       let salePrice = undefined;
       if (formData.salePrice) {
         salePrice = convertPriceToNumber(formData.salePrice);
       }
-
       const stockQuantity = parseInt(formData.stockQuantity, 10);
 
       const productData = {

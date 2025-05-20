@@ -23,11 +23,11 @@ const CategorySelectorContent = ({
 }: CategorySelectorProps) => {
   const { categories, isLoading, error } = useCategories();
   const [activeSubcategoryType, setActiveSubcategoryType] = useState<string | null>(null);
-  
+
   useEffect(() => {
     setActiveSubcategoryType(null);
   }, [selectedCategory]);
-  
+
   const category = categories.find(cat => cat.id === selectedCategory);
 
   // Buscar objeto da subcategoria pela type
@@ -38,29 +38,30 @@ const CategorySelectorContent = ({
   // Atualizar subcategoriaId ao selecionar subcategoria
   useEffect(() => {
     if (onSubcategoryIdChange) {
+      // Quando subcategoria mudar, envia o ID para o pai/hook
       onSubcategoryIdChange(activeSubcatObj?.id || null);
+      console.log("[CategorySelector] Subcategoria selecionada:", activeSubcatObj?.id || null);
     }
+    // eslint-disable-next-line
   }, [activeSubcatObj?.id]);
 
   // Atualizar atributoId ao selecionar atributo
   useEffect(() => {
     if (onAttributeIdChange && activeSubcatObj && subcategoryValues[activeSubcategoryType || ""]) {
-      // Procurar índice na lista de attributes
       const attributeSelected = subcategoryValues[activeSubcategoryType];
-      // No modelo atual, attributes é um array de string, então buscamos pelo valor
-      // Se o valor existe em attributes, simulamos um "id" por índice ou pelo próprio valor
-      // MAS na tabela attribute_id, salvamos o valor correto ao editar/criar. Aqui passamos o valor
-      if (attributeSelected) onAttributeIdChange(attributeSelected); // Passa o valor como id
+      if (attributeSelected) onAttributeIdChange(attributeSelected);
       else onAttributeIdChange(null);
+      console.log("[CategorySelector] Atributo selecionado:", attributeSelected);
     } else if (onAttributeIdChange && !subcategoryValues[activeSubcategoryType || ""]) {
       onAttributeIdChange(null);
     }
+    // eslint-disable-next-line
   }, [subcategoryValues, activeSubcatObj, activeSubcategoryType, onAttributeIdChange]);
 
   if (isLoading) {
     return <div className="space-y-4">Carregando categorias...</div>;
   }
-  
+
   if (error) {
     return <div className="text-red-500">Erro ao carregar categorias: {error}</div>;
   }
@@ -70,7 +71,11 @@ const CategorySelectorContent = ({
       <div>
         <Label htmlFor="category">Categoria</Label>
         <Select 
-          onValueChange={onCategoryChange} 
+          onValueChange={(catId) => {
+            onCategoryChange(catId);
+            // Ao mudar categoria, limpa subcategoria
+            setActiveSubcategoryType(null);
+          }}
           value={selectedCategory}
           disabled={categories.length === 0}
         >
@@ -89,12 +94,23 @@ const CategorySelectorContent = ({
           </SelectContent>
         </Select>
       </div>
-      
+
       {selectedCategory && (
         <div>
           <Label htmlFor="subcategoryType">Subcategoria</Label>
           <Select 
-            onValueChange={(type) => setActiveSubcategoryType(type)}
+            onValueChange={(type) => {
+              setActiveSubcategoryType(type);
+              // Ache o id da subcategoria ao selecionar (garante sincronia)
+              const obj = category?.subcategories.find(sc => sc.type === type);
+              if (onSubcategoryIdChange) {
+                onSubcategoryIdChange(obj?.id || null);
+              }
+              // Também limpa atributo ao trocar subcategoria
+              if (onAttributeIdChange) {
+                onAttributeIdChange(null);
+              }
+            }}
             value={activeSubcategoryType || ""}
           >
             <SelectTrigger>
@@ -112,7 +128,7 @@ const CategorySelectorContent = ({
           </Select>
         </div>
       )}
-      
+
       {activeSubcategoryType && activeSubcatObj && (
         <div>
           <Label htmlFor="subcategoryValue">
@@ -121,6 +137,11 @@ const CategorySelectorContent = ({
           <Select 
             onValueChange={(value) => {
               onSubcategoryChange(activeSubcategoryType, value);
+              // Ao escolher atributo, tenta enviar como ID para hook pai
+              if (onAttributeIdChange) {
+                onAttributeIdChange(value);
+              }
+              console.log("[CategorySelector] onSubcategoryChange:", activeSubcategoryType, value);
             }}
             value={subcategoryValues[activeSubcategoryType] || ""}
           >
