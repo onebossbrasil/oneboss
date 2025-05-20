@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { useProducts } from "@/contexts/ProductContext";
 import { useToast } from "@/hooks/use-toast";
@@ -47,7 +48,11 @@ export const useProductSubmit = (
     try {
       setIsSubmitting(true);
 
-      // LOGs de diagnóstico
+      // LOGs de diagnóstico essenciais para debug
+      console.log("[SUBMIT] Salvar produto");
+      console.log("[SUBMIT] selectedCategory:", selectedCategory);
+      console.log("[SUBMIT] selectedSubcategoryId:", selectedSubcategoryId);
+      console.log("[SUBMIT] selectedAttributeId:", selectedAttributeId);
 
       const isValid = validateProductData(
         formData.name,
@@ -68,7 +73,7 @@ export const useProductSubmit = (
       }
 
       // Agora subcategoria e atributo são opcionais.
-      // Eles serão salvos apenas se passados (pode ser null)
+      // Eles serão salvos só se passados (pode ser null)
       const price = convertPriceToNumber(formData.price);
 
       let salePrice = undefined;
@@ -85,6 +90,7 @@ export const useProductSubmit = (
         price,
         salePrice: salePrice || null,
         categoryId: selectedCategory,
+        // ATENÇÃO: agora sempre envia os campos corretamente do modal!
         subcategoryId: selectedSubcategoryId ?? null,
         attributeId: selectedAttributeId ?? null,
         subcategoryValues: Object.keys(subcategoryValues).length > 0 ? subcategoryValues : null,
@@ -93,6 +99,8 @@ export const useProductSubmit = (
         stockQuantity,
         deletedImageIds: deletedImageIds
       };
+
+      console.log("[SUBMIT] Payload para updateProduct:", productData);
 
       await updateProduct(product.id, productData, images.length > 0 ? images : undefined);
 
