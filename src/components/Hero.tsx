@@ -1,50 +1,32 @@
-
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
 import { useIsMobile } from "@/hooks/use-mobile";
-import {
-  Carousel,
-  CarouselContent,
-  CarouselItem,
-  CarouselNext,
-  CarouselPrevious,
-  type CarouselApi
-} from "@/components/ui/carousel";
+import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious, type CarouselApi } from "@/components/ui/carousel";
 import { useEffect, useState } from "react";
-
 const Hero = () => {
   const isMobile = useIsMobile();
   const [activeIndex, setActiveIndex] = useState(0);
   const [api, setApi] = useState<CarouselApi>();
-  
-  const bannerImages = [
-    "/lovable-uploads/ea5e00ad-4293-4c9d-b6a5-80a544366ed4.png",
-    "/lovable-uploads/d31ae657-c225-4f14-b8b8-39eade59dd48.png",
-    "/lovable-uploads/c0b49897-08c2-4312-88cf-df7567ba1def.png"
-  ];
-  
+  const bannerImages = ["/lovable-uploads/ea5e00ad-4293-4c9d-b6a5-80a544366ed4.png", "/lovable-uploads/d31ae657-c225-4f14-b8b8-39eade59dd48.png", "/lovable-uploads/c0b49897-08c2-4312-88cf-df7567ba1def.png"];
+
   // Update current slide index when the carousel changes
   useEffect(() => {
     if (!api) return;
-    
     const onChange = () => {
       setActiveIndex(api.selectedScrollSnap());
     };
-    
     api.on("select", onChange);
-    
+
     // Initial update
     onChange();
-    
     return () => {
       api.off("select", onChange);
     };
   }, [api]);
-  
+
   // Auto-rotate carousel with infinite loop
   useEffect(() => {
     if (!api) return;
-    
     const interval = setInterval(() => {
       if (activeIndex < bannerImages.length - 1) {
         api.scrollNext();
@@ -52,40 +34,24 @@ const Hero = () => {
         api.scrollTo(0);
       }
     }, 5000);
-    
     return () => clearInterval(interval);
   }, [api, activeIndex, bannerImages.length]);
-  
-  return (
-    <section className="relative h-[70vh] md:h-[85vh] min-h-[550px] md:min-h-[650px] w-full overflow-hidden">
+  return <section className="relative h-[70vh] md:h-[85vh] min-h-[550px] md:min-h-[650px] w-full overflow-hidden">
       {/* Background Carousel */}
       <div className="absolute inset-0 z-0">
-        <Carousel className="w-full h-full" setApi={setApi} opts={{ loop: true }}>
+        <Carousel className="w-full h-full" setApi={setApi} opts={{
+        loop: true
+      }}>
           <CarouselContent className="h-full w-full m-0 p-0">
-            {bannerImages.map((image, index) => (
-              <CarouselItem key={index} className="h-full w-full p-0 overflow-hidden">
+            {bannerImages.map((image, index) => <CarouselItem key={index} className="h-full w-full p-0 overflow-hidden">
                 <div className="relative w-full h-full">
-                  <img 
-                    src={image} 
-                    alt={`Banner slide ${index + 1}`}
-                    className="absolute inset-0 w-full h-full object-cover object-center"
-                  />
+                  <img src={image} alt={`Banner slide ${index + 1}`} className="absolute inset-0 w-full h-full object-cover object-center" />
                   <div className="absolute inset-0 bg-black/40"></div>
                 </div>
-              </CarouselItem>
-            ))}
+              </CarouselItem>)}
           </CarouselContent>
           <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex gap-2 z-20">
-            {bannerImages.map((_, index) => (
-              <button
-                key={index}
-                onClick={() => api?.scrollTo(index)}
-                className={`w-3 h-3 rounded-full ${
-                  activeIndex === index ? "bg-gold" : "bg-white/40"
-                }`}
-                aria-label={`Go to slide ${index + 1}`}
-              />
-            ))}
+            {bannerImages.map((_, index) => <button key={index} onClick={() => api?.scrollTo(index)} className={`w-3 h-3 rounded-full ${activeIndex === index ? "bg-gold" : "bg-white/40"}`} aria-label={`Go to slide ${index + 1}`} />)}
           </div>
           <CarouselPrevious className="absolute left-4 top-1/2 -translate-y-1/2 bg-black/30 hover:bg-black/50 border-none text-white z-20" />
           <CarouselNext className="absolute right-4 top-1/2 -translate-y-1/2 bg-black/30 hover:bg-black/50 border-none text-white z-20" />
@@ -105,15 +71,11 @@ const Hero = () => {
           
           <div className="flex flex-wrap gap-3 md:gap-5 justify-center">
             <Button asChild variant="outline" className="bg-transparent border-white/30 text-white hover:bg-white/10 btn-hover-effect text-sm md:text-base px-6 py-2 md:px-8 md:py-6 h-auto">
-              <Link to="/sobre">
-                Conheça a One Boss
-              </Link>
+              
             </Button>
           </div>
         </div>
       </div>
-    </section>
-  );
+    </section>;
 };
-
 export default Hero;

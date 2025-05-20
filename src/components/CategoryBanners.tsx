@@ -45,7 +45,7 @@ const CategoryBanners = () => {
       <div className="absolute -top-40 -right-40 w-96 h-96 bg-gold/5 rounded-full blur-3xl"></div>
       <div className="absolute -bottom-40 -left-40 w-96 h-96 bg-gold/5 rounded-full blur-3xl"></div>
       
-      <div className={`mx-auto relative z-10 ${isMobile ? "" : "container px-4 md:px-8"}`}>
+      <div className="px-[46px] mx-0 py-[35px] rounded-none">
         <div className="text-center mb-6 md:mb-8 px-4">
           <h2 className="font-playfair text-3xl md:text-5xl font-bold mb-4">
             Categorias 
