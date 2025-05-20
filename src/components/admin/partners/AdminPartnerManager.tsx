@@ -29,6 +29,9 @@ export default function AdminPartnerManager() {
   const [showForm, setShowForm] = useState(false);
   const [loading, setLoading] = useState(false);
 
+  // ADICIONA LOG para depuração do loading
+  console.log("AdminPartnerManager loading:", loading);
+
   // Carregar parceiros do banco
   const fetchPartners = async () => {
     setLoading(true);
