@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Product, ProductImage } from "@/types/product";
 
@@ -13,16 +12,19 @@ export const useImageManagement = (product: Product | null) => {
       setImagePreviewUrls(product.images.map(img => img.url));
       setImages([]);
       setDeletedImageIds([]); // Reset deleted image IDs
+      console.log("[useImageManagement] Carregando imagens fresh do produto:", product.images);
     } else {
       setImagePreviewUrls([]);
       setImages([]);
       setDeletedImageIds([]);
+      console.log("[useImageManagement] Resetou imagens (novo produto)");
     }
   }, [product]);
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) {
       const newFiles = Array.from(e.target.files);
+
       // Filtra arquivos já existentes por nome para evitar duplicata
       const uniqueNewFiles = newFiles.filter(newFile => (
         !images.some(existing => existing.name === newFile.name && existing.size === newFile.size)
@@ -33,11 +35,12 @@ export const useImageManagement = (product: Product | null) => {
 
       setImages(prev => [...prev, ...uniqueNewFiles]);
       setImagePreviewUrls(prev => [...prev, ...newPreviewUrls]);
+
+      console.log("[useImageManagement] Imagens novas adicionadas:", uniqueNewFiles.map(f => f.name), "Total previews:", newPreviewUrls);
     }
   };
 
   const handleRemoveImage = (index: number) => {
-    // Remoção pode ser de imagem existente no banco OU nova imagem
     if (product && index < product.images.length) {
       // Remove imagem existente, guarda id para deleção
       const imageToDelete = product.images[index];
@@ -46,6 +49,7 @@ export const useImageManagement = (product: Product | null) => {
       const newPreviewUrls = [...imagePreviewUrls];
       newPreviewUrls.splice(index, 1);
       setImagePreviewUrls(newPreviewUrls);
+      console.log("[useImageManagement] Marcou imagem para deleção (no banco)", imageToDelete.id, "deletedImageIds agora:", [...deletedImageIds, imageToDelete.id]);
     } else {
       // Nova imagem (ainda não foi enviada ao banco)
       const newImageIndex = index - (product?.images?.length ?? 0);
@@ -57,6 +61,7 @@ export const useImageManagement = (product: Product | null) => {
       newPreviewUrls.splice(index, 1);
       setImages(newImages);
       setImagePreviewUrls(newPreviewUrls);
+      console.log("[useImageManagement] Removeu nova imagem local, previews restantes:", newPreviewUrls.length);
     }
   };
 
@@ -66,7 +71,7 @@ export const useImageManagement = (product: Product | null) => {
     deletedImageIds,
     handleImageChange,
     handleRemoveImage,
-    setImages, // para permitir resetamento explícito
+    setImages,
     setImagePreviewUrls,
     setDeletedImageIds
   };

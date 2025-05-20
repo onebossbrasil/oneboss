@@ -1,3 +1,4 @@
+
 import { Product } from "@/types/product";
 import {
   Dialog,
@@ -51,11 +52,25 @@ const ProductEditDialog = ({ product, open, onOpenChange, onClose }: ProductEdit
     setDeletedImageIds
   } = useProductEdit(freshProduct, handleDialogClose);
 
+  // ---- DIAGNÓSTICO: Log detalhado do state do modal ao abrir ----
+  useEffect(() => {
+    if (open) {
+      console.log("[Modal] OPEN: Produto recebido:", product);
+      console.log("[Modal] Produto fresh do banco:", freshProduct);
+      console.log("[Modal] Estado inicial:", {
+        selectedCategory,
+        subcategoryValues,
+        images,
+        imagePreviewUrls,
+        formData
+      });
+    }
+  }, [open, product, freshProduct, selectedCategory, subcategoryValues, images, imagePreviewUrls, formData]);
+
   // Sempre recarrega produto depois de edição salvar para garantir reidratação correta
   useEffect(() => {
     if (!open) return;
-    // Força buscar sempre que abrir o modal
-    // (refetch removido - não existe na hook)
+    // Nada a fazer aqui; hook reidrata o produto fresh de qualquer forma
     // eslint-disable-next-line
   }, [open, productId]);
 
@@ -67,9 +82,22 @@ const ProductEditDialog = ({ product, open, onOpenChange, onClose }: ProductEdit
       setImages([]);
       setImagePreviewUrls([]);
       setDeletedImageIds([]);
+      console.log("[Modal] Fechando modal: Resetei todos os campos internos de edição!");
     }
     // eslint-disable-next-line
   }, [open]);
+
+  // ---- DIAGNÓSTICO: Log detalhado do submit ----
+  const wrappedHandleSubmit = (e: React.FormEvent) => {
+    console.log("[Modal] Submissão iniciada. Dados do formulário:", {
+      formData,
+      selectedCategory,
+      subcategoryValues,
+      images,
+      imagePreviewUrls,
+    });
+    handleSubmit(e);
+  };
 
   return (
     <Dialog open={open} onOpenChange={(isOpen) => {
@@ -87,19 +115,28 @@ const ProductEditDialog = ({ product, open, onOpenChange, onClose }: ProductEdit
             <span className="ml-4 text-muted-foreground">Carregando dados do produto...</span>
           </div>
         ) : (
-          <form onSubmit={handleSubmit} className="space-y-6">
+          <form onSubmit={wrappedHandleSubmit} className="space-y-6">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="space-y-4">
                 <ProductDetailsForm 
                   formData={formData}
-                  onChange={handleFormChange}
+                  onChange={(field, value) => {
+                    console.log(`[Modal] Mudou campo: ${field}`, value);
+                    handleFormChange(field, value);
+                  }}
                 />
 
                 <CategorySelector
                   selectedCategory={selectedCategory}
                   subcategoryValues={subcategoryValues}
-                  onCategoryChange={handleCategoryChange}
-                  onSubcategoryChange={handleSubcategoryChange}
+                  onCategoryChange={(categoryId) => {
+                    console.log("[Modal] Categoria alterada:", categoryId);
+                    handleCategoryChange(categoryId);
+                  }}
+                  onSubcategoryChange={(type, value) => {
+                    console.log("[Modal] Subcategoria alterada:", type, value);
+                    handleSubcategoryChange(type, value);
+                  }}
                 />
               </div>
 
@@ -107,8 +144,14 @@ const ProductEditDialog = ({ product, open, onOpenChange, onClose }: ProductEdit
                 <ImageUpload
                   images={images}
                   imagePreviewUrls={imagePreviewUrls}
-                  handleImageChange={handleImageChange}
-                  handleRemoveImage={handleRemoveImage}
+                  handleImageChange={(e) => {
+                    console.log("[Modal] Imagem adicionada: Arquivos:", e.target.files);
+                    handleImageChange(e);
+                  }}
+                  handleRemoveImage={(idx) => {
+                    console.log("[Modal] Removendo imagem: index:", idx);
+                    handleRemoveImage(idx);
+                  }}
                   existingImages={freshProduct?.images || []}
                 />
               </div>

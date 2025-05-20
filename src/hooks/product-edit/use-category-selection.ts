@@ -11,7 +11,6 @@ export const useCategorySelection = (product: Product | null) => {
 
   // Reset categories when product changes
   useEffect(() => {
-    // Corrigido: sincroniza SEMPRE com o produto, inclusive em edição reaberta
     if (product) {
       setSelectedCategory(product.categoryId ?? "");
       setSubcategoryValues(product.subcategoryValues ?? {});
@@ -19,13 +18,15 @@ export const useCategorySelection = (product: Product | null) => {
       setSelectedCategory("");
       setSubcategoryValues({});
     }
+    // Diagnóstico extra
+    console.log("[useCategorySelection] RESET. Produto=", product);
   }, [product?.id]); // Só reseta de fato quando id muda
 
   const handleCategoryChange = (categoryId: string) => {
     setSelectedCategory(categoryId);
-    // Mantém featured se existir
-    const featured = subcategoryValues.featured;
-    setSubcategoryValues(featured ? { featured } : {});
+    setSubcategoryValues({});
+    // Diagnóstico: alterando categoria precisa zerar subcategorias para evitar resíduos!
+    console.log("[useCategorySelection] Categoria alterada:", categoryId, "(resetou subcategoryValues)");
   };
   
   const handleSubcategoryChange = (type: string, value: string) => {
@@ -33,6 +34,7 @@ export const useCategorySelection = (product: Product | null) => {
       ...prev,
       [type]: value,
     }));
+    console.log("[useCategorySelection] Subcategoria alterada:", type, value);
   };
 
   return {
