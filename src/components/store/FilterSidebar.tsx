@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { Filter, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -5,7 +6,7 @@ import { Separator } from "@/components/ui/separator";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Sidebar, SidebarContent, SidebarHeader, SidebarFooter } from "@/components/ui/sidebar";
 import { useCategories } from "@/contexts/CategoryContext";
-import { SubcategoryType } from "@/types/category";
+import { SubcategoryType, AttributeType } from "@/types/category";
 import { Product } from "@/types/product";
 
 type FilterSidebarProps = {
@@ -46,11 +47,11 @@ const FilterSidebar = ({
     return subcategories
       .map((subcat) => {
         // For each attribute of the subcategory:
-        const activeAttributes = subcat.attributes.filter((value) =>
+        const activeAttributes = subcat.attributes.filter((attr: AttributeType) =>
           publishedProducts.some(
             (product) =>
               product.subcategoryValues &&
-              Object.values(product.subcategoryValues).includes(value)
+              Object.values(product.subcategoryValues).includes(attr.id)
           )
         );
         // Only return subcategory if there is at least 1 active attribute
@@ -110,14 +111,16 @@ const FilterSidebar = ({
                           <span className="block text-xs text-muted-foreground font-medium ml-2 mb-1">{subcategory.name}</span>
                         )}
                         <div className="flex flex-col space-y-1">
-                          {subcategory.attributes.map(value => (
+                          {subcategory.attributes.map(attr => (
                             <Button
-                              key={`${subcategory.id}-${value}`}
+                              key={`${subcategory.id}-${attr.id}`}
                               variant="ghost"
-                              className={`justify-start font-normal h-8 px-2 w-full text-left ${selectedSubcategories.includes(value) ? 'bg-gold/10 text-gold' : ''}`}
-                              onClick={() => onSubcategoryToggle(value)}
+                              className={`justify-start font-normal h-8 px-2 w-full text-left ${
+                                selectedSubcategories.includes(attr.id) ? 'bg-gold/10 text-gold' : ''
+                              }`}
+                              onClick={() => onSubcategoryToggle(attr.id)}
                             >
-                              {value}
+                              {attr.name}
                             </Button>
                           ))}
                         </div>

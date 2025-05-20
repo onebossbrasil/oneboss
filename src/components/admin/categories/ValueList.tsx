@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -7,6 +8,7 @@ import { useToast } from "@/hooks/use-toast";
 import { useCategories, CategoryType, SubcategoryType } from "@/contexts/CategoryContext";
 import InlineEditInput from "./InlineEditInput";
 import { updateSubcategoryValue } from "@/services/category/valueOperations";
+import { AttributeType } from "@/types/category"; // <-- Import type
 
 type AttributeListProps = {
   selectedCategory: string | null;
@@ -38,10 +40,15 @@ const AttributeList = ({
   const category = getCurrentCategory();
   const subcategory = getCurrentSubcategory();
 
+  // Check for duplicate attribute name
+  const attributeNameExists = (name: string) => {
+    return subcategory?.attributes.some(attr => attr.name === name);
+  };
+
   const handleAddAttribute = async () => {
     if (!selectedCategory || !selectedSubcategory || !newAttributeName) return;
     if (!category || !subcategory) return;
-    if (subcategory.attributes.includes(newAttributeName)) {
+    if (attributeNameExists(newAttributeName)) {
       toast({
         title: "Atributo duplicado",
         description: "Este atributo já existe nesta subcategoria.",
@@ -66,14 +73,14 @@ const AttributeList = ({
     }
   };
 
-  const handleRemoveAttribute = async (value: string) => {
+  const handleRemoveAttribute = async (attr: AttributeType) => {
     if (!selectedCategory || !selectedSubcategory) return;
     if (!category || !subcategory) return;
     try {
-      await removeSubcategoryValue(category.id, subcategory.id, value);
+      await removeSubcategoryValue(category.id, subcategory.id, attr.id);
       toast({
         title: "Atributo removido",
-        description: `${value} foi removido com sucesso.`,
+        description: `${attr.name} foi removido com sucesso.`,
       });
     } catch (e: any) {
       toast({
@@ -84,12 +91,12 @@ const AttributeList = ({
     }
   };
 
-  const handleEditAttribute = async (oldValue: string) => {
+  const handleEditAttribute = async (oldAttr: AttributeType) => {
     if (!selectedCategory || !selectedSubcategory) return;
     if (!category || !subcategory) return;
     setSavingEdit(true);
     try {
-      await updateSubcategoryValue(subcategory.id, oldValue, editValue);
+      await updateSubcategoryValue(subcategory.id, oldAttr.id, editValue);
       toast({
         title: "Atributo atualizado",
         description: `${editValue} editado com sucesso.`,
@@ -160,30 +167,30 @@ const AttributeList = ({
           {subcategory ? (
             <div className="space-y-2">
               {subcategory.attributes.length > 0 ? (
-                subcategory.attributes.map((value, index) => (
+                subcategory.attributes.map((attr, index) => (
                   <div
-                    key={index}
+                    key={attr.id}
                     className="flex items-center justify-between w-full p-2 rounded-md hover:bg-accent"
                   >
                     {editIndex === index ? (
                       <InlineEditInput
                         value={editValue}
                         onChange={setEditValue}
-                        onSave={() => handleEditAttribute(value)}
+                        onSave={() => handleEditAttribute(attr)}
                         onCancel={() => setEditIndex(null)}
                         loading={savingEdit}
                         className="mr-2"
                       />
                     ) : (
                       <>
-                        <span className="text-sm">{value}</span>
+                        <span className="text-sm">{attr.name}</span>
                         <div className="flex gap-1">
                           <Button
                             variant="ghost"
                             size="icon"
                             onClick={() => {
                               setEditIndex(index);
-                              setEditValue(value);
+                              setEditValue(attr.name);
                             }}
                           >
                             <Pencil className="h-4 w-4 text-primary" />
@@ -191,7 +198,7 @@ const AttributeList = ({
                           <Button
                             variant="ghost"
                             size="icon"
-                            onClick={() => handleRemoveAttribute(value)}
+                            onClick={() => handleRemoveAttribute(attr)}
                           >
                             <Trash2 className="h-4 w-4 text-red-500" />
                           </Button>
