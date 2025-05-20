@@ -1,5 +1,19 @@
-import React, { useCallback, useEffect, useRef } from "react";
+
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import useEmblaCarousel from "embla-carousel-react";
+
+// Atente-se: hook simplificado para checar se é mobile
+function useIsMobile() {
+  const [isMobile, setIsMobile] = useState(
+    typeof window !== "undefined" ? window.innerWidth < 768 : false
+  );
+  useEffect(() => {
+    const onResize = () => setIsMobile(window.innerWidth < 768);
+    window.addEventListener("resize", onResize);
+    return () => window.removeEventListener("resize", onResize);
+  }, []);
+  return isMobile;
+}
 
 const partners = [
   {
@@ -15,11 +29,16 @@ const partners = [
 const AUTO_PLAY_INTERVAL = 2500;
 
 const PartnersCarousel = () => {
+  const isMobile = useIsMobile();
+
+  // Embla config depende do tipo de device
   const [emblaRef, emblaApi] = useEmblaCarousel({
     loop: true,
     slidesToScroll: 1,
-    align: "start",
+    align: isMobile ? "center" : "start",
+    // Não existe 'speed' option aqui
   });
+
   const autoplayRef = useRef<NodeJS.Timeout | null>(null);
 
   // Autoplay: avança 1 logo a cada intervalo
@@ -40,14 +59,14 @@ const PartnersCarousel = () => {
     };
   }, [emblaApi, autoplay]);
 
-  // Se houver 2 logos, sempre duplica para garantir looping fluido
+  // Duplicação dos logos se só houver 2, para looping suave
   const displayPartners = partners.length === 2
     ? [...partners, ...partners]
     : partners;
 
   return (
-    <section className="w-full bg-background py-6 md:py-8 relative overflow-hidden border-b border-gold/10">
-      <div className="container mx-auto">
+    <section className="w-full bg-[#1A1F2C] py-5 md:py-8 relative overflow-hidden border-b border-gold/10">
+      <div className="container mx-auto px-0 md:px-6">
         <h2 className="font-playfair text-center text-xl md:text-2xl mb-6 font-bold text-muted-foreground tracking-wide">
           Nossos Parceiros
         </h2>
@@ -56,17 +75,25 @@ const PartnersCarousel = () => {
             <div className="embla__container flex">
               {displayPartners.map((logo, idx) => (
                 <div
-                  className="embla__slide flex items-center justify-center flex-shrink-0 px-4"
+                  className={`
+                    embla__slide flex items-center justify-center flex-shrink-0 
+                    px-1 md:px-6
+                  `}
                   style={{
-                    minWidth: "50%", // sempre 2 visíveis incluso mobile/desktop
-                    maxWidth: "50%",
+                    minWidth: isMobile ? "100%" : "50%",
+                    maxWidth: isMobile ? "100%" : "50%",
+                    transition: "min-width 0.2s, max-width 0.2s",
                   }}
                   key={idx}
                 >
                   <img
                     src={logo.src}
                     alt={logo.alt}
-                    className="h-14 md:h-20 object-contain max-w-[180px] saturate-150 transition-transform duration-300 hover:scale-105"
+                    className={`
+                      object-contain saturate-150 transition-transform duration-300 hover:scale-105
+                      h-20 max-w-[180px]
+                      md:h-32 md:max-w-[280px]
+                    `}
                     draggable={false}
                   />
                 </div>
@@ -87,3 +114,4 @@ const PartnersCarousel = () => {
 };
 
 export default PartnersCarousel;
+
