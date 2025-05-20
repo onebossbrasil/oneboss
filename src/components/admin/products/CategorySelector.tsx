@@ -25,27 +25,23 @@ const CategorySelectorContent = ({
     setActiveSubcategoryType(null);
   }, [selectedCategory]);
   
+  // Novo: Buscar categoria pelo UUID/id
+  const category = categories.find(cat => cat.id === selectedCategory);
+
   // Get all subcategory types for the selected category
   const subcategoryTypes = () => {
-    const category = categories.find(cat => cat.value === selectedCategory);
     return category ? category.subcategories.map(sc => sc.type) : [];
   };
   
   // Get available values for a specific subcategory type
   const getSubcategoryOptions = (subcatType: string) => {
-    const category = categories.find(cat => cat.value === selectedCategory);
-    if (!category) return [];
-    
-    const subcategory = category.subcategories.find(sc => sc.type === subcatType);
+    const subcategory = category?.subcategories.find(sc => sc.type === subcatType);
     return subcategory ? subcategory.values : [];
   };
   
   // Get the label of a subcategory type
   const getSubcategoryLabel = (subcatType: string) => {
-    const category = categories.find(cat => cat.value === selectedCategory);
-    if (!category) return subcatType.charAt(0).toUpperCase() + subcatType.slice(1);
-    
-    const subcategory = category.subcategories.find(sc => sc.type === subcatType);
+    const subcategory = category?.subcategories.find(sc => sc.type === subcatType);
     return subcategory ? subcategory.name : subcatType.charAt(0).toUpperCase() + subcatType.slice(1);
   };
   
@@ -80,7 +76,7 @@ const CategorySelectorContent = ({
             {categories.map((category) => (
               <SelectItem 
                 key={category.id} 
-                value={category.id} // Aqui o value agora é o uuid (id), antes podia ser value/sluf
+                value={category.id}
               >
                 {category.name}
               </SelectItem>
@@ -100,14 +96,13 @@ const CategorySelectorContent = ({
               <SelectValue placeholder="Selecione uma subcategoria" />
             </SelectTrigger>
             <SelectContent>
-              {(() => {
-                const category = categories.find(cat => cat.value === selectedCategory);
-                return category ? category.subcategories.map(sc => (
-                  <SelectItem key={sc.type} value={sc.type}>
-                    {sc.name}
-                  </SelectItem>
-                )) : null;
-              })()}
+              {category
+                ? category.subcategories.map(sc => (
+                    <SelectItem key={sc.type} value={sc.type}>
+                      {sc.name}
+                    </SelectItem>
+                  ))
+                : null}
             </SelectContent>
           </Select>
         </div>
@@ -117,7 +112,6 @@ const CategorySelectorContent = ({
         <div>
           <Label htmlFor="subcategoryValue">
             {(() => {
-              const category = categories.find(cat => cat.value === selectedCategory);
               const subcategory = category?.subcategories.find(sc => sc.type === activeSubcategoryType);
               return (subcategory ? subcategory.name : activeSubcategoryType) + " - Atributos";
             })()}
@@ -129,7 +123,6 @@ const CategorySelectorContent = ({
             <SelectTrigger>
               <SelectValue placeholder={
                 (() => {
-                  const category = categories.find(cat => cat.value === selectedCategory);
                   const subcategory = category?.subcategories.find(sc => sc.type === activeSubcategoryType);
                   const nomeSubcategoria = subcategory ? subcategory.name.toLowerCase() : activeSubcategoryType.toLowerCase();
                   return `Selecione um atributo para ${nomeSubcategoria}`;
@@ -138,7 +131,6 @@ const CategorySelectorContent = ({
             </SelectTrigger>
             <SelectContent>
               {(() => {
-                const category = categories.find(cat => cat.value === selectedCategory);
                 const subcategory = category?.subcategories.find(sc => sc.type === activeSubcategoryType);
                 return subcategory ? subcategory.values.map((option: string) => (
                   <SelectItem key={option} value={option}>
