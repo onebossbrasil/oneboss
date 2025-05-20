@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Filter, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -8,6 +7,7 @@ import { Sidebar, SidebarContent, SidebarHeader, SidebarFooter } from "@/compone
 import { useCategories } from "@/contexts/CategoryContext";
 import { SubcategoryType, AttributeType } from "@/types/category";
 import { Product } from "@/types/product";
+import AttributeListDisplay from "@/components/categories/AttributeListDisplay";
 
 type FilterSidebarProps = {
   selectedCategory: string | null;
@@ -110,20 +110,11 @@ const FilterSidebar = ({
                         {subcategories.length > 1 && (
                           <span className="block text-xs text-muted-foreground font-medium ml-2 mb-1">{subcategory.name}</span>
                         )}
-                        <div className="flex flex-col space-y-1">
-                          {subcategory.attributes.map(attr => (
-                            <Button
-                              key={`${subcategory.id}-${attr.id}`}
-                              variant="ghost"
-                              className={`justify-start font-normal h-8 px-2 w-full text-left ${
-                                selectedSubcategories.includes(attr.id) ? 'bg-gold/10 text-gold' : ''
-                              }`}
-                              onClick={() => onSubcategoryToggle(attr.id)}
-                            >
-                              {attr.name}
-                            </Button>
-                          ))}
-                        </div>
+                        <AttributeListDisplay
+                          attributes={subcategory.attributes}
+                          selectedAttributeIds={selectedSubcategories}
+                          onAttributeToggle={onSubcategoryToggle}
+                        />
                       </div>
                     ))}
                   </div>

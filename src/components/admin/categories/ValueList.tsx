@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -9,6 +8,7 @@ import { useCategories, CategoryType, SubcategoryType } from "@/contexts/Categor
 import InlineEditInput from "./InlineEditInput";
 import { updateSubcategoryValue } from "@/services/category/valueOperations";
 import { AttributeType } from "@/types/category"; // <-- Import type
+import AttributeListDisplay from "@/components/categories/AttributeListDisplay";
 
 type AttributeListProps = {
   selectedCategory: string | null;
@@ -167,46 +167,16 @@ const AttributeList = ({
           {subcategory ? (
             <div className="space-y-2">
               {subcategory.attributes.length > 0 ? (
-                subcategory.attributes.map((attr, index) => (
-                  <div
-                    key={attr.id}
-                    className="flex items-center justify-between w-full p-2 rounded-md hover:bg-accent"
-                  >
-                    {editIndex === index ? (
-                      <InlineEditInput
-                        value={editValue}
-                        onChange={setEditValue}
-                        onSave={() => handleEditAttribute(attr)}
-                        onCancel={() => setEditIndex(null)}
-                        loading={savingEdit}
-                        className="mr-2"
-                      />
-                    ) : (
-                      <>
-                        <span className="text-sm">{attr.name}</span>
-                        <div className="flex gap-1">
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            onClick={() => {
-                              setEditIndex(index);
-                              setEditValue(attr.name);
-                            }}
-                          >
-                            <Pencil className="h-4 w-4 text-primary" />
-                          </Button>
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            onClick={() => handleRemoveAttribute(attr)}
-                          >
-                            <Trash2 className="h-4 w-4 text-red-500" />
-                          </Button>
-                        </div>
-                      </>
-                    )}
-                  </div>
-                ))
+                <AttributeListDisplay
+                  attributes={subcategory.attributes}
+                  editable
+                  onEdit={(attr) => {
+                    const index = subcategory.attributes.findIndex(a => a.id === attr.id);
+                    setEditIndex(index);
+                    setEditValue(attr.name);
+                  }}
+                  onDelete={handleRemoveAttribute}
+                />
               ) : (
                 <p className="text-sm text-muted-foreground py-2">
                   Nenhum atributo encontrado. Adicione novos atributos para esta subcategoria.
