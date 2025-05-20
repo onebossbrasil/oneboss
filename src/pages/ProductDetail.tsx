@@ -10,6 +10,7 @@ import ProductDetailSkeleton from "@/components/product-detail/ProductDetailSkel
 import ProductNotFound from "@/components/product-detail/ProductNotFound";
 import ProductMetaTags from "@/components/product-detail/ProductMetaTags";
 import ProductDetailContent from "@/components/product-detail/ProductDetailContent";
+import FeaturedProductsSection from "@/components/FeaturedProductsSection";
 
 const ProductDetail = () => {
   const { productId } = useParams<{ productId: string }>();
@@ -54,6 +55,12 @@ const ProductDetail = () => {
       {product && <ProductMetaTags product={product} />}
       <Header />
       {product && <ProductDetailContent product={product} onGoBack={handleGoBack} />}
+      {/* NOVA SESSÃO: Produtos em destaque (exibir, exceto se for o próprio produto sendo exibido) */}
+      <FeaturedProductsSection
+        title="Veja também: Produtos em Destaque"
+        className="bg-zinc-50 dark:bg-zinc-900/50"
+        hideIfNone={true}
+      />
       <Footer />
     </div>
   );

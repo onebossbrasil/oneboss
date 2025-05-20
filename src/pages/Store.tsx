@@ -7,6 +7,7 @@ import SearchBar from "@/components/store/SearchBar";
 import FilterSidebar from "@/components/store/FilterSidebar";
 import ResultsHeader from "@/components/store/ResultsHeader";
 import ProductGrid from "@/components/store/ProductGrid";
+import FeaturedProductsSection from "@/components/FeaturedProductsSection";
 import { useProducts } from "@/contexts/ProductContext";
 import { useCategories } from "@/contexts/CategoryContext";
 import { FormattedProduct, Product } from "@/types/product";
@@ -136,6 +137,8 @@ const Store = () => {
       <Header />
       <main className="flex-grow">
         <StoreBanner />
+        {/* NOVO: sessão produtos em destaque */}
+        <FeaturedProductsSection title="Produtos em Destaque" hideIfNone={true} />
         <div className="container mx-auto px-4 py-8 md:py-12">
           <SearchBar
             searchQuery={searchQuery}

@@ -142,22 +142,6 @@ const CategorySelectorContent = ({
           </Select>
         </div>
       )}
-
-      <div>
-        <Label htmlFor="featured">Em Destaque?</Label>
-        <Select 
-          value={subcategoryValues['featured'] || "false"} 
-          onValueChange={(value) => onSubcategoryChange('featured', value)}
-        >
-          <SelectTrigger>
-            <SelectValue placeholder="O produto ficará em destaque?" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="true">Sim</SelectItem>
-            <SelectItem value="false">Não</SelectItem>
-          </SelectContent>
-        </Select>
-      </div>
     </div>
   );
 };
