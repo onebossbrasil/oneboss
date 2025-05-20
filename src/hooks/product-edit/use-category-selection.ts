@@ -2,8 +2,12 @@ import { useState, useEffect } from "react";
 import { Product } from "@/types/product";
 
 export const useCategorySelection = (product: Product | null) => {
-  const [selectedCategory, setSelectedCategory] = useState("");
-  const [subcategoryValues, setSubcategoryValues] = useState<Record<string, string>>({});
+  // A categoryId agora SEMPRE precisa ser o uuid
+  // Se vier do produto, já é uuid (product.categoryId)
+  // Se vier do formulário, receba sempre o uuid da category
+
+  const [selectedCategory, setSelectedCategory] = useState<string>(product?.categoryId ?? "");
+  const [subcategoryValues, setSubcategoryValues] = useState<Record<string, string>>(product?.subcategoryValues || {});
 
   // Reset categories when product changes
   useEffect(() => {
@@ -13,8 +17,8 @@ export const useCategorySelection = (product: Product | null) => {
     }
   }, [product]);
 
-  const handleCategoryChange = (value: string) => {
-    setSelectedCategory(value);
+  const handleCategoryChange = (categoryId: string) => {
+    setSelectedCategory(categoryId);
     // Keep the featured status but reset other subcategory values
     const featured = subcategoryValues.featured;
     setSubcategoryValues(featured ? { featured } : {});

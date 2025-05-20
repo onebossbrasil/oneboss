@@ -153,7 +153,7 @@ export type Database = {
       }
       products: {
         Row: {
-          category_id: string | null
+          category_id: string
           created_at: string | null
           description: string | null
           featured: boolean | null
@@ -169,7 +169,7 @@ export type Database = {
           url: string | null
         }
         Insert: {
-          category_id?: string | null
+          category_id: string
           created_at?: string | null
           description?: string | null
           featured?: boolean | null
@@ -185,7 +185,7 @@ export type Database = {
           url?: string | null
         }
         Update: {
-          category_id?: string | null
+          category_id?: string
           created_at?: string | null
           description?: string | null
           featured?: boolean | null
@@ -200,31 +200,46 @@ export type Database = {
           updated_at?: string | null
           url?: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "fk_product_category"
+            columns: ["category_id"]
+            isOneToOne: false
+            referencedRelation: "categories"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       subcategories: {
         Row: {
-          category_id: string | null
+          category_id: string
           created_at: string | null
           id: string
           name: string
           type: string
         }
         Insert: {
-          category_id?: string | null
+          category_id: string
           created_at?: string | null
           id?: string
           name: string
           type: string
         }
         Update: {
-          category_id?: string | null
+          category_id?: string
           created_at?: string | null
           id?: string
           name?: string
           type?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "fk_subcategory_category"
+            columns: ["category_id"]
+            isOneToOne: false
+            referencedRelation: "categories"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "subcategories_category_id_fkey"
             columns: ["category_id"]
@@ -239,21 +254,28 @@ export type Database = {
           attribute: string
           created_at: string | null
           id: string
-          subcategory_id: string | null
+          subcategory_id: string
         }
         Insert: {
           attribute: string
           created_at?: string | null
           id?: string
-          subcategory_id?: string | null
+          subcategory_id: string
         }
         Update: {
           attribute?: string
           created_at?: string | null
           id?: string
-          subcategory_id?: string | null
+          subcategory_id?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "fk_attribute_subcategory"
+            columns: ["subcategory_id"]
+            isOneToOne: false
+            referencedRelation: "subcategories"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "subcategory_attributes_subcategory_id_fkey"
             columns: ["subcategory_id"]

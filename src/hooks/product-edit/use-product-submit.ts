@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { useProducts } from "@/contexts/ProductContext";
 import { useToast } from "@/hooks/use-toast";
@@ -86,7 +85,7 @@ export const useProductSubmit = (
         description: formData.description,
         price,
         salePrice: salePrice || null,
-        categoryId: selectedCategory,
+        categoryId: selectedCategory, // uuid
         subcategoryValues,
         published: formData.published,
         featured: formData.featured,

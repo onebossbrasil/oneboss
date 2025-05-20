@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { useProducts } from "@/contexts/ProductContext";
 import { useToast } from "@/hooks/use-toast";
@@ -31,6 +30,18 @@ export const useProductAdd = (
     e.preventDefault();
 
     setIsSubmitting(true);
+
+    // Validação básica, deve vir ID uuid no selectedCategory
+    const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[4][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+    if (!selectedCategory || !uuidRegex.test(selectedCategory)) {
+      setIsSubmitting(false);
+      toast({
+        title: "Categoria inválida",
+        description: "Selecione uma categoria válida.",
+        variant: "destructive"
+      });
+      return;
+    }
 
     // Validate form data
     const isValid = validateProductData(
@@ -71,7 +82,7 @@ export const useProductAdd = (
         description: formData.description,
         price,
         salePrice: salePrice || null,
-        categoryId: selectedCategory,
+        categoryId: selectedCategory, // uuid!
         subcategoryValues,
         published: formData.published,
         featured: formData.featured,

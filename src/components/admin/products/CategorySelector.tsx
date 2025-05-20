@@ -78,7 +78,10 @@ const CategorySelectorContent = ({
           </SelectTrigger>
           <SelectContent>
             {categories.map((category) => (
-              <SelectItem key={category.value} value={category.value}>
+              <SelectItem 
+                key={category.id} 
+                value={category.id} // Aqui o value agora é o uuid (id), antes podia ser value/sluf
+              >
                 {category.name}
               </SelectItem>
             ))}

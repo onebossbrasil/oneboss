@@ -75,11 +75,23 @@ export const useProductForm = () => {
     e.preventDefault();
     
     try {
-      // Validate form data
+      // Validar categoria como campo obrigatório (deve ser UUID, já que category_id agora é NOT NULL FK)
       if (!formData.name || !formData.price || !selectedCategory) {
         toast({
           title: "Erro no formulário",
           description: "Por favor, preencha todos os campos obrigatórios.",
+          variant: "destructive"
+        });
+        return;
+      }
+
+      // Validar: selectedCategory deve ser um UUID válido!
+      // Verifica se é um uuid simples (cuidado: não permite category_id ser um 'value' não UUID)
+      const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[4][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+      if (!uuidRegex.test(selectedCategory)) {
+        toast({
+          title: "Categoria inválida",
+          description: "Selecione uma categoria válida.",
           variant: "destructive"
         });
         return;
@@ -121,14 +133,14 @@ export const useProductForm = () => {
         return;
       }
 
-      // Prepare product data
+      // Prepara os dados, repassando categoryId como uuid:
       const productData = {
         name: formData.name,
         shortDescription: formData.shortDescription || null,
         description: formData.description,
         price,
         salePrice: salePrice || null,
-        categoryId: selectedCategory,
+        categoryId: selectedCategory, // AGORA sempre uuid
         subcategoryValues,
         published: formData.published,
         featured: formData.featured,
