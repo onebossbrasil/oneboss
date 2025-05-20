@@ -5,9 +5,9 @@ import ProductInfo from "./ProductInfo";
 import ProductDescription from "./ProductDescription";
 import ProductAdditionalInfo from "./ProductAdditionalInfo";
 import RelatedProducts from "./related-products";
-import ContactSection from "./ContactSection";
 import ProductBreadcrumbs from "./ProductBreadcrumbs";
 import BackButton from "./BackButton";
+// Removido: import ContactSection from "./ContactSection";
 
 interface ProductDetailContentProps {
   product: Product;
@@ -41,10 +41,10 @@ const ProductDetailContent = ({ product, onGoBack }: ProductDetailContentProps) 
       {/* Related Products */}
       <RelatedProducts currentProductId={product.id} categoryId={product.categoryId} />
       
-      {/* Contact Section */}
-      <ContactSection productName={product.name} productId={product.id} />
+      {/* Sessão de Contato removida da página de produto individual */}
     </main>
   );
 };
 
 export default ProductDetailContent;
+
