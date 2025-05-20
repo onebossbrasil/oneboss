@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { useProducts } from "@/contexts/ProductContext";
 import { useToast } from "@/hooks/use-toast";
@@ -23,7 +22,9 @@ export const useProductSubmit = (
   subcategoryValues: Record<string, string>,
   images: File[],
   deletedImageIds: string[],
-  onSuccess: () => void
+  onSuccess: () => void,
+  selectedSubcategoryId?: string | null,
+  selectedAttributeId?: string | null,
 ) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { updateProduct } = useProducts();
@@ -46,12 +47,8 @@ export const useProductSubmit = (
     try {
       setIsSubmitting(true);
 
-      // Logs de depuração de categoria/subcategoria
-      console.log("[Diagnóstico Edição] Produto sendo editado:", product.id);
-      console.log("[Diagnóstico Edição] selectedCategory (esperado UUID):", selectedCategory);
-      console.log("[Diagnóstico Edição] subcategoryValues:", subcategoryValues);
+      // LOGs de diagnóstico
 
-      // Validate form fields
       const isValid = validateProductData(
         formData.name,
         formData.price,
@@ -70,28 +67,10 @@ export const useProductSubmit = (
         return;
       }
 
-      // Validação adicional: se subcategoryValues for necessária, impedir submit vazio
-      // Se a categoria requer subcategoria (tem ao menos um campo) e não foi escolhida, impedir envio
-      // Regra: se existir categoria selecionada, e ela tem subcategorias, deve ter pelo menos 1 par chave:valor preenchido
-      // Para isso usamos length das chaves
-      if (
-        selectedCategory &&
-        Array.isArray(Object.keys(subcategoryValues)) &&
-        Object.keys(subcategoryValues).length === 0
-      ) {
-        setIsSubmitting(false);
-        toast({
-          title: "Subcategoria obrigatória",
-          description: "Selecione ao menos uma subcategoria/atributo antes de salvar.",
-          variant: "destructive"
-        });
-        return;
-      }
-
-      // Convert price to number
+      // Agora subcategoria e atributo são opcionais.
+      // Eles serão salvos apenas se passados (pode ser null)
       const price = convertPriceToNumber(formData.price);
 
-      // Sale price to number, if any
       let salePrice = undefined;
       if (formData.salePrice) {
         salePrice = convertPriceToNumber(formData.salePrice);
@@ -99,7 +78,6 @@ export const useProductSubmit = (
 
       const stockQuantity = parseInt(formData.stockQuantity, 10);
 
-      // Monta dados: só envia subcategoryValues se não estiver vazio; senão, envia null explicitamente
       const productData = {
         name: formData.name,
         shortDescription: formData.shortDescription || null,
@@ -107,18 +85,14 @@ export const useProductSubmit = (
         price,
         salePrice: salePrice || null,
         categoryId: selectedCategory,
+        subcategoryId: selectedSubcategoryId ?? null,
+        attributeId: selectedAttributeId ?? null,
         subcategoryValues: Object.keys(subcategoryValues).length > 0 ? subcategoryValues : null,
         published: formData.published,
         featured: formData.featured,
         stockQuantity,
         deletedImageIds: deletedImageIds
       };
-
-      console.log("[Diagnóstico Edição] ENVIANDO PARA updateProduct:", {
-        id: product.id,
-        ...productData,
-        imagesLength: images?.length
-      });
 
       await updateProduct(product.id, productData, images.length > 0 ? images : undefined);
 

@@ -13,6 +13,9 @@ export type Product = {
   price: number;
   salePrice?: number | null;
   categoryId: string | null;
+  // NOVOS CAMPOS RELACIONADOS COM IDs
+  subcategoryId?: string | null;
+  attributeId?: string | null;
   subcategoryValues: Record<string, string>;
   published: boolean;
   featured: boolean;

@@ -42,6 +42,42 @@ export type Database = {
         }
         Relationships: []
       }
+      attributes: {
+        Row: {
+          attribute: string
+          created_at: string | null
+          id: string
+          subcategory_id: string
+        }
+        Insert: {
+          attribute: string
+          created_at?: string | null
+          id?: string
+          subcategory_id: string
+        }
+        Update: {
+          attribute?: string
+          created_at?: string | null
+          id?: string
+          subcategory_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "fk_attribute_subcategory"
+            columns: ["subcategory_id"]
+            isOneToOne: false
+            referencedRelation: "subcategories"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "subcategory_attributes_subcategory_id_fkey"
+            columns: ["subcategory_id"]
+            isOneToOne: false
+            referencedRelation: "subcategories"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       categories: {
         Row: {
           created_at: string | null
@@ -192,6 +228,7 @@ export type Database = {
       }
       products: {
         Row: {
+          attribute_id: string | null
           category_id: string
           created_at: string | null
           description: string | null
@@ -203,11 +240,13 @@ export type Database = {
           sale_price: number | null
           short_description: string | null
           stock_quantity: number | null
+          subcategory_id: string | null
           subcategory_values: Json | null
           updated_at: string | null
           url: string | null
         }
         Insert: {
+          attribute_id?: string | null
           category_id: string
           created_at?: string | null
           description?: string | null
@@ -219,11 +258,13 @@ export type Database = {
           sale_price?: number | null
           short_description?: string | null
           stock_quantity?: number | null
+          subcategory_id?: string | null
           subcategory_values?: Json | null
           updated_at?: string | null
           url?: string | null
         }
         Update: {
+          attribute_id?: string | null
           category_id?: string
           created_at?: string | null
           description?: string | null
@@ -235,6 +276,7 @@ export type Database = {
           sale_price?: number | null
           short_description?: string | null
           stock_quantity?: number | null
+          subcategory_id?: string | null
           subcategory_values?: Json | null
           updated_at?: string | null
           url?: string | null
@@ -245,6 +287,20 @@ export type Database = {
             columns: ["category_id"]
             isOneToOne: false
             referencedRelation: "categories"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fk_products_attribute"
+            columns: ["attribute_id"]
+            isOneToOne: false
+            referencedRelation: "attributes"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fk_products_subcategory"
+            columns: ["subcategory_id"]
+            isOneToOne: false
+            referencedRelation: "subcategories"
             referencedColumns: ["id"]
           },
         ]
@@ -299,42 +355,6 @@ export type Database = {
             columns: ["category_id"]
             isOneToOne: false
             referencedRelation: "categories"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      subcategory_attributes: {
-        Row: {
-          attribute: string
-          created_at: string | null
-          id: string
-          subcategory_id: string
-        }
-        Insert: {
-          attribute: string
-          created_at?: string | null
-          id?: string
-          subcategory_id: string
-        }
-        Update: {
-          attribute?: string
-          created_at?: string | null
-          id?: string
-          subcategory_id?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "fk_attribute_subcategory"
-            columns: ["subcategory_id"]
-            isOneToOne: false
-            referencedRelation: "subcategories"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "subcategory_attributes_subcategory_id_fkey"
-            columns: ["subcategory_id"]
-            isOneToOne: false
-            referencedRelation: "subcategories"
             referencedColumns: ["id"]
           },
         ]

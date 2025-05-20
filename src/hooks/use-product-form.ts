@@ -8,6 +8,8 @@ export const useProductForm = () => {
   const [images, setImages] = useState<File[]>([]);
   const [imagePreviewUrls, setImagePreviewUrls] = useState<string[]>([]);
   const [selectedCategory, setSelectedCategory] = useState("");
+  const [selectedSubcategoryId, setSelectedSubcategoryId] = useState<string | null>(null);
+  const [selectedAttributeId, setSelectedAttributeId] = useState<string | null>(null);
   const [subcategoryValues, setSubcategoryValues] = useState<Record<string, string>>({});
   const [isOpen, setIsOpen] = useState(false);
   const [formData, setFormData] = useState({
@@ -50,22 +52,25 @@ export const useProductForm = () => {
   
   const handleCategoryChange = (value: string) => {
     setSelectedCategory(value);
-    // Keep the featured status but reset other subcategory values
+    // Mantém featured mas reseta subcategoria/atributo
+    setSelectedSubcategoryId(null);
+    setSelectedAttributeId(null);
     const featured = subcategoryValues.featured;
     setSubcategoryValues(featured ? { featured } : {});
   };
   
-  const handleSubcategoryChange = (type: string, value: string) => {
-    setSubcategoryValues(prev => ({
-      ...prev,
-      [type]: value
-    }));
+  const handleSubcategoryChange = (subcategoryId: string | null) => {
+    setSelectedSubcategoryId(subcategoryId);
+  };
+
+  const handleAttributeChange = (attributeId: string | null) => {
+    setSelectedAttributeId(attributeId);
   };
 
   const handleFormChange = (field: string, value: any) => {
     if (field === 'featured') {
       setFormData(prev => ({ ...prev, [field]: value }));
-      handleSubcategoryChange('featured', value.toString());
+      setSubcategoryValues(prev => ({ ...prev, featured: value.toString() }));
     } else {
       setFormData(prev => ({ ...prev, [field]: value }));
     }
@@ -133,14 +138,16 @@ export const useProductForm = () => {
         return;
       }
 
-      // Prepara os dados, repassando categoryId como uuid:
+      // Prepara os dados para cadastro incluindo os novos campos
       const productData = {
         name: formData.name,
         shortDescription: formData.shortDescription || null,
         description: formData.description,
         price,
         salePrice: salePrice || null,
-        categoryId: selectedCategory, // AGORA sempre uuid
+        categoryId: selectedCategory,
+        subcategoryId: selectedSubcategoryId ?? null,
+        attributeId: selectedAttributeId ?? null,
         subcategoryValues,
         published: formData.published,
         featured: formData.featured,
@@ -164,6 +171,8 @@ export const useProductForm = () => {
           featured: false
         });
         setSelectedCategory("");
+        setSelectedSubcategoryId(null);
+        setSelectedAttributeId(null);
         setSubcategoryValues({});
         setImages([]);
         setImagePreviewUrls([]);
@@ -184,6 +193,8 @@ export const useProductForm = () => {
     images,
     imagePreviewUrls,
     selectedCategory,
+    selectedSubcategoryId,
+    selectedAttributeId,
     subcategoryValues,
     isOpen,
     setIsOpen,
@@ -192,6 +203,7 @@ export const useProductForm = () => {
     handleRemoveImage,
     handleCategoryChange,
     handleSubcategoryChange,
+    handleAttributeChange,
     handleSubmit
   };
 };
