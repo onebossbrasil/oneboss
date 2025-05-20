@@ -12,6 +12,7 @@ import ProductCreateButton from "./ProductCreateButton";
 import ConfirmDeleteProductModal from "./ConfirmDeleteProductModal";
 import { useCategories } from "@/contexts/CategoryContext";
 import BulkActionBar from "./BulkActionBar";
+import { Button } from "@/components/ui/button";
 
 const PAGE_SIZE = 20;
 
