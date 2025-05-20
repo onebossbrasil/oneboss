@@ -1,5 +1,6 @@
 
-import React from "react";
+import React, { useCallback, useEffect, useRef } from "react";
+import useEmblaCarousel from "embla-carousel-react";
 
 const partners = [
   {
@@ -12,25 +13,58 @@ const partners = [
   },
 ];
 
+const AUTO_PLAY_INTERVAL = 2500;
+
 const PartnersCarousel = () => {
-  // Duplicar os itens para criar efeito de loop contínuo
-  const logos = [...partners, ...partners];
+  const [emblaRef, emblaApi] = useEmblaCarousel({
+    loop: true,
+    slidesToScroll: 1,
+    speed: 6, // smoothness of the slide
+    align: "start",
+  });
+  const autoplayRef = useRef<NodeJS.Timeout | null>(null);
+
+  // Autoplay: avança 1 logo a cada intervalo
+  const autoplay = useCallback(() => {
+    if (!emblaApi) return;
+    if (emblaApi.canScrollNext()) {
+      emblaApi.scrollNext();
+    } else {
+      emblaApi.scrollTo(0);
+    }
+  }, [emblaApi]);
+
+  useEffect(() => {
+    if (!emblaApi) return;
+    autoplayRef.current = setInterval(autoplay, AUTO_PLAY_INTERVAL);
+    return () => {
+      if (autoplayRef.current) clearInterval(autoplayRef.current);
+    };
+  }, [emblaApi, autoplay]);
+
+  // Se houver 2 logos, sempre duplica para garantir looping fluido
+  const displayPartners = partners.length === 2
+    ? [...partners, ...partners]
+    : partners;
+
   return (
     <section className="w-full bg-background py-6 md:py-8 relative overflow-hidden border-b border-gold/10">
       <div className="container mx-auto">
-        <h2 className="font-playfair text-center text-xl md:text-2xl mb-6 font-bold text-muted-foreground tracking-wide">Nossos Parceiros</h2>
-        <div className="w-full relative">
-          <div className="h-24 md:h-32 overflow-hidden">
-            <div
-              className="flex gap-12 md:gap-24 animate-partner-marquee items-center h-full"
-              style={{
-                animationDuration: "18s",
-                animationTimingFunction: "linear",
-                animationIterationCount: "infinite"
-              }}
-            >
-              {logos.map((logo, idx) => (
-                <div className="flex-shrink-0 flex items-center h-full" key={idx}>
+        <h2 className="font-playfair text-center text-xl md:text-2xl mb-6 font-bold text-muted-foreground tracking-wide">
+          Nossos Parceiros
+        </h2>
+        <div className="w-full">
+          <div ref={emblaRef} className="embla overflow-hidden">
+            <div className="embla__container flex">
+              {displayPartners.map((logo, idx) => (
+                <div
+                  className="embla__slide flex items-center justify-center flex-shrink-0 px-4"
+                  style={{
+                    minWidth: "50%", // sempre 2 visíveis incluso mobile/desktop
+                    maxWidth: "50%",
+                  }}
+                  key={idx}
+                >
                   <img
                     src={logo.src}
                     alt={logo.alt}
@@ -45,13 +79,8 @@ const PartnersCarousel = () => {
       </div>
       <style>
         {`
-        @keyframes partner-marquee {
-          0% { transform: translateX(0); }
-          100% { transform: translateX(-50%); }
-        }
-        .animate-partner-marquee {
-          width: 200%;
-          animation-name: partner-marquee;
+        .embla__container {
+          will-change: transform;
         }
         `}
       </style>
@@ -60,3 +89,4 @@ const PartnersCarousel = () => {
 };
 
 export default PartnersCarousel;
+
