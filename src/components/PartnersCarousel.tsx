@@ -1,4 +1,3 @@
-
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import useEmblaCarousel from "embla-carousel-react";
 
@@ -65,7 +64,7 @@ const PartnersCarousel = () => {
     : partners;
 
   return (
-    <section className="w-full bg-[#1A1F2C] py-5 md:py-8 relative overflow-hidden border-b border-gold/10">
+    <section className="w-full bg-background py-5 md:py-8 relative overflow-hidden border-b border-gold/10">
       <div className="container mx-auto px-0 md:px-6">
         <h2 className="font-playfair text-center text-xl md:text-2xl mb-6 font-bold text-muted-foreground tracking-wide">
           Nossos Parceiros
@@ -114,4 +113,3 @@ const PartnersCarousel = () => {
 };
 
 export default PartnersCarousel;
-
