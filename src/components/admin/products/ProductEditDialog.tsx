@@ -1,4 +1,3 @@
-
 import { Product } from "@/types/product";
 import {
   Dialog,
@@ -54,7 +53,7 @@ const ProductEditDialog = ({ product, open, onOpenChange, onClose }: ProductEdit
     setImages,
     setImagePreviewUrls,
     setDeletedImageIds,
-    selectedSubcategoryId,
+    selectedSubcategoryId, // <-- este é o UUID
     selectedAttributeId,
     handleAttributeChange,
     handleSubcatIdChange
@@ -112,11 +111,8 @@ const ProductEditDialog = ({ product, open, onOpenChange, onClose }: ProductEdit
     }}>
       <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>
-            {freshProduct ? "Editar Produto" : "Cadastrar Produto"}
-          </DialogTitle>
+          <DialogTitle>{freshProduct ? "Editar Produto" : "Cadastrar Produto"}</DialogTitle>
         </DialogHeader>
-
         {isLoading ? (
           <div className="flex justify-center items-center py-8">
             <span className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900"></span>
@@ -129,7 +125,6 @@ const ProductEditDialog = ({ product, open, onOpenChange, onClose }: ProductEdit
                 <ProductDetailsForm 
                   formData={formData}
                   onChange={(field, value) => {
-                    console.log(`[Modal] Mudou campo: ${field}`, value);
                     handleFormChange(field, value);
                   }}
                 />
@@ -137,15 +132,9 @@ const ProductEditDialog = ({ product, open, onOpenChange, onClose }: ProductEdit
                 <CategorySelector
                   selectedCategory={selectedCategory}
                   subcategoryValues={subcategoryValues}
-                  selectedSubcategoryId={selectedSubcategoryId} // CONTROLADO!
-                  onCategoryChange={(categoryId) => {
-                    console.log("[Modal] Categoria alterada:", categoryId);
-                    handleCategoryChange(categoryId);
-                  }}
-                  onSubcategoryChange={(type, value) => {
-                    console.log("[Modal] Subcategoria alterada:", type, value);
-                    handleSubcategoryChange(type, value);
-                  }}
+                  selectedSubcategoryId={selectedSubcategoryId}    // <-- Passa o id como value!
+                  onCategoryChange={handleCategoryChange}
+                  onSubcategoryChange={handleSubcategoryChange}
                   onSubcategoryIdChange={handleSubcatIdChange}
                   onAttributeIdChange={handleAttributeChange}
                 />
@@ -154,14 +143,8 @@ const ProductEditDialog = ({ product, open, onOpenChange, onClose }: ProductEdit
                 <ImageUpload
                   images={images}
                   imagePreviewUrls={imagePreviewUrls}
-                  handleImageChange={(e) => {
-                    console.log("[Modal] Imagem adicionada: Arquivos:", e.target.files);
-                    handleImageChange(e);
-                  }}
-                  handleRemoveImage={(idx) => {
-                    console.log("[Modal] Removendo imagem: index:", idx);
-                    handleRemoveImage(idx);
-                  }}
+                  handleImageChange={handleImageChange}
+                  handleRemoveImage={handleRemoveImage}
                   existingImages={freshProduct?.images || []}
                 />
               </div>

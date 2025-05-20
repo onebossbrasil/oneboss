@@ -1,4 +1,3 @@
-
 import { useCategories } from "@/contexts/CategoryContext";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Label } from "@/components/ui/label";
@@ -18,52 +17,46 @@ type CategorySelectorProps = {
 const CategorySelectorContent = ({
   selectedCategory,
   subcategoryValues,
-  selectedSubcategoryId, // novo
+  selectedSubcategoryId, // agora prioritário!
   onCategoryChange,
   onSubcategoryChange,
   onSubcategoryIdChange,
   onAttributeIdChange
 }: CategorySelectorProps) => {
   const { categories, isLoading, error } = useCategories();
-  const [activeSubcategoryType, setActiveSubcategoryType] = useState<string | null>(null);
 
-  useEffect(() => {
-    setActiveSubcategoryType(null);
-  }, [selectedCategory]);
-
+  // O valor selecionado é SEMPRE o id (uuid) da subcategoria
   const category = categories.find(cat => cat.id === selectedCategory);
+  const [activeSubcategoryId, setActiveSubcategoryId] = useState<string | null>(selectedSubcategoryId ?? null);
 
-  // Mapear subcategoryId recebido para subcategoryType
+  // Atualiza subcategoria ativa sempre que prop muda (mantém controlado pelo id)
   useEffect(() => {
-    if (selectedSubcategoryId && category) {
-      const obj = category.subcategories.find(sc => sc.id === selectedSubcategoryId);
-      if (obj) setActiveSubcategoryType(obj.type);
-    }
-    // eslint-disable-next-line
-  }, [selectedSubcategoryId, category?.id]);
+    setActiveSubcategoryId(selectedSubcategoryId ?? null);
+  }, [selectedSubcategoryId]);
 
-  // Buscar objeto da subcategoria pela type
+  // Busca subcategoria ativa pelo id
   const activeSubcatObj = category?.subcategories.find(
-    sc => sc.type === activeSubcategoryType
+    sc => sc.id === activeSubcategoryId
   );
 
   useEffect(() => {
     if (onSubcategoryIdChange) {
-      onSubcategoryIdChange(activeSubcatObj?.id || null);
+      // Notifica mudança para o parent
+      onSubcategoryIdChange(activeSubcategoryId);
     }
     // eslint-disable-next-line
-  }, [activeSubcatObj?.id]);
+  }, [activeSubcategoryId]);
 
   useEffect(() => {
-    if (onAttributeIdChange && activeSubcatObj && subcategoryValues[activeSubcategoryType || ""]) {
-      const attributeSelected = subcategoryValues[activeSubcategoryType];
+    if (onAttributeIdChange && activeSubcatObj && subcategoryValues[activeSubcategoryId || ""]) {
+      const attributeSelected = subcategoryValues[activeSubcategoryId || ""];
       if (attributeSelected) onAttributeIdChange(attributeSelected);
       else onAttributeIdChange(null);
-    } else if (onAttributeIdChange && !subcategoryValues[activeSubcategoryType || ""]) {
+    } else if (onAttributeIdChange && !subcategoryValues[activeSubcategoryId || ""]) {
       onAttributeIdChange(null);
     }
     // eslint-disable-next-line
-  }, [subcategoryValues, activeSubcatObj, activeSubcategoryType, onAttributeIdChange]);
+  }, [subcategoryValues, activeSubcatObj, activeSubcategoryId, onAttributeIdChange]);
 
   if (isLoading) {
     return <div className="space-y-4">Carregando categorias...</div>;
@@ -80,7 +73,7 @@ const CategorySelectorContent = ({
         <Select 
           onValueChange={(catId) => {
             onCategoryChange(catId);
-            setActiveSubcategoryType(null);
+            setActiveSubcategoryId(null); // reseta subcat!
           }}
           value={selectedCategory}
           disabled={categories.length === 0}
@@ -103,20 +96,14 @@ const CategorySelectorContent = ({
 
       {selectedCategory && (
         <div>
-          <Label htmlFor="subcategoryType">Subcategoria</Label>
+          <Label htmlFor="subcategoryId">Subcategoria</Label>
           <Select 
-            onValueChange={(type) => {
-              setActiveSubcategoryType(type);
-              // Ache o id da subcategoria ao selecionar (garante sincronia)
-              const obj = category?.subcategories.find(sc => sc.type === type);
-              if (onSubcategoryIdChange) {
-                onSubcategoryIdChange(obj?.id || null);
-              }
-              if (onAttributeIdChange) {
-                onAttributeIdChange(null);
-              }
+            onValueChange={(subcatId) => {
+              setActiveSubcategoryId(subcatId);
+              if (onSubcategoryIdChange) onSubcategoryIdChange(subcatId);
+              if (onAttributeIdChange) onAttributeIdChange(null);
             }}
-            value={activeSubcategoryType || ""}
+            value={activeSubcategoryId ?? ""}
           >
             <SelectTrigger>
               <SelectValue placeholder="Selecione uma subcategoria" />
@@ -124,30 +111,29 @@ const CategorySelectorContent = ({
             <SelectContent>
               {category
                 ? category.subcategories.map(sc => (
-                    <SelectItem key={sc.type} value={sc.type}>
-                      {sc.name}
-                    </SelectItem>
-                  ))
+                  <SelectItem key={sc.id} value={sc.id}>
+                    {sc.name}
+                  </SelectItem>
+                ))
                 : null}
             </SelectContent>
           </Select>
         </div>
       )}
 
-      {activeSubcategoryType && activeSubcatObj && (
+      {activeSubcategoryId && activeSubcatObj && (
         <div>
           <Label htmlFor="subcategoryValue">
             {activeSubcatObj.name + " - Atributos"}
           </Label>
           <Select 
             onValueChange={(attributeId) => {
-              onSubcategoryChange(activeSubcategoryType, attributeId);
+              onSubcategoryChange(activeSubcategoryId, attributeId);
               if (onAttributeIdChange) {
                 onAttributeIdChange(attributeId);
               }
-              console.log("[CategorySelector] onSubcategoryChange:", activeSubcategoryType, attributeId);
             }}
-            value={subcategoryValues[activeSubcategoryType] || ""}
+            value={subcategoryValues[activeSubcategoryId] || ""}
           >
             <SelectTrigger>
               <SelectValue placeholder={
@@ -157,10 +143,10 @@ const CategorySelectorContent = ({
             <SelectContent>
               {activeSubcatObj.attributes
                 ? activeSubcatObj.attributes.map((attr: any) => (
-                    <SelectItem key={attr.id} value={attr.id}>
-                      {attr.name ?? attr}
-                    </SelectItem>
-                  ))
+                  <SelectItem key={attr.id} value={attr.id}>
+                    {attr.name ?? attr}
+                  </SelectItem>
+                ))
                 : null}
             </SelectContent>
           </Select>
