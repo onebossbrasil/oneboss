@@ -17,21 +17,20 @@ export const useAddProduct = () => {
   ) => {
     try {
       setIsLoading(true);
+      console.log("[useAddProduct] Adicionando produto:", product);
       
       if (!session) {
+        console.error("[useAddProduct] Tentativa de adicionar produto sem sessão!");
         throw new Error('Você precisa estar autenticado como administrador para adicionar produtos.');
       }
       
-      console.log("Adding product with auth:", !!session.access_token);
-      
-      // Check connection before attempting operation
+      // Diagnóstico antes de inserir
       const { error: connectionError } = await supabase.from('products').select('id').limit(1);
       if (connectionError) {
-        console.error("Connection error:", connectionError);
+        console.error("[useAddProduct] Falha de conexão:", connectionError);
         throw new Error('Não foi possível conectar ao banco de dados. Verifique sua conexão.');
       }
-      
-      // Insert new product
+
       const { data, error } = await supabase
         .from('products')
         .insert({
@@ -48,35 +47,31 @@ export const useAddProduct = () => {
         })
         .select()
         .single();
-        
+
       if (error) {
-        console.error("Insert error:", error);
+        console.error("[useAddProduct] Erro ao inserir produto:", error);
         throw error;
       }
-      
-      console.log("Product added successfully, ID:", data.id);
-      
-      // Upload images if any
+
+      console.log("[useAddProduct] Produto salvo com ID:", data.id);
+
       if (images.length > 0) {
-        console.log("Uploading images:", images.length);
+        console.log("[useAddProduct] Enviando imagens:", images.length);
         await Promise.all(
-          images.map((image, index) => 
-            uploadProductImage(data.id, image, index)
-          )
+          images.map((file, idx) => uploadProductImage(data.id, file, idx))
         );
       }
-      
+
       toast({
-        title: 'Produto adicionado',
-        description: `${product.name} foi adicionado com sucesso.`,
+        title: "Produto adicionado",
+        description: `${product.name} foi adicionado com sucesso e salvo no Supabase.`,
+        variant: 'default'
       });
 
       return data;
     } catch (err: any) {
-      console.error('Error adding product:', err);
-      
+      console.error('[useAddProduct] Falha ao adicionar produto:', err);
       let errorMessage = 'Erro ao adicionar produto.';
-      
       if (err.message?.includes('conexão') || err.code === 'PGRST301') {
         errorMessage = 'Falha na conexão com o banco de dados. Verifique sua internet.';
       } else if (err.code === '23505') {
@@ -88,11 +83,10 @@ export const useAddProduct = () => {
       } else if (!session) {
         errorMessage = 'Você precisa estar autenticado como administrador para adicionar produtos.';
       }
-      
       toast({
-        title: 'Erro ao adicionar produto',
+        title: "Erro ao adicionar produto",
         description: errorMessage,
-        variant: 'destructive',
+        variant: "destructive"
       });
       throw err;
     } finally {
@@ -105,3 +99,4 @@ export const useAddProduct = () => {
     addProduct
   };
 };
+

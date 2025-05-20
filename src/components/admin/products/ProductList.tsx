@@ -27,6 +27,11 @@ export default function ProductList() {
   const { isLoading: isDeleting, deleteProduct } = useDeleteProduct();
   const [showCreate, setShowCreate] = useState(false);
 
+  // Diagnóstico: logar toda vez que lista é recarregada
+  useEffect(() => {
+    console.info("[ProductList] Recarregando lista. Quantidade de produtos:", products.length);
+  }, [products]);
+
   // Filtros
   const [search, setSearch] = useState("");
   const [filterCategory, setFilterCategory] = useState("");
@@ -63,6 +68,7 @@ export default function ProductList() {
 
   useEffect(() => {
     refreshProducts();
+    console.info("[ProductList] refreshProducts acionado.");
   }, [refreshProducts]);
 
   useEffect(() => {
@@ -72,6 +78,7 @@ export default function ProductList() {
 
   useEffect(() => {
     if (error) {
+      console.error("[ProductList] Erro detectado:", error);
       toast({
         title: "Erro ao carregar produtos",
         description: error,

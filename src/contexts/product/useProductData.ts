@@ -20,55 +20,68 @@ export const useProductData = () => {
   // Minimum time between fetches (in milliseconds)
   const MIN_FETCH_INTERVAL = 2000;
 
+  // Diagnóstico extra!
+  useEffect(() => {
+    console.log("[useProductData] Inicializado. Session?", session, "User?", user);
+  }, [session, user]);
+
   // Improved fetchProducts with retry logic, debounce and better request management
   const fetchProducts = useCallback(async (force = false) => {
-    // Check if we're already fetching or if it's too soon since the last fetch
     const now = Date.now();
     const timeSinceLastFetch = now - lastFetchTimeRef.current;
     
     if (isFetchingRef.current) {
-      console.log("Fetch already in progress, skipping");
+      console.warn("[useProductData] Fetch já em andamento, ignorado.");
       return;
     }
     
     if (!force && timeSinceLastFetch < MIN_FETCH_INTERVAL) {
-      console.log(`Throttling fetch request. Last fetch was ${timeSinceLastFetch}ms ago.`);
+      console.log(`[useProductData] Bloqueio temporal. Última busca há ${timeSinceLastFetch}ms.`);
       return;
     }
     
     isFetchingRef.current = true;
     setIsLoading(true);
     setError(null);
-    
+
     try {
-      console.log("Fetching products, authenticated:", !!session?.access_token);
+      console.log("[useProductData] Buscando produtos (autenticado?", !!session?.access_token, ")");
       if (user) {
-        console.log("Fetching with user:", user.email);
+        console.log("[useProductData] Buscando como usuário:", user.email);
       }
       
       const { products: fetchedProducts, error: fetchError } = await fetchProductsFromSupabase();
-      
+
       if (fetchError) {
+        console.error("[useProductData] Erro ao buscar produtos:", fetchError);
+        toast({
+          title: 'Erro ao buscar produtos',
+          description: fetchError,
+          variant: 'destructive',
+        });
         throw new Error(fetchError);
       }
-      
+
+      console.log("[useProductData] Produtos obtidos:", fetchedProducts.length);
       setProducts(fetchedProducts);
-      // Update last fetch time on success
       lastFetchTimeRef.current = Date.now();
-      // Reset retry count on success
       setRetryCount(0);
+
+      toast({
+        title: 'Sincronização concluída',
+        description: 'Lista de produtos carregada do Supabase.',
+        variant: "default"
+      });
     } catch (err: any) {
-      console.error('Error in fetchProducts:', err);
+      console.error('[useProductData] Falha na conexão com Supabase:', err);
       setError(err.message || 'Falha ao conectar com o banco de dados');
-      
-      // Implement exponential backoff for retries (max 3 retries)
       if (retryCount < 3) {
-        const nextRetryDelay = Math.pow(2, retryCount) * 1000; // Exponential backoff: 1s, 2s, 4s
-        console.log(`Tentando reconectar em ${nextRetryDelay / 1000} segundos...`);
+        const nextRetryDelay = Math.pow(2, retryCount) * 1000;
+        console.warn(`[useProductData] Tentando reconectar em ${nextRetryDelay / 1000}s...`);
         
         setTimeout(() => {
           setRetryCount(prev => prev + 1);
-          isFetchingRef.current = false; // Reset the flag before retrying
+          isFetchingRef.current = false;
           fetchProducts();
         }, nextRetryDelay);
         
@@ -80,7 +93,7 @@ export const useProductData = () => {
       } else {
         toast({
           title: 'Erro ao carregar produtos',
-          description: 'Não foi possível conectar ao banco de dados após várias tentativas.',
+          description: 'Não foi possível conectar ao banco após várias tentativas.',
           variant: 'destructive',
         });
       }
@@ -90,7 +103,6 @@ export const useProductData = () => {
     }
   }, [toast, retryCount, session, user]);
 
-  // Get featured products as a computed property
   const featuredProducts = products.filter(product => product.featured && product.published);
 
   return {

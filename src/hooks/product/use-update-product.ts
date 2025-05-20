@@ -18,21 +18,30 @@ export const useUpdateProduct = () => {
   ) => {
     try {
       setIsLoading(true);
-      
-      // Verificando se o usuário está autenticado
+      console.log("[useUpdateProduct] Atualizando produto:", id, productData);
+
       if (!session) {
+        console.error("[useUpdateProduct] Sem sessão!");
         throw new Error('Você precisa estar autenticado como administrador para editar produtos.');
       }
 
-      console.log("Atualizando produto com ID:", id);
-      console.log("Usuário autenticado:", user?.email);
-      console.log("Token de autenticação:", session.access_token?.substring(0, 10) + "...");
-      
-      // Prepare product data for update
+      // Diagnóstico de existência do produto
+      const { data: existingProduct, error: checkError } = await supabase
+        .from('products')
+        .select('id')
+        .eq('id', id)
+        .single();
+        
+      if (checkError || !existingProduct) {
+        console.warn("[useUpdateProduct] Produto não encontrado antes do update.", checkError);
+        throw new Error('Produto não encontrado. Ele pode ter sido excluído.');
+      }
+
+      // Prepara e atualiza
       const updateData: Record<string, any> = {
         updated_at: new Date().toISOString()
       };
-      
+      // ... preenchimento igual já tinha antes ...
       if (productData.name !== undefined) updateData.name = productData.name;
       if (productData.shortDescription !== undefined) updateData.short_description = productData.shortDescription;
       if (productData.description !== undefined) updateData.description = productData.description;
@@ -43,89 +52,56 @@ export const useUpdateProduct = () => {
       if (productData.featured !== undefined) updateData.featured = productData.featured;
       if (productData.published !== undefined) updateData.published = productData.published;
       if (productData.stockQuantity !== undefined) updateData.stock_quantity = productData.stockQuantity;
-      
-      // Check if product exists before attempting update
-      const { data: existingProduct, error: checkError } = await supabase
-        .from('products')
-        .select('id')
-        .eq('id', id)
-        .single();
-        
-      if (checkError || !existingProduct) {
-        throw new Error('Produto não encontrado. Ele pode ter sido excluído.');
-      }
-      
-      console.log("Enviando dados de atualização:", updateData);
-      
-      // Update product in database with explicit auth header
+
       const { error } = await supabase
         .from('products')
         .update(updateData)
         .eq('id', id);
-        
+
       if (error) {
-        console.error("Erro ao atualizar produto:", error);
+        console.error("[useUpdateProduct] Erro ao atualizar produto:", error);
         throw error;
       }
-      
-      console.log("Produto atualizado com sucesso. Processando imagens...");
-      
-      // Delete images that were removed in the UI
+
+      console.log("[useUpdateProduct] Produto atualizado com sucesso!", id);
+
+      // Gerenciamento de imagens
       if (productData.deletedImageIds && productData.deletedImageIds.length > 0) {
-        console.log("Removendo imagens:", productData.deletedImageIds);
+        console.log("[useUpdateProduct] Removendo imagens do produto:", productData.deletedImageIds);
         await Promise.all(
           productData.deletedImageIds.map(imageId => deleteProductImage(imageId))
         );
       }
-      
-      // Upload new images if any
+
       if (newImages && newImages.length > 0) {
-        console.log("Enviando novas imagens:", newImages.length);
-        // Get current number of images to determine sort_order for new ones
         const { data: existingImages } = await supabase
           .from('product_images')
           .select('*')
           .eq('product_id', id);
-          
         const startSortOrder = existingImages ? existingImages.length : 0;
-        
+        console.log("[useUpdateProduct] Enviando novas imagens. Ordem inicial:", startSortOrder);
         await Promise.all(
-          newImages.map((image, index) => 
-            uploadProductImage(id, image, startSortOrder + index)
+          newImages.map((img, idx) =>
+            uploadProductImage(id, img, startSortOrder + idx)
           )
         );
       }
-      
+
       toast({
         title: 'Produto atualizado',
-        description: 'O produto foi atualizado com sucesso.',
+        description: 'O produto foi atualizado e salvo no Supabase.',
+        variant: "default"
       });
     } catch (err: any) {
-      console.error('Error updating product:', err);
-      
+      console.error('[useUpdateProduct] Falha ao atualizar produto:', err);
       let errorMessage = 'Erro ao atualizar produto.';
-      
-      if (err.message?.includes('encontrado')) {
-        errorMessage = err.message;
-      } else if (err.message?.includes('conexão') || err.code === 'PGRST301') {
-        errorMessage = 'Falha na conexão com o banco de dados. Verifique sua internet.';
-      } else if (err.code === '42501') {
-        errorMessage = 'Permissão negada. Certifique-se de estar logado como administrador.';
-      } else if (err.code?.includes('PGRST')) {
-        errorMessage = `Erro ao comunicar com o banco de dados (${err.code}). Verifique sua conexão.`;
-      } else if (!session) {
-        errorMessage = 'Você precisa estar autenticado como administrador para editar produtos.';
-      } else if (!user) {
-        errorMessage = 'Usuário não encontrado na sessão. Tente fazer login novamente.';
-      } else {
-        errorMessage = `Erro: ${err.message || 'Erro desconhecido'}`;
-      }
-      
-      toast({
-        title: 'Erro ao atualizar produto',
-        description: errorMessage,
-        variant: 'destructive',
-      });
+      if (err.message?.includes('encontrado')) errorMessage = err.message;
+      else if (err.message?.includes('conexão') || err.code === 'PGRST301') errorMessage = 'Falha na conexão com o banco de dados.';
+      else if (err.code === '42501') errorMessage = 'Permissão negada.';
+      else if (!session) errorMessage = 'Você precisa estar autenticado como administrador.';
+      else if (!user) errorMessage = 'Usuário não encontrado na sessão.';
+      else errorMessage = `Erro: ${err.message || 'Erro desconhecido'}`;
+      toast({ title: 'Erro ao atualizar produto', description: errorMessage, variant: 'destructive' });
       throw err;
     } finally {
       setIsLoading(false);

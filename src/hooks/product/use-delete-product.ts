@@ -12,56 +12,48 @@ export const useDeleteProduct = () => {
   const deleteProduct = async (id: string) => {
     try {
       setIsLoading(true);
-      
+
       if (!session) {
+        console.error("[useDeleteProduct] Tentativa de excluir produto sem sessão!");
         throw new Error('Você precisa estar autenticado como administrador para remover produtos.');
       }
-      
-      console.log("Deleting product with ID:", id);
-      
-      // Check if product exists before attempting delete
+
+      // Diagnóstico: checagem do produto antes
       const { data: existingProduct, error: checkError } = await supabase
         .from('products')
         .select('id, name')
         .eq('id', id)
         .single();
-        
+
       if (checkError || !existingProduct) {
+        console.warn("[useDeleteProduct] Produto não encontrado na exclusão.", checkError);
         throw new Error('Produto não encontrado. Ele já pode ter sido excluído.');
       }
-      
-      // Delete product (images will be automatically deleted due to CASCADE)
+
       const { error } = await supabase
         .from('products')
         .delete()
         .eq('id', id);
-        
+
       if (error) {
-        console.error("Delete error:", error);
+        console.error("[useDeleteProduct] Erro ao excluir produto:", error);
         throw error;
       }
-      
-      console.log("Product deleted successfully");
-      
+
+      console.log("[useDeleteProduct] Produto removido com sucesso:", id);
+
       toast({
         title: 'Produto removido',
-        description: `${existingProduct.name} foi removido com sucesso.`,
+        description: `${existingProduct.name} foi removido do Supabase.`,
+        variant: 'default'
       });
     } catch (err: any) {
-      console.error('Error deleting product:', err);
-      
+      console.error('[useDeleteProduct] Falha ao remover produto:', err);
       let errorMessage = 'Erro ao remover produto.';
-      
-      if (err.message?.includes('encontrado')) {
-        errorMessage = err.message;
-      } else if (err.message?.includes('conexão') || err.code === 'PGRST301') {
-        errorMessage = 'Falha na conexão com o banco de dados. Verifique sua internet.';
-      } else if (err.code === '42501') {
-        errorMessage = 'Permissão negada. Certifique-se de estar logado como administrador.';
-      } else if (!session) {
-        errorMessage = 'Você precisa estar autenticado como administrador para remover produtos.';
-      }
-      
+      if (err.message?.includes('encontrado')) errorMessage = err.message;
+      else if (err.message?.includes('conexão') || err.code === 'PGRST301') errorMessage = 'Falha na conexão com o banco de dados.';
+      else if (err.code === '42501') errorMessage = 'Permissão negada.';
+      else if (!session) errorMessage = 'Você precisa estar autenticado como administrador.';
       toast({
         title: 'Erro ao remover produto',
         description: errorMessage,
