@@ -10,6 +10,9 @@ import AdminError from "@/components/admin/states/AdminError";
 import AccessDenied from "@/components/admin/states/AccessDenied";
 import { useAuth } from "@/contexts/AuthContext";
 import { RefreshCcw } from "lucide-react";
+// Importando notificação apenas aqui:
+import { Toaster } from "@/components/ui/toaster";
+import { Toaster as Sonner } from "@/components/ui/sonner";
 
 const Admin = () => {
   const { toast } = useToast();
@@ -107,28 +110,38 @@ const Admin = () => {
     );
   }
 
-  // If not authenticated, show login
+  // If not authenticated, show login (wrap com toaster apenas na UI admin)
   if (!isAuthenticated) {
-    return <AdminLogin onLogin={handleLogin} />;
+    return (
+      <>
+        <Toaster />
+        <Sonner />
+        <AdminLogin onLogin={handleLogin} />
+      </>
+    );
   }
 
   // Se autenticado mas não é admin, mostrar AccessDenied
   if (isAuthenticated && !isAdmin) {
     return (
-      <div>
-        <AccessDenied onLogout={handleLogout} />
-        <div className="fixed bottom-4 right-4">
-          <Button 
-            variant="outline" 
-            size="sm" 
-            onClick={handleForceRefresh}
-            className="flex items-center gap-2"
-          >
-            <RefreshCcw className="h-4 w-4" />
-            Limpar cache e recarregar
-          </Button>
+      <>
+        <Toaster />
+        <Sonner />
+        <div>
+          <AccessDenied onLogout={handleLogout} />
+          <div className="fixed bottom-4 right-4">
+            <Button 
+              variant="outline" 
+              size="sm" 
+              onClick={handleForceRefresh}
+              className="flex items-center gap-2"
+            >
+              <RefreshCcw className="h-4 w-4" />
+              Limpar cache e recarregar
+            </Button>
+          </div>
         </div>
-      </div>
+      </>
     );
   }
 
@@ -147,24 +160,34 @@ const Admin = () => {
   // Show error state if database connection fails
   if (dbConnectionError) {
     return (
-      <div className="container mx-auto px-4 py-8">
-        <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md">
-          <h2 className="text-xl font-bold text-red-600 dark:text-red-400 mb-4">Erro de conexão</h2>
-          <p className="mb-4 text-gray-700 dark:text-gray-300">
-            {`Erro ao conectar ao banco de dados: ${dbConnectionError}`}
-          </p>
-          
-          <div className="flex justify-between items-center">
-            <Button onClick={handleRetryConnection}>Tentar novamente</Button>
-            <Button variant="outline" onClick={handleLogout}>Sair</Button>
+      <>
+        <Toaster />
+        <Sonner />
+        <div className="container mx-auto px-4 py-8">
+          <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md">
+            <h2 className="text-xl font-bold text-red-600 dark:text-red-400 mb-4">Erro de conexão</h2>
+            <p className="mb-4 text-gray-700 dark:text-gray-300">
+              {`Erro ao conectar ao banco de dados: ${dbConnectionError}`}
+            </p>
+            
+            <div className="flex justify-between items-center">
+              <Button onClick={handleRetryConnection}>Tentar novamente</Button>
+              <Button variant="outline" onClick={handleLogout}>Sair</Button>
+            </div>
           </div>
         </div>
-      </div>
+      </>
     );
   }
 
   // Renderizar o painel administrativo se a conexão estiver OK e autenticado
-  return <AdminDashboard onLogout={handleLogout} />;
+  return (
+    <>
+      <Toaster />
+      <Sonner />
+      <AdminDashboard onLogout={handleLogout} />
+    </>
+  );
 };
 
 export default Admin;
