@@ -12,7 +12,7 @@ import {
   SidebarTrigger,
   useSidebar,
 } from "@/components/ui/sidebar";
-import { User, Box, ArrowLeft } from "lucide-react";
+import { User, Box, ArrowLeft, Users } from "lucide-react";
 
 interface AdminSidebarProps {
   activeTab: string;
@@ -23,6 +23,7 @@ const sidebarTabs = [
   { key: "produtos", label: "Produtos", icon: <Box className="h-5 w-5" /> },
   { key: "categorias", label: "Categorias", icon: <ArrowLeft className="h-5 w-5" /> },
   { key: "leads", label: "Leads", icon: <User className="h-5 w-5" /> },
+  { key: "parceiros", label: "Parceiros", icon: <Users className="h-5 w-5" /> }, // Mantido como última opção
 ];
 
 const AdminSidebar = ({ activeTab, onTabChange }: AdminSidebarProps) => {
@@ -67,3 +68,4 @@ const AdminSidebar = ({ activeTab, onTabChange }: AdminSidebarProps) => {
   );
 };
 export default AdminSidebar;
+
