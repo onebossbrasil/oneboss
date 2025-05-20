@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { useProducts } from "@/contexts/ProductContext";
 import { useToast } from "@/hooks/use-toast";
@@ -91,7 +92,6 @@ export const useProductForm = () => {
       }
 
       // Validar: selectedCategory deve ser um UUID válido!
-      // Verifica se é um uuid simples (cuidado: não permite category_id ser um 'value' não UUID)
       const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[4][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
       if (!uuidRegex.test(selectedCategory)) {
         toast({
