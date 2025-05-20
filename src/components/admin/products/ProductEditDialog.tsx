@@ -142,6 +142,7 @@ const ProductEditDialog = ({ product, open, onOpenChange, onClose }: ProductEdit
                     console.log("[Modal] Subcategoria alterada:", type, value);
                     handleSubcategoryChange(type, value);
                   }}
+                  // Correct usage: only one argument for onSubcategoryIdChange
                   onSubcategoryIdChange={handleSubcatIdChange}
                   onAttributeIdChange={handleAttributeChange}
                 />

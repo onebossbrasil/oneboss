@@ -1,11 +1,11 @@
 
+import React, { useState } from "react";
 import { Product } from "@/types/product";
 import { useFormState } from "@/hooks/product-edit/use-form-state";
 import { useCategorySelection } from "@/hooks/product-edit/use-category-selection";
 import { useImageManagement } from "@/hooks/product-edit/use-image-management";
 import { useProductSubmit } from "@/hooks/product-edit/use-product-submit";
-import { useProductAdd } from "@/hooks/product-edit/use-product-add"; // NOVO IMPORT
-import { useState } from "react";
+import { useProductAdd } from "@/hooks/product-edit/use-product-add";
 
 export const useProductEdit = (
   product: Product | null,
@@ -106,6 +106,8 @@ export const useProductEdit = (
     selectedSubcategoryId,
     selectedAttributeId,
     handleAttributeChange,
+    // avoid duplicate handleSubcategoryChange property:
+    // Only export with this name for CategorySelector expecting prop
     handleSubcategoryChange: handleSubcategoryIdChange
   };
 };
