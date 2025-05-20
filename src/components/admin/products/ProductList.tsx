@@ -229,6 +229,13 @@ export default function ProductList() {
       {/* Botão para cadastrar/ou criar produto */}
       <ProductCreateButton onClick={() => setShowCreate(true)} />
 
+      {/* Linha com total de produtos */}
+      <div className="w-full flex justify-center mt-2">
+        <span className="text-xs text-muted-foreground">
+          Total de produtos: <strong>{filteredProducts.length}</strong>
+        </span>
+      </div>
+
       {/* Barra de filtros */}
       <div className="w-full flex justify-center mt-4">
         <ProductFilters
