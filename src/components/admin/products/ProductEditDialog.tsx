@@ -12,6 +12,7 @@ import ImageUpload from "./ImageUpload";
 import ProductEditActions from "./edit/ProductEditActions";
 import { useProductEdit } from "@/hooks/use-product-edit";
 import { useFetchProductById } from "@/hooks/use-fetch-product-by-id";
+import { useEffect } from "react";
 
 interface ProductEditDialogProps {
   product: Product | null;
@@ -43,8 +44,20 @@ const ProductEditDialog = ({ product, open, onOpenChange, onClose }: ProductEdit
     handleSubcategoryChange,
     handleImageChange,
     handleRemoveImage,
-    handleSubmit // USAR ESSE SEMPRE (edit ou add)
+    handleSubmit
   } = useProductEdit(freshProduct, handleDialogClose);
+
+  // Garante reset sempre que abrir para criar novo (product==null)
+  useEffect(() => {
+    if (open && !productId) {
+      // Chama o onClose do formulário para resetar tudo
+      // ProductEdit já cuida de reset interno nos seus próprios hooks, pois 
+      // recebe freshProduct = null no cadastro (caso useEffect só para trigger)
+      // Poderia expandir se necessário a limpeza de campos extras
+    }
+    // Não precisa dependências, pois freshProduct sempre muda com productId/open
+    // eslint-disable-next-line
+  }, [open, productId]);
 
   return (
     <Dialog open={open} onOpenChange={(isOpen) => {

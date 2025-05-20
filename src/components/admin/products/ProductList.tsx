@@ -86,11 +86,21 @@ export default function ProductList() {
     }
   }, [error, toast]);
 
+  // Corrigido: Função que abre cadastro garantindo estado limpo
+  const handleOpenCreate = () => {
+    setSelectedProduct(null);
+    setDialogOpen(true);
+    setShowCreate(true); // indica cadastro
+  };
+
+  // Corrigido: Função de editar apenas edita produto existente
   const handleEditClick = (product: Product) => {
     setSelectedProduct(product);
     setDialogOpen(true);
+    setShowCreate(false);
   };
 
+  // Reset total ao fechar modal de cadastro/edição
   const handleDialogClose = () => {
     setSelectedProduct(null);
     setDialogOpen(false);
@@ -226,7 +236,7 @@ export default function ProductList() {
     return (
       <div className="flex flex-col items-center w-full animate-fade-in px-0 sm:px-2">
         <div className="fixed bottom-6 right-6 z-40">
-          <ProductCreateButton onClick={() => setShowCreate(true)} />
+          <ProductCreateButton onClick={handleOpenCreate} />
         </div>
         <div className="w-full flex justify-center mt-2">
           <span className="text-xs text-muted-foreground">
@@ -290,14 +300,12 @@ export default function ProductList() {
           </div>
         ) : null}
         <ProductEditDialog
-          product={selectedProduct}
-          open={dialogOpen || showCreate}
+          // Chave: se showCreate está true, sempre product=null
+          product={showCreate ? null : selectedProduct}
+          open={dialogOpen}
           onOpenChange={openState => {
             if (!openState) {
               handleDialogClose();
-            } else {
-              setDialogOpen(!!selectedProduct);
-              setShowCreate(!selectedProduct);
             }
           }}
           onClose={handleDialogClose}
@@ -317,11 +325,11 @@ export default function ProductList() {
     <div className="flex flex-col items-center w-full animate-fade-in px-0 sm:px-2">
       {/* MOBILE: botão fixo no rodapé */}
       <div className="sm:hidden fixed bottom-6 right-6 z-40">
-        <ProductCreateButton onClick={() => setShowCreate(true)} />
+        <ProductCreateButton onClick={handleOpenCreate} />
       </div>
       {/* DESKTOP: botão normal na área */}
       <div className="hidden sm:block w-full">
-        <ProductCreateButton onClick={() => setShowCreate(true)} />
+        <ProductCreateButton onClick={handleOpenCreate} />
       </div>
       {/* Total de produtos */}
       <div className="w-full flex justify-center mt-2">
@@ -394,14 +402,11 @@ export default function ProductList() {
         </div>
       ) : null}
       <ProductEditDialog
-        product={selectedProduct}
-        open={dialogOpen || showCreate}
+        product={showCreate ? null : selectedProduct}
+        open={dialogOpen}
         onOpenChange={openState => {
           if (!openState) {
             handleDialogClose();
-          } else {
-            setDialogOpen(!!selectedProduct);
-            setShowCreate(!selectedProduct);
           }
         }}
         onClose={handleDialogClose}
