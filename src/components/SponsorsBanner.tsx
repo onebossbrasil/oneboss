@@ -1,3 +1,4 @@
+
 import { Button } from "@/components/ui/button";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { useEffect, useState } from "react";
@@ -36,35 +37,70 @@ const SponsorsBanner = () => {
           </p>
         </div>
 
-        <div className={`relative h-[300px] w-full ${isMobile ? "" : "rounded-none"} overflow-hidden animate-slide-in-right`}>
+        <div
+          className={`relative h-[300px] w-full overflow-hidden animate-slide-in-right flex items-center justify-center`}
+        >
           {/* Banner image */}
           {partner.banner_image_url ? (
-            <img src={partner.banner_image_url} alt={partner.name || ""} className="w-full h-full object-cover" />
+            <img
+              src={partner.banner_image_url}
+              alt={partner.name || ""}
+              className="absolute inset-0 w-full h-full object-cover"
+            />
           ) : (
-            <div className="bg-gray-200 w-full h-full" />
+            <div className="bg-gray-200 w-full h-full absolute inset-0" />
           )}
 
           {/* Overlay gradient */}
           <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-black/30"></div>
 
-          {/* Content overlay - centered */}
-          <div className="absolute inset-0 flex flex-col items-center justify-center p-6 text-white py-[24px]">
-            {/* Logo */}
+          {/* Content overlay - centralizado */}
+          <div className="relative flex flex-col items-center justify-center z-10 px-4 w-full h-full">
+            {/* Logo centralizada com glassmorphism */}
             {partner.logo_url && (
-              <div className="mb-4 w-48 md:w-56">
-                <img src={partner.logo_url} alt={partner.name || ""} className="w-full" />
+              <div className="mb-4 flex items-center justify-center w-fit h-fit">
+                <div
+                  className="glassmorphism rounded-xl p-2 md:p-3"
+                  style={{
+                    background: "rgba(255,255,255,0.60)",
+                    backdropFilter: "blur(10px)",
+                    border: "1.5px solid rgba(255,255,255,0.13)",
+                  }}
+                >
+                  <img
+                    src={partner.logo_url}
+                    alt={partner.name || ""}
+                    className="w-40 md:w-52 h-auto object-contain"
+                    style={{
+                      filter: "drop-shadow(0 2px 8px rgba(0,0,0,0.09))",
+                      maxHeight: 90,
+                      maxWidth: 220,
+                    }}
+                  />
+                </div>
               </div>
             )}
 
-            {/* Description */}
-            <p className="text-base md:text-lg text-center mb-4 max-w-md font-medium">
+            {/* Descrição centralizada */}
+            <p className="text-base md:text-lg text-center mb-4 max-w-md font-medium text-white drop-shadow">
               {partner.description}
             </p>
 
-            {/* Glassmorphism CTA Button */}
+            {/* Botão centralizado */}
             {partner.link && (
-              <Button size="sm" asChild className="bg-white/30 backdrop-blur-md border border-white/20 text-white font-medium px-8 py-2.5 rounded-md transition-all duration-300 shadow-lg hover:bg-white/40">
-                <a href={partner.link} target="_blank" rel="noopener noreferrer">Saiba Mais</a>
+              <Button
+                size="sm"
+                asChild
+                className="bg-white/30 backdrop-blur-md border border-white/20 text-white font-medium px-8 py-2.5 rounded-md transition-all duration-300 shadow-lg hover:bg-white/40"
+              >
+                <a
+                  href={partner.link}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="block"
+                >
+                  Saiba Mais
+                </a>
               </Button>
             )}
           </div>
@@ -75,3 +111,4 @@ const SponsorsBanner = () => {
 };
 
 export default SponsorsBanner;
+
