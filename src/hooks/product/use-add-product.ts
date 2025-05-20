@@ -17,8 +17,21 @@ export const useAddProduct = () => {
   ) => {
     try {
       setIsLoading(true);
-      console.log("[useAddProduct] Adicionando produto:", product);
-      
+      // LOG de diagnóstico do payload convertido para snake_case
+      const dbProduct = {
+        name: product.name,
+        short_description: product.shortDescription || null,
+        description: product.description,
+        price: product.price,
+        sale_price: product.salePrice ?? null,
+        category_id: product.categoryId,
+        subcategory_values: product.subcategoryValues ?? {},
+        featured: product.featured,
+        published: product.published,
+        stock_quantity: product.stockQuantity
+      };
+      console.log("[useAddProduct] Produto (snake_case):", dbProduct);
+
       if (!session) {
         console.error("[useAddProduct] Tentativa de adicionar produto sem sessão!");
         throw new Error('Você precisa estar autenticado como administrador para adicionar produtos.');
@@ -33,27 +46,21 @@ export const useAddProduct = () => {
 
       const { data, error } = await supabase
         .from('products')
-        .insert({
-          name: product.name,
-          short_description: product.shortDescription,
-          description: product.description,
-          price: product.price,
-          sale_price: product.salePrice,
-          category_id: product.categoryId,
-          subcategory_values: product.subcategoryValues,
-          featured: product.featured,
-          published: product.published,
-          stock_quantity: product.stockQuantity
-        })
+        .insert(dbProduct)
         .select()
         .single();
+
+      // LOG do Supabase
+      console.log("[useAddProduct] Resposta do Supabase INSERT:", { data, error });
 
       if (error) {
         console.error("[useAddProduct] Erro ao inserir produto:", error);
         throw error;
       }
 
-      console.log("[useAddProduct] Produto salvo com ID:", data.id);
+      if (!data) {
+        throw new Error("O produto não foi criado. Verifique os campos obrigatórios e tente novamente.");
+      }
 
       if (images.length > 0) {
         console.log("[useAddProduct] Enviando imagens:", images.length);
@@ -71,18 +78,7 @@ export const useAddProduct = () => {
       return data;
     } catch (err: any) {
       console.error('[useAddProduct] Falha ao adicionar produto:', err);
-      let errorMessage = 'Erro ao adicionar produto.';
-      if (err.message?.includes('conexão') || err.code === 'PGRST301') {
-        errorMessage = 'Falha na conexão com o banco de dados. Verifique sua internet.';
-      } else if (err.code === '23505') {
-        errorMessage = 'Já existe um produto com este nome.';
-      } else if (err.code === '23502') {
-        errorMessage = 'Campos obrigatórios não preenchidos.';
-      } else if (err.code === '42501') {
-        errorMessage = 'Permissão negada. Certifique-se de estar logado como administrador.';
-      } else if (!session) {
-        errorMessage = 'Você precisa estar autenticado como administrador para adicionar produtos.';
-      }
+      let errorMessage = err?.message || 'Erro ao adicionar produto.';
       toast({
         title: "Erro ao adicionar produto",
         description: errorMessage,
@@ -99,4 +95,3 @@ export const useAddProduct = () => {
     addProduct
   };
 };
-

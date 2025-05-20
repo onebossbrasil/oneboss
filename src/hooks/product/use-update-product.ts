@@ -18,7 +18,24 @@ export const useUpdateProduct = () => {
   ) => {
     try {
       setIsLoading(true);
-      console.log("[useUpdateProduct] Atualizando produto:", id, productData);
+
+      // Monta os dados convertendo camelCase -> snake_case
+      const updateData: Record<string, any> = {
+        updated_at: new Date().toISOString()
+      };
+      if (productData.name !== undefined) updateData.name = productData.name;
+      if (productData.shortDescription !== undefined) updateData.short_description = productData.shortDescription;
+      if (productData.description !== undefined) updateData.description = productData.description;
+      if (productData.price !== undefined) updateData.price = productData.price;
+      if (productData.salePrice !== undefined) updateData.sale_price = productData.salePrice;
+      if (productData.categoryId !== undefined) updateData.category_id = productData.categoryId;
+      if (productData.subcategoryValues !== undefined) updateData.subcategory_values = productData.subcategoryValues;
+      if (productData.featured !== undefined) updateData.featured = productData.featured;
+      if (productData.published !== undefined) updateData.published = productData.published;
+      if (productData.stockQuantity !== undefined) updateData.stock_quantity = productData.stockQuantity;
+
+      // LOG de diagnóstico do updateData
+      console.log("[useUpdateProduct] updateData (snake_case):", updateData);
 
       if (!session) {
         console.error("[useUpdateProduct] Sem sessão!");
@@ -37,33 +54,17 @@ export const useUpdateProduct = () => {
         throw new Error('Produto não encontrado. Ele pode ter sido excluído.');
       }
 
-      // Prepara e atualiza
-      const updateData: Record<string, any> = {
-        updated_at: new Date().toISOString()
-      };
-      // ... preenchimento igual já tinha antes ...
-      if (productData.name !== undefined) updateData.name = productData.name;
-      if (productData.shortDescription !== undefined) updateData.short_description = productData.shortDescription;
-      if (productData.description !== undefined) updateData.description = productData.description;
-      if (productData.price !== undefined) updateData.price = productData.price;
-      if (productData.salePrice !== undefined) updateData.sale_price = productData.salePrice;
-      if (productData.categoryId !== undefined) updateData.category_id = productData.categoryId;
-      if (productData.subcategoryValues !== undefined) updateData.subcategory_values = productData.subcategoryValues;
-      if (productData.featured !== undefined) updateData.featured = productData.featured;
-      if (productData.published !== undefined) updateData.published = productData.published;
-      if (productData.stockQuantity !== undefined) updateData.stock_quantity = productData.stockQuantity;
-
       const { error } = await supabase
         .from('products')
         .update(updateData)
         .eq('id', id);
 
+      console.log("[useUpdateProduct] Resposta do Supabase UPDATE:", { error });
+
       if (error) {
         console.error("[useUpdateProduct] Erro ao atualizar produto:", error);
         throw error;
       }
-
-      console.log("[useUpdateProduct] Produto atualizado com sucesso!", id);
 
       // Gerenciamento de imagens
       if (productData.deletedImageIds && productData.deletedImageIds.length > 0) {
@@ -94,13 +95,7 @@ export const useUpdateProduct = () => {
       });
     } catch (err: any) {
       console.error('[useUpdateProduct] Falha ao atualizar produto:', err);
-      let errorMessage = 'Erro ao atualizar produto.';
-      if (err.message?.includes('encontrado')) errorMessage = err.message;
-      else if (err.message?.includes('conexão') || err.code === 'PGRST301') errorMessage = 'Falha na conexão com o banco de dados.';
-      else if (err.code === '42501') errorMessage = 'Permissão negada.';
-      else if (!session) errorMessage = 'Você precisa estar autenticado como administrador.';
-      else if (!user) errorMessage = 'Usuário não encontrado na sessão.';
-      else errorMessage = `Erro: ${err.message || 'Erro desconhecido'}`;
+      let errorMessage = err?.message || 'Erro ao atualizar produto.';
       toast({ title: 'Erro ao atualizar produto', description: errorMessage, variant: 'destructive' });
       throw err;
     } finally {
