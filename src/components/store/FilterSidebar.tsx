@@ -7,6 +7,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Sidebar, SidebarContent, SidebarHeader, SidebarFooter } from "@/components/ui/sidebar";
 import { useCategories } from "@/contexts/CategoryContext";
 import { SubcategoryType } from "@/types/category";
+
 type FilterSidebarProps = {
   selectedCategory: string | null;
   selectedSubcategories: string[];
@@ -16,6 +17,7 @@ type FilterSidebarProps = {
   setIsMobileFiltersOpen: (isOpen: boolean) => void;
   resetFilters: () => void;
 };
+
 const FilterSidebar = ({
   selectedCategory,
   selectedSubcategories,
@@ -25,11 +27,9 @@ const FilterSidebar = ({
   setIsMobileFiltersOpen,
   resetFilters
 }: FilterSidebarProps) => {
-  const {
-    categories
-  } = useCategories();
+  const { categories } = useCategories();
 
-  // Helper function to get subcategories for selected category
+  // Get subcategories for the selected category
   const getSubcategories = () => {
     if (!selectedCategory) return [];
     const category = categories.find(cat => cat.value === selectedCategory);
@@ -38,7 +38,6 @@ const FilterSidebar = ({
   };
 
   const subcategories = getSubcategories();
-  const hasSubcategories = subcategories.length > 0;
 
   return (
     <>
@@ -55,17 +54,16 @@ const FilterSidebar = ({
           </Button>
         </SidebarHeader>
         <SidebarContent>
-          {/* Combined Filters Section with a single ScrollArea */}
           <div className="space-y-6">
             <h3 className="font-medium">Categorias</h3>
             <ScrollArea className="h-[400px] pr-4">
-              {/* Categories section */}
+              {/* Categories */}
               <div className="space-y-1 mb-6">
                 {categories.map(category => (
                   <div key={category.id} className="flex flex-col">
                     <Button
                       variant="ghost"
-                      className={`justify-start font-normal h-8 px-2 ${selectedCategory === category.value ? 'bg-gold/10 text-gold' : ''}`}
+                      className={`justify-start font-normal h-8 px-2 w-full text-left ${selectedCategory === category.value ? 'bg-gold/10 text-gold' : ''}`}
                       onClick={() => onCategorySelect(category.value)}
                     >
                       {category.name}
@@ -73,31 +71,35 @@ const FilterSidebar = ({
                   </div>
                 ))}
               </div>
+              {/* Subcategories */}
               {selectedCategory && (
                 <>
                   <Separator className="my-4" />
-                  <div className="space-y-6">
-                    <h3 className="font-medium">Subcategorias</h3>
-                    {!hasSubcategories ? (
+                  <div className="space-y-2">
+                    <h3 className="font-medium mb-2">Subcategorias</h3>
+                    {subcategories.length === 0 ? (
                       <p className="text-sm text-muted-foreground">Nenhuma subcategoria disponível para esta categoria</p>
                     ) : (
-                      <div className="space-y-1">
-                        {/* Cada valor de subcategoria vira um botão visual flat, igual às categorias */}
-                        {subcategories.map((subcategory: SubcategoryType) =>
-                          subcategory.values.map(value => (
-                            <Button
-                              key={`${subcategory.id}-${value}`}
-                              variant="ghost"
-                              className={`justify-start font-normal h-8 px-2 w-full text-left ${
-                                selectedSubcategories.includes(value) ? 'bg-gold/10 text-gold' : ''
-                              }`}
-                              onClick={() => onSubcategoryToggle(value)}
-                            >
-                              {value}
-                            </Button>
-                          ))
-                        )}
-                      </div>
+                      subcategories.map((subcategory: SubcategoryType) => (
+                        <div key={subcategory.id}>
+                          {/* Optionally render subcategory name for grouped attributes */}
+                          {subcategories.length > 1 && (
+                            <span className="block text-xs text-muted-foreground font-medium ml-2 mb-1">{subcategory.name}</span>
+                          )}
+                          <div className="flex flex-col space-y-1">
+                            {subcategory.values.map(value => (
+                              <Button
+                                key={`${subcategory.id}-${value}`}
+                                variant="ghost"
+                                className={`justify-start font-normal h-8 px-2 w-full text-left ${selectedSubcategories.includes(value) ? 'bg-gold/10 text-gold' : ''}`}
+                                onClick={() => onSubcategoryToggle(value)}
+                              >
+                                {value}
+                              </Button>
+                            ))}
+                          </div>
+                        </div>
+                      ))
                     )}
                   </div>
                 </>
@@ -115,4 +117,5 @@ const FilterSidebar = ({
     </>
   );
 };
+
 export default FilterSidebar;
