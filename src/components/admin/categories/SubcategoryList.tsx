@@ -192,7 +192,7 @@ const SubcategoryList = ({
                           <List className="h-4 w-4 mr-2" />
                           <span className="text-sm">{subcat.name}</span>
                           <span className="ml-2 text-xs text-muted-foreground">
-                            ({subcat.values.length})
+                            ({subcat.attributes.length})
                           </span>
                         </button>
                         <div className="flex gap-1">

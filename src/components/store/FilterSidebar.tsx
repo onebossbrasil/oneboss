@@ -40,28 +40,30 @@ const FilterSidebar = ({
     return category.subcategories || [];
   };
 
-  // Filtra subcategorias para exibir apenas as que têm produtos publicados associados
+  // Subcategoria estará visível se pelo menos UM produto publicado possuir subcategoryValue igual a algum dos seus atributos
   const getActiveSubcategories = () => {
     const subcategories = getSubcategories();
 
-    // Subcategoria estará visível se pelo menos UM produto publicado possuir subcategoryValue igual a algum dos seus values
+    // Subcategoria visível se algum produto publicado tiver subcategoryValue igual a algum dos seus atributos
     return subcategories
       .map(subcat => {
-        // Para cada valor da subcategoria (ex: ["Fibra", "Alumínio"]):
-        const activeValues = subcat.values.filter(value =>
+        // Para cada atributo da subcategoria:
+        const activeAttributes = subcat.attributes.filter(value =>
           publishedProducts.some(product =>
             product.subcategoryValues && Object.values(product.subcategoryValues).includes(value)
           )
         );
-        // Só retorna subcategoria se houver pelo menos 1 valor ativo
-        return activeValues.length > 0
+        // Só retorna subcategoria se houver pelo menos 1 atributo ativo
+        return activeAttributes.length > 0
           ? {
               ...subcat,
-              values: activeValues
+-             values: activeAttributes // Removido, porque não existe mais 'values'
++             attributes: activeAttributes
             }
           : null;
       })
-      .filter((item): item is SubcategoryType => !!item);
+-     .filter((item): item is SubcategoryType => !!item);
++     .filter((item): item is SubcategoryType => !!item);
   };
 
   const subcategories = getActiveSubcategories();
@@ -110,7 +112,8 @@ const FilterSidebar = ({
                           <span className="block text-xs text-muted-foreground font-medium ml-2 mb-1">{subcategory.name}</span>
                         )}
                         <div className="flex flex-col space-y-1">
-                          {subcategory.values.map(value => (
+-                         {subcategory.values.map(value => (
++                         {subcategory.attributes.map(value => (
                             <Button
                               key={`${subcategory.id}-${value}`}
                               variant="ghost"
@@ -141,3 +144,4 @@ const FilterSidebar = ({
 };
 
 export default FilterSidebar;
+

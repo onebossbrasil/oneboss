@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -42,7 +41,7 @@ const AttributeList = ({
   const handleAddAttribute = async () => {
     if (!selectedCategory || !selectedSubcategory || !newAttributeName) return;
     if (!category || !subcategory) return;
-    if (subcategory.values.includes(newAttributeName)) {
+    if (subcategory.attributes.includes(newAttributeName)) {
       toast({
         title: "Atributo duplicado",
         description: "Este atributo já existe nesta subcategoria.",
@@ -160,8 +159,8 @@ const AttributeList = ({
           )}
           {subcategory ? (
             <div className="space-y-2">
-              {subcategory.values.length > 0 ? (
-                subcategory.values.map((value, index) => (
+              {subcategory.attributes.length > 0 ? (
+                subcategory.attributes.map((value, index) => (
                   <div
                     key={index}
                     className="flex items-center justify-between w-full p-2 rounded-md hover:bg-accent"
@@ -219,4 +218,3 @@ const AttributeList = ({
 };
 
 export default AttributeList;
-
