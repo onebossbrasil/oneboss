@@ -33,8 +33,6 @@ export const useProductSubmit = (
   const handleUpdateProduct = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    console.log("EditSubmit: handleUpdateProduct chamado."); // Diagnóstico
-
     if (!product) {
       toast({
         title: "Nenhum produto selecionado",
@@ -48,12 +46,12 @@ export const useProductSubmit = (
     try {
       setIsSubmitting(true);
 
-      // Logs detalhados para depuração de categoria/subcategoria
+      // Logs de depuração de categoria/subcategoria
       console.log("[Diagnóstico Edição] Produto sendo editado:", product.id);
       console.log("[Diagnóstico Edição] selectedCategory (esperado UUID):", selectedCategory);
       console.log("[Diagnóstico Edição] subcategoryValues:", subcategoryValues);
 
-      // Validate form data
+      // Validate form fields
       const isValid = validateProductData(
         formData.name,
         formData.price,
@@ -72,41 +70,56 @@ export const useProductSubmit = (
         return;
       }
 
-      // Convert price to a number
+      // Validação adicional: se subcategoryValues for necessária, impedir submit vazio
+      // Se a categoria requer subcategoria (tem ao menos um campo) e não foi escolhida, impedir envio
+      // Regra: se existir categoria selecionada, e ela tem subcategorias, deve ter pelo menos 1 par chave:valor preenchido
+      // Para isso usamos length das chaves
+      if (
+        selectedCategory &&
+        Array.isArray(Object.keys(subcategoryValues)) &&
+        Object.keys(subcategoryValues).length === 0
+      ) {
+        setIsSubmitting(false);
+        toast({
+          title: "Subcategoria obrigatória",
+          description: "Selecione ao menos uma subcategoria/atributo antes de salvar.",
+          variant: "destructive"
+        });
+        return;
+      }
+
+      // Convert price to number
       const price = convertPriceToNumber(formData.price);
 
-      // Convert sale price to a number if provided
+      // Sale price to number, if any
       let salePrice = undefined;
       if (formData.salePrice) {
         salePrice = convertPriceToNumber(formData.salePrice);
       }
 
-      // Convert stock quantity to a number
       const stockQuantity = parseInt(formData.stockQuantity, 10);
 
-      // Prepare product data
+      // Monta dados: só envia subcategoryValues se não estiver vazio; senão, envia null explicitamente
       const productData = {
         name: formData.name,
         shortDescription: formData.shortDescription || null,
         description: formData.description,
         price,
         salePrice: salePrice || null,
-        categoryId: selectedCategory, // uuid (deve ser preenchido!)
-        subcategoryValues: subcategoryValues, // deve ser objeto correto!
+        categoryId: selectedCategory,
+        subcategoryValues: Object.keys(subcategoryValues).length > 0 ? subcategoryValues : null,
         published: formData.published,
         featured: formData.featured,
         stockQuantity,
-        deletedImageIds: deletedImageIds // Pass the deleted image IDs to updateProduct
+        deletedImageIds: deletedImageIds
       };
 
-      // LOG explícito do objeto enviado
       console.log("[Diagnóstico Edição] ENVIANDO PARA updateProduct:", {
         id: product.id,
         ...productData,
         imagesLength: images?.length
       });
 
-      // Update product
       await updateProduct(product.id, productData, images.length > 0 ? images : undefined);
 
       toast({

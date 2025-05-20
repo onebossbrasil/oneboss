@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { useProducts } from "@/contexts/ProductContext";
 import { useToast } from "@/hooks/use-toast";
@@ -31,7 +32,7 @@ export const useProductAdd = (
 
     setIsSubmitting(true);
 
-    // Validação básica, deve vir ID uuid no selectedCategory
+    // Validação básica da categoria
     const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[4][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
     if (!selectedCategory || !uuidRegex.test(selectedCategory)) {
       setIsSubmitting(false);
@@ -43,7 +44,23 @@ export const useProductAdd = (
       return;
     }
 
-    // Validate form data
+    // Validação subcategoria obrigatória: se categoria foi selecionada (sempre é, pois é obrigatória), 
+    // e subcategoryValues é vazio, barrar submit
+    if (
+      selectedCategory &&
+      Array.isArray(Object.keys(subcategoryValues)) &&
+      Object.keys(subcategoryValues).length === 0
+    ) {
+      setIsSubmitting(false);
+      toast({
+        title: "Subcategoria obrigatória",
+        description: "Selecione ao menos uma subcategoria/atributo antes de salvar.",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    // Validate the rest of the form
     const isValid = validateProductData(
       formData.name,
       formData.price,
@@ -63,27 +80,25 @@ export const useProductAdd = (
     }
 
     try {
-      // Convert price to a number
+      // Convert price to number
       const price = convertPriceToNumber(formData.price);
 
-      // Convert sale price to a number if provided
       let salePrice = undefined;
       if (formData.salePrice) {
         salePrice = convertPriceToNumber(formData.salePrice);
       }
 
-      // Convert stock quantity to a number
       const stockQuantity = parseInt(formData.stockQuantity, 10);
 
-      // Prepare product data
+      // Enviar subcategoryValues apenas se não estiver vazio; senão, envia null explicitamente
       const productData = {
         name: formData.name,
         shortDescription: formData.shortDescription || null,
         description: formData.description,
         price,
         salePrice: salePrice || null,
-        categoryId: selectedCategory, // uuid!
-        subcategoryValues,
+        categoryId: selectedCategory,
+        subcategoryValues: Object.keys(subcategoryValues).length > 0 ? subcategoryValues : null,
         published: formData.published,
         featured: formData.featured,
         stockQuantity
