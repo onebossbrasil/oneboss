@@ -1,13 +1,10 @@
-
 import { useState } from "react";
 import { useToast } from "@/hooks/use-toast";
 import {
-  // Correção: importar funções diretamente dos operations corretos
-  // createCategory,
-  // deleteCategory,
-} from "@/services/category";
-// CORRETO:
-import { createCategory, deleteCategory, updateCategory } from "@/services/category/categoryOperations";
+  createCategory,
+  deleteCategory,
+  updateCategory
+} from "@/services/category/categoryOperations";
 import { isValidUuid } from "@/utils/validateUuid";
 
 export function useCategoryMutations(
