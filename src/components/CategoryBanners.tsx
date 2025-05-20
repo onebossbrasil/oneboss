@@ -41,7 +41,8 @@ const categoryData = [{
 }];
 const CategoryBanners = () => {
   const isMobile = useIsMobile();
-  return <section className="py-6 md:py-8 bg-background relative overflow-hidden">
+  return (
+    <section className="py-6 md:py-8 bg-background relative overflow-hidden flex md:justify-center">
       {/* Decorative elements */}
       <div className="absolute -top-40 -right-40 w-96 h-96 bg-gold/5 rounded-full blur-3xl"></div>
       <div className="absolute -bottom-40 -left-40 w-96 h-96 bg-gold/5 rounded-full blur-3xl"></div>
@@ -96,6 +97,7 @@ const CategoryBanners = () => {
           </Link>
         </div>
       </div>
-    </section>;
+    </section>
+  );
 };
 export default CategoryBanners;
