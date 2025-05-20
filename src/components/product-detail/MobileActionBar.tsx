@@ -51,7 +51,7 @@ const MobileActionBar = ({ product }: MobileActionBarProps) => {
   };
 
   return (
-    <div className="fixed bottom-0 left-0 right-0 z-40 bg-white/95 dark:bg-zinc-950/95 shadow-t-lg flex items-center py-3 px-3 border-t glass-morphism animate-fade-in md:hidden">
+    <div className="fixed bottom-0 left-0 right-0 z-40 bg-white/95 dark:bg-zinc-950/95 shadow-t-lg flex items-center py-2 px-2 border-t glass-morphism animate-fade-in md:hidden">
       <Button
         size="lg"
         onClick={openWhatsApp}
@@ -60,17 +60,17 @@ const MobileActionBar = ({ product }: MobileActionBarProps) => {
           color: "white",
           boxShadow: "0 4px 16px 0 rgba(37,211,102,0.12)",
         }}
-        className="w-full font-bold text-lg rounded-full h-14 flex justify-center items-center shadow-md transition-transform duration-150 active:scale-98 focus:outline-none focus:ring-2 focus:ring-green-400 mx-0"
+        className="w-full font-bold text-base rounded-full h-11 flex justify-center items-center shadow-md transition-transform duration-150 active:scale-98 focus:outline-none focus:ring-2 focus:ring-green-400 px-0"
       >
-        <MessageCircle className="mr-2 h-6 w-6" />
+        <MessageCircle className="mr-2 h-5 w-5" />
         Falar com Vendedor
       </Button>
       <div className="flex flex-col ml-2 gap-2">
-        <Button variant="outline" size="icon" className="h-12 w-12" onClick={toggleFavorite}>
-          <Heart className={`h-6 w-6 ${isFavorite ? 'fill-red-500 text-red-500' : ''}`} />
+        <Button variant="outline" size="icon" className="h-11 w-11" onClick={toggleFavorite}>
+          <Heart className={`h-5 w-5 ${isFavorite ? 'fill-red-500 text-red-500' : ''}`} />
         </Button>
-        <Button variant="outline" size="icon" className="h-12 w-12" onClick={handleShare}>
-          <Share2 className="h-6 w-6" />
+        <Button variant="outline" size="icon" className="h-11 w-11" onClick={handleShare}>
+          <Share2 className="h-5 w-5" />
         </Button>
       </div>
     </div>

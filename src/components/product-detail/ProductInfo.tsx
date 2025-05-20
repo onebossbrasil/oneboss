@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { Product } from "@/types/product";
 import { Button } from "@/components/ui/button";
@@ -93,8 +94,8 @@ const ProductInfo = ({
           </div>}
       </div>
 
-      {/* Action Buttons */}
-      <div className="flex flex-col sm:flex-row gap-3 pt-4">
+      {/* Action Buttons - SÓ DESKTOP */}
+      <div className="hidden md:flex flex-col sm:flex-row gap-3 pt-4">
         <Button
           size="lg"
           onClick={openWhatsApp}
