@@ -6,17 +6,6 @@ import { useToast } from "@/hooks/use-toast";
 import PartnerForm from "./PartnerForm";
 import PartnerList, { Partner } from "./PartnerList";
 
-type Partner = {
-  id: string;
-  name: string;
-  description?: string;
-  banner_image_url?: string;
-  logo_url: string;
-  link?: string;
-  order_index: number;
-  visible: boolean;
-};
-
 const initialForm: Omit<Partner, "id" | "order_index" | "visible"> = {
   name: "",
   description: "",
