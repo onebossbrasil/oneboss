@@ -1,4 +1,3 @@
-
 import { Product } from "@/types/product";
 import {
   Dialog,
@@ -49,7 +48,11 @@ const ProductEditDialog = ({ product, open, onOpenChange, onClose }: ProductEdit
     setSubcategoryValues,
     setImages,
     setImagePreviewUrls,
-    setDeletedImageIds
+    setDeletedImageIds,
+    selectedSubcategoryId,
+    selectedAttributeId,
+    handleAttributeChange,
+    handleSubcategoryChange: handleSubcatIdChange
   } = useProductEdit(freshProduct, handleDialogClose);
 
   // ---- DIAGNÓSTICO: Log detalhado do state do modal ao abrir ----
@@ -137,6 +140,8 @@ const ProductEditDialog = ({ product, open, onOpenChange, onClose }: ProductEdit
                     console.log("[Modal] Subcategoria alterada:", type, value);
                     handleSubcategoryChange(type, value);
                   }}
+                  onSubcategoryIdChange={handleSubcatIdChange}
+                  onAttributeIdChange={handleAttributeChange}
                 />
               </div>
 

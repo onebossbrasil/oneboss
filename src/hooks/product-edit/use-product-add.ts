@@ -75,7 +75,7 @@ export const useProductAdd = (
 
       const stockQuantity = parseInt(formData.stockQuantity, 10);
 
-      // Inclui os novos campos
+      // Inclui os novos campos ID, agora corretamente
       const productData = {
         name: formData.name,
         shortDescription: formData.shortDescription || null,

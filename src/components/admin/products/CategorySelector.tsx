@@ -1,4 +1,3 @@
-
 import { useCategories } from "@/contexts/CategoryContext";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Label } from "@/components/ui/label";
@@ -9,13 +8,17 @@ type CategorySelectorProps = {
   subcategoryValues: Record<string, string>;
   onCategoryChange: (value: string) => void;
   onSubcategoryChange: (type: string, value: string) => void;
+  onSubcategoryIdChange?: (subcategoryId: string | null) => void;
+  onAttributeIdChange?: (attributeId: string | null) => void;
 };
 
 const CategorySelectorContent = ({
   selectedCategory,
   subcategoryValues,
   onCategoryChange,
-  onSubcategoryChange
+  onSubcategoryChange,
+  onSubcategoryIdChange,
+  onAttributeIdChange
 }: CategorySelectorProps) => {
   const { categories, isLoading, error } = useCategories();
   const [activeSubcategoryType, setActiveSubcategoryType] = useState<string | null>(null);
@@ -26,27 +29,34 @@ const CategorySelectorContent = ({
   
   const category = categories.find(cat => cat.id === selectedCategory);
 
-  // Get all subcategory types for the selected category
-  const subcategoryTypes = () => {
-    return category ? category.subcategories.map(sc => sc.type) : [];
-  };
-  
-  // Get available attributes for a specific subcategory type
-  const getSubcategoryOptions = (subcatType: string) => {
-    const subcategory = category?.subcategories.find(sc => sc.type === subcatType);
-    return subcategory ? subcategory.attributes : [];
-  };
-  
-  // Get the label of a subcategory type
-  const getSubcategoryLabel = (subcatType: string) => {
-    const subcategory = category?.subcategories.find(sc => sc.type === subcatType);
-    return subcategory ? subcategory.name : subcatType.charAt(0).toUpperCase() + subcatType.slice(1);
-  };
-  
-  // Handle subcategory selection
-  const handleSubcategoryTypeSelect = (type: string) => {
-    setActiveSubcategoryType(type);
-  };
+  // Adicional: buscar subcategoria ativa como objeto, não só type
+  const activeSubcatObj = category?.subcategories.find(
+    sc => sc.type === activeSubcategoryType
+  );
+
+  // Atualizar subcategoriaId ao selecionar subcategoria
+  useEffect(() => {
+    if (onSubcategoryIdChange) {
+      onSubcategoryIdChange(activeSubcatObj?.id || null);
+    }
+    // eslint-disable-next-line
+  }, [activeSubcatObj?.id]);
+
+  // Atualizar atributoId ao selecionar atributo
+  useEffect(() => {
+    if (onAttributeIdChange && activeSubcatObj && subcategoryValues[activeSubcategoryType || ""]) {
+      // Encontrar o atributoId correspondente ao atributo selecionado
+      const attributeSelected = subcategoryValues[activeSubcategoryType];
+      // Procurar ID do atributo a partir do nome/valor
+      const attributeObj = activeSubcatObj?.attributesData?.find(
+        (a: any) => a.attribute === attributeSelected
+      );
+      if (attributeObj) onAttributeIdChange(attributeObj.id);
+      else onAttributeIdChange(null);
+    } else if (onAttributeIdChange && !subcategoryValues[activeSubcategoryType || ""]) {
+      onAttributeIdChange(null);
+    }
+  }, [subcategoryValues, activeSubcatObj, activeSubcategoryType, onAttributeIdChange]);
 
   if (isLoading) {
     return <div className="space-y-4">Carregando categorias...</div>;
@@ -85,7 +95,7 @@ const CategorySelectorContent = ({
         <div>
           <Label htmlFor="subcategoryType">Subcategoria</Label>
           <Select 
-            onValueChange={setActiveSubcategoryType} 
+            onValueChange={(type) => setActiveSubcategoryType(type)}
             value={activeSubcategoryType || ""}
           >
             <SelectTrigger>
@@ -104,36 +114,30 @@ const CategorySelectorContent = ({
         </div>
       )}
       
-      {activeSubcategoryType && (
+      {activeSubcategoryType && activeSubcatObj && (
         <div>
           <Label htmlFor="subcategoryValue">
-            {(() => {
-              const subcategory = category?.subcategories.find(sc => sc.type === activeSubcategoryType);
-              return (subcategory ? subcategory.name : activeSubcategoryType) + " - Atributos";
-            })()}
+            {activeSubcatObj.name + " - Atributos"}
           </Label>
           <Select 
-            onValueChange={(value) => onSubcategoryChange(activeSubcategoryType, value)}
+            onValueChange={(value) => {
+              onSubcategoryChange(activeSubcategoryType, value);
+            }}
             value={subcategoryValues[activeSubcategoryType] || ""}
           >
             <SelectTrigger>
               <SelectValue placeholder={
-                (() => {
-                  const subcategory = category?.subcategories.find(sc => sc.type === activeSubcategoryType);
-                  const nomeSubcategoria = subcategory ? subcategory.name.toLowerCase() : activeSubcategoryType.toLowerCase();
-                  return `Selecione um atributo para ${nomeSubcategoria}`;
-                })()
+                `Selecione um atributo para ${activeSubcatObj.name.toLowerCase()}`
               } />
             </SelectTrigger>
             <SelectContent>
-              {(() => {
-                const subcategory = category?.subcategories.find(sc => sc.type === activeSubcategoryType);
-                return subcategory ? subcategory.attributes.map((option: string) => (
-                  <SelectItem key={option} value={option}>
-                    {option}
-                  </SelectItem>
-                )) : null;
-              })()}
+              {activeSubcatObj.attributesData
+                ? activeSubcatObj.attributesData.map((option: any) => (
+                    <SelectItem key={option.id} value={option.attribute}>
+                      {option.attribute}
+                    </SelectItem>
+                  ))
+                : null}
             </SelectContent>
           </Select>
         </div>

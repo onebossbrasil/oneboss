@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { useProducts } from "@/contexts/ProductContext";
 import { useToast } from "@/hooks/use-toast";
@@ -51,9 +50,9 @@ export const useProductForm = () => {
     setImagePreviewUrls(newPreviewUrls);
   };
   
+  // Mantém featured mas reseta subcategoria/atributo ao trocar categoria
   const handleCategoryChange = (value: string) => {
     setSelectedCategory(value);
-    // Mantém featured mas reseta subcategoria/atributo
     setSelectedSubcategoryId(null);
     setSelectedAttributeId(null);
     const featured = subcategoryValues.featured;
@@ -62,6 +61,8 @@ export const useProductForm = () => {
   
   const handleSubcategoryChange = (subcategoryId: string | null) => {
     setSelectedSubcategoryId(subcategoryId);
+    // Também reseta atributo ao trocar a subcategoria
+    setSelectedAttributeId(null);
   };
 
   const handleAttributeChange = (attributeId: string | null) => {
