@@ -7,7 +7,7 @@ export const addSubcategoryValue = async (subcategoryId: number | string, attrib
     logServiceAction("Adicionando atributo à subcategoria", { subcategoryId, attribute, categoryId });
 
     const { error } = await supabase
-      .from('subcategory_attributes')
+      .from('attributes')
       .insert({
         subcategory_id: subcategoryId.toString(),
         attribute
@@ -32,7 +32,7 @@ export const removeSubcategoryValue = async (subcategoryId: number | string, att
 
     // Find the attribute first
     const { data: attributeData, error: findError } = await supabase
-      .from('subcategory_attributes')
+      .from('attributes')
       .select('id')
       .eq('subcategory_id', subcategoryId.toString())
       .eq('attribute', attribute)
@@ -52,7 +52,7 @@ export const removeSubcategoryValue = async (subcategoryId: number | string, att
 
     // Delete the attribute
     const { error } = await supabase
-      .from('subcategory_attributes')
+      .from('attributes')
       .delete()
       .eq('id', attributeData.id);
 
@@ -77,7 +77,7 @@ export const updateSubcategoryValue = async (
     logServiceAction("Atualizando atributo da subcategoria", { subcategoryId, oldAttribute, newAttribute });
     // Encontrar ID do atributo antigo
     const { data: attrData, error: findError } = await supabase
-      .from('subcategory_attributes')
+      .from('attributes')
       .select('id')
       .eq('subcategory_id', subcategoryId)
       .eq('attribute', oldAttribute)
@@ -88,7 +88,7 @@ export const updateSubcategoryValue = async (
     }
     // Atualizar atributo
     const { error } = await supabase
-      .from('subcategory_attributes')
+      .from('attributes')
       .update({ attribute: newAttribute })
       .eq('id', attrData.id);
 

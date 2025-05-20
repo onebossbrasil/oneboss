@@ -28,9 +28,9 @@ export const fetchCategoriesData = async () => {
       throw subcategoriesError;
     }
 
-    // Fetch subcategory attributes
+    // Fetch subcategory attributes (agora usando a tabela 'attributes')
     const { data: valuesData, error: valuesError } = await supabase
-      .from('subcategory_attributes')
+      .from('attributes')
       .select('*');
 
     if (valuesError) {
@@ -127,7 +127,7 @@ export const deleteCategory = async (categoryId: string) => {
       
       for (const subcat of subcategoriesData) {
         const { error: valuesError } = await supabase
-          .from('subcategory_attributes')
+          .from('attributes')
           .delete()
           .eq('subcategory_id', subcat.id);
           

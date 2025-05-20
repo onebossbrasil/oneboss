@@ -36,7 +36,7 @@ export const deleteSubcategory = async (subcategoryId: number) => {
     
     // Primeiro, remover todos os atributos associados a esta subcategoria
     const { error: valuesError } = await supabase
-      .from('subcategory_attributes')
+      .from('attributes')
       .delete()
       .eq('subcategory_id', subcategoryId.toString());
       
