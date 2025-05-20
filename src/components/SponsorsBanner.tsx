@@ -1,4 +1,3 @@
-
 import { Button } from "@/components/ui/button";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { useEffect, useState } from "react";
@@ -62,7 +61,7 @@ const SponsorsBanner = () => {
                 <div
                   className="glassmorphism rounded-xl p-2 md:p-3"
                   style={{
-                    background: "rgba(255,255,255,0.60)",
+                    background: "rgba(255,255,255,0.25)", // MAIS TRANSPARENTE
                     backdropFilter: "blur(10px)",
                     border: "1.5px solid rgba(255,255,255,0.13)",
                   }}
@@ -111,4 +110,3 @@ const SponsorsBanner = () => {
 };
 
 export default SponsorsBanner;
-
