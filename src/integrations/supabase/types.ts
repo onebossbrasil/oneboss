@@ -122,6 +122,45 @@ export type Database = {
         }
         Relationships: []
       }
+      partners: {
+        Row: {
+          alt: string | null
+          banner_image_url: string | null
+          created_at: string | null
+          description: string | null
+          id: string
+          link: string | null
+          logo_url: string
+          name: string
+          order_index: number | null
+          visible: boolean | null
+        }
+        Insert: {
+          alt?: string | null
+          banner_image_url?: string | null
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          link?: string | null
+          logo_url: string
+          name: string
+          order_index?: number | null
+          visible?: boolean | null
+        }
+        Update: {
+          alt?: string | null
+          banner_image_url?: string | null
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          link?: string | null
+          logo_url?: string
+          name?: string
+          order_index?: number | null
+          visible?: boolean | null
+        }
+        Relationships: []
+      }
       product_images: {
         Row: {
           id: string

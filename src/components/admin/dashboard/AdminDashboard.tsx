@@ -1,10 +1,10 @@
-
 import { useState } from "react";
 import { SidebarProvider } from "@/components/ui/sidebar";
 import AdminLayout from "@/components/admin/AdminLayout";
 import ProductList from "../products/ProductList";
 import CategoryManager from "../CategoryManager";
 import LeadsManager from "../LeadsManager";
+import AdminPartnerManager from "../partners/AdminPartnerManager";
 import { ProductProvider } from "@/contexts/product";
 import { useIsMobile } from "@/hooks/useIsMobile";
 
@@ -16,6 +16,7 @@ const TABS = [
   { key: "produtos", label: "Produtos" },
   { key: "categorias", label: "Categorias" },
   { key: "leads", label: "Leads" },
+  { key: "parceiros", label: "Parceiros" },
 ];
 
 const AdminDashboard = ({ onLogout }: AdminDashboardProps) => {
@@ -56,6 +57,7 @@ const AdminDashboard = ({ onLogout }: AdminDashboardProps) => {
           ))}
         </nav>
         <div className="flex-1 p-2">
+          {/* Adiciona renderização dos parceiros */}
           <ProductProvider>
             {activeTab === "produtos" && (
               <div className="w-full">
@@ -67,6 +69,9 @@ const AdminDashboard = ({ onLogout }: AdminDashboardProps) => {
             )}
             {activeTab === "leads" && (
               <LeadsManager />
+            )}
+            {activeTab === "parceiros" && (
+              <AdminPartnerManager />
             )}
           </ProductProvider>
         </div>
@@ -83,6 +88,7 @@ const AdminDashboard = ({ onLogout }: AdminDashboardProps) => {
             {activeTab === "produtos" && <ProductList />}
             {activeTab === "categorias" && <CategoryManager />}
             {activeTab === "leads" && <LeadsManager />}
+            {activeTab === "parceiros" && <AdminPartnerManager />}
           </div>
         </ProductProvider>
       </AdminLayout>

@@ -11,6 +11,7 @@ const TABS = [
   { key: "produtos", label: "Produtos" },
   { key: "categorias", label: "Categorias" },
   { key: "leads", label: "Leads" },
+  { key: "parceiros", label: "Parceiros" },
 ];
 
 function AdminTabsNav({ activeTab, onTabChange }: AdminTabsNavProps) {
