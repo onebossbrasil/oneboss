@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Filter, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -40,30 +39,29 @@ const FilterSidebar = ({
     return category.subcategories || [];
   };
 
-  // Subcategoria estará visível se pelo menos UM produto publicado possuir subcategoryValue igual a algum dos seus atributos
-  const getActiveSubcategories = () => {
+  // Subcategory will be visible if at least ONE published product has subcategoryValue equal to any of its attributes
+  const getActiveSubcategories = (): SubcategoryType[] => {
     const subcategories = getSubcategories();
 
-    // Subcategoria visível se algum produto publicado tiver subcategoryValue igual a algum dos seus atributos
     return subcategories
-      .map(subcat => {
-        // Para cada atributo da subcategoria:
-        const activeAttributes = subcat.attributes.filter(value =>
-          publishedProducts.some(product =>
-            product.subcategoryValues && Object.values(product.subcategoryValues).includes(value)
+      .map((subcat) => {
+        // For each attribute of the subcategory:
+        const activeAttributes = subcat.attributes.filter((value) =>
+          publishedProducts.some(
+            (product) =>
+              product.subcategoryValues &&
+              Object.values(product.subcategoryValues).includes(value)
           )
         );
-        // Só retorna subcategoria se houver pelo menos 1 atributo ativo
+        // Only return subcategory if there is at least 1 active attribute
         return activeAttributes.length > 0
           ? {
               ...subcat,
--             values: activeAttributes // Removido, porque não existe mais 'values'
-+             attributes: activeAttributes
+              attributes: activeAttributes
             }
           : null;
       })
--     .filter((item): item is SubcategoryType => !!item);
-+     .filter((item): item is SubcategoryType => !!item);
+      .filter((item): item is SubcategoryType => !!item);
   };
 
   const subcategories = getActiveSubcategories();
@@ -112,8 +110,7 @@ const FilterSidebar = ({
                           <span className="block text-xs text-muted-foreground font-medium ml-2 mb-1">{subcategory.name}</span>
                         )}
                         <div className="flex flex-col space-y-1">
--                         {subcategory.values.map(value => (
-+                         {subcategory.attributes.map(value => (
+                          {subcategory.attributes.map(value => (
                             <Button
                               key={`${subcategory.id}-${value}`}
                               variant="ghost"
@@ -144,4 +141,3 @@ const FilterSidebar = ({
 };
 
 export default FilterSidebar;
-
