@@ -1,3 +1,4 @@
+
 import { supabase } from "@/integrations/supabase/client";
 import { logServiceAction } from "./baseService";
 
@@ -28,7 +29,7 @@ export const fetchCategoriesData = async () => {
       throw subcategoriesError;
     }
 
-    // Fetch subcategory attributes (agora usando a tabela 'attributes')
+    // Fetch subcategory attributes (agora sempre usando tabela 'attributes')
     const { data: valuesData, error: valuesError } = await supabase
       .from('attributes')
       .select('*');

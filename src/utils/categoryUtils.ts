@@ -1,4 +1,3 @@
-
 import { CategoryType, SubcategoryType } from "@/types/category";
 
 // Group subcategories by category ID
@@ -15,16 +14,20 @@ export const groupSubcategoriesByCategory = (subcategoriesData: any[]) => {
   return subcategoriesByCategory;
 };
 
-// Group attributes by subcategory ID (searches in subcategory_attributes now)
+// Group attributes by subcategory ID (agora usando tabela "attributes" corretamente)
 export const groupValuesBySubcategory = (attributesData: any[]) => {
-  const attributesBySubcategory: Record<string, string[]> = {};
+  const attributesBySubcategory: Record<string, { id: string; name: string }[]> = {};
 
   attributesData.forEach((row: any) => {
-    // row is from subcategory_attributes
+    // row vem de attributes (não mais subcategory_attributes)
     if (!attributesBySubcategory[row.subcategory_id]) {
       attributesBySubcategory[row.subcategory_id] = [];
     }
-    attributesBySubcategory[row.subcategory_id].push(row.attribute);
+    // Garantir formato { id, name }
+    attributesBySubcategory[row.subcategory_id].push({
+      id: row.id ? row.id.toString() : row.attribute, // use id se houver, fallback para attribute string só para legado
+      name: row.attribute
+    });
   });
 
   return attributesBySubcategory;
@@ -34,7 +37,7 @@ export const groupValuesBySubcategory = (attributesData: any[]) => {
 export const formatCategoriesData = (
   categoriesData: any[],
   subcategoriesByCategory: Record<string, any[]>,
-  attributesBySubcategory: Record<string, string[]>
+  attributesBySubcategory: Record<string, { id: string; name: string }[]>
 ): CategoryType[] => {
   return categoriesData.map((category: any) => {
     const categorySubcategories = subcategoriesByCategory[category.id] || [];
