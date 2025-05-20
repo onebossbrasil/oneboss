@@ -9,7 +9,7 @@ import ResultsHeader from "@/components/store/ResultsHeader";
 import ProductGrid from "@/components/store/ProductGrid";
 import { useProducts } from "@/contexts/ProductContext";
 import { useCategories } from "@/contexts/CategoryContext";
-import { FormattedProduct } from "@/types/product";
+import { FormattedProduct, Product } from "@/types/product";
 import { useToast } from "@/hooks/use-toast";
 
 // ATENÇÃO: Esta página já usa hooks para produtos/categorias vindos do Supabase.
