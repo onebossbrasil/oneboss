@@ -9,6 +9,8 @@ interface MobileActionBarProps {
   product: Product;
 }
 
+const whatsappColor = "#25D366"; // Cor oficial do WhatsApp
+
 const MobileActionBar = ({ product }: MobileActionBarProps) => {
   const { toast } = useToast();
   const [isFavorite, setIsFavorite] = useState(false);
@@ -50,7 +52,12 @@ const MobileActionBar = ({ product }: MobileActionBarProps) => {
 
   return (
     <div className="fixed bottom-0 left-0 right-0 z-40 bg-white/95 dark:bg-zinc-950/95 shadow-t-lg flex justify-around items-center py-3 px-3 border-t glass-morphism animate-fade-in md:hidden">
-      <Button size="lg" onClick={openWhatsApp} className="flex-1 mr-2 font-bold bg-primary text-white rounded-xl shadow hover:scale-105 transition-transform">
+      <Button
+        size="lg"
+        onClick={openWhatsApp}
+        style={{ backgroundColor: whatsappColor, color: "white" }}
+        className="flex-1 mr-2 font-bold rounded-xl shadow hover:scale-105 transition-transform border-none"
+      >
         <MessageCircle className="mr-2 h-5 w-5" />
         Falar com Vendedor
       </Button>
@@ -65,4 +72,3 @@ const MobileActionBar = ({ product }: MobileActionBarProps) => {
 };
 
 export default MobileActionBar;
-

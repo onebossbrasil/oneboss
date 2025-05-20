@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { 
   Carousel, 
@@ -10,6 +9,7 @@ import {
 import { AspectRatio } from "@/components/ui/aspect-ratio";
 import { ProductImage } from "@/types/product";
 import { Search, X } from "lucide-react";
+import ProductGalleryModal from "./ProductGalleryModal";
 
 interface ProductGalleryProps {
   images: ProductImage[];
@@ -20,6 +20,7 @@ const ProductGallery = ({ images, productName }: ProductGalleryProps) => {
   const [selectedImage, setSelectedImage] = useState<number>(0);
   const [zoomActive, setZoomActive] = useState(false);
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
+  const [showModal, setShowModal] = useState(false);
 
   // Set first image as selected when images change
   useEffect(() => {
@@ -30,6 +31,9 @@ const ProductGallery = ({ images, productName }: ProductGalleryProps) => {
 
   // Fallback image if no images provided
   const fallbackImage = "https://images.unsplash.com/photo-1567899378494-47b22a2ae96a?auto=format&fit=crop&q=80&w=600&h=400";
+
+  // Detect if user is on desktop (override for modal)
+  const isDesktop = window.matchMedia("(min-width: 768px)").matches;
 
   // Handle zoom functionality
   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
@@ -46,11 +50,20 @@ const ProductGallery = ({ images, productName }: ProductGalleryProps) => {
     setZoomActive(!zoomActive);
   };
 
+  // Open modal in desktop, zoom overlay in mobile
+  const handleImageClick = () => {
+    if (isDesktop) {
+      setShowModal(true);
+    } else {
+      toggleZoom();
+    }
+  };
+
   return (
     <div className="product-gallery">
-      {/* Main Image with Zoom */}
+      {/* Main Image with Zoom/Modal */}
       <div className="relative mb-4 rounded-lg overflow-hidden bg-gray-100 border">
-        {zoomActive && (
+        {zoomActive && !isDesktop && (
           <div 
             className="absolute top-0 right-0 z-20 p-2"
             onClick={toggleZoom}
@@ -62,19 +75,19 @@ const ProductGallery = ({ images, productName }: ProductGalleryProps) => {
         )}
         
         <div 
-          className={`relative overflow-hidden ${zoomActive ? 'cursor-zoom-out' : 'cursor-zoom-in'}`}
-          onClick={toggleZoom}
-          onMouseMove={handleMouseMove}
+          className={`relative overflow-hidden ${zoomActive && !isDesktop ? 'cursor-zoom-out' : 'cursor-zoom-in'}`}
+          onClick={handleImageClick}
+          onMouseMove={zoomActive && !isDesktop ? handleMouseMove : undefined}
           style={{ aspectRatio: "4/3" }}
         >
           <div 
-            className={`${zoomActive ? 'absolute top-0 left-0 w-full h-full' : ''}`}
+            className={`${zoomActive && !isDesktop ? 'absolute top-0 left-0 w-full h-full' : ''}`}
           >
             {images.length > 0 ? (
               <div 
-                className={`relative w-full h-full ${zoomActive ? 'scale-150' : ''}`}
+                className={`relative w-full h-full ${(zoomActive && !isDesktop) ? 'scale-150' : ''}`}
                 style={
-                  zoomActive ? {
+                  zoomActive && !isDesktop ? {
                     transformOrigin: `${mousePosition.x}% ${mousePosition.y}%`
                   } : {}
                 }
@@ -97,7 +110,7 @@ const ProductGallery = ({ images, productName }: ProductGalleryProps) => {
               className="absolute bottom-4 right-4 p-2 rounded-full bg-black/60 text-white"
               onClick={(e) => {
                 e.stopPropagation();
-                toggleZoom();
+                handleImageClick();
               }}
             >
               <Search size={18} />
@@ -105,6 +118,17 @@ const ProductGallery = ({ images, productName }: ProductGalleryProps) => {
           )}
         </div>
       </div>
+
+      {/* Modal para Desktop */}
+      {isDesktop && (
+        <ProductGalleryModal
+          open={showModal}
+          onOpenChange={setShowModal}
+          images={images}
+          currentIndex={selectedImage}
+          onNavigate={(i) => setSelectedImage(i)}
+        />
+      )}
 
       {/* Thumbnail Carousel */}
       {images.length > 1 && (

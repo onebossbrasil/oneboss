@@ -8,6 +8,7 @@ import { useToast } from "@/hooks/use-toast";
 interface ProductInfoProps {
   product: Product;
 }
+const whatsappColor = "#25D366"; // Cor oficial do WhatsApp
 const ProductInfo = ({
   product
 }: ProductInfoProps) => {
@@ -94,7 +95,12 @@ const ProductInfo = ({
 
       {/* Action Buttons */}
       <div className="flex flex-col sm:flex-row gap-3 pt-4">
-        <Button size="lg" onClick={openWhatsApp} className="flex-1">
+        <Button
+          size="lg"
+          onClick={openWhatsApp}
+          style={{ backgroundColor: whatsappColor, color: "white" }}
+          className="flex-1 font-bold rounded-xl border-none"
+        >
           <MessageCircle className="mr-2 h-5 w-5" />
           Falar com Vendedor
         </Button>
