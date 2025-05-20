@@ -33,13 +33,10 @@ export const ProductProvider: React.FC<{ children: React.ReactNode }> = ({ child
   // Always fetch products regardless of authentication status
   useEffect(() => {
     let isMounted = true;
-    
-    // Remove authentication check to allow public viewing of products
     if (isMounted) {
-      console.log("ProductProvider requesting fetchProducts");
+      console.log("ProductProvider requesting fetchProducts: Initial");
       fetchProducts();
     }
-    
     return () => {
       isMounted = false;
     };
@@ -47,8 +44,10 @@ export const ProductProvider: React.FC<{ children: React.ReactNode }> = ({ child
 
   // Stable refreshProducts function with force parameter
   const refreshProducts = useCallback(async (force = true) => {
-    console.log("Manual refresh products requested, force =", force);
-    return fetchProducts(force);
+    console.log("[ProductProvider] Manual refresh products requested, force =", force);
+    const res = await fetchProducts(force);
+    console.log("[ProductProvider] refreshProducts completed.");
+    return res;
   }, [fetchProducts]);
 
   // Optimized product operations
@@ -65,18 +64,16 @@ export const ProductProvider: React.FC<{ children: React.ReactNode }> = ({ child
         });
         return;
       }
-      
-      console.log("Adicionando produto como:", user?.email);
+      console.log("[ProductProvider] Adicionando produto como:", user?.email);
       await addProductOperation(product, images);
       await refreshProducts(); 
-      
       toast({
         title: "Produto adicionado",
         description: "Produto adicionado com sucesso!",
         variant: "default"
       });
     } catch (err) {
-      console.error("Erro ao adicionar produto:", err);
+      console.error("[ProductProvider] Erro ao adicionar produto:", err);
       // Error is already handled in the operation
     }
   }, [session, user, addProductOperation, refreshProducts, toast]);
@@ -95,18 +92,17 @@ export const ProductProvider: React.FC<{ children: React.ReactNode }> = ({ child
         });
         return;
       }
-      
-      console.log("Atualizando produto como:", user.email);
+      console.log("[ProductProvider] Atualizando produto como:", user.email, "ProductId:", id);
       await updateProductOperation(id, productData, newImages);
-      await refreshProducts();
-      
+      console.log("[ProductProvider] Produto atualizado no Supabase, agora refrescando lista...");
+      await refreshProducts(true); // <--- aguarda atualizar lista!
       toast({
         title: "Produto atualizado",
-        description: "As alterações foram salvas com sucesso!",
+        description: "As alterações foram salvas e sincronizadas!",
         variant: "default"
       });
     } catch (err) {
-      console.error("Erro ao atualizar produto:", err);
+      console.error("[ProductProvider] Erro ao atualizar produto:", err);
       // Error is already handled in the operation
     }
   }, [session, user, updateProductOperation, refreshProducts, toast]);
@@ -121,8 +117,7 @@ export const ProductProvider: React.FC<{ children: React.ReactNode }> = ({ child
         });
         return;
       }
-      
-      console.log("Removendo produto como:", user?.email);
+      console.log("[ProductProvider] Removendo produto como:", user?.email, "ProductId:", id);
       await deleteProductOperation(id);
       await refreshProducts();
     } catch (err) {
