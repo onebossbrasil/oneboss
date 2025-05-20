@@ -51,10 +51,11 @@ const FeaturedProductsSection: React.FC<FeaturedProductsSectionProps> = ({
           </div>
         ) : formattedProducts.length > 0 ? (
           <>
+            {/* Só um título! */}
             <div className="flex justify-between items-end mb-6">
               <h2 className="font-playfair text-3xl font-bold">{title}</h2>
             </div>
-            <ProductSlider products={formattedProducts} />
+            <ProductSlider products={formattedProducts} hideTitle />
           </>
         ) : (
           <div className="text-center py-12">

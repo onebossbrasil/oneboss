@@ -16,15 +16,15 @@ import { FormattedProduct } from "@/types/product";
 
 type ProductSliderProps = {
   products: FormattedProduct[];
+  hideTitle?: boolean;
 };
 
-const ProductSlider = ({ products }: ProductSliderProps) => {
+const ProductSlider = ({ products, hideTitle = false }: ProductSliderProps) => {
   const [api, setApi] = useState<ReturnType<typeof useEmblaCarousel>[1]>();
   const [canScrollPrev, setCanScrollPrev] = useState(false);
   const [canScrollNext, setCanScrollNext] = useState(true);
   const [isPaused, setIsPaused] = useState(false);
-  
-  // Handle scroll button state based on carousel position
+
   useEffect(() => {
     if (!api) return;
 
@@ -36,7 +36,6 @@ const ProductSlider = ({ products }: ProductSliderProps) => {
     api.on("select", onSelect);
     api.on("reInit", onSelect);
 
-    // Initial check
     onSelect();
 
     return () => {
@@ -45,24 +44,20 @@ const ProductSlider = ({ products }: ProductSliderProps) => {
     };
   }, [api]);
 
-  // Auto scroll functionality with infinite loop
   useEffect(() => {
     if (!api || isPaused) return;
-    
+
     const interval = setInterval(() => {
       if (!api.canScrollNext()) {
-        // If we're at the end, scroll back to the beginning
         api.scrollTo(0);
       } else {
-        // Otherwise, scroll to next
         api.scrollNext();
       }
     }, 5000);
-    
+
     return () => clearInterval(interval);
   }, [api, isPaused]);
-  
-  // Custom carousel options for product display
+
   const carouselOptions = {
     align: "start" as const,
     loop: true,
@@ -72,36 +67,38 @@ const ProductSlider = ({ products }: ProductSliderProps) => {
 
   return (
     <div className="relative">
-      <div className="flex justify-between items-center mb-8">
-        <h2 className="font-playfair text-3xl font-bold">Produtos em Destaque</h2>
-        <div className="flex space-x-2">
-          <Button
-            variant="outline"
-            size="icon"
-            disabled={!canScrollPrev}
-            onClick={() => api?.scrollPrev()}
-            className={cn(
-              "rounded-full",
-              canScrollPrev ? "hover:text-gold hover:border-gold" : "opacity-50"
-            )}
-          >
-            <ChevronLeft className="h-5 w-5" />
-          </Button>
-          <Button
-            variant="outline"
-            size="icon"
-            disabled={!canScrollNext}
-            onClick={() => api?.scrollNext()}
-            className={cn(
-              "rounded-full",
-              canScrollNext ? "hover:text-gold hover:border-gold" : "opacity-50"
-            )}
-          >
-            <ChevronRight className="h-5 w-5" />
-          </Button>
+      {!hideTitle && (
+        <div className="flex justify-between items-center mb-8">
+          <h2 className="font-playfair text-3xl font-bold">Produtos em Destaque</h2>
+          <div className="flex space-x-2">
+            <Button
+              variant="outline"
+              size="icon"
+              disabled={!canScrollPrev}
+              onClick={() => api?.scrollPrev()}
+              className={cn(
+                "rounded-full",
+                canScrollPrev ? "hover:text-gold hover:border-gold" : "opacity-50"
+              )}
+            >
+              <ChevronLeft className="h-5 w-5" />
+            </Button>
+            <Button
+              variant="outline"
+              size="icon"
+              disabled={!canScrollNext}
+              onClick={() => api?.scrollNext()}
+              className={cn(
+                "rounded-full",
+                canScrollNext ? "hover:text-gold hover:border-gold" : "opacity-50"
+              )}
+            >
+              <ChevronRight className="h-5 w-5" />
+            </Button>
+          </div>
         </div>
-      </div>
-      
+      )}
+
       <Carousel
         setApi={setApi}
         opts={carouselOptions}
@@ -119,8 +116,6 @@ const ProductSlider = ({ products }: ProductSliderProps) => {
             </CarouselItem>
           ))}
         </CarouselContent>
-        
-        {/* We're using custom controls above, so we'll hide these */}
         <div className="hidden">
           <CarouselPrevious />
           <CarouselNext />

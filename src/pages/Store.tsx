@@ -137,8 +137,6 @@ const Store = () => {
       <Header />
       <main className="flex-grow">
         <StoreBanner />
-        {/* NOVO: sessão produtos em destaque */}
-        <FeaturedProductsSection title="Produtos em Destaque" hideIfNone={true} />
         <div className="container mx-auto px-4 py-8 md:py-12">
           <SearchBar
             searchQuery={searchQuery}
@@ -172,6 +170,12 @@ const Store = () => {
             </div>
           </div>
         </div>
+        {/* Sessão de Produtos em Destaque: agora abaixo da lista e antes do rodapé */}
+        <FeaturedProductsSection
+          title="Produtos em Destaque"
+          className="bg-zinc-50 dark:bg-zinc-900/50"
+          hideIfNone={true}
+        />
       </main>
       <Footer />
     </div>
