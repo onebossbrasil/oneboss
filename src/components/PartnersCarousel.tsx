@@ -1,4 +1,3 @@
-
 import React, { useCallback, useEffect, useRef } from "react";
 import useEmblaCarousel from "embla-carousel-react";
 
@@ -19,7 +18,6 @@ const PartnersCarousel = () => {
   const [emblaRef, emblaApi] = useEmblaCarousel({
     loop: true,
     slidesToScroll: 1,
-    speed: 6, // smoothness of the slide
     align: "start",
   });
   const autoplayRef = useRef<NodeJS.Timeout | null>(null);
@@ -89,4 +87,3 @@ const PartnersCarousel = () => {
 };
 
 export default PartnersCarousel;
-
