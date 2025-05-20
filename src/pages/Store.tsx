@@ -151,6 +151,7 @@ const Store = () => {
               isMobileFiltersOpen={isMobileFiltersOpen}
               setIsMobileFiltersOpen={setIsMobileFiltersOpen}
               resetFilters={resetFilters}
+              publishedProducts={filteredProducts}
             />
             <div className="flex-grow">
               <ResultsHeader productCount={filteredProducts.length} />

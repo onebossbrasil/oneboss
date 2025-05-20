@@ -7,6 +7,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Sidebar, SidebarContent, SidebarHeader, SidebarFooter } from "@/components/ui/sidebar";
 import { useCategories } from "@/contexts/CategoryContext";
 import { SubcategoryType } from "@/types/category";
+import { Product } from "@/types/product";
 
 type FilterSidebarProps = {
   selectedCategory: string | null;
@@ -16,6 +17,7 @@ type FilterSidebarProps = {
   isMobileFiltersOpen: boolean;
   setIsMobileFiltersOpen: (isOpen: boolean) => void;
   resetFilters: () => void;
+  publishedProducts: Product[];
 };
 
 const FilterSidebar = ({
@@ -25,7 +27,8 @@ const FilterSidebar = ({
   onSubcategoryToggle,
   isMobileFiltersOpen,
   setIsMobileFiltersOpen,
-  resetFilters
+  resetFilters,
+  publishedProducts
 }: FilterSidebarProps) => {
   const { categories } = useCategories();
 
@@ -37,7 +40,31 @@ const FilterSidebar = ({
     return category.subcategories || [];
   };
 
-  const subcategories = getSubcategories();
+  // Filtra subcategorias para exibir apenas as que têm produtos publicados associados
+  const getActiveSubcategories = () => {
+    const subcategories = getSubcategories();
+
+    // Subcategoria estará visível se pelo menos UM produto publicado possuir subcategoryValue igual a algum dos seus values
+    return subcategories
+      .map(subcat => {
+        // Para cada valor da subcategoria (ex: ["Fibra", "Alumínio"]):
+        const activeValues = subcat.values.filter(value =>
+          publishedProducts.some(product =>
+            product.subcategoryValues && Object.values(product.subcategoryValues).includes(value)
+          )
+        );
+        // Só retorna subcategoria se houver pelo menos 1 valor ativo
+        return activeValues.length > 0
+          ? {
+              ...subcat,
+              values: activeValues
+            }
+          : null;
+      })
+      .filter((item): item is SubcategoryType => !!item);
+  };
+
+  const subcategories = getActiveSubcategories();
 
   return (
     <>
@@ -72,35 +99,30 @@ const FilterSidebar = ({
                 ))}
               </div>
               {/* Subcategories */}
-              {selectedCategory && (
+              {selectedCategory && subcategories.length > 0 && (
                 <>
                   <Separator className="my-4" />
                   <div className="space-y-2">
                     <h3 className="font-medium mb-2">Subcategorias</h3>
-                    {subcategories.length === 0 ? (
-                      <p className="text-sm text-muted-foreground">Nenhuma subcategoria disponível para esta categoria</p>
-                    ) : (
-                      subcategories.map((subcategory: SubcategoryType) => (
-                        <div key={subcategory.id}>
-                          {/* Optionally render subcategory name for grouped attributes */}
-                          {subcategories.length > 1 && (
-                            <span className="block text-xs text-muted-foreground font-medium ml-2 mb-1">{subcategory.name}</span>
-                          )}
-                          <div className="flex flex-col space-y-1">
-                            {subcategory.values.map(value => (
-                              <Button
-                                key={`${subcategory.id}-${value}`}
-                                variant="ghost"
-                                className={`justify-start font-normal h-8 px-2 w-full text-left ${selectedSubcategories.includes(value) ? 'bg-gold/10 text-gold' : ''}`}
-                                onClick={() => onSubcategoryToggle(value)}
-                              >
-                                {value}
-                              </Button>
-                            ))}
-                          </div>
+                    {subcategories.map((subcategory: SubcategoryType) => (
+                      <div key={subcategory.id}>
+                        {subcategories.length > 1 && (
+                          <span className="block text-xs text-muted-foreground font-medium ml-2 mb-1">{subcategory.name}</span>
+                        )}
+                        <div className="flex flex-col space-y-1">
+                          {subcategory.values.map(value => (
+                            <Button
+                              key={`${subcategory.id}-${value}`}
+                              variant="ghost"
+                              className={`justify-start font-normal h-8 px-2 w-full text-left ${selectedSubcategories.includes(value) ? 'bg-gold/10 text-gold' : ''}`}
+                              onClick={() => onSubcategoryToggle(value)}
+                            >
+                              {value}
+                            </Button>
+                          ))}
                         </div>
-                      ))
-                    )}
+                      </div>
+                    ))}
                   </div>
                 </>
               )}
