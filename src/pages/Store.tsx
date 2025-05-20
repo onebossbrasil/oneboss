@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { useSearchParams } from "react-router-dom";
 import Header from "@/components/Header";
@@ -12,6 +13,7 @@ import { useProducts } from "@/contexts/ProductContext";
 import { useCategories } from "@/contexts/CategoryContext";
 import { FormattedProduct, Product } from "@/types/product";
 import { useToast } from "@/hooks/use-toast";
+import { AttributeType } from "@/types/category";
 
 // ATENÇÃO: Esta página já usa hooks para produtos/categorias vindos do Supabase.
 // Apenas garantimos filtrar só published e manter a Sidebar sempre dinâmica.
@@ -20,7 +22,8 @@ const Store = () => {
   const { toast } = useToast();
   const [searchParams, setSearchParams] = useSearchParams();
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
-  const [selectedSubcategories, setSelectedSubcategories] = useState<string[]>([]);
+  // CHANGE 1: Use AttributeType[] instead of string[]
+  const [selectedSubcategories, setSelectedSubcategories] = useState<AttributeType[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [isMobileFiltersOpen, setIsMobileFiltersOpen] = useState(false);
 
@@ -68,10 +71,11 @@ const Store = () => {
 
     // Filtro: subcategorias (valores dinâmicos)
     if (selectedSubcategories.length > 0) {
+      const selectedIds = selectedSubcategories.map(attr => attr.id);
       result = result.filter(product => {
         if (!product.subcategoryValues) return false;
         const productValues = Object.values(product.subcategoryValues);
-        return selectedSubcategories.some(selected => productValues.includes(selected));
+        return selectedIds.some(selected => productValues.includes(selected));
       });
     }
 
@@ -82,12 +86,13 @@ const Store = () => {
   // Não há código hardcoded para subcategorias, tudo consumido do contexto.
 
   // Toggle subcategoria
-  const toggleSubcategory = (subcategory: string) => {
-    if (selectedSubcategories.includes(subcategory)) {
-      setSelectedSubcategories(selectedSubcategories.filter(s => s !== subcategory));
-    } else {
-      setSelectedSubcategories([...selectedSubcategories, subcategory]);
-    }
+  // CHANGE 2: Use AttributeType for toggling
+  const toggleSubcategory = (attr: AttributeType) => {
+    setSelectedSubcategories(prev =>
+      prev.some(a => a.id === attr.id)
+        ? prev.filter(a => a.id !== attr.id)
+        : [...prev, attr]
+    );
   };
 
   // Selecionar categoria
@@ -183,3 +188,4 @@ const Store = () => {
 };
 
 export default Store;
+
