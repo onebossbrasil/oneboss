@@ -28,18 +28,23 @@ export default function AdminPartnerManager() {
   const [editingId, setEditingId] = useState<string | null>(null);
   const [showForm, setShowForm] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [triedInsertDemo, setTriedInsertDemo] = useState(false);
+  const [fetchError, setFetchError] = useState<string | null>(null);
 
-  // ADICIONA LOG para depuração do loading
   console.log("AdminPartnerManager loading:", loading);
 
-  // Carregar parceiros do banco
   const fetchPartners = async () => {
     setLoading(true);
     const { data, error } = await supabase
       .from("partners")
       .select("*")
       .order("order_index", { ascending: true });
-    if (!error && data) setPartners(data);
+    if (!error && data) {
+      setPartners(data);
+      setFetchError(null);
+    } else {
+      setFetchError(error?.message || "Erro desconhecido");
+    }
     setLoading(false);
   };
 
@@ -47,10 +52,14 @@ export default function AdminPartnerManager() {
     fetchPartners();
   }, []);
 
-  // Migrar demo se necessário
   useEffect(() => {
-    // Se não há parceiros, insere parceiros demo
-    if (partners.length === 0 && !loading) {
+    if (
+      partners.length === 0 &&
+      !loading &&
+      !triedInsertDemo &&
+      !fetchError
+    ) {
+      setTriedInsertDemo(true);
       (async () => {
         const demo = [
           {
@@ -81,7 +90,7 @@ export default function AdminPartnerManager() {
       })();
     }
     // eslint-disable-next-line
-  }, [partners, loading]);
+  }, [partners, loading, fetchError, triedInsertDemo]);
 
   function handleInput(e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) {
     const { name, value } = e.target;
@@ -135,7 +144,6 @@ export default function AdminPartnerManager() {
     setLoading(false);
   }
 
-  // Reordenar parceiros
   async function move(index: number, delta: number) {
     if (
       (index === 0 && delta < 0) ||
@@ -145,7 +153,6 @@ export default function AdminPartnerManager() {
     const newPartners = [...partners];
     const [removed] = newPartners.splice(index, 1);
     newPartners.splice(index + delta, 0, removed);
-    // Ajusta order_index
     for (let i = 0; i < newPartners.length; i++) {
       newPartners[i].order_index = i;
       await supabase
