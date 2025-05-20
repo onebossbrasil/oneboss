@@ -1,7 +1,9 @@
+
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import ImageInputSupabase from "./ImageInputSupabase";
+import { useToast } from "@/hooks/use-toast";
 
 type Partner = {
   id: string;
@@ -30,8 +32,7 @@ export default function AdminPartnerManager() {
   const [loading, setLoading] = useState(false);
   const [triedInsertDemo, setTriedInsertDemo] = useState(false);
   const [fetchError, setFetchError] = useState<string | null>(null);
-
-  console.log("AdminPartnerManager loading:", loading);
+  const { toast } = useToast();
 
   const fetchPartners = async () => {
     setLoading(true);
@@ -43,7 +44,13 @@ export default function AdminPartnerManager() {
       setPartners(data);
       setFetchError(null);
     } else {
+      setPartners([]);
       setFetchError(error?.message || "Erro desconhecido");
+      toast({
+        title: "Erro ao buscar parceiros",
+        description: error?.message || "Erro desconhecido ao buscar parceiros",
+        variant: "destructive",
+      });
     }
     setLoading(false);
   };
@@ -101,26 +108,50 @@ export default function AdminPartnerManager() {
     e.preventDefault();
     setLoading(true);
     if (!form.name || !form.logo_url) {
-      alert("Nome e logo são obrigatórios.");
+      toast({
+        title: "Campos obrigatórios",
+        description: "Nome e logo são obrigatórios.",
+        variant: "destructive",
+      });
       setLoading(false);
       return;
     }
-    if (editingId) {
-      await supabase.from("partners").update({
-        ...form,
-      }).eq("id", editingId);
-    } else {
-      const maxOrder = Math.max(0, ...partners.map((p) => p.order_index ?? 0));
-      await supabase.from("partners").insert({
-        ...form,
-        order_index: maxOrder + 1,
-        visible: true,
+    try {
+      if (editingId) {
+        const { error } = await supabase.from("partners").update({
+          ...form,
+        }).eq("id", editingId);
+        if (error) throw error;
+        toast({
+          title: "Parceiro atualizado",
+          description: "As alterações foram salvas com sucesso!",
+          variant: "default",
+        });
+      } else {
+        const maxOrder = Math.max(0, ...partners.map((p) => p.order_index ?? 0));
+        const { error } = await supabase.from("partners").insert({
+          ...form,
+          order_index: maxOrder + 1,
+          visible: true,
+        });
+        if (error) throw error;
+        toast({
+          title: "Parceiro cadastrado",
+          description: "O parceiro foi cadastrado com sucesso!",
+          variant: "default",
+        });
+      }
+      fetchPartners();
+      setShowForm(false);
+      setEditingId(null);
+      setForm(initialForm);
+    } catch (error: any) {
+      toast({
+        title: "Erro ao salvar parceiro",
+        description: error?.message || "Erro desconhecido ao salvar parceiro.",
+        variant: "destructive",
       });
     }
-    fetchPartners();
-    setShowForm(false);
-    setEditingId(null);
-    setForm(initialForm);
     setLoading(false);
   }
 
@@ -139,8 +170,22 @@ export default function AdminPartnerManager() {
   async function handleDelete(id: string) {
     if (!window.confirm("Tem certeza que deseja excluir este parceiro?")) return;
     setLoading(true);
-    await supabase.from("partners").delete().eq("id", id);
-    fetchPartners();
+    try {
+      const { error } = await supabase.from("partners").delete().eq("id", id);
+      if (error) throw error;
+      toast({
+        title: "Parceiro excluído",
+        description: "O parceiro foi excluído com sucesso!",
+        variant: "default",
+      });
+      fetchPartners();
+    } catch (error: any) {
+      toast({
+        title: "Erro ao excluir parceiro",
+        description: error?.message || "Erro ao excluir parceiro",
+        variant: "destructive",
+      });
+    }
     setLoading(false);
   }
 
@@ -175,6 +220,11 @@ export default function AdminPartnerManager() {
           setForm(initialForm);
         }}>Novo Parceiro</Button>
       </div>
+      {fetchError && (
+        <div className="mb-4 p-3 bg-red-100 border border-red-300 text-red-700 rounded">
+          Erro ao buscar parceiros: {fetchError}
+        </div>
+      )}
       {showForm && (
         <form className="space-y-3 mb-6" onSubmit={handleSave}>
           <input
@@ -235,7 +285,7 @@ export default function AdminPartnerManager() {
         </form>
       )}
       <div>
-        {partners.length === 0 && <p className="text-muted-foreground">Nenhum parceiro cadastrado.</p>}
+        {partners.length === 0 && !fetchError && <p className="text-muted-foreground">Nenhum parceiro cadastrado.</p>}
         <ul>
           {partners.map((partner, idx) => (
             <li key={partner.id} className="border-b py-2 flex flex-col md:flex-row md:items-center gap-2">
