@@ -1,4 +1,3 @@
-
 import { Product } from "@/types/product";
 import ProductVisibilityButton from "./ProductVisibilityButton";
 import { Button } from "@/components/ui/button";
@@ -58,31 +57,29 @@ const ProductListMobileItem = ({
             Estoque: {product.stockQuantity}
           </div>
         </div>
-        {/* Ícones de ação: PUBLICAR, EDITAR, EXCLUIR no canto direito */}
-        <div className="flex flex-col items-end justify-between pl-2">
-          <div className="flex gap-2">
-            <ProductVisibilityButton
-              published={product.published}
-              onClick={() => onEditClick()} // Permanece: clicando abre edição de publicação.
-            />
-            <Button
-              variant="outline"
-              size="icon"
-              onClick={onEditClick}
-              title="Editar produto"
-            >
-              <Edit className="h-4 w-4" />
-            </Button>
-            <Button
-              variant="destructive"
-              size="icon"
-              onClick={onSelectDelete}
-              title="Excluir produto"
-            >
-              <Trash2 className="h-4 w-4" />
-            </Button>
-          </div>
-        </div>
+      </div>
+      {/* Nova linha de ícones fixa na parte inferior do card */}
+      <div className="flex justify-end items-center border-t pt-2 px-3 pb-2 gap-2">
+        <ProductVisibilityButton
+          published={product.published}
+          onClick={() => onEditClick()} // Mantém ação de editar ao clicar em publicar
+        />
+        <Button
+          variant="outline"
+          size="icon"
+          onClick={onEditClick}
+          title="Editar produto"
+        >
+          <Edit className="h-4 w-4" />
+        </Button>
+        <Button
+          variant="destructive"
+          size="icon"
+          onClick={onSelectDelete}
+          title="Excluir produto"
+        >
+          <Trash2 className="h-4 w-4" />
+        </Button>
       </div>
     </li>
   );
