@@ -2,6 +2,7 @@
 import { useState, useEffect } from "react";
 import { Product } from "@/types/product";
 
+// Permite reidratação do formData ao mudar produto
 export const useFormState = (product: Product | null) => {
   const [formData, setFormData] = useState({
     name: "",
@@ -14,7 +15,7 @@ export const useFormState = (product: Product | null) => {
     featured: false
   });
 
-  // Reset form when product changes
+  // Sempre que o produto fresh chegar, RESETA o formulário
   useEffect(() => {
     if (product) {
       setFormData({
@@ -27,6 +28,7 @@ export const useFormState = (product: Product | null) => {
         published: product.published,
         featured: product.featured
       });
+      console.log("[useFormState] Formulário reidratado com produto fresh:", product.name);
     }
   }, [product]);
 
@@ -37,5 +39,6 @@ export const useFormState = (product: Product | null) => {
   return {
     formData,
     handleFormChange,
+    setFormData // exportado se quiser resetar manualmente no futuro
   };
 };

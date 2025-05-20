@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+
+import React, { useState, useEffect } from "react";
 import { Product } from "@/types/product";
 import { useFormState } from "@/hooks/product-edit/use-form-state";
 import { useCategorySelection } from "@/hooks/product-edit/use-category-selection";
@@ -11,8 +12,25 @@ export const useProductEdit = (
   onClose: () => void
 ) => {
   // Form state management
-  const { formData, handleFormChange } = useFormState(product);
+  const { formData, handleFormChange, setFormData } = useFormState(product);
 
+  // Sincronizar reidratação do form sempre que produto fresh chegar (real-time)
+  useEffect(() => {
+    if (product) {
+      setFormData({
+        name: product.name,
+        shortDescription: product.shortDescription || "",
+        description: product.description,
+        price: product.price.toString(),
+        salePrice: product.salePrice ? product.salePrice.toString() : "",
+        stockQuantity: product.stockQuantity.toString(),
+        published: product.published,
+        featured: product.featured
+      });
+      console.log("[useProductEdit] Reidratação do formulário com produto fresh:", product.name);
+    }
+  }, [product, setFormData]);
+  
   // Category and subcategory selection
   const {
     selectedCategory,
@@ -28,13 +46,13 @@ export const useProductEdit = (
   const [selectedAttributeId, setSelectedAttributeId] = useState<string | null>(product?.attributeId ?? null);
 
   // Sincroniza ids ao mudar produto
-  React.useEffect(() => {
+  useEffect(() => {
     setSelectedSubcategoryId(product?.subcategoryId ?? null);
     setSelectedAttributeId(product?.attributeId ?? null);
   }, [product?.id]);
 
   // Diagnóstico para sincronização dos ids (LOG)
-  React.useEffect(() => {
+  useEffect(() => {
     console.log("[useProductEdit] selectedCategory:", selectedCategory);
     console.log("[useProductEdit] selectedSubcategoryId:", selectedSubcategoryId);
     console.log("[useProductEdit] selectedAttributeId:", selectedAttributeId);

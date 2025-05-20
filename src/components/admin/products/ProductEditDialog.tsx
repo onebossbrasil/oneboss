@@ -26,11 +26,15 @@ const ProductEditDialog = ({ product, open, onOpenChange, onClose }: ProductEdit
     onClose?.();
   };
 
-  // Se o produto vier da listagem, vamos buscar do banco ao abrir.
   const productId = product?.id || null;
   const { product: freshProduct, isLoading } = useFetchProductById(productId, open);
 
-  // Só monta o hook do formulário quando o dado está carregado
+  useEffect(() => {
+    if (open && freshProduct) {
+      console.log("[Modal] freshProduct carregado pós-update:", freshProduct);
+    }
+  }, [open, freshProduct]);
+
   const {
     formData,
     selectedCategory,
@@ -55,7 +59,6 @@ const ProductEditDialog = ({ product, open, onOpenChange, onClose }: ProductEdit
     handleSubcatIdChange
   } = useProductEdit(freshProduct, handleDialogClose);
 
-  // ---- DIAGNÓSTICO: Log detalhado do state do modal ao abrir ----
   useEffect(() => {
     if (open) {
       console.log("[Modal] OPEN: Produto recebido:", product);
@@ -70,14 +73,12 @@ const ProductEditDialog = ({ product, open, onOpenChange, onClose }: ProductEdit
     }
   }, [open, product, freshProduct, selectedCategory, subcategoryValues, images, imagePreviewUrls, formData]);
 
-  // Sempre recarrega produto depois de edição salvar para garantir reidratação correta
   useEffect(() => {
     if (!open) return;
     // Nada a fazer aqui; hook reidrata o produto fresh de qualquer forma
     // eslint-disable-next-line
   }, [open, productId]);
 
-  // Ao salvar, após fechar modal, resetar tudo para evitar estados poluídos
   useEffect(() => {
     if (!open) {
       setSelectedCategory("");
@@ -90,7 +91,6 @@ const ProductEditDialog = ({ product, open, onOpenChange, onClose }: ProductEdit
     // eslint-disable-next-line
   }, [open]);
 
-  // ---- DIAGNÓSTICO: Log detalhado do submit ----
   const wrappedHandleSubmit = (e: React.FormEvent) => {
     console.log("[Modal] Submissão iniciada. Dados do formulário:", {
       formData,
