@@ -4,10 +4,8 @@ import ProductEditDialog from "./ProductEditDialog";
 import { Product } from "@/types/product";
 import { useToast } from "@/hooks/use-toast";
 import { Alert, AlertTitle, AlertDescription } from "@/components/ui/alert";
-import { Button } from "@/components/ui/button";
-import { RefreshCw, Trash2, Plus } from "lucide-react";
-import { useDeleteProduct } from "@/hooks/product/use-delete-product";
-import PaginationArrows from "@/components/ui/PaginationArrows";
+import ProductListToolbar from "./ProductListToolbar";
+import ProductListPagination from "./ProductListPagination";
 import ProductTable from "./ProductTable";
 import ProductFilters from "./ProductFilters";
 import ProductCreateButton from "./ProductCreateButton";
@@ -24,7 +22,7 @@ export default function ProductList() {
   const [dialogOpen, setDialogOpen] = useState(false);
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [confirmDelete, setConfirmDelete] = useState<Product | null>(null);
-  const { isLoading: isDeleting, deleteProduct } = useDeleteProduct();
+  const { isLoading: isDeleting, deleteProduct } = useProducts();
   const [showCreate, setShowCreate] = useState(false);
 
   // Diagnóstico: logar toda vez que lista é recarregada
@@ -38,13 +36,11 @@ export default function ProductList() {
   const [filterStatus, setFilterStatus] = useState("");
   const { categories } = useCategories();
 
-  // Filtragem local ORDENANDO por nome!
+  // Filtragem local e ordenação
   const filteredProducts = products
     .filter((product) => {
       const matchesName = product.name.toLowerCase().includes(search.toLowerCase());
-      const matchesCategory =
-        !filterCategory ||
-        product.categoryId === filterCategory;
+      const matchesCategory = !filterCategory || product.categoryId === filterCategory;
       const matchesStatus =
         !filterStatus ||
         (filterStatus === "published" && product.published) ||
@@ -53,7 +49,7 @@ export default function ProductList() {
     })
     .sort((a, b) => a.name.localeCompare(b.name)); // <-- Ordenação alfabética
 
-  // Paginação — importante: declarar ANTES de usar nos cálculos de seleção!
+  // Paginação
   const [page, setPage] = useState(1);
   const pageCount = Math.ceil(filteredProducts.length / PAGE_SIZE);
   const paginatedProducts = filteredProducts.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
@@ -229,7 +225,7 @@ export default function ProductList() {
         onPublishSelected={handleBulkPublish}
         onUnpublishSelected={handleBulkUnpublish}
       />
-      {/* Botão flutuante/destaque para cadastrar produto */}
+      {/* Botão para cadastrar/ou criar produto */}
       <ProductCreateButton onClick={() => setShowCreate(true)} />
 
       {/* Barra de filtros */}
@@ -264,39 +260,19 @@ export default function ProductList() {
         </div>
       </div>
 
-      <PaginationArrows
+      <ProductListPagination
         page={page}
         pageCount={pageCount}
         onPageChange={handlePageChange}
-        className="my-8"
       />
 
-      <div className="flex flex-col sm:flex-row justify-between items-center gap-2 mt-6 mb-4 w-full max-w-5xl mx-auto">
-        <h3 className="text-lg font-medium">Produtos Cadastrados</h3>
-        <div className="flex gap-2">
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={handleManualRefresh}
-            disabled={isLoading || isRefreshing}
-            className="flex items-center gap-1"
-          >
-            <RefreshCw className={isRefreshing ? "animate-spin h-4 w-4" : "h-4 w-4"} />
-            <span className="hidden sm:inline">Atualizar</span>
-          </Button>
-          <Button
-            variant="destructive"
-            size="sm"
-            className="flex items-center gap-1"
-            disabled={(!confirmDelete && selectedIds.length === 0) || isDeleting}
-            onClick={handleConfirmDelete}
-            style={{ minWidth: 100 }}
-          >
-            <Trash2 className="h-4 w-4" />
-            Excluir Produto
-          </Button>
-        </div>
-      </div>
+      <ProductListToolbar
+        onRefresh={handleManualRefresh}
+        onDelete={handleConfirmDelete}
+        isRefreshing={isRefreshing}
+        isDeleting={isDeleting}
+        disableDelete={(!confirmDelete && selectedIds.length === 0)}
+      />
 
       {error && (
         <Alert variant="destructive" className="mb-4 w-full max-w-5xl mx-auto">
