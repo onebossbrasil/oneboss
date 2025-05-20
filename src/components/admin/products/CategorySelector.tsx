@@ -1,8 +1,8 @@
+
 import { useCategories } from "@/contexts/CategoryContext";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Label } from "@/components/ui/label";
 import { useState, useEffect } from "react";
-import { CategoryProvider } from "@/contexts/CategoryContext";
 
 type CategorySelectorProps = {
   selectedCategory: string;
@@ -20,12 +20,10 @@ const CategorySelectorContent = ({
   const { categories, isLoading, error } = useCategories();
   const [activeSubcategoryType, setActiveSubcategoryType] = useState<string | null>(null);
   
-  // Reset active subcategory type when category changes
   useEffect(() => {
     setActiveSubcategoryType(null);
   }, [selectedCategory]);
   
-  // Novo: Buscar categoria pelo UUID/id
   const category = categories.find(cat => cat.id === selectedCategory);
 
   // Get all subcategory types for the selected category
@@ -33,10 +31,10 @@ const CategorySelectorContent = ({
     return category ? category.subcategories.map(sc => sc.type) : [];
   };
   
-  // Get available values for a specific subcategory type
+  // Get available attributes for a specific subcategory type
   const getSubcategoryOptions = (subcatType: string) => {
     const subcategory = category?.subcategories.find(sc => sc.type === subcatType);
-    return subcategory ? subcategory.values : [];
+    return subcategory ? subcategory.attributes : [];
   };
   
   // Get the label of a subcategory type
@@ -50,12 +48,10 @@ const CategorySelectorContent = ({
     setActiveSubcategoryType(type);
   };
 
-  // If categories are loading, show a placeholder
   if (isLoading) {
     return <div className="space-y-4">Carregando categorias...</div>;
   }
   
-  // If there's an error fetching categories, show an error message
   if (error) {
     return <div className="text-red-500">Erro ao carregar categorias: {error}</div>;
   }
@@ -132,7 +128,7 @@ const CategorySelectorContent = ({
             <SelectContent>
               {(() => {
                 const subcategory = category?.subcategories.find(sc => sc.type === activeSubcategoryType);
-                return subcategory ? subcategory.values.map((option: string) => (
+                return subcategory ? subcategory.attributes.map((option: string) => (
                   <SelectItem key={option} value={option}>
                     {option}
                   </SelectItem>
@@ -146,8 +142,6 @@ const CategorySelectorContent = ({
   );
 };
 
-// Remover o provider wrapper;
-// Agora exporta simplesmente o conteúdo.
 const CategorySelector = (props: CategorySelectorProps) => {
   return <CategorySelectorContent {...props} />;
 };

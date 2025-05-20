@@ -3,7 +3,7 @@ export type SubcategoryType = {
   id: string; // Apenas string UUID
   name: string;
   type: string;
-  values: string[]; // rename to 'attributes' in future refactor
+  attributes: string[]; // lista de possíveis atributos p/ essa subcategoria
 };
 
 export type CategoryType = {

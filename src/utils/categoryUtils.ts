@@ -1,3 +1,4 @@
+
 import { CategoryType, SubcategoryType } from "@/types/category";
 
 // Group subcategories by category ID
@@ -45,7 +46,7 @@ export const formatCategoriesData = (
         id: subcategory.id.toString(),
         name: subcategory.name,
         type: subcategory.type,
-        values: attributesBySubcategory[subcategory.id] || []
+        attributes: attributesBySubcategory[subcategory.id] || []
       }))
     };
   });
