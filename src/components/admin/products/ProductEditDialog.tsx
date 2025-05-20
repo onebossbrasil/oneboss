@@ -1,3 +1,4 @@
+
 import { Product } from "@/types/product";
 import {
   Dialog,
@@ -30,11 +31,14 @@ const ProductEditDialog = ({ product, open, onOpenChange, onClose }: ProductEdit
   const productId = product?.id || null;
   const { product: freshProduct, isLoading } = useFetchProductById(productId, open);
 
+  // === DIAGNÓSTICO: Log para depuração ===
   useEffect(() => {
-    if (open && freshProduct) {
-      console.log("[Modal] freshProduct carregado pós-update:", freshProduct);
+    if (open) {
+      // Adiciona logs para garantir que os valores estejam corretos
+      console.log("[Diagnóstico Modal] Produto do banco:", freshProduct);
+      console.log("[Diagnóstico Modal] Produto prop:", product);
     }
-  }, [open, freshProduct]);
+  }, [open, freshProduct, product]);
 
   const {
     formData,
@@ -54,25 +58,29 @@ const ProductEditDialog = ({ product, open, onOpenChange, onClose }: ProductEdit
     setImages,
     setImagePreviewUrls,
     setDeletedImageIds,
-    selectedSubcategoryId, // é o UUID vindo do banco
-    selectedAttributeId,    // é o UUID do atributo
+    selectedSubcategoryId,
+    selectedAttributeId,
     handleAttributeChange,
     handleSubcatIdChange
   } = useProductEdit(freshProduct, handleDialogClose); // freshProduct já está atualizado
 
+  // === DIAGNÓSTICO: Log para categoryId ===
   useEffect(() => {
     if (open) {
-      console.log("[Modal] OPEN: Produto recebido:", product);
-      console.log("[Modal] Produto fresh do banco:", freshProduct);
-      console.log("[Modal] Estado inicial:", {
-        selectedCategory,
-        subcategoryValues,
-        images,
-        imagePreviewUrls,
-        formData
-      });
+      console.log("[Diagnóstico Modal] Comparação Category: product?.categoryId =", product?.categoryId, "| freshProduct?.categoryId =", freshProduct?.categoryId, "| selectedCategory (hook) =", selectedCategory);
     }
-  }, [open, product, freshProduct, selectedCategory, subcategoryValues, images, imagePreviewUrls, formData]);
+  }, [open, product, freshProduct, selectedCategory]);
+
+  // === GARANTIR REIDRATAÇÃO MANUAL caso necessário ===
+  // Se freshProduct existir e categoria divergente do selectedCategory, forçamos sincronização
+  useEffect(() => {
+    if (open && freshProduct?.categoryId && freshProduct.categoryId !== selectedCategory) {
+      console.log("[Diagnóstico Modal] Corrigindo selectedCategory (force sync) para UUID do banco:", freshProduct.categoryId);
+      setSelectedCategory(freshProduct.categoryId);
+    }
+    // Não depende de selectedCategory para evitar loop
+    // eslint-disable-next-line
+  }, [open, freshProduct?.categoryId]);
 
   useEffect(() => {
     if (!open) return;
@@ -129,10 +137,14 @@ const ProductEditDialog = ({ product, open, onOpenChange, onClose }: ProductEdit
                     handleFormChange(field, value);
                   }}
                 />
+                {/* DIAGNÓSTICO: log para value do Select */}
+                <div>
+                  <span style={{fontSize:10, color:"#6c6"}}>[DEBUG: selectedCategory = {selectedCategory}]</span>
+                </div>
                 <CategorySelector
                   selectedCategory={selectedCategory}
                   subcategoryValues={subcategoryValues}
-                  selectedSubcategoryId={selectedSubcategoryId} // sempre o UUID do banco!
+                  selectedSubcategoryId={selectedSubcategoryId}
                   onCategoryChange={handleCategoryChange}
                   onSubcategoryChange={handleSubcategoryChange}
                   onSubcategoryIdChange={handleSubcatIdChange}
@@ -161,3 +173,4 @@ const ProductEditDialog = ({ product, open, onOpenChange, onClose }: ProductEdit
 };
 
 export default ProductEditDialog;
+
