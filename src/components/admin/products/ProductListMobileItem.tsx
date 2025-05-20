@@ -37,7 +37,7 @@ const ProductListMobileItem = ({
               src={product.images[0].url}
               alt={product.name}
               className="w-16 h-16 object-cover rounded-lg border bg-muted"
-              />
+            />
           ) : (
             <div className="w-16 h-16 rounded-lg flex items-center justify-center text-xs text-muted-foreground bg-muted">
               Sem imagem
@@ -58,29 +58,31 @@ const ProductListMobileItem = ({
             Estoque: {product.stockQuantity}
           </div>
         </div>
-      </div>
-      <div className="flex justify-between items-center border-t pt-2 px-3 pb-2 gap-2">
-        <ProductVisibilityButton
-          published={product.published}
-          onClick={() => onEditClick()} // Por padrão, clique visualização vai abrir edição. 
-          // (Se precisar de lógica específica, alterar aqui).
-        />
-        <Button
-          variant="outline"
-          size="icon"
-          onClick={onEditClick}
-          title="Editar produto"
-        >
-          <Edit className="h-4 w-4" />
-        </Button>
-        <Button
-          variant="destructive"
-          size="icon"
-          onClick={onSelectDelete}
-          title="Excluir produto"
-        >
-          <Trash2 className="h-4 w-4" />
-        </Button>
+        {/* Ícones de ação: PUBLICAR, EDITAR, EXCLUIR no canto direito */}
+        <div className="flex flex-col items-end justify-between pl-2">
+          <div className="flex gap-2">
+            <ProductVisibilityButton
+              published={product.published}
+              onClick={() => onEditClick()} // Permanece: clicando abre edição de publicação.
+            />
+            <Button
+              variant="outline"
+              size="icon"
+              onClick={onEditClick}
+              title="Editar produto"
+            >
+              <Edit className="h-4 w-4" />
+            </Button>
+            <Button
+              variant="destructive"
+              size="icon"
+              onClick={onSelectDelete}
+              title="Excluir produto"
+            >
+              <Trash2 className="h-4 w-4" />
+            </Button>
+          </div>
+        </div>
       </div>
     </li>
   );
