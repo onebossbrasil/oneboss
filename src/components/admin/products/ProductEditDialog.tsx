@@ -1,4 +1,3 @@
-
 import { Product } from "@/types/product";
 import {
   Dialog,
@@ -29,7 +28,7 @@ const ProductEditDialog = ({ product, open, onOpenChange, onClose }: ProductEdit
 
   // Se o produto vier da listagem, vamos buscar do banco ao abrir.
   const productId = product?.id || null;
-  const { product: freshProduct, isLoading } = useFetchProductById(productId, open);
+  const { product: freshProduct, isLoading, refetch } = useFetchProductById(productId, open);
 
   // Só monta o hook do formulário quando o dado está carregado
   const {
@@ -44,20 +43,35 @@ const ProductEditDialog = ({ product, open, onOpenChange, onClose }: ProductEdit
     handleSubcategoryChange,
     handleImageChange,
     handleRemoveImage,
-    handleSubmit
+    handleSubmit,
+    setSelectedCategory,
+    setSubcategoryValues,
+    setImages,
+    setImagePreviewUrls,
+    setDeletedImageIds
   } = useProductEdit(freshProduct, handleDialogClose);
 
-  // Garante reset sempre que abrir para criar novo (product==null)
+  // Sempre recarrega produto depois de edição salvar para garantir reidratação correta
   useEffect(() => {
-    if (open && !productId) {
-      // Chama o onClose do formulário para resetar tudo
-      // ProductEdit já cuida de reset interno nos seus próprios hooks, pois 
-      // recebe freshProduct = null no cadastro (caso useEffect só para trigger)
-      // Poderia expandir se necessário a limpeza de campos extras
+    if (!open) return;
+    // Força buscar sempre que abrir o modal
+    if (productId) {
+      refetch?.();
     }
-    // Não precisa dependências, pois freshProduct sempre muda com productId/open
     // eslint-disable-next-line
   }, [open, productId]);
+
+  // Ao salvar, após fechar modal, resetar tudo para evitar estados poluídos
+  useEffect(() => {
+    if (!open) {
+      setSelectedCategory("");
+      setSubcategoryValues({});
+      setImages([]);
+      setImagePreviewUrls([]);
+      setDeletedImageIds([]);
+    }
+    // eslint-disable-next-line
+  }, [open]);
 
   return (
     <Dialog open={open} onOpenChange={(isOpen) => {

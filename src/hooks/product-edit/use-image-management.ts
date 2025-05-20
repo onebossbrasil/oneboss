@@ -7,54 +7,55 @@ export const useImageManagement = (product: Product | null) => {
   const [imagePreviewUrls, setImagePreviewUrls] = useState<string[]>([]);
   const [deletedImageIds, setDeletedImageIds] = useState<string[]>([]);
 
-  // Reset images when product changes
+  // Reset images when product changes ou após update bem sucedido
   useEffect(() => {
     if (product) {
       setImagePreviewUrls(product.images.map(img => img.url));
       setImages([]);
       setDeletedImageIds([]); // Reset deleted image IDs
+    } else {
+      setImagePreviewUrls([]);
+      setImages([]);
+      setDeletedImageIds([]);
     }
   }, [product]);
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) {
       const newFiles = Array.from(e.target.files);
-      
+      // Filtra arquivos já existentes por nome para evitar duplicata
+      const uniqueNewFiles = newFiles.filter(newFile => (
+        !images.some(existing => existing.name === newFile.name && existing.size === newFile.size)
+      ));
+
       // Create preview URLs
-      const newPreviewUrls = newFiles.map(file => URL.createObjectURL(file));
-      
-      setImages(prev => [...prev, ...newFiles]);
+      const newPreviewUrls = uniqueNewFiles.map(file => URL.createObjectURL(file));
+
+      setImages(prev => [...prev, ...uniqueNewFiles]);
       setImagePreviewUrls(prev => [...prev, ...newPreviewUrls]);
     }
   };
-  
-  const handleRemoveImage = (index: number) => {
-    if (!product) return;
 
-    // Check if this is an existing image from the database
-    if (index < product.images.length) {
+  const handleRemoveImage = (index: number) => {
+    // Remoção pode ser de imagem existente no banco OU nova imagem
+    if (product && index < product.images.length) {
+      // Remove imagem existente, guarda id para deleção
       const imageToDelete = product.images[index];
       setDeletedImageIds(prev => [...prev, imageToDelete.id]);
-      
-      // Remove from preview URLs
+      // Remove do preview também
       const newPreviewUrls = [...imagePreviewUrls];
       newPreviewUrls.splice(index, 1);
       setImagePreviewUrls(newPreviewUrls);
     } else {
-      // This is a newly added image
-      const newImageIndex = index - product.images.length;
-      
-      // Remove from images array
+      // Nova imagem (ainda não foi enviada ao banco)
+      const newImageIndex = index - (product?.images?.length ?? 0);
       const newImages = [...images];
+      const newImagePreview = imagePreviewUrls[index];
+      if (newImagePreview) URL.revokeObjectURL(newImagePreview);
       newImages.splice(newImageIndex, 1);
-      setImages(newImages);
-      
-      // Revoke URL to free memory
-      URL.revokeObjectURL(imagePreviewUrls[index]);
-      
-      // Remove from preview URLs
       const newPreviewUrls = [...imagePreviewUrls];
       newPreviewUrls.splice(index, 1);
+      setImages(newImages);
       setImagePreviewUrls(newPreviewUrls);
     }
   };
@@ -65,5 +66,8 @@ export const useImageManagement = (product: Product | null) => {
     deletedImageIds,
     handleImageChange,
     handleRemoveImage,
+    setImages, // para permitir resetamento explícito
+    setImagePreviewUrls,
+    setDeletedImageIds
   };
 };

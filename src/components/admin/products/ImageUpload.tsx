@@ -20,6 +20,8 @@ const ImageUpload: React.FC<ImageUploadProps> = ({
   handleImageChange,
   handleRemoveImage
 }) => {
+  const isDisabled = false; // Poderia ser passado como prop para "isSubmitting", mas mantemos simples
+
   return (
     <Card>
       <CardContent className="pt-6">
@@ -30,7 +32,6 @@ const ImageUpload: React.FC<ImageUploadProps> = ({
               Arraste e solte ou clique para adicionar imagens do produto. 
               Recomendado: 800x800px, máximo 5MB.
             </p>
-            
             <div className="border-2 border-dashed border-muted-foreground/25 rounded-md p-8 text-center">
               <input
                 type="file"
@@ -39,10 +40,11 @@ const ImageUpload: React.FC<ImageUploadProps> = ({
                 accept="image/*"
                 className="hidden"
                 onChange={handleImageChange}
+                disabled={isDisabled}
               />
               <label
                 htmlFor="image-upload"
-                className="cursor-pointer flex flex-col items-center justify-center"
+                className={`cursor-pointer flex flex-col items-center justify-center ${isDisabled ? "opacity-50 pointer-events-none" : ""}`}
               >
                 <Upload className="h-10 w-10 text-muted-foreground mb-2" />
                 <span className="text-sm text-muted-foreground">
@@ -54,7 +56,6 @@ const ImageUpload: React.FC<ImageUploadProps> = ({
               </label>
             </div>
           </div>
-          
           {(imagePreviewUrls.length > 0 || existingImages.length > 0) && (
             <div>
               <h4 className="text-sm font-medium mb-2">Imagens adicionadas</h4>
@@ -72,6 +73,7 @@ const ImageUpload: React.FC<ImageUploadProps> = ({
                     <Button
                       variant="destructive"
                       size="icon"
+                      disabled={isDisabled}
                       className="absolute top-1 right-1 h-6 w-6 rounded-full"
                       onClick={() => handleRemoveImage(index)}
                       type="button"
@@ -80,7 +82,6 @@ const ImageUpload: React.FC<ImageUploadProps> = ({
                     </Button>
                   </div>
                 ))}
-                
                 {imagePreviewUrls.slice(existingImages.length).map((url, index) => (
                   <div
                     key={`new-${index}`}
@@ -94,6 +95,7 @@ const ImageUpload: React.FC<ImageUploadProps> = ({
                     <Button
                       variant="destructive"
                       size="icon"
+                      disabled={isDisabled}
                       className="absolute top-1 right-1 h-6 w-6 rounded-full"
                       onClick={() => handleRemoveImage(index + existingImages.length)}
                       type="button"

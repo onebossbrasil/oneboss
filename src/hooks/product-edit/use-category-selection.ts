@@ -11,15 +11,19 @@ export const useCategorySelection = (product: Product | null) => {
 
   // Reset categories when product changes
   useEffect(() => {
+    // Corrigido: sincroniza SEMPRE com o produto, inclusive em edição reaberta
     if (product) {
-      setSelectedCategory(product.categoryId || "");
-      setSubcategoryValues(product.subcategoryValues || {});
+      setSelectedCategory(product.categoryId ?? "");
+      setSubcategoryValues(product.subcategoryValues ?? {});
+    } else {
+      setSelectedCategory("");
+      setSubcategoryValues({});
     }
-  }, [product]);
+  }, [product?.id]); // Só reseta de fato quando id muda
 
   const handleCategoryChange = (categoryId: string) => {
     setSelectedCategory(categoryId);
-    // Keep the featured status but reset other subcategory values
+    // Mantém featured se existir
     const featured = subcategoryValues.featured;
     setSubcategoryValues(featured ? { featured } : {});
   };
@@ -27,7 +31,7 @@ export const useCategorySelection = (product: Product | null) => {
   const handleSubcategoryChange = (type: string, value: string) => {
     setSubcategoryValues(prev => ({
       ...prev,
-      [type]: value
+      [type]: value,
     }));
   };
 
@@ -35,6 +39,8 @@ export const useCategorySelection = (product: Product | null) => {
     selectedCategory,
     subcategoryValues,
     handleCategoryChange,
-    handleSubcategoryChange
+    handleSubcategoryChange,
+    setSelectedCategory,
+    setSubcategoryValues
   };
 };

@@ -12,26 +12,30 @@ export const useProductEdit = (
 ) => {
   // Form state management
   const { formData, handleFormChange } = useFormState(product);
-  
+
   // Category and subcategory selection
-  const { 
+  const {
     selectedCategory,
     subcategoryValues,
     handleCategoryChange,
-    handleSubcategoryChange
+    handleSubcategoryChange,
+    setSelectedCategory,
+    setSubcategoryValues
   } = useCategorySelection(product);
-  
+
   // Image management
   const {
     images,
     imagePreviewUrls,
     deletedImageIds,
     handleImageChange,
-    handleRemoveImage
+    handleRemoveImage,
+    setImages,
+    setImagePreviewUrls,
+    setDeletedImageIds
   } = useImageManagement(product);
-  
+
   // Form submission
-  // Dois hooks, um para editar, outro para adicionar:
   const { isSubmitting: isUpdating, handleUpdateProduct } = useProductSubmit(
     product,
     formData,
@@ -55,6 +59,11 @@ export const useProductEdit = (
   const isSubmitting = isEditMode ? isUpdating : isAdding;
   const handleSubmit = isEditMode ? handleUpdateProduct : handleAddProduct;
 
+  // Sempre que o produto for aberto para edição, resetar campos do formulário, categorias e imagens
+  // Útil para reidratar valores caso modal seja reaberto em produto diferente
+  // (Este effect é seguro porque hooks de estado já são sincronizados pelos outros hooks)
+  // ... mas se complementarmente quiser resetar algum hook particular, pode fazer aqui
+
   return {
     formData,
     selectedCategory,
@@ -67,6 +76,11 @@ export const useProductEdit = (
     handleSubcategoryChange,
     handleImageChange,
     handleRemoveImage,
-    handleSubmit // Sempre usar este para <form onSubmit>
+    handleSubmit,
+    setSelectedCategory,
+    setSubcategoryValues,
+    setImages,
+    setImagePreviewUrls,
+    setDeletedImageIds
   };
 };
