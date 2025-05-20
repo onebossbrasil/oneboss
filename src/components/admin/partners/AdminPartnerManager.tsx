@@ -1,3 +1,4 @@
+
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -20,11 +21,10 @@ export default function AdminPartnerManager() {
   const [editingId, setEditingId] = useState<string | null>(null);
   const [showForm, setShowForm] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [triedInsertDemo, setTriedInsertDemo] = useState(false);
   const [fetchError, setFetchError] = useState<string | null>(null);
   const { toast } = useToast();
 
-  // Busca lista de parceiros mais atualizada possível
+  // Busca lista de parceiros em tempo real, sem demos
   const fetchPartners = async () => {
     setLoading(true);
     const { data, error } = await supabase
@@ -32,7 +32,7 @@ export default function AdminPartnerManager() {
       .select("*")
       .order("order_index", { ascending: true });
     if (!error && data) {
-      setPartners(data);
+      setPartners(data); // Garante sincronização exata
       setFetchError(null);
     } else {
       setPartners([]);
@@ -49,46 +49,6 @@ export default function AdminPartnerManager() {
   useEffect(() => {
     fetchPartners();
   }, []);
-
-  useEffect(() => {
-    if (
-      partners.length === 0 &&
-      !loading &&
-      !triedInsertDemo &&
-      !fetchError
-    ) {
-      setTriedInsertDemo(true);
-      (async () => {
-        const demo = [
-          {
-            name: "EUROFIX",
-            description: "Oficina mecânica especializada, preparação e performance",
-            banner_image_url: "/lovable-uploads/94c4f913-0185-4aaa-b639-fa0e29e727ac.png",
-            logo_url: "/lovable-uploads/1048c280-9081-420f-a0a1-899e5e5ce851.png",
-            alt: "EUROFIX - Manutenção & Performance",
-            link: null,
-            order_index: 0,
-            visible: true,
-          },
-          {
-            name: "AUTOMATIZE",
-            description: "",
-            banner_image_url: "",
-            logo_url: "/lovable-uploads/5bff8c7e-d3d1-45b9-8a6a-1fe67277ee72.png",
-            alt: "AUTOMATIZE",
-            link: null,
-            order_index: 1,
-            visible: true,
-          },
-        ];
-        for (const partner of demo) {
-          await supabase.from("partners").insert(partner);
-        }
-        fetchPartners();
-      })();
-    }
-    // eslint-disable-next-line
-  }, [partners, loading, fetchError, triedInsertDemo]);
 
   function handleInput(e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) {
     const { name, value } = e.target;
@@ -118,7 +78,6 @@ export default function AdminPartnerManager() {
         const { error, data } = await supabase.from("partners").update({
           ...form,
         }).eq("id", editingId).select();
-        console.log("[AdminPartnerManager] UPDATE ->", { error, data });
         if (error) throw error;
         if (!data || data.length === 0) {
           throw new Error("Nada foi alterado. Verifique se você tem permissão de admin.");
@@ -135,7 +94,6 @@ export default function AdminPartnerManager() {
           order_index: maxOrder + 1,
           visible: true,
         }).select();
-        console.log("[AdminPartnerManager] INSERT ->", { error, data });
         if (error) throw error;
         if (!data || data.length === 0) {
           throw new Error("Nada foi inserido. Você é admin?");
@@ -177,7 +135,6 @@ export default function AdminPartnerManager() {
     setLoading(true);
     try {
       const { error, data } = await supabase.from("partners").delete().eq("id", id).select();
-      console.log("[AdminPartnerManager] DELETE ->", { error, data });
       if (error) throw error;
       if (!data || data.length === 0) {
         throw new Error("Nada foi excluído. Talvez você não seja admin ou já foi removido.");
@@ -240,7 +197,7 @@ export default function AdminPartnerManager() {
           setShowForm(true);
           setEditingId(null);
           setForm(initialForm);
-        }}>Novo Parceiro</Button>
+        }} className="bg-gold hover:bg-gold/80 text-white">Novo Parceiro</Button>
       </div>
       {fetchError && (
         <div className="mb-4 p-3 bg-red-100 border border-red-300 text-red-700 rounded">
