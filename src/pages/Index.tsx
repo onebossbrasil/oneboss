@@ -1,3 +1,4 @@
+
 import React, { useEffect } from "react";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
@@ -7,7 +8,6 @@ import FeaturedProducts from "../components/FeaturedProducts";
 import WhyChooseUs from "../components/WhyChooseUs";
 import SponsorsBanner from "../components/SponsorsBanner";
 import AdvertiseWithUs from "../components/AdvertiseWithUs";
-import PartnersCarousel from "../components/PartnersCarousel";
 
 const Index = () => {
   useEffect(() => {
@@ -19,7 +19,6 @@ const Index = () => {
       <Header />
       <main className="flex-1">
         <Hero />
-        <PartnersCarousel />
         <CategoryBanners />
         <FeaturedProducts />
         <WhyChooseUs />
