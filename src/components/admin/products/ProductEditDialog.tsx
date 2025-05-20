@@ -26,6 +26,7 @@ const ProductEditDialog = ({ product, open, onOpenChange, onClose }: ProductEdit
     onClose?.();
   };
 
+  // O productId sempre será o UUID correto do produto
   const productId = product?.id || null;
   const { product: freshProduct, isLoading } = useFetchProductById(productId, open);
 
@@ -53,11 +54,11 @@ const ProductEditDialog = ({ product, open, onOpenChange, onClose }: ProductEdit
     setImages,
     setImagePreviewUrls,
     setDeletedImageIds,
-    selectedSubcategoryId, // <-- este é o UUID
-    selectedAttributeId,
+    selectedSubcategoryId, // é o UUID vindo do banco
+    selectedAttributeId,    // é o UUID do atributo
     handleAttributeChange,
     handleSubcatIdChange
-  } = useProductEdit(freshProduct, handleDialogClose);
+  } = useProductEdit(freshProduct, handleDialogClose); // freshProduct já está atualizado
 
   useEffect(() => {
     if (open) {
@@ -128,11 +129,10 @@ const ProductEditDialog = ({ product, open, onOpenChange, onClose }: ProductEdit
                     handleFormChange(field, value);
                   }}
                 />
-
                 <CategorySelector
                   selectedCategory={selectedCategory}
                   subcategoryValues={subcategoryValues}
-                  selectedSubcategoryId={selectedSubcategoryId}    // <-- Passa o id como value!
+                  selectedSubcategoryId={selectedSubcategoryId} // sempre o UUID do banco!
                   onCategoryChange={handleCategoryChange}
                   onSubcategoryChange={handleSubcategoryChange}
                   onSubcategoryIdChange={handleSubcatIdChange}

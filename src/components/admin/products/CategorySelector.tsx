@@ -17,7 +17,7 @@ type CategorySelectorProps = {
 const CategorySelectorContent = ({
   selectedCategory,
   subcategoryValues,
-  selectedSubcategoryId, // agora prioritário!
+  selectedSubcategoryId, // valor prioritário, o UUID da subcategoria escolhida
   onCategoryChange,
   onSubcategoryChange,
   onSubcategoryIdChange,
@@ -29,7 +29,7 @@ const CategorySelectorContent = ({
   const category = categories.find(cat => cat.id === selectedCategory);
   const [activeSubcategoryId, setActiveSubcategoryId] = useState<string | null>(selectedSubcategoryId ?? null);
 
-  // Atualiza subcategoria ativa sempre que prop muda (mantém controlado pelo id)
+  // Sincronizar com prop corretamente pelos UUIDs sempre!
   useEffect(() => {
     setActiveSubcategoryId(selectedSubcategoryId ?? null);
   }, [selectedSubcategoryId]);
@@ -39,14 +39,15 @@ const CategorySelectorContent = ({
     sc => sc.id === activeSubcategoryId
   );
 
+  // Notifica mudança por ID
   useEffect(() => {
     if (onSubcategoryIdChange) {
-      // Notifica mudança para o parent
       onSubcategoryIdChange(activeSubcategoryId);
     }
     // eslint-disable-next-line
   }, [activeSubcategoryId]);
 
+  // Notifica alteração dos atributos via prop sempre por UUID
   useEffect(() => {
     if (onAttributeIdChange && activeSubcatObj && subcategoryValues[activeSubcategoryId || ""]) {
       const attributeSelected = subcategoryValues[activeSubcategoryId || ""];
@@ -73,7 +74,7 @@ const CategorySelectorContent = ({
         <Select 
           onValueChange={(catId) => {
             onCategoryChange(catId);
-            setActiveSubcategoryId(null); // reseta subcat!
+            setActiveSubcategoryId(null);
           }}
           value={selectedCategory}
           disabled={categories.length === 0}
