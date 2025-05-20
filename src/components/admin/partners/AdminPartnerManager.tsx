@@ -1,9 +1,10 @@
-
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import ImageInputSupabase from "./ImageInputSupabase";
 import { useToast } from "@/hooks/use-toast";
+import PartnerForm from "./PartnerForm";
+import PartnerList, { Partner } from "./PartnerList";
 
 type Partner = {
   id: string;
@@ -103,6 +104,12 @@ export default function AdminPartnerManager() {
   function handleInput(e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) {
     const { name, value } = e.target;
     setForm((f) => ({ ...f, [name]: value }));
+  }
+
+  function handleCancelForm() {
+    setShowForm(false);
+    setEditingId(null);
+    setForm(initialForm);
   }
 
   async function handleSave(e: React.FormEvent) {
@@ -252,82 +259,25 @@ export default function AdminPartnerManager() {
         </div>
       )}
       {showForm && (
-        <form className="space-y-3 mb-6" onSubmit={handleSave}>
-          <input
-            name="name"
-            placeholder="Nome do parceiro"
-            value={form.name}
-            onChange={handleInput}
-            required
-            className="w-full border rounded px-3 py-2"
-          />
-          <textarea
-            name="description"
-            placeholder="Descrição breve (aparece no banner da home)"
-            value={form.description}
-            onChange={handleInput}
-            className="w-full border rounded px-3 py-2"
-          />
-          <ImageInputSupabase
-            label="Banner do parceiro (recomendado 1200x400px)"
-            bucket="partners-banners"
-            value={form.banner_image_url || ""}
-            onChange={url => setForm(f => ({ ...f, banner_image_url: url }))}
-            accept="image/png,image/jpeg,image/webp"
-            disabled={loading}
-          />
-          <ImageInputSupabase
-            label="Logo PNG sem fundo (para carrossel e banner)"
-            bucket="partners-logos"
-            value={form.logo_url || ""}
-            onChange={url => setForm(f => ({ ...f, logo_url: url }))}
-            accept="image/png"
-            disabled={loading}
-          />
-          <input
-            name="link"
-            placeholder="Link do parceiro (site, Instagram, etc)"
-            value={form.link}
-            onChange={handleInput}
-            className="w-full border rounded px-3 py-2"
-          />
-          <div className="flex gap-2">
-            <Button type="submit" size="sm" disabled={loading}>
-              {editingId ? "Salvar alterações" : "Adicionar"}
-            </Button>
-            <Button
-              type="button"
-              size="sm"
-              variant="outline"
-              onClick={() => {
-                setShowForm(false);
-                setEditingId(null);
-                setForm(initialForm);
-              }}
-            >
-              Cancelar
-            </Button>
-          </div>
-        </form>
+        <PartnerForm
+          form={form}
+          editingId={editingId}
+          loading={loading}
+          onChange={handleInput}
+          onBannerChange={url => setForm(f => ({ ...f, banner_image_url: url }))}
+          onLogoChange={url => setForm(f => ({ ...f, logo_url: url }))}
+          onCancel={handleCancelForm}
+          onSubmit={handleSave}
+        />
       )}
       <div>
-        {partners.length === 0 && !fetchError && <p className="text-muted-foreground">Nenhum parceiro cadastrado.</p>}
-        <ul>
-          {partners.map((partner, idx) => (
-            <li key={partner.id} className="border-b py-2 flex flex-col md:flex-row md:items-center gap-2">
-              <div className="flex-1">
-                <span className="font-semibold mr-2">{partner.name}</span>
-                <span className="text-sm text-muted-foreground">{partner.description}</span>
-              </div>
-              <div className="flex gap-2">
-                <Button size="sm" variant="outline" onClick={() => move(idx, -1)} disabled={idx === 0 || loading}>↑</Button>
-                <Button size="sm" variant="outline" onClick={() => move(idx, 1)} disabled={idx === partners.length - 1 || loading}>↓</Button>
-                <Button size="sm" onClick={() => handleEdit(partner)} disabled={loading}>Editar</Button>
-                <Button size="sm" variant="destructive" onClick={() => handleDelete(partner.id)} disabled={loading}>Excluir</Button>
-              </div>
-            </li>
-          ))}
-        </ul>
+        <PartnerList
+          partners={partners}
+          loading={loading}
+          onEdit={handleEdit}
+          onDelete={handleDelete}
+          onMove={move}
+        />
       </div>
     </div>
   );
