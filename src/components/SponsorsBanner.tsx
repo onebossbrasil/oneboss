@@ -1,3 +1,4 @@
+
 import { Button } from "@/components/ui/button";
 import { useIsMobile } from "@/hooks/use-mobile";
 const SponsorsBanner = () => {
@@ -13,7 +14,7 @@ const SponsorsBanner = () => {
           </p>
         </div>
         
-        <div className={`relative h-[200px] w-full ${isMobile ? "" : "rounded-none"} overflow-hidden animate-slide-in-right`}>
+        <div className={`relative h-[300px] w-full ${isMobile ? "" : "rounded-none"} overflow-hidden animate-slide-in-right`}>
           {/* Banner image */}
           <img src="/lovable-uploads/94c4f913-0185-4aaa-b639-fa0e29e727ac.png" alt="EUROFIX banner" className="w-full h-full object-cover" />
           
