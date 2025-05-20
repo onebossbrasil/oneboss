@@ -80,17 +80,17 @@ export const useProductEdit = (
   const isSubmitting = isEditMode ? isUpdating : isAdding;
   const handleSubmit = isEditMode ? handleUpdateProduct : handleAddProduct;
 
-  // Handler para CategorySelector para atualizar selectedSubcategoryId
+  // Handler para CategorySelector para atualizar selectedSubcategoryId e AttributeId
   const handleSubcategoryIdChange = (subcategoryId: string | null) => {
     setSelectedSubcategoryId(subcategoryId);
     setSelectedAttributeId(null);
-    console.log("[useProductEdit] setSelectedSubcategoryId:", subcategoryId);
+    console.log("[useProductEdit] setSelectedSubcategoryId (UUID):", subcategoryId);
   };
 
-  // Handler para atributo (pode ser string id/texto)
+  // Handler para atributo UUID
   const handleAttributeChange = (attributeId: string | null) => {
     setSelectedAttributeId(attributeId);
-    console.log("[useProductEdit] setSelectedAttributeId:", attributeId);
+    console.log("[useProductEdit] setSelectedAttributeId (UUID):", attributeId);
   };
 
   return {

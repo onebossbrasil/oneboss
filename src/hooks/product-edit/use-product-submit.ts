@@ -85,9 +85,8 @@ export const useProductSubmit = (
         price,
         salePrice: salePrice || null,
         categoryId: selectedCategory,
-        // ATENÇÃO: agora sempre envia os campos corretamente do modal!
-        subcategoryId: selectedSubcategoryId ?? null,
-        attributeId: selectedAttributeId ?? null,
+        subcategoryId: selectedSubcategoryId ?? null,          // <-- Envia UUID correto
+        attributeId: selectedAttributeId ?? null,              // <-- Envia UUID correto
         subcategoryValues: Object.keys(subcategoryValues).length > 0 ? subcategoryValues : null,
         published: formData.published,
         featured: formData.featured,
@@ -95,7 +94,7 @@ export const useProductSubmit = (
         deletedImageIds: deletedImageIds
       };
 
-      console.log("[SUBMIT] Payload para updateProduct:", productData);
+      console.log("[SUBMIT] Payload para updateProduct (com UUIDs):", productData);
 
       await updateProduct(product.id, productData, images.length > 0 ? images : undefined);
 

@@ -1,4 +1,3 @@
-
 import { useCategories } from "@/contexts/CategoryContext";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Label } from "@/components/ui/label";
@@ -104,6 +103,7 @@ const CategorySelectorContent = ({
               // Ache o id da subcategoria ao selecionar (garante sincronia)
               const obj = category?.subcategories.find(sc => sc.type === type);
               if (onSubcategoryIdChange) {
+                // Agora envia o UUID
                 onSubcategoryIdChange(obj?.id || null);
               }
               // Também limpa atributo ao trocar subcategoria
@@ -135,13 +135,13 @@ const CategorySelectorContent = ({
             {activeSubcatObj.name + " - Atributos"}
           </Label>
           <Select 
-            onValueChange={(value) => {
-              onSubcategoryChange(activeSubcategoryType, value);
-              // Ao escolher atributo, tenta enviar como ID para hook pai
+            onValueChange={(attributeId) => {
+              onSubcategoryChange(activeSubcategoryType, attributeId);
+              // Envia o UUID do atributo
               if (onAttributeIdChange) {
-                onAttributeIdChange(value);
+                onAttributeIdChange(attributeId);
               }
-              console.log("[CategorySelector] onSubcategoryChange:", activeSubcategoryType, value);
+              console.log("[CategorySelector] onSubcategoryChange:", activeSubcategoryType, attributeId);
             }}
             value={subcategoryValues[activeSubcategoryType] || ""}
           >
@@ -152,9 +152,10 @@ const CategorySelectorContent = ({
             </SelectTrigger>
             <SelectContent>
               {activeSubcatObj.attributes
-                ? activeSubcatObj.attributes.map((option: string) => (
-                    <SelectItem key={option} value={option}>
-                      {option}
+                // aqui assumimos que attributes é array de objetos com id/nome
+                ? activeSubcatObj.attributes.map((attr: any) => (
+                    <SelectItem key={attr.id} value={attr.id}>
+                      {attr.name ?? attr}
                     </SelectItem>
                   ))
                 : null}
@@ -171,4 +172,3 @@ const CategorySelector = (props: CategorySelectorProps) => {
 };
 
 export default CategorySelector;
-

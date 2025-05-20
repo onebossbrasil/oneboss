@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
@@ -29,6 +28,8 @@ export const useUpdateProduct = () => {
       if (productData.price !== undefined) updateData.price = productData.price;
       if (productData.salePrice !== undefined) updateData.sale_price = productData.salePrice;
       if (productData.categoryId !== undefined) updateData.category_id = productData.categoryId;
+      if (productData.subcategoryId !== undefined) updateData.subcategory_id = productData.subcategoryId;   // <-- UUID
+      if (productData.attributeId !== undefined) updateData.attribute_id = productData.attributeId;         // <-- UUID
       if (productData.subcategoryValues !== undefined) updateData.subcategory_values = productData.subcategoryValues;
       if (productData.featured !== undefined) updateData.featured = productData.featured;
       if (productData.published !== undefined) updateData.published = productData.published;
