@@ -1,20 +1,13 @@
-
 import { Link } from "react-router-dom";
 import { Phone, Mail, Instagram, Facebook, Twitter } from "lucide-react";
 import NewsletterSignup from "./NewsletterSignup";
-
 const Footer = () => {
-  return (
-    <footer className="bg-zinc-900 text-white">
+  return <footer className="bg-zinc-900 text-white">
       {/* Newsletter Section */}
       <div className="bg-gold/80 py-12">
         <div className="container mx-auto px-4 text-center">
-          <h3 className="font-playfair text-2xl md:text-3xl font-semibold mb-4">
-            Junte-se à Nossa Newsletter
-          </h3>
-          <p className="text-zinc-800 mb-6 max-w-2xl mx-auto">
-            Receba ofertas exclusivas, lançamentos antecipados e acesso a produtos limitados diretamente no seu email.
-          </p>
+          <h3 className="font-playfair text-2xl md:text-3xl font-semibold mb-4">Receba ofertas exclusivas</h3>
+          <p className="text-zinc-800 mb-6 max-w-2xl mx-auto">Lançamentos antecipados e acesso a produtos limitados diretamente no seu email.</p>
           <div className="flex justify-center">
             <NewsletterSignup />
           </div>
@@ -87,8 +80,6 @@ const Footer = () => {
           <p>© 2025 One Boss. Todos os direitos reservados.</p>
         </div>
       </div>
-    </footer>
-  );
+    </footer>;
 };
-
 export default Footer;
