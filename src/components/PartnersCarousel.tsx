@@ -1,4 +1,3 @@
-
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import useEmblaCarousel from "embla-carousel-react";
 import { supabase } from "@/integrations/supabase/client";
@@ -84,7 +83,7 @@ const PartnersCarousel = () => {
                   }}
                   key={partner.id + "-" + idx}
                 >
-                  <img src={partner.logo_url} alt={partner.alt || partner.name} className={`
+                  <img src={partner.logo_url} alt={partner.name || ""} className={`
                       object-contain saturate-150 transition-transform duration-300 hover:scale-105
                       h-20 max-w-[180px]
                       md:h-32 md:max-w-[280px]

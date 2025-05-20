@@ -1,7 +1,7 @@
-
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
+import ImageInputSupabase from "./ImageInputSupabase";
 
 type Partner = {
   id: string;
@@ -9,7 +9,6 @@ type Partner = {
   description?: string;
   banner_image_url?: string;
   logo_url: string;
-  alt?: string;
   link?: string;
   order_index: number;
   visible: boolean;
@@ -20,7 +19,6 @@ const initialForm: Omit<Partner, "id" | "order_index" | "visible"> = {
   description: "",
   banner_image_url: "",
   logo_url: "",
-  alt: "",
   link: "",
 };
 
@@ -122,7 +120,6 @@ export default function AdminPartnerManager() {
       description: partner.description || "",
       banner_image_url: partner.banner_image_url || "",
       logo_url: partner.logo_url,
-      alt: partner.alt || "",
       link: partner.link || "",
     });
   }
@@ -180,36 +177,30 @@ export default function AdminPartnerManager() {
           />
           <textarea
             name="description"
-            placeholder="Descrição breve"
+            placeholder="Descrição breve (aparece no banner da home)"
             value={form.description}
             onChange={handleInput}
             className="w-full border rounded px-3 py-2"
           />
-          <input
-            name="banner_image_url"
-            placeholder="URL da imagem do banner"
-            value={form.banner_image_url}
-            onChange={handleInput}
-            className="w-full border rounded px-3 py-2"
+          <ImageInputSupabase
+            label="Banner do parceiro (recomendado 1200x400px)"
+            bucket="partners-banners"
+            value={form.banner_image_url || ""}
+            onChange={url => setForm(f => ({ ...f, banner_image_url: url }))}
+            accept="image/png,image/jpeg,image/webp"
+            disabled={loading}
           />
-          <input
-            name="logo_url"
-            placeholder="URL do logo (obrigatório)"
-            value={form.logo_url}
-            onChange={handleInput}
-            required
-            className="w-full border rounded px-3 py-2"
-          />
-          <input
-            name="alt"
-            placeholder="Texto alternativo da logo"
-            value={form.alt}
-            onChange={handleInput}
-            className="w-full border rounded px-3 py-2"
+          <ImageInputSupabase
+            label="Logo PNG sem fundo (para carrossel e banner)"
+            bucket="partners-logos"
+            value={form.logo_url || ""}
+            onChange={url => setForm(f => ({ ...f, logo_url: url }))}
+            accept="image/png"
+            disabled={loading}
           />
           <input
             name="link"
-            placeholder="Link (opcional)"
+            placeholder="Link do parceiro (site, Instagram, etc)"
             value={form.link}
             onChange={handleInput}
             className="w-full border rounded px-3 py-2"

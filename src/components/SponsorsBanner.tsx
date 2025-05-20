@@ -1,4 +1,3 @@
-
 import { Button } from "@/components/ui/button";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { useEffect, useState } from "react";
@@ -40,7 +39,7 @@ const SponsorsBanner = () => {
         <div className={`relative h-[300px] w-full ${isMobile ? "" : "rounded-none"} overflow-hidden animate-slide-in-right`}>
           {/* Banner image */}
           {partner.banner_image_url ? (
-            <img src={partner.banner_image_url} alt={partner.alt || partner.name} className="w-full h-full object-cover" />
+            <img src={partner.banner_image_url} alt={partner.name || ""} className="w-full h-full object-cover" />
           ) : (
             <div className="bg-gray-200 w-full h-full" />
           )}
@@ -53,7 +52,7 @@ const SponsorsBanner = () => {
             {/* Logo */}
             {partner.logo_url && (
               <div className="mb-4 w-48 md:w-56">
-                <img src={partner.logo_url} alt={partner.alt || partner.name} className="w-full" />
+                <img src={partner.logo_url} alt={partner.name || ""} className="w-full" />
               </div>
             )}
 
