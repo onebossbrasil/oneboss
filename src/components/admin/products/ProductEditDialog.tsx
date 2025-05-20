@@ -28,7 +28,7 @@ const ProductEditDialog = ({ product, open, onOpenChange, onClose }: ProductEdit
 
   // Se o produto vier da listagem, vamos buscar do banco ao abrir.
   const productId = product?.id || null;
-  const { product: freshProduct, isLoading, refetch } = useFetchProductById(productId, open);
+  const { product: freshProduct, isLoading } = useFetchProductById(productId, open);
 
   // Só monta o hook do formulário quando o dado está carregado
   const {
@@ -55,9 +55,7 @@ const ProductEditDialog = ({ product, open, onOpenChange, onClose }: ProductEdit
   useEffect(() => {
     if (!open) return;
     // Força buscar sempre que abrir o modal
-    if (productId) {
-      refetch?.();
-    }
+    // (refetch removido - não existe na hook)
     // eslint-disable-next-line
   }, [open, productId]);
 
