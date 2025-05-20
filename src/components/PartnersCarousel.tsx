@@ -2,7 +2,7 @@
 import useEmblaCarousel from "embla-carousel-react";
 import { useEffect, useRef } from "react";
 
-// Substitua pelo caminho correto dos arquivos enviados!
+// Logos dos parceiros
 const partners = [
   {
     name: "Parceiro 1",
@@ -14,30 +14,36 @@ const partners = [
   },
 ];
 
-const PartnersCarousel = () => {
-  // Duplicamos os logos para efeito de loop perfeito visual
-  const logos = [...partners, ...partners];
-  const [emblaRef, emblaApi] = useEmblaCarousel({ 
-    loop: true, 
-    align: "start", 
-    dragFree: true,
-    speed: 2, // transição rápida e contínua
-  });
-  const autoScrollRef = useRef<NodeJS.Timeout>();
+// Duplicar para efeito visual de loop/marquee
+const logos = [...partners, ...partners];
 
-  // Autoplay suave (scroll + reset) para efeito de loop
+const PartnersCarousel = () => {
+  const [emblaRef, emblaApi] = useEmblaCarousel({
+    loop: true,
+    align: "start",
+    dragFree: true,
+    // REMOVIDO: speed
+  });
+  const autoScrollRef = useRef<NodeJS.Timeout | null>(null);
+
   useEffect(() => {
     if (!emblaApi) return;
     emblaApi.scrollTo(0);
 
-    function autoScroll() {
+    // Função para avançar para próximo slide
+    const autoScroll = () => {
       if (!emblaApi) return;
-      emblaApi.scrollBy(1); // rola 1 pixel por tick
-    }
-    autoScrollRef.current = setInterval(autoScroll, 20);
+      if (emblaApi.canScrollNext()) {
+        emblaApi.scrollNext();
+      } else {
+        emblaApi.scrollTo(0); // Volta para o início se estiver no final
+      }
+    };
+
+    autoScrollRef.current = setInterval(autoScroll, 1500); // Velocidade de rotação
 
     return () => {
-      if(autoScrollRef.current) clearInterval(autoScrollRef.current);
+      if (autoScrollRef.current) clearInterval(autoScrollRef.current);
     };
   }, [emblaApi]);
 
