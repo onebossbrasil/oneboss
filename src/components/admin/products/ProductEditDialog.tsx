@@ -52,7 +52,7 @@ const ProductEditDialog = ({ product, open, onOpenChange, onClose }: ProductEdit
     selectedSubcategoryId,
     selectedAttributeId,
     handleAttributeChange,
-    handleSubcategoryChange: handleSubcatIdChange
+    handleSubcatIdChange
   } = useProductEdit(freshProduct, handleDialogClose);
 
   // ---- DIAGNÓSTICO: Log detalhado do state do modal ao abrir ----
@@ -111,7 +111,9 @@ const ProductEditDialog = ({ product, open, onOpenChange, onClose }: ProductEdit
     }}>
       <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>{freshProduct ? "Editar Produto" : "Cadastrar Produto"}</DialogTitle>
+          <DialogTitle>
+            {freshProduct ? "Editar Produto" : "Cadastrar Produto"}
+          </DialogTitle>
         </DialogHeader>
 
         {isLoading ? (
@@ -142,12 +144,10 @@ const ProductEditDialog = ({ product, open, onOpenChange, onClose }: ProductEdit
                     console.log("[Modal] Subcategoria alterada:", type, value);
                     handleSubcategoryChange(type, value);
                   }}
-                  // Correct usage: only one argument for onSubcategoryIdChange
                   onSubcategoryIdChange={handleSubcatIdChange}
                   onAttributeIdChange={handleAttributeChange}
                 />
               </div>
-
               <div className="space-y-4">
                 <ImageUpload
                   images={images}

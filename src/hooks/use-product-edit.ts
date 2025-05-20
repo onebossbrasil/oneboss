@@ -28,7 +28,7 @@ export const useProductEdit = (
   const [selectedSubcategoryId, setSelectedSubcategoryId] = useState<string | null>(product?.subcategoryId ?? null);
   const [selectedAttributeId, setSelectedAttributeId] = useState<string | null>(product?.attributeId ?? null);
 
-  // A cada abertura de produto, manter sincronizado os ids com o produto carregado
+  // Sincroniza ids ao mudar produto
   React.useEffect(() => {
     setSelectedSubcategoryId(product?.subcategoryId ?? null);
     setSelectedAttributeId(product?.attributeId ?? null);
@@ -74,11 +74,10 @@ export const useProductEdit = (
   const isSubmitting = isEditMode ? isUpdating : isAdding;
   const handleSubmit = isEditMode ? handleUpdateProduct : handleAddProduct;
 
-  // Novo: Receber os handlers para CategorySelector
+  // Handler para CategorySelector para atualizar selectedSubcategoryId
   const handleSubcategoryIdChange = (subcategoryId: string | null) => {
     setSelectedSubcategoryId(subcategoryId);
-    // Ao trocar subcategoria, limpamos o atributo
-    setSelectedAttributeId(null);
+    setSelectedAttributeId(null); // Ao trocar subcategoria, limpamos o atributo
   };
 
   const handleAttributeChange = (attributeId: string | null) => {
@@ -106,8 +105,6 @@ export const useProductEdit = (
     selectedSubcategoryId,
     selectedAttributeId,
     handleAttributeChange,
-    // avoid duplicate handleSubcategoryChange property:
-    // Only export with this name for CategorySelector expecting prop
-    handleSubcategoryChange: handleSubcategoryIdChange
+    handleSubcatIdChange: handleSubcategoryIdChange // Fornecemos um alias claro para o prop do componente
   };
 };
