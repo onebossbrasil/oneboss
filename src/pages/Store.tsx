@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useSearchParams } from "react-router-dom";
 import Header from "@/components/Header";
@@ -51,8 +50,8 @@ const Store = () => {
       selectedSubcategories
     });
     
-    // First, only include published products
-    let result = products.filter(product => product.published !== false);
+    // Ajuste essencial: só incluir produtos publicados de verdade
+    let result = products.filter(product => product.published === true);
     
     // Filter by search
     if (searchQuery) {
