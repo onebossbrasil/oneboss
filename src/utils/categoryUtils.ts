@@ -14,11 +14,12 @@ export const groupSubcategoriesByCategory = (subcategoriesData: any[]) => {
   return subcategoriesByCategory;
 };
 
-// Group attributes by subcategory ID
+// Group attributes by subcategory ID (searches in subcategory_attributes now)
 export const groupValuesBySubcategory = (attributesData: any[]) => {
   const attributesBySubcategory: Record<string, string[]> = {};
 
   attributesData.forEach((row: any) => {
+    // row is from subcategory_attributes
     if (!attributesBySubcategory[row.subcategory_id]) {
       attributesBySubcategory[row.subcategory_id] = [];
     }
