@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { Filter, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -11,9 +12,9 @@ import AttributeListDisplay from "@/components/categories/AttributeListDisplay";
 
 type FilterSidebarProps = {
   selectedCategory: string | null;
-  selectedSubcategories: string[];
+  selectedSubcategories: AttributeType[];
   onCategorySelect: (categoryId: string) => void;
-  onSubcategoryToggle: (subcategory: string) => void;
+  onSubcategoryToggle: (attr: AttributeType) => void;
   isMobileFiltersOpen: boolean;
   setIsMobileFiltersOpen: (isOpen: boolean) => void;
   resetFilters: () => void;
@@ -112,7 +113,7 @@ const FilterSidebar = ({
                         )}
                         <AttributeListDisplay
                           attributes={subcategory.attributes}
-                          selectedAttributeIds={selectedSubcategories}
+                          selectedAttributes={selectedSubcategories}
                           onAttributeToggle={onSubcategoryToggle}
                         />
                       </div>
@@ -135,3 +136,4 @@ const FilterSidebar = ({
 };
 
 export default FilterSidebar;
+

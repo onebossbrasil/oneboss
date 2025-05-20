@@ -26,6 +26,7 @@ const AttributeList = ({
   const [editIndex, setEditIndex] = useState<number | null>(null);
   const [editValue, setEditValue] = useState("");
   const [savingEdit, setSavingEdit] = useState(false);
+  const [selectedAttributes, setSelectedAttributes] = useState<AttributeType[]>([]);
 
   const getCurrentCategory = (): CategoryType | null => {
     return categories.find(cat => cat.value === selectedCategory) || null;
@@ -113,6 +114,14 @@ const AttributeList = ({
     }
   };
 
+  const handleAttributeToggle = (attr: AttributeType) => {
+    setSelectedAttributes((prev) =>
+      prev.some((a) => a.id === attr.id)
+        ? prev.filter((a) => a.id !== attr.id)
+        : [...prev, attr]
+    );
+  };
+
   return (
     <Card className="md:col-span-1 w-full md:w-[120%]">
       <CardContent className="pt-6">
@@ -169,6 +178,8 @@ const AttributeList = ({
               {subcategory.attributes.length > 0 ? (
                 <AttributeListDisplay
                   attributes={subcategory.attributes}
+                  selectedAttributes={selectedAttributes}
+                  onAttributeToggle={handleAttributeToggle}
                   editable
                   onEdit={(attr) => {
                     const index = subcategory.attributes.findIndex(a => a.id === attr.id);

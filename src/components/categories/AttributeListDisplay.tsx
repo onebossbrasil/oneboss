@@ -6,8 +6,8 @@ import { Pencil, Trash2 } from "lucide-react";
 
 type AttributeListDisplayProps = {
   attributes: AttributeType[];
-  selectedAttributeIds?: string[];
-  onAttributeToggle?: (attrId: string) => void;
+  selectedAttributes?: AttributeType[];
+  onAttributeToggle?: (attr: AttributeType) => void;
   onEdit?: (attr: AttributeType) => void;
   onDelete?: (attr: AttributeType) => void;
   editable?: boolean;
@@ -15,12 +15,15 @@ type AttributeListDisplayProps = {
 
 const AttributeListDisplay: React.FC<AttributeListDisplayProps> = ({
   attributes,
-  selectedAttributeIds = [],
+  selectedAttributes = [],
   onAttributeToggle,
   onEdit,
   onDelete,
   editable = false,
 }) => {
+  const isSelected = (attr: AttributeType) =>
+    selectedAttributes.some((a) => a.id === attr.id);
+
   return (
     <div className="flex flex-col space-y-1">
       {attributes.map((attr) => (
@@ -28,9 +31,9 @@ const AttributeListDisplay: React.FC<AttributeListDisplayProps> = ({
           <Button
             variant="ghost"
             className={`text-left justify-start flex-1 px-2 h-8 font-normal ${
-              selectedAttributeIds.includes(attr.id) ? "bg-gold/10 text-gold" : ""
+              isSelected(attr) ? "bg-gold/10 text-gold" : ""
             }`}
-            onClick={() => onAttributeToggle && onAttributeToggle(attr.id)}
+            onClick={() => onAttributeToggle && onAttributeToggle(attr)}
           >
             {attr.name}
           </Button>
@@ -51,3 +54,4 @@ const AttributeListDisplay: React.FC<AttributeListDisplayProps> = ({
 };
 
 export default AttributeListDisplay;
+
