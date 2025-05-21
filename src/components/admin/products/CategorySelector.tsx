@@ -1,3 +1,4 @@
+
 import { useCategories } from "@/contexts/CategoryContext";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Label } from "@/components/ui/label";
@@ -8,6 +9,7 @@ type CategorySelectorProps = {
   selectedCategory: string;
   subcategoryValues: Record<string, string>;
   selectedSubcategoryId?: string | null; // NOVO!
+  selectedAttributeId?: string | null;   // <-- ADICIONADO, receber valor do atributo
   onCategoryChange: (value: string) => void;
   onSubcategoryChange: (type: string, value: string) => void;
   onSubcategoryIdChange?: (subcategoryId: string | null) => void;
@@ -18,6 +20,7 @@ const CategorySelectorContent = ({
   selectedCategory,
   subcategoryValues,
   selectedSubcategoryId, // valor prioritário, o UUID da subcategoria escolhida
+  selectedAttributeId,   // valor do atributo selecionado
   onCategoryChange,
   onSubcategoryChange,
   onSubcategoryIdChange,
@@ -99,6 +102,7 @@ const CategorySelectorContent = ({
             onValueChange={(subcatId) => {
               setActiveSubcategoryId(subcatId);
               if (onSubcategoryIdChange) onSubcategoryIdChange(subcatId);
+              // Não resetar atributo aqui: a lógica do atributo será via renderização/efeito novo
               if (onAttributeIdChange) onAttributeIdChange(null);
             }}
             value={activeSubcategoryId ?? ""}
@@ -130,11 +134,7 @@ const CategorySelectorContent = ({
                 onAttributeIdChange(attributeId);
               }
             }}
-            value={
-              activeSubcatObj.attributes.length && activeSubcatObj.attributes.some(attr => attr.id === activeSubcategoryId)
-                ? activeSubcategoryId
-                : ""
-            }
+            value={selectedAttributeId ?? ""}
           >
             <SelectTrigger>
               <SelectValue placeholder={
@@ -142,13 +142,13 @@ const CategorySelectorContent = ({
               } />
             </SelectTrigger>
             <SelectContent>
-              {activeSubcatObj.attributes
+              {activeSubcatObj.attributes && activeSubcatObj.attributes.length > 0
                 ? activeSubcatObj.attributes.map((attr: any) => (
                   <SelectItem key={attr.id} value={attr.id}>
                     {attr.name ?? attr}
                   </SelectItem>
                 ))
-                : null}
+                : <SelectItem value="" disabled>Nenhum atributo</SelectItem>}
             </SelectContent>
           </Select>
         </div>
