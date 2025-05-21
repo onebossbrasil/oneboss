@@ -12,6 +12,7 @@ import ProductEditActions from "./edit/ProductEditActions";
 import { useProductEdit } from "@/hooks/use-product-edit";
 import { useFetchProductById } from "@/hooks/use-fetch-product-by-id";
 import { useEffect } from "react";
+import CategoryDebugPanel from "./CategoryDebugPanel";
 
 interface ProductEditDialogProps {
   product: Product | null;
@@ -110,43 +111,51 @@ const ProductEditDialog = ({ product, open, onOpenChange, onClose }: ProductEdit
             <span className="ml-4 text-muted-foreground">Carregando dados do produto...</span>
           </div>
         ) : (
-          <form onSubmit={wrappedHandleSubmit} className="space-y-6">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div className="space-y-4">
-                <ProductDetailsForm 
-                  formData={formData}
-                  onChange={(field, value) => {
-                    handleFormChange(field, value);
-                  }}
-                />
-                <div>
-                  <span style={{fontSize:10, color:"#6c6"}}>[DEBUG: selectedCategory = {selectedCategory}]</span>
+          <>
+            <form onSubmit={wrappedHandleSubmit} className="space-y-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="space-y-4">
+                  <ProductDetailsForm 
+                    formData={formData}
+                    onChange={(field, value) => {
+                      handleFormChange(field, value);
+                    }}
+                  />
+                  <div>
+                    <span style={{fontSize:10, color:"#6c6"}}>[DEBUG: selectedCategory = {selectedCategory}]</span>
+                  </div>
+                  <CategorySelector
+                    selectedCategory={selectedCategory}
+                    subcategoryValues={{}} // não usar mais subcategoryValues da API
+                    selectedSubcategoryId={selectedSubcategoryId}
+                    onCategoryChange={handleCategoryChange}
+                    onSubcategoryChange={() => {}}
+                    onSubcategoryIdChange={handleSubcatIdChange}
+                    onAttributeIdChange={handleAttributeChange}
+                  />
                 </div>
-                <CategorySelector
-                  selectedCategory={selectedCategory}
-                  subcategoryValues={{}} // não usar mais subcategoryValues da API
-                  selectedSubcategoryId={selectedSubcategoryId}
-                  onCategoryChange={handleCategoryChange}
-                  onSubcategoryChange={() => {}}
-                  onSubcategoryIdChange={handleSubcatIdChange}
-                  onAttributeIdChange={handleAttributeChange}
-                />
+                <div className="space-y-4">
+                  <ImageUpload
+                    images={images}
+                    imagePreviewUrls={imagePreviewUrls}
+                    handleImageChange={handleImageChange}
+                    handleRemoveImage={handleRemoveImage}
+                    existingImages={freshProduct?.images || []}
+                  />
+                </div>
               </div>
-              <div className="space-y-4">
-                <ImageUpload
-                  images={images}
-                  imagePreviewUrls={imagePreviewUrls}
-                  handleImageChange={handleImageChange}
-                  handleRemoveImage={handleRemoveImage}
-                  existingImages={freshProduct?.images || []}
-                />
-              </div>
-            </div>
-            <ProductEditActions 
-              onCancel={handleDialogClose} 
-              isSubmitting={isSubmitting} 
+              <ProductEditActions 
+                onCancel={handleDialogClose} 
+                isSubmitting={isSubmitting} 
+              />
+            </form>
+            {/* Painel de debug visual */}
+            <CategoryDebugPanel
+              selectedCategory={selectedCategory}
+              selectedSubcategoryId={selectedSubcategoryId}
+              selectedAttributeId={selectedAttributeId}
             />
-          </form>
+          </>
         )}
       </DialogContent>
     </Dialog>
