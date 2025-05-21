@@ -93,6 +93,9 @@ const CategorySelectorContent = ({
             ))}
           </SelectContent>
         </Select>
+        <div>
+          <span style={{fontSize:10, color:"#6c6"}}>[DEBUG: selectedCategory = {selectedCategory}]</span>
+        </div>
       </div>
 
       {selectedCategory && (
@@ -120,6 +123,9 @@ const CategorySelectorContent = ({
                 : null}
             </SelectContent>
           </Select>
+          <div>
+            <span style={{fontSize:10, color:"#cc6"}}>[DEBUG: activeSubcategoryId = {activeSubcategoryId ?? "(nenhuma)"}</span>
+          </div>
         </div>
       )}
 
