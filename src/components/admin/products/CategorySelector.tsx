@@ -123,7 +123,8 @@ const CategorySelectorContent = ({
         </div>
       )}
 
-      {activeSubcategoryId && activeSubcatObj && (
+      {/* Só renderiza seletor de atributo se subcategoria tem atributos */}
+      {activeSubcategoryId && activeSubcatObj && activeSubcatObj.attributes && activeSubcatObj.attributes.length > 0 && (
         <div>
           <Label htmlFor="subcategoryValue">
             {activeSubcatObj.name + " - Atributos"}
@@ -142,15 +143,20 @@ const CategorySelectorContent = ({
               } />
             </SelectTrigger>
             <SelectContent>
-              {activeSubcatObj.attributes && activeSubcatObj.attributes.length > 0
-                ? activeSubcatObj.attributes.map((attr: any) => (
-                  <SelectItem key={attr.id} value={attr.id}>
-                    {attr.name ?? attr}
-                  </SelectItem>
-                ))
-                : <SelectItem value="" disabled>Nenhum atributo</SelectItem>}
+              {activeSubcatObj.attributes.map((attr: any) => (
+                <SelectItem key={attr.id} value={attr.id}>
+                  {attr.name ?? attr}
+                </SelectItem>
+              ))}
             </SelectContent>
           </Select>
+        </div>
+      )}
+
+      {/* Caso NÃO tenha atributos, mostra aviso (pode tirar essa linha se quiser nada) */}
+      {activeSubcategoryId && activeSubcatObj && (!activeSubcatObj.attributes || activeSubcatObj.attributes.length === 0) && (
+        <div className="text-sm text-muted-foreground italic">
+          Esta subcategoria não possui atributos cadastrados.
         </div>
       )}
     </div>
