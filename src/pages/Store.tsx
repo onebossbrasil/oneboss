@@ -1,187 +1,100 @@
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { useSearchParams } from "react-router-dom";
-import Header from "@/components/Header";
-import Footer from "@/components/Footer";
-import StoreBanner from "@/components/store/StoreBanner";
-import SearchBar from "@/components/store/SearchBar";
-import FilterSidebar from "@/components/store/FilterSidebar";
-import ResultsHeader from "@/components/store/ResultsHeader";
-import ProductGrid from "@/components/store/ProductGrid";
-import FeaturedProductsSection from "@/components/FeaturedProductsSection";
 import { useProducts } from "@/contexts/ProductContext";
 import { useCategories } from "@/contexts/CategoryContext";
-import { FormattedProduct, Product } from "@/types/product";
-import { useToast } from "@/hooks/use-toast";
-import { AttributeType } from "@/types/category";
-
-// ATENÇÃO: Esta página já usa hooks para produtos/categorias vindos do Supabase.
-// Apenas garantimos filtrar só published e manter a Sidebar sempre dinâmica.
+import ProductCard from "@/components/ProductCard";
+import CategoryFilter from "@/components/store/CategoryFilter";
+import Pagination from "@/components/ui/pagination";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { Search } from "lucide-react";
+import { Product } from "@/types/product";
 
 const Store = () => {
-  const { toast } = useToast();
-  const [searchParams, setSearchParams] = useSearchParams();
-  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
-  // CHANGE 1: Use AttributeType[] instead of string[]
-  const [selectedSubcategories, setSelectedSubcategories] = useState<AttributeType[]>([]);
-  const [searchQuery, setSearchQuery] = useState("");
-  const [isMobileFiltersOpen, setIsMobileFiltersOpen] = useState(false);
-
-  const { products, isLoading } = useProducts();
+  const { products, isLoading, error } = useProducts();
   const { categories } = useCategories();
+  const [searchParams, setSearchParams] = useSearchParams();
+  const [searchTerm, setSearchTerm] = useState<string>(searchParams.get("search") || "");
+  const [selectedCategory, setSelectedCategory] = useState<string>(searchParams.get("category") || "");
+  const [currentPage, setCurrentPage] = useState<number>(Number(searchParams.get("page")) || 1);
+  const productsPerPage = 12;
 
-  // FILTRAR só produtos publicados explícitos (true)
-  const [filteredProducts, setFilteredProducts] = useState<Product[]>([]);
-
-  // Atualiza categoria vinda da URL, se houver
   useEffect(() => {
-    const categoryFromUrl = searchParams.get("categoria");
-    if (categoryFromUrl) {
-      setSelectedCategory(categoryFromUrl);
-    }
-  }, [searchParams]);
+    const newParams = new URLSearchParams();
+    if (searchTerm) newParams.set("search", searchTerm);
+    if (selectedCategory) newParams.set("category", selectedCategory);
+    if (currentPage > 1) newParams.set("page", currentPage.toString());
 
-  // Buscar ID real da categoria (por value <-> id do banco)
-  const getCategoryIdByValue = (value: string | null) => {
-    if (!value) return null;
-    const category = categories.find(cat => cat.value === value);
-    return category ? category.id.toString() : null;
+    setSearchParams(newParams);
+  }, [searchTerm, selectedCategory, currentPage, setSearchParams]);
+
+  const filteredProducts = products.filter(product => {
+    const searchMatch = product.name.toLowerCase().includes(searchTerm.toLowerCase());
+    const categoryMatch = selectedCategory ? product.categoryId === selectedCategory : true;
+    return searchMatch && categoryMatch;
+  });
+
+  const totalPages = Math.ceil(filteredProducts.length / productsPerPage);
+  const paginatedProducts = filteredProducts.slice((currentPage - 1) * productsPerPage, currentPage * productsPerPage);
+
+  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchTerm(e.target.value);
+    setCurrentPage(1);
   };
 
-  // FILTRAR produtos conforme os dados vindos do Supabase e estado dos filtros
-  useEffect(() => {
-    // Garante que só produtos published === true entram
-    let result = products.filter(product => product.published === true);
-
-    // Filtro: busca (query textual)
-    if (searchQuery) {
-      const query = searchQuery.toLowerCase();
-      result = result.filter(product =>
-        product.name.toLowerCase().includes(query) ||
-        (product.description && product.description.toLowerCase().includes(query)) ||
-        (product.shortDescription && product.shortDescription.toLowerCase().includes(query))
-      );
-    }
-
-    // Filtro: categoria (usar id real da categoria)
-    const selectedCategoryId = getCategoryIdByValue(selectedCategory);
-    if (selectedCategoryId) {
-      result = result.filter(product => product.categoryId === selectedCategoryId);
-    }
-
-    // Filtro: subcategorias (valores dinâmicos)
-    if (selectedSubcategories.length > 0) {
-      const selectedIds = selectedSubcategories.map(attr => attr.id);
-      result = result.filter(product => {
-        if (!product.subcategoryValues) return false;
-        const productValues = Object.values(product.subcategoryValues);
-        return selectedIds.some(selected => productValues.includes(selected));
-      });
-    }
-
-    setFilteredProducts(result);
-  }, [selectedCategory, selectedSubcategories, searchQuery, products, categories]);
-
-  // Atuação dos filtros do Sidebar são sempre baseados nas categorias reais do Supabase.
-  // Não há código hardcoded para subcategorias, tudo consumido do contexto.
-
-  // Toggle subcategoria
-  // CHANGE 2: Use AttributeType for toggling
-  const toggleSubcategory = (attr: AttributeType) => {
-    setSelectedSubcategories(prev =>
-      prev.some(a => a.id === attr.id)
-        ? prev.filter(a => a.id !== attr.id)
-        : [...prev, attr]
-    );
+  const handleCategoryChange = (category: string) => {
+    setSelectedCategory(category);
+    setCurrentPage(1);
   };
 
-  // Selecionar categoria
-  const handleCategorySelect = (categoryValue: string) => {
-    const newCategory = categoryValue === selectedCategory ? null : categoryValue;
-    setSelectedCategory(newCategory);
-    setSelectedSubcategories([]);
-
-    // Atualiza URL para manter sincronizado com a navegação
-    if (newCategory) {
-      searchParams.set("categoria", newCategory);
-    } else {
-      searchParams.delete("categoria");
-    }
-    setSearchParams(searchParams);
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
   };
 
-  // Resetar filtros
-  const resetFilters = () => {
-    setSelectedCategory(null);
-    setSelectedSubcategories([]);
-    setSearchQuery("");
-    searchParams.delete("categoria");
-    setSearchParams(searchParams);
-  };
-
-  // Mapeamento de produtos para formato do Grid
-  const formattedProducts: FormattedProduct[] = filteredProducts.map(product => ({
-    id: product.id,
-    name: product.name,
-    description: product.shortDescription || product.description,
-    price: typeof product.price === 'number'
-      ? new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(product.price)
-      : product.price + "",
-    salePrice: product.salePrice
-      ? new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(product.salePrice)
-      : undefined,
-    category: categories.find(cat => cat.id.toString() === product.categoryId)?.name || '',
-    subcategory: "", // subcategoryValues removido
-    imageUrl: product.images.length > 0 ? product.images[0].url : 'https://images.unsplash.com/photo-1567899378494-47b22a2ae96a?auto=format&fit=crop&q=80&w=600&h=400',
-    featured: product.featured,
-  }));
-
-  // Renderização principal
   return (
-    <div className="min-h-screen flex flex-col">
-      <Header />
-      <main className="flex-grow">
-        <StoreBanner />
-        <div className="container mx-auto px-4 py-8 md:py-12">
-          <SearchBar
-            searchQuery={searchQuery}
-            setSearchQuery={setSearchQuery}
-            toggleMobileFilters={() => setIsMobileFiltersOpen(!isMobileFiltersOpen)}
+    <div className="container mx-auto px-4 py-8">
+      <h1 className="text-2xl font-bold mb-4">Loja</h1>
+
+      <div className="flex flex-col md:flex-row items-center justify-between mb-4 gap-2">
+        <div className="flex items-center w-full md:w-auto">
+          <Input
+            type="search"
+            placeholder="Pesquisar produtos..."
+            value={searchTerm}
+            onChange={handleSearchChange}
+            className="w-full md:w-64"
           />
-          <div className="flex flex-col md:flex-row gap-6 md:gap-8">
-            <FilterSidebar
-              selectedCategory={selectedCategory}
-              selectedSubcategories={selectedSubcategories}
-              onCategorySelect={handleCategorySelect}
-              onSubcategoryToggle={toggleSubcategory}
-              isMobileFiltersOpen={isMobileFiltersOpen}
-              setIsMobileFiltersOpen={setIsMobileFiltersOpen}
-              resetFilters={resetFilters}
-              publishedProducts={filteredProducts}
-            />
-            <div className="flex-grow">
-              <ResultsHeader productCount={filteredProducts.length} />
-              {isLoading ? (
-                <div className="text-center py-12">
-                  <div className="animate-spin h-8 w-8 border-4 border-primary border-t-transparent rounded-full mx-auto"></div>
-                  <p className="mt-4 text-muted-foreground">Carregando produtos...</p>
-                </div>
-              ) : (
-                <ProductGrid
-                  products={formattedProducts}
-                  resetFilters={resetFilters}
-                />
-              )}
-            </div>
-          </div>
+          <Button variant="outline" size="icon" className="ml-2">
+            <Search className="h-4 w-4" />
+          </Button>
         </div>
-        {/* Mover sessão de destaque EXATAMENTE antes do Footer, fora do container da loja */}
-        <FeaturedProductsSection
-          title="Produtos em Destaque"
-          className="bg-zinc-50 dark:bg-zinc-900/50"
-          hideIfNone={true}
+
+        <CategoryFilter
+          categories={categories}
+          selectedCategory={selectedCategory}
+          onCategoryChange={handleCategoryChange}
         />
-      </main>
-      <Footer />
+      </div>
+
+      {isLoading ? (
+        <div className="text-center">Carregando produtos...</div>
+      ) : error ? (
+        <div className="text-red-500 text-center">Erro ao carregar produtos.</div>
+      ) : (
+        <>
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+            {paginatedProducts.map(product => (
+              <ProductCard key={product.id} product={product} />
+            ))}
+          </div>
+
+          <Pagination
+            currentPage={currentPage}
+            totalPages={totalPages}
+            onPageChange={handlePageChange}
+          />
+        </>
+      )}
     </div>
   );
 };

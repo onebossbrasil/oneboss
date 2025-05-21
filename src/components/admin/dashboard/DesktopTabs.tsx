@@ -1,7 +1,6 @@
-
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ProductProvider } from "@/contexts/ProductContext";
-import ProductForm from "../ProductForm";
+import ProductList from "../ProductList";
 import CategoryManager from "../CategoryManager";
 import LeadsManager from "../LeadsManager";
 import ManageCategoriesCard from "../products/ManageCategoriesCard";
@@ -27,8 +26,8 @@ const DesktopTabs = ({ activeTab, onTabChange }: DesktopTabsProps) => {
       {/* Wrap products related tabs with a single ProductProvider to avoid remounting */}
       <ProductProvider>
         <TabsContent value="produtos" className="space-y-4">
-          {/* Apenas o formulário/lista de produtos */}
-          <ProductForm />
+          {/* Trocar ProductForm por ProductList */}
+          <ProductList />
         </TabsContent>
         <TabsContent value="categorias" className="space-y-4">
           <CategoryManager />
