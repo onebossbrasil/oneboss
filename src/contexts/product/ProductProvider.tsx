@@ -1,4 +1,3 @@
-
 import React, { createContext, useContext, useEffect, useMemo, useCallback } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/contexts/AuthContext";
@@ -30,6 +29,14 @@ export const ProductProvider: React.FC<{ children: React.ReactNode }> = ({ child
     }
   }, [user]);
   
+  // Faz o carregamento inicial automático, mas apenas UMA vez
+  useEffect(() => {
+    console.log("ProductProvider: Carregando produtos automaticamente na montagem.");
+    fetchProducts(true);
+    // Não ouve por mudanças de foco (no refresh manual, apenas se usuário pedir ou CRUD)
+    // eslint-disable-next-line
+  }, []); // Executa apenas na MONTAGEM do Provider
+
   // Remover fetchProducts de montagem automática! (Carregamento inicial manual)
   // useEffect(() => {
   //   let isMounted = true;
