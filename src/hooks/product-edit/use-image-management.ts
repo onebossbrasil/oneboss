@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Product, ProductImage } from "@/types/product";
 
@@ -8,12 +7,11 @@ export const useImageManagement = (product: Product | null) => {
   const [deletedImageIds, setDeletedImageIds] = useState<string[]>([]);
 
   useEffect(() => {
-    // Sempre reseta previews corretamente ao receber novo produto
     if (product?.images) {
-      // Garante que todas do banco (não só 2) vão para o preview
+      // Agora SEMPRE traz todas imagens do banco para o preview (sem fatiar)
       setImagePreviewUrls(product.images.map(img => img.url));
       setImages([]); // Limpa uploads novos
-      setDeletedImageIds([]); // Limpa deleções pendentes
+      setDeletedImageIds([]);
       console.log("[useImageManagement] Imagens fresh do produto:", product.images.length, product.images);
     } else {
       setImagePreviewUrls([]);
@@ -26,7 +24,7 @@ export const useImageManagement = (product: Product | null) => {
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) {
       const newFiles = Array.from(e.target.files);
-      // Evita duplicidade só nos novos arquivos (user pode re-adicionar imagem igual)
+      // Evita duplicidade
       const uniqueNewFiles = newFiles.filter(newFile =>
         !images.some(existing => existing.name === newFile.name && existing.size === newFile.size)
       );

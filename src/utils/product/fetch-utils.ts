@@ -36,11 +36,11 @@ export const fetchProductsFromSupabase = async (): Promise<{ products: Product[]
       throw productsResult.error;
     }
 
-    // Busca todas imagens, sem limite
+    // Busca todas imagens, sem limite e SEM FILTRO DE QUANTIDADE
     const imagesPromise = supabase
       .from('product_images')
       .select('*')
-      .order('sort_order');
+      .order('sort_order', { ascending: true }); // Garante todas e ordena
     const imagesResult = await fetchWithTimeout(Promise.resolve(imagesPromise));
 
     if (imagesResult.error) {
@@ -62,7 +62,7 @@ export const fetchProductsFromSupabase = async (): Promise<{ products: Product[]
       });
     });
 
-    // Cria array final, agora garantindo todas imagens relacionadas
+    // Cria array final, garantindo todas imagens relacionadas (SEM FATIAR)
     const formattedProducts: Product[] = productsResult.data.map((product: any) => ({
       id: product.id,
       name: product.name,
@@ -77,6 +77,7 @@ export const fetchProductsFromSupabase = async (): Promise<{ products: Product[]
       featured: product.featured ?? false,
       published: product.published !== undefined ? product.published : true,
       stockQuantity: product.stock_quantity || 0,
+      // Aqui: SEM fatiar, pega todas as imagens já ordenadas
       images: (imagesByProduct[product.id] || []).sort((a, b) => (a.sortOrder ?? 0) - (b.sortOrder ?? 0)),
       createdAt: product.created_at,
       updatedAt: product.updated_at,

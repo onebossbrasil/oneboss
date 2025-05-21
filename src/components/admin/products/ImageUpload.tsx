@@ -22,8 +22,9 @@ const ImageUpload: React.FC<ImageUploadProps> = ({
 }) => {
   const isDisabled = false;
 
-  // Garantir preview completo: todas do banco (existingImages) + todas novas (seguindo ordenação dos previews!)
-  // A grid adapta conforme quantidade
+  // Calcula o número total de imagens (do banco + previews)
+  const hasImages = (existingImages.length > 0 || imagePreviewUrls.length > 0);
+
   return (
     <Card>
       <CardContent className="pt-6">
@@ -54,25 +55,26 @@ const ImageUpload: React.FC<ImageUploadProps> = ({
               </label>
             </div>
           </div>
-          {(imagePreviewUrls.length > 0 || existingImages.length > 0) && (
+          {hasImages && (
             <div>
               <h4 className="text-sm font-medium mb-2">Imagens adicionadas</h4>
               <div
-                className={`grid gap-4`}
+                className="grid gap-4"
                 style={{
                   gridTemplateColumns: `repeat(auto-fill, minmax(120px, 1fr))`
                 }}
               >
-                {/* Imagens do banco */}
+                {/* Imagens existentes no banco */}
                 {existingImages.map((image, index) => (
                   <div
                     key={`existing-${image.id}`}
-                    className="relative aspect-square border rounded-md overflow-hidden"
+                    className="relative aspect-square border rounded-md overflow-hidden bg-gray-50"
                   >
                     <img
                       src={image.url}
                       alt={`Imagem do produto ${index + 1}`}
                       className="w-full h-full object-cover"
+                      onError={e => { e.currentTarget.src = '/placeholder.svg'; }}
                     />
                     <Button
                       variant="destructive"
@@ -87,16 +89,17 @@ const ImageUpload: React.FC<ImageUploadProps> = ({
                     </Button>
                   </div>
                 ))}
-                {/* Previews das novas imagens */}
+                {/* Previews das novas imagens (sempre após as existentes, sem limite de quantidade) */}
                 {imagePreviewUrls.slice(existingImages.length).map((url, index) => (
                   <div
                     key={`new-${index}`}
-                    className="relative aspect-square border rounded-md overflow-hidden"
+                    className="relative aspect-square border rounded-md overflow-hidden bg-gray-50"
                   >
                     <img
                       src={url}
                       alt={`Nova imagem ${index + 1}`}
                       className="w-full h-full object-cover"
+                      onError={e => { e.currentTarget.src = '/placeholder.svg'; }}
                     />
                     <Button
                       variant="destructive"
