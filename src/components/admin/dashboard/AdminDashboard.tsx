@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { SidebarProvider } from "@/components/ui/sidebar";
 import AdminLayout from "@/components/admin/AdminLayout";
 import ProductList from "../products/ProductList";
@@ -21,9 +21,22 @@ const TABS = [
   { key: "parceiros", label: "Parceiros" },
 ];
 
+const LOCAL_STORAGE_KEY = "admin_dashboard_active_tab";
+
 const AdminDashboard = ({ onLogout }: AdminDashboardProps) => {
-  const [activeTab, setActiveTab] = useState("produtos");
+  // Inicializa com o valor salvo ou "produtos"
+  const [activeTab, setActiveTab] = useState(() => {
+    const saved = typeof window !== "undefined"
+      ? localStorage.getItem(LOCAL_STORAGE_KEY)
+      : null;
+    return saved && TABS.some(tab => tab.key === saved) ? saved : "produtos";
+  });
   const isMobile = useIsMobile();
+
+  // Salva o valor sempre que mudar
+  useEffect(() => {
+    localStorage.setItem(LOCAL_STORAGE_KEY, activeTab);
+  }, [activeTab]);
 
   if (isMobile) {
     // MOBILE LAYOUT
@@ -103,3 +116,4 @@ const AdminDashboard = ({ onLogout }: AdminDashboardProps) => {
 };
 
 export default AdminDashboard;
+
