@@ -1,11 +1,9 @@
-
 import React, { useState, useEffect } from "react";
 import { useSearchParams } from "react-router-dom";
 import { useProducts } from "@/contexts/ProductContext";
 import { useCategories } from "@/contexts/CategoryContext";
 import ProductCard from "@/components/ProductCard";
 import CategoryFilter from "@/components/store/CategoryFilter";
-import { Pagination } from "@/components/ui/pagination";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Search } from "lucide-react";
@@ -56,10 +54,14 @@ const Store = () => {
   function formatProduct(product: Product) {
     const categoryName =
       categories.find(cat => cat.id === product.categoryId)?.name || "";
-    const price =
-      typeof product.price === "number"
-        ? new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" }).format(product.price)
-        : product.price?.toString?.() || "";
+    let price: string;
+    if (typeof product.price === "number") {
+      price = new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" }).format(product.price);
+    } else if (typeof product.price === "string") {
+      price = product.price;
+    } else {
+      price = "";
+    }
     const imageUrl =
       product.images?.[0]?.url ||
       "https://images.unsplash.com/photo-1503376780353-7e6692767b70?auto=format&fit=crop&q=80&w=600&h=400";
@@ -79,10 +81,53 @@ const Store = () => {
     };
   }
 
+  // Custom simple pagination
+  const Pagination = ({
+    currentPage,
+    totalPages,
+    onPageChange
+  }: {
+    currentPage: number;
+    totalPages: number;
+    onPageChange: (page: number) => void;
+  }) => {
+    if (totalPages < 2) return null;
+    return (
+      <div className="flex justify-center mt-6 gap-2">
+        <button
+          className="rounded px-3 py-1 bg-gray-200 text-gray-700 disabled:opacity-50"
+          disabled={currentPage === 1}
+          onClick={() => onPageChange(currentPage - 1)}
+        >
+          Anterior
+        </button>
+        {[...Array(totalPages)].map((_, idx) => (
+          <button
+            key={idx}
+            className={`rounded px-3 py-1 ${currentPage === idx + 1
+              ? "bg-gold text-white"
+              : "bg-gray-200 text-gray-700"
+              }`}
+            onClick={() => onPageChange(idx + 1)}
+            disabled={currentPage === idx + 1}
+          >
+            {idx + 1}
+          </button>
+        ))}
+        <button
+          className="rounded px-3 py-1 bg-gray-200 text-gray-700 disabled:opacity-50"
+          disabled={currentPage === totalPages}
+          onClick={() => onPageChange(currentPage + 1)}
+        >
+          Próxima
+        </button>
+      </div>
+    );
+  };
+
   return (
     <div className="container mx-auto px-4 py-8">
       <h1 className="text-2xl font-bold mb-4">Loja</h1>
-
       <div className="flex flex-col md:flex-row items-center justify-between mb-4 gap-2">
         <div className="flex items-center w-full md:w-auto">
           <Input
@@ -114,7 +159,6 @@ const Store = () => {
               <ProductCard key={product.id} product={formatProduct(product)} />
             ))}
           </div>
-
           <Pagination
             currentPage={currentPage}
             totalPages={totalPages}

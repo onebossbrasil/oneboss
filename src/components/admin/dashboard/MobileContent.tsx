@@ -1,7 +1,7 @@
 
 import { ChevronLeft } from "lucide-react";
 import { ProductProvider } from "@/contexts/ProductContext";
-import ProductForm from "../ProductForm";
+import ProductList from "../products/ProductList";
 import CategoryManager from "../CategoryManager";
 import { CategoryProvider } from "@/contexts/CategoryContext";
 import LeadsManager from "../LeadsManager";
@@ -25,7 +25,7 @@ const MobileContent = ({ activeTab }: MobileContentProps) => {
         </h2>
       </div>
       <ProductProvider>
-        {activeTab === "produtos" && <ProductForm />}
+        {activeTab === "produtos" && <ProductList />}
       </ProductProvider>
       {activeTab === "categorias" && (
         <CategoryProvider>
