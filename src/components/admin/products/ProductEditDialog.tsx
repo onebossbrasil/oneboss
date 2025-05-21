@@ -149,12 +149,6 @@ const ProductEditDialog = ({ product, open, onOpenChange, onClose }: ProductEdit
                 isSubmitting={isSubmitting} 
               />
             </form>
-            {/* Painel de debug visual */}
-            <CategoryDebugPanel
-              selectedCategory={selectedCategory}
-              selectedSubcategoryId={selectedSubcategoryId}
-              selectedAttributeId={selectedAttributeId}
-            />
           </>
         )}
       </DialogContent>
