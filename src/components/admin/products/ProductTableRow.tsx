@@ -1,5 +1,5 @@
 
-import { Eye, EyeOff, Edit, Trash2 } from "lucide-react";
+import { Eye, EyeOff, Edit, Trash2, ImageOff } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { TableCell, TableRow } from "@/components/ui/table";
 import { Product } from "@/types/product";
@@ -28,33 +28,8 @@ const ProductTableRow = ({
   const [isToggling, setIsToggling] = useState(false);
   const fallbackImg = "/placeholder.svg";
 
-  // Diagnóstico completo
-  console.log("[ProductTableRow] product.id:", product?.id, "product.images:", product?.images);
-
-  /**
-   * Seleciona sempre a primeira imagem válida.
-   */
-  let imageUrl: string | null = null;
-  let imageReason: string = "";
-  if (Array.isArray(product?.images)) {
-    if (product.images.length > 0) {
-      const validImgs = product.images.filter((img) =>
-        img && typeof img.url === "string" && img.url.trim() !== ""
-      );
-      if (validImgs.length > 0) {
-        imageUrl = validImgs[0].url;
-      } else {
-        imageReason = "Imagens do array são inválidas (url vazia ou tipo errado)";
-      }
-    } else {
-      imageReason = "Array de imagens está vazio";
-    }
-  } else {
-    imageReason = "product.images não é um array";
-  }
-
-  // Log visual
-  console.log("[ProductTableRow] imageUrl selecionada:", imageUrl, "Motivo se ausente:", imageReason);
+  // Diagnóstico detalhado
+  console.log("[ProductTableRow-DIAG] product.id:", product?.id, "product.images:", product?.images);
 
   const handleVisibilityToggle = async (product: Product) => {
     setIsToggling(true);
@@ -62,7 +37,6 @@ const ProductTableRow = ({
       await updateProduct(product.id, {
         published: !product.published,
       });
-
       toast({
         title: product.published ? "Produto ocultado" : "Produto publicado",
         description: `${product.name} ${
@@ -76,6 +50,9 @@ const ProductTableRow = ({
     }
   };
 
+  // Badge de contagem imagens
+  const totalImagens = Array.isArray(product?.images) ? product.images.length : 0;
+
   return (
     <TableRow
       className={isSelectedToDelete ? "bg-red-50 dark:bg-red-900/20" : ""}
@@ -83,25 +60,37 @@ const ProductTableRow = ({
     >
       <TableCell className="text-center">{selectionCheckbox}</TableCell>
       <TableCell>
-        {imageUrl ? (
-          <img
-            src={imageUrl}
-            alt={product.name}
-            className="w-16 h-16 object-cover rounded-lg"
-            style={{ minWidth: 52, minHeight: 52 }}
-            onError={(e) => {
-              e.currentTarget.onerror = null;
-              e.currentTarget.src = fallbackImg;
-            }}
-          />
-        ) : (
-          <div className="w-16 h-16 bg-muted rounded-lg flex items-center justify-center text-xs text-muted-foreground border border-dashed flex-col">
-            <span>Nenhuma imagem</span>
-            {imageReason && (
-              <span className="text-red-600 block text-[10px]">{imageReason}</span>
-            )}
-          </div>
-        )}
+        <div className="flex gap-1">
+          {totalImagens > 0 ? (
+            product.images.map((img, index) => (
+              <div key={img.id} className="relative">
+                <img
+                  src={img.url}
+                  alt={`Imagem ${index + 1} de ${product.name}`}
+                  className="w-10 h-10 object-cover rounded border"
+                  style={{ minWidth: 40, minHeight: 40 }}
+                  onError={e => {
+                    e.currentTarget.onerror = null;
+                    e.currentTarget.src = fallbackImg;
+                  }}
+                />
+              </div>
+            ))
+          ) : (
+            <div className="w-16 h-16 bg-muted rounded-lg flex items-center justify-center text-xs text-muted-foreground border border-dashed flex-col">
+              <ImageOff className="w-6 h-6 mb-1 text-red-400" />
+              <span>Nenhuma imagem</span>
+            </div>
+          )}
+          {/* Badge de contagem */}
+          <span className="ml-2 px-2 py-0.5 rounded bg-gray-200 text-gray-700 text-xs h-fit self-start">{totalImagens} img</span>
+        </div>
+        {/* Diagnóstico visual */}
+        <div className="mt-1 w-40 max-w-xs overflow-x-auto">
+          <pre className="text-[10px] bg-gray-50 text-gray-400 border p-1 rounded">{
+            JSON.stringify(product.images, null, 2)
+          }</pre>
+        </div>
       </TableCell>
       <TableCell className="font-medium min-w-[220px] max-w-[360px] whitespace-nowrap overflow-hidden text-ellipsis group relative">
         <span
@@ -147,3 +136,4 @@ const ProductTableRow = ({
 };
 
 export default ProductTableRow;
+

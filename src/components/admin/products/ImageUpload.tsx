@@ -1,7 +1,8 @@
+
 import React from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { Upload, X } from "lucide-react";
+import { Upload, X, ImageOff } from "lucide-react";
 import { ProductImage } from "@/types/product";
 
 interface ImageUploadProps {
@@ -23,7 +24,7 @@ const ImageUpload: React.FC<ImageUploadProps> = ({
   const fallbackImg = "/placeholder.svg";
 
   // Diagnóstico: mostrar todas imagens persistidas
-  console.log("[ImageUpload] existingImages do modal:", existingImages);
+  console.log("[ImageUpload-DIAG] existingImages:", existingImages);
 
   // Sempre filtra imagens com url válida
   const validExistingImages =
@@ -37,15 +38,8 @@ const ImageUpload: React.FC<ImageUploadProps> = ({
       : [];
   const hasImages = (validExistingImages.length > 0 || imagePreviewUrls.length > 0);
 
-  // Diagnóstico visual extra
-  if (!hasImages) {
-    console.warn(
-      "[ImageUpload] Nenhuma imagem existente, nem preview local -- EXISTING:",
-      existingImages,
-      "PREVIEW URLs:",
-      imagePreviewUrls
-    );
-  }
+  // Badge contagem imagens exibidas (persistidas + upload local)
+  const totalImagens = validExistingImages.length + images.length;
 
   return (
     <Card>
@@ -78,13 +72,18 @@ const ImageUpload: React.FC<ImageUploadProps> = ({
             </div>
           </div>
           {!hasImages && (
-            <div className="text-red-700 text-xs py-2">
-              Nenhuma imagem disponível para este produto do banco ou local. Verifique o cadastro ou upload.
+            <div className="text-red-700 text-xs py-2 flex items-center gap-2">
+              <ImageOff className="w-4 h-4" /> Nenhuma imagem disponível para este produto do banco ou local. Verifique o cadastro ou upload.
             </div>
           )}
           {hasImages && (
             <div>
               <h4 className="text-sm font-medium mb-2">Imagens adicionadas</h4>
+              <div className="flex gap-2 items-center mb-2">
+                <span className="inline-block px-2 py-0.5 rounded-full bg-gray-200 text-gray-700 text-xs border">
+                  {totalImagens} imagem(ns) exibidas
+                </span>
+              </div>
               <div
                 className="grid gap-4"
                 style={{
@@ -142,9 +141,10 @@ const ImageUpload: React.FC<ImageUploadProps> = ({
                   </div>
                 ))}
               </div>
-              <div className="text-xs text-muted-foreground mt-2">
-                {validExistingImages.length + images.length} imagem(ns) no total.
-              </div>
+              {/* Diagnóstico visual total */}
+              <pre className="text-[10px] bg-gray-50 text-gray-400 border p-1 rounded mt-2 max-w-full overflow-x-auto">
+                {JSON.stringify(validExistingImages, null, 2)}
+              </pre>
             </div>
           )}
         </div>
@@ -154,3 +154,4 @@ const ImageUpload: React.FC<ImageUploadProps> = ({
 };
 
 export default ImageUpload;
+
