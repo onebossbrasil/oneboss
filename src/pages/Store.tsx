@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useSearchParams } from "react-router-dom";
 import Header from "@/components/Header";
@@ -131,7 +130,7 @@ const Store = () => {
       ? new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(product.salePrice)
       : undefined,
     category: categories.find(cat => cat.id.toString() === product.categoryId)?.name || '',
-    subcategory: Object.values(product.subcategoryValues || {}).join(', '),
+    subcategory: "", // subcategoryValues removido
     imageUrl: product.images.length > 0 ? product.images[0].url : 'https://images.unsplash.com/photo-1567899378494-47b22a2ae96a?auto=format&fit=crop&q=80&w=600&h=400',
     featured: product.featured,
   }));
@@ -188,4 +187,3 @@ const Store = () => {
 };
 
 export default Store;
-

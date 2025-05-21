@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
@@ -25,7 +24,6 @@ export const useAddProduct = () => {
         price: product.price,
         sale_price: product.salePrice ?? null,
         category_id: product.categoryId,
-        subcategory_values: product.subcategoryValues ?? {},
         featured: product.featured,
         published: product.published,
         stock_quantity: product.stockQuantity

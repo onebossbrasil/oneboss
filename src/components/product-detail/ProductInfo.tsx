@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Product } from "@/types/product";
 import { Button } from "@/components/ui/button";
@@ -124,10 +123,7 @@ const ProductInfo = ({
           {product.categoryId && <div className="grid grid-cols-3">
               <dt className="font-medium text-muted-foreground">Categoria:</dt>
               <dd className="col-span-2">
-                {Object.entries(product.subcategoryValues || {}).length > 0 ? Object.entries(product.subcategoryValues).map(([key, value]) => <div key={key} className="mb-1">
-                        <span className="capitalize">{key.replace('_', ' ')}: </span> 
-                        <span className="font-medium">{value}</span>
-                      </div>) : "Não especificada"}
+                Não especificada
               </dd>
             </div>}
           {product.stockQuantity > 0 && <div className="grid grid-cols-3">

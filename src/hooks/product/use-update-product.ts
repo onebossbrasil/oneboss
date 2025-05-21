@@ -30,7 +30,6 @@ export const useUpdateProduct = () => {
       if (productData.categoryId !== undefined) updateData.category_id = productData.categoryId;
       if (productData.subcategoryId !== undefined) updateData.subcategory_id = productData.subcategoryId;   // <-- UUID
       if (productData.attributeId !== undefined) updateData.attribute_id = productData.attributeId;         // <-- UUID
-      if (productData.subcategoryValues !== undefined) updateData.subcategory_values = productData.subcategoryValues;
       if (productData.featured !== undefined) updateData.featured = productData.featured;
       if (productData.published !== undefined) updateData.published = productData.published;
       if (productData.stockQuantity !== undefined) updateData.stock_quantity = productData.stockQuantity;

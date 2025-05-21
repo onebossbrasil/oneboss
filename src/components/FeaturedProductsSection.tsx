@@ -28,7 +28,7 @@ const FeaturedProductsSection: React.FC<FeaturedProductsSectionProps> = ({
       ? new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(product.salePrice)
       : undefined,
     category: categories.find(cat => cat.id.toString() === product.categoryId)?.name || '',
-    subcategory: Object.values(product.subcategoryValues || {}).join(', '),
+    subcategory: "", // subcategoryValues removed; leave blank or adapt as needed
     imageUrl: product.images.length > 0
       ? product.images[0].url
       : 'https://images.unsplash.com/photo-1503376780353-7e6692767b70?auto=format&fit=crop&q=80&w=600&h=400',

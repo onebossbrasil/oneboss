@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Product } from "@/types/product";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -64,14 +63,6 @@ const ProductDescription = ({ product }: ProductDescriptionProps) => {
                       </td>
                     </tr>
                   )}
-                  {Object.entries(product.subcategoryValues || {}).map(([key, value]) => (
-                    <tr key={key} className="divide-x">
-                      <th className="p-3 text-left bg-muted/50 w-1/3 font-medium capitalize">
-                        {key.replace('_', ' ')}
-                      </th>
-                      <td className="p-3">{value}</td>
-                    </tr>
-                  ))}
                 </tbody>
               </table>
             </div>

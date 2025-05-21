@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Filter, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -51,8 +50,7 @@ const FilterSidebar = ({
         const activeAttributes = subcat.attributes.filter((attr: AttributeType) =>
           publishedProducts.some(
             (product) =>
-              product.subcategoryValues &&
-              Object.values(product.subcategoryValues).includes(attr.id)
+              false // subcategoryValues removido; nunca há valores vinculados
           )
         );
         // Only return subcategory if there is at least 1 active attribute
@@ -136,4 +134,3 @@ const FilterSidebar = ({
 };
 
 export default FilterSidebar;
-
