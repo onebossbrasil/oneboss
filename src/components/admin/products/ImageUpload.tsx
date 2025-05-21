@@ -1,4 +1,3 @@
-
 import React from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -141,10 +140,6 @@ const ImageUpload: React.FC<ImageUploadProps> = ({
                   </div>
                 ))}
               </div>
-              {/* Diagnóstico visual total */}
-              <pre className="text-[10px] bg-gray-50 text-gray-400 border p-1 rounded mt-2 max-w-full overflow-x-auto">
-                {JSON.stringify(validExistingImages, null, 2)}
-              </pre>
             </div>
           )}
         </div>
@@ -154,4 +149,3 @@ const ImageUpload: React.FC<ImageUploadProps> = ({
 };
 
 export default ImageUpload;
-

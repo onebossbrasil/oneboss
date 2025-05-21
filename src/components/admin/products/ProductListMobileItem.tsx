@@ -1,4 +1,3 @@
-
 import { Product } from "@/types/product";
 import ProductVisibilityButton from "./ProductVisibilityButton";
 import { Button } from "@/components/ui/button";
@@ -56,10 +55,6 @@ const ProductListMobileItem = ({
             {/* Badge contagem */}
             <span className="ml-1 px-2 py-0.5 rounded bg-gray-200 text-gray-700 text-xs h-fit self-start">{totalImagens} img</span>
           </div>
-          {/* Diagnóstico visual */}
-          <pre className="text-[10px] bg-gray-50 text-gray-400 border p-1 rounded mt-1 max-w-[140px] overflow-x-auto">
-            {JSON.stringify(product.images, null, 2)}
-          </pre>
         </div>
         <div className="flex flex-col flex-1 justify-center min-w-0">
           <div className="font-medium text-base truncate" title={product.name}>

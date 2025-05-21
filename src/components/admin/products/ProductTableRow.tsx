@@ -1,4 +1,3 @@
-
 import { Eye, EyeOff, Edit, Trash2, ImageOff } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { TableCell, TableRow } from "@/components/ui/table";
@@ -85,12 +84,6 @@ const ProductTableRow = ({
           {/* Badge de contagem */}
           <span className="ml-2 px-2 py-0.5 rounded bg-gray-200 text-gray-700 text-xs h-fit self-start">{totalImagens} img</span>
         </div>
-        {/* Diagnóstico visual */}
-        <div className="mt-1 w-40 max-w-xs overflow-x-auto">
-          <pre className="text-[10px] bg-gray-50 text-gray-400 border p-1 rounded">{
-            JSON.stringify(product.images, null, 2)
-          }</pre>
-        </div>
       </TableCell>
       <TableCell className="font-medium min-w-[220px] max-w-[360px] whitespace-nowrap overflow-hidden text-ellipsis group relative">
         <span
@@ -136,4 +129,3 @@ const ProductTableRow = ({
 };
 
 export default ProductTableRow;
-
