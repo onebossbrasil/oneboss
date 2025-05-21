@@ -23,9 +23,9 @@ export const useProductEdit = (
   const [selectedSubcategoryId, setSelectedSubcategoryId] = useState<string | null>(product?.subcategoryId ?? null);
   const [selectedAttributeId, setSelectedAttributeId] = useState<string | null>(product?.attributeId ?? null);
 
-  // Sincroniza selects com o produto e categorias carregadas
+  // Sincroniza selects com o produto E categorias carregadas
   useEffect(() => {
-    // Só muda se estiver em modo edição
+    // Só executa se o produto mudou (edição)
     if (product) {
       setFormData({
         name: product.name,
@@ -37,6 +37,7 @@ export const useProductEdit = (
         published: product.published,
         featured: product.featured
       });
+      // Mantém SEMPRE os valores originais do produto
       setSelectedCategory(product.categoryId ?? "");
       setSelectedSubcategoryId(product.subcategoryId ?? null);
       setSelectedAttributeId(product.attributeId ?? null);
@@ -56,23 +57,20 @@ export const useProductEdit = (
       const cat = categories.find(cat => cat.id === product.categoryId);
       if (cat) {
         setSelectedCategory(product.categoryId ?? "");
-        // Busca subcategoria válida
         const subcat = cat.subcategories.find(sc => sc.id === product.subcategoryId);
         if (subcat) {
           setSelectedSubcategoryId(product.subcategoryId ?? null);
-          // Busca atributo válido
+          // Busca e só atualiza selectedAttributeId se a id ainda existir na lista
           const attr = subcat.attributes.find(at => at.id === product.attributeId);
           if (attr) {
             setSelectedAttributeId(product.attributeId ?? null);
-            // Garante que o valor correto venha selecionado 
             console.log("[useProductEdit] IDs sincronizados:", {
               categoria: cat.name, subcat: subcat.name, atributo: attr.name
             });
           } else if (subcat.attributes.length > 0) {
-            // Se atributo salvo não existe mas outros existem, seleciona o primeiro deles
-            setSelectedAttributeId(subcat.attributes[0].id);
+            setSelectedAttributeId(subcat.attributes[0].id); // Seleciona primeiro atributo válido
           } else {
-            setSelectedAttributeId(null); // Atributo não existe mais
+            setSelectedAttributeId(null);
           }
         } else {
           setSelectedSubcategoryId(null);
@@ -90,14 +88,14 @@ export const useProductEdit = (
   // --- Handlers principais ---
   const handleCategoryChange = (categoryId: string) => {
     setSelectedCategory(categoryId);
-    setSelectedSubcategoryId(null); // Reseta subcategoria ao trocar categoria
-    setSelectedAttributeId(null);   // Reseta atributo
+    setSelectedSubcategoryId(null);
+    setSelectedAttributeId(null);
     console.log("[useProductEdit] Categoria alterada:", categoryId);
   };
 
   const handleSubcategoryIdChange = (subcategoryId: string | null) => {
     setSelectedSubcategoryId(subcategoryId);
-    setSelectedAttributeId(null); // reset atributo ao trocar subcat
+    setSelectedAttributeId(null);
     console.log("[useProductEdit] setSelectedSubcategoryId:", subcategoryId);
   };
 

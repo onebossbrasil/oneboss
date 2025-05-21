@@ -28,8 +28,8 @@ const CategorySelectorContent = ({
 }: CategorySelectorProps) => {
   const { categories, isLoading, error } = useCategories();
 
-  // O valor selecionado é SEMPRE o id (uuid) da subcategoria
   const category = categories.find(cat => cat.id === selectedCategory);
+  // Manter activeSubcategoryId local apenas se não vier por prop
   const [activeSubcategoryId, setActiveSubcategoryId] = useState<string | null>(selectedSubcategoryId ?? null);
 
   // Sincronizar com prop corretamente pelos UUIDs sempre!
@@ -42,22 +42,22 @@ const CategorySelectorContent = ({
     sc => sc.id === activeSubcategoryId
   );
 
-  // Notifica mudança por ID
+  // Sempre que activeSubcategoryId mudar, notifica o parent
   useEffect(() => {
     if (onSubcategoryIdChange) {
       onSubcategoryIdChange(activeSubcategoryId);
     }
-  }, [activeSubcategoryId]);
-
-  // Notifica alteração dos atributos via prop sempre por UUID
-  useEffect(() => {
-    if (onAttributeIdChange && activeSubcatObj && activeSubcategoryId) {
-      const firstAttr = activeSubcatObj.attributes.length > 0 ? activeSubcatObj.attributes[0].id : null;
-      onAttributeIdChange(firstAttr);
-    } else if (onAttributeIdChange && !activeSubcategoryId) {
-      onAttributeIdChange(null);
+    // Ao mudar subcategoria, se já estamos em uma nova subcategoria e existe atributo, seleciona o primeiro SOMENTE se selectedAttributeId for null/undefined.
+    if (
+      onAttributeIdChange &&
+      activeSubcatObj &&
+      activeSubcategoryId &&
+      activeSubcatObj.attributes.length > 0 &&
+      (!selectedAttributeId || !activeSubcatObj.attributes.some(a => a.id === selectedAttributeId))
+    ) {
+      onAttributeIdChange(activeSubcatObj.attributes[0].id);
     }
-  }, [activeSubcatObj, onAttributeIdChange, activeSubcategoryId]);
+  }, [activeSubcategoryId, activeSubcatObj, onSubcategoryIdChange]);
 
   if (isLoading) {
     return <div className="space-y-4">Carregando categorias...</div>;
@@ -75,6 +75,8 @@ const CategorySelectorContent = ({
           onValueChange={(catId) => {
             onCategoryChange(catId);
             setActiveSubcategoryId(null);
+            if (onSubcategoryIdChange) onSubcategoryIdChange(null);
+            if (onAttributeIdChange) onAttributeIdChange(null);
           }}
           value={selectedCategory}
           disabled={categories.length === 0}
@@ -102,7 +104,7 @@ const CategorySelectorContent = ({
             onValueChange={(subcatId) => {
               setActiveSubcategoryId(subcatId);
               if (onSubcategoryIdChange) onSubcategoryIdChange(subcatId);
-              // Não resetar atributo aqui: a lógica do atributo será via renderização/efeito novo
+              // Somente reseta atributo se a subcategoria mudou de fato
               if (onAttributeIdChange) onAttributeIdChange(null);
             }}
             value={activeSubcategoryId ?? ""}
@@ -135,6 +137,7 @@ const CategorySelectorContent = ({
                 onAttributeIdChange(attributeId);
               }
             }}
+            // Corrigir - Seleciona pelo id do atributo recebido por prop!
             value={selectedAttributeId ?? ""}
           >
             <SelectTrigger>
@@ -145,7 +148,7 @@ const CategorySelectorContent = ({
             <SelectContent>
               {activeSubcatObj.attributes.map((attr: any) => (
                 <SelectItem key={attr.id} value={attr.id}>
-                  {attr.name ?? attr}
+                  {attr.name}
                 </SelectItem>
               ))}
             </SelectContent>
