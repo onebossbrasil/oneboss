@@ -1,3 +1,4 @@
+
 import { Product } from "@/types/product";
 import ProductVisibilityButton from "./ProductVisibilityButton";
 import { Button } from "@/components/ui/button";
@@ -21,9 +22,9 @@ const ProductListMobileItem = ({
   onSelectDelete,
   isSelectedToDelete,
 }: ProductListMobileItemProps) => {
-  // Badge de contagem imagens
-  const totalImagens = Array.isArray(product?.images) ? product.images.length : 0;
   const fallbackImg = "/placeholder.svg";
+  const hasImg = Array.isArray(product?.images) && product.images.length > 0;
+  const imgUrl = hasImg ? product.images[0].url : "";
 
   return (
     <li className={`rounded-xl border shadow bg-white relative ${isSelectedToDelete ? "border-red-300 bg-red-50" : "border-gray-200"}`}>
@@ -36,24 +37,22 @@ const ProductListMobileItem = ({
         </div>
         <div className="flex flex-col items-center">
           <div className="flex gap-1 overflow-x-auto max-w-[140px]">
-            {totalImagens > 0 ? (
-              product.images.map((img, i) => (
-                <img
-                  key={img.id}
-                  src={img.url}
-                  alt={`Imagem ${i + 1} de ${product.name}`}
-                  className="w-10 h-10 object-cover rounded border"
-                  onError={e => { e.currentTarget.onerror = null; e.currentTarget.src = fallbackImg; }}
-                />
-              ))
+            {hasImg ? (
+              <img
+                src={imgUrl}
+                alt={`Imagem de ${product.name}`}
+                className="w-10 h-10 object-cover rounded border"
+                onError={e => {
+                  console.error("Erro ao carregar imagem:", imgUrl, e.nativeEvent);
+                  (e.currentTarget as HTMLImageElement).src = fallbackImg;
+                }}
+              />
             ) : (
               <div className="w-16 h-16 rounded-lg flex items-center justify-center text-xs text-muted-foreground bg-muted flex-col border">
                 <ImageOff className="w-6 h-6 mb-1 text-red-400" />
                 Sem imagem
               </div>
             )}
-            {/* Badge contagem */}
-            <span className="ml-1 px-2 py-0.5 rounded bg-gray-200 text-gray-700 text-xs h-fit self-start">{totalImagens} img</span>
           </div>
         </div>
         <div className="flex flex-col flex-1 justify-center min-w-0">

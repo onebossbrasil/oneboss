@@ -1,3 +1,4 @@
+
 import { Eye, EyeOff, Edit, Trash2, ImageOff } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { TableCell, TableRow } from "@/components/ui/table";
@@ -27,9 +28,6 @@ const ProductTableRow = ({
   const [isToggling, setIsToggling] = useState(false);
   const fallbackImg = "/placeholder.svg";
 
-  // Diagnóstico detalhado
-  console.log("[ProductTableRow-DIAG] product.id:", product?.id, "product.images:", product?.images);
-
   const handleVisibilityToggle = async (product: Product) => {
     setIsToggling(true);
     try {
@@ -49,8 +47,8 @@ const ProductTableRow = ({
     }
   };
 
-  // Badge de contagem imagens
-  const totalImagens = Array.isArray(product?.images) ? product.images.length : 0;
+  const hasImg = Array.isArray(product?.images) && product.images.length > 0;
+  const imgUrl = hasImg ? product.images[0].url : "";
 
   return (
     <TableRow
@@ -59,31 +57,23 @@ const ProductTableRow = ({
     >
       <TableCell className="text-center">{selectionCheckbox}</TableCell>
       <TableCell>
-        <div className="flex gap-1">
-          {totalImagens > 0 ? (
-            product.images.map((img, index) => (
-              <div key={img.id} className="relative">
-                <img
-                  src={img.url}
-                  alt={`Imagem ${index + 1} de ${product.name}`}
-                  className="w-10 h-10 object-cover rounded border"
-                  style={{ minWidth: 40, minHeight: 40 }}
-                  onError={e => {
-                    e.currentTarget.onerror = null;
-                    e.currentTarget.src = fallbackImg;
-                  }}
-                />
-              </div>
-            ))
-          ) : (
-            <div className="w-16 h-16 bg-muted rounded-lg flex items-center justify-center text-xs text-muted-foreground border border-dashed flex-col">
-              <ImageOff className="w-6 h-6 mb-1 text-red-400" />
-              <span>Nenhuma imagem</span>
-            </div>
-          )}
-          {/* Badge de contagem */}
-          <span className="ml-2 px-2 py-0.5 rounded bg-gray-200 text-gray-700 text-xs h-fit self-start">{totalImagens} img</span>
-        </div>
+        {hasImg ? (
+          <img
+            src={imgUrl}
+            alt={`Imagem de ${product.name}`}
+            className="w-10 h-10 object-cover rounded border"
+            style={{ minWidth: 40, minHeight: 40 }}
+            onError={e => {
+              console.error("Erro ao carregar imagem:", imgUrl, e.nativeEvent);
+              (e.currentTarget as HTMLImageElement).src = fallbackImg;
+            }}
+          />
+        ) : (
+          <div className="w-16 h-16 bg-muted rounded-lg flex items-center justify-center text-xs text-muted-foreground border border-dashed flex-col">
+            <ImageOff className="w-6 h-6 mb-1 text-red-400" />
+            <span>Nenhuma imagem</span>
+          </div>
+        )}
       </TableCell>
       <TableCell className="font-medium min-w-[220px] max-w-[360px] whitespace-nowrap overflow-hidden text-ellipsis group relative">
         <span
