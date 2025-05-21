@@ -1,3 +1,4 @@
+
 import { useToast } from "@/hooks/use-toast";
 import {
   createSubcategory,
@@ -15,9 +16,9 @@ export function useSubcategoryMutations(
     try {
       setIsLoading(true);
       await createSubcategory(categoryId, name, type);
-      // Forçar fetch com "force = true"
+      // Forçar fetch removido argumento incorreto
       if (fetchCategories) {
-        await fetchCategories(true);
+        await fetchCategories();
       }
       toast({
         title: 'Subcategoria adicionada',
@@ -48,7 +49,7 @@ export function useSubcategoryMutations(
     try {
       setIsLoading(true);
       await deleteSubcategory(subcategoryId as any);
-      await fetchCategories(true); // força após remoção também!
+      await fetchCategories(); // removido argumento incorreto
       toast({
         title: 'Subcategoria removida',
         description: 'A subcategoria foi removida com sucesso.',

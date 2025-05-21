@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { SidebarProvider } from "@/components/ui/sidebar";
 import AdminLayout from "@/components/admin/AdminLayout";
@@ -6,6 +7,7 @@ import CategoryManager from "../CategoryManager";
 import LeadsManager from "../LeadsManager";
 import AdminPartnerManager from "../partners/AdminPartnerManager";
 import { ProductProvider } from "@/contexts/product";
+import { CategoryProvider } from "@/contexts/CategoryContext";
 import { useIsMobile } from "@/hooks/useIsMobile";
 
 interface AdminDashboardProps {
