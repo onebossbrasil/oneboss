@@ -30,17 +30,17 @@ export const ProductProvider: React.FC<{ children: React.ReactNode }> = ({ child
     }
   }, [user]);
   
-  // Always fetch products regardless of authentication status
-  useEffect(() => {
-    let isMounted = true;
-    if (isMounted) {
-      console.log("ProductProvider requesting fetchProducts: Initial");
-      fetchProducts();
-    }
-    return () => {
-      isMounted = false;
-    };
-  }, [fetchProducts]);
+  // Remover fetchProducts de montagem automática! (Carregamento inicial manual)
+  // useEffect(() => {
+  //   let isMounted = true;
+  //   if (isMounted) {
+  //     console.log("ProductProvider requesting fetchProducts: Initial");
+  //     fetchProducts();
+  //   }
+  //   return () => {
+  //     isMounted = false;
+  //   };
+  // }, [fetchProducts]);
 
   // Stable refreshProducts function with force parameter
   const refreshProducts = useCallback(async (force = true) => {
@@ -94,6 +94,7 @@ export const ProductProvider: React.FC<{ children: React.ReactNode }> = ({ child
       }
       console.log("[ProductProvider] Atualizando produto como:", user.email, "ProductId:", id);
       await updateProductOperation(id, productData, newImages);
+      // Só atualiza a lista após confirmação do Supabase!
       console.log("[ProductProvider] Produto atualizado no Supabase, agora refrescando lista...");
       await refreshProducts(true); // <--- aguarda atualizar lista!
       toast({
