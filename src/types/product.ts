@@ -1,4 +1,3 @@
-
 export type ProductImage = {
   id: string;
   url: string;
@@ -16,7 +15,6 @@ export type Product = {
   // NOVOS CAMPOS RELACIONADOS COM IDs
   subcategoryId?: string | null;
   attributeId?: string | null;
-  subcategoryValues: Record<string, string>;
   published: boolean;
   featured: boolean;
   stockQuantity: number;

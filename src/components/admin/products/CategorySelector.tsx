@@ -49,15 +49,15 @@ const CategorySelectorContent = ({
 
   // Notifica alteração dos atributos via prop sempre por UUID
   useEffect(() => {
-    if (onAttributeIdChange && activeSubcatObj && subcategoryValues[activeSubcategoryId || ""]) {
-      const attributeSelected = subcategoryValues[activeSubcategoryId || ""];
-      if (attributeSelected) onAttributeIdChange(attributeSelected);
-      else onAttributeIdChange(null);
-    } else if (onAttributeIdChange && !subcategoryValues[activeSubcategoryId || ""]) {
+    if (onAttributeIdChange && activeSubcatObj && activeSubcategoryId) {
+      // BUSCA PRIMEIRO ATRIBUTO DISPONÍVEL AO TROCAR SUBCATEGORIA
+      const firstAttr = activeSubcatObj.attributes.length > 0 ? activeSubcatObj.attributes[0].id : null;
+      onAttributeIdChange(firstAttr);
+    } else if (onAttributeIdChange && !activeSubcategoryId) {
       onAttributeIdChange(null);
     }
     // eslint-disable-next-line
-  }, [subcategoryValues, activeSubcatObj, activeSubcategoryId, onAttributeIdChange]);
+  }, [activeSubcatObj, onAttributeIdChange, activeSubcategoryId]);
 
   if (isLoading) {
     return <div className="space-y-4">Carregando categorias...</div>;
@@ -102,6 +102,7 @@ const CategorySelectorContent = ({
             onValueChange={(subcatId) => {
               setActiveSubcategoryId(subcatId);
               if (onSubcategoryIdChange) onSubcategoryIdChange(subcatId);
+              // ao trocar subcategoria, zera atributo na tela superior
               if (onAttributeIdChange) onAttributeIdChange(null);
             }}
             value={activeSubcategoryId ?? ""}
@@ -129,12 +130,16 @@ const CategorySelectorContent = ({
           </Label>
           <Select 
             onValueChange={(attributeId) => {
-              onSubcategoryChange(activeSubcategoryId, attributeId);
               if (onAttributeIdChange) {
                 onAttributeIdChange(attributeId);
               }
             }}
-            value={subcategoryValues[activeSubcategoryId] || ""}
+            value={
+              // valor atribuído ao atributo ativo principal
+              activeSubcatObj.attributes.length && activeSubcatObj.attributes.some(attr => attr.id === activeSubcategoryId)
+                ? activeSubcategoryId
+                : ""
+            }
           >
             <SelectTrigger>
               <SelectValue placeholder={

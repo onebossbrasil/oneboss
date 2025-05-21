@@ -1,4 +1,3 @@
-
 import { Product } from "@/types/product";
 import {
   Dialog,
@@ -27,14 +26,11 @@ const ProductEditDialog = ({ product, open, onOpenChange, onClose }: ProductEdit
     onClose?.();
   };
 
-  // O productId sempre será o UUID correto do produto
   const productId = product?.id || null;
   const { product: freshProduct, isLoading } = useFetchProductById(productId, open);
 
-  // === DIAGNÓSTICO: Log para depuração ===
   useEffect(() => {
     if (open) {
-      // Adiciona logs para garantir que os valores estejam corretos
       console.log("[Diagnóstico Modal] Produto do banco:", freshProduct);
       console.log("[Diagnóstico Modal] Produto prop:", product);
     }
@@ -43,7 +39,6 @@ const ProductEditDialog = ({ product, open, onOpenChange, onClose }: ProductEdit
   const {
     formData,
     selectedCategory,
-    subcategoryValues,
     images,
     imagePreviewUrls,
     isSubmitting,
@@ -54,7 +49,6 @@ const ProductEditDialog = ({ product, open, onOpenChange, onClose }: ProductEdit
     handleRemoveImage,
     handleSubmit,
     setSelectedCategory,
-    setSubcategoryValues,
     setImages,
     setImagePreviewUrls,
     setDeletedImageIds,
@@ -62,40 +56,29 @@ const ProductEditDialog = ({ product, open, onOpenChange, onClose }: ProductEdit
     selectedAttributeId,
     handleAttributeChange,
     handleSubcatIdChange
-  } = useProductEdit(freshProduct, handleDialogClose); // freshProduct já está atualizado
+  } = useProductEdit(freshProduct, handleDialogClose);
 
-  // === DIAGNÓSTICO: Log para categoryId ===
   useEffect(() => {
     if (open) {
-      console.log("[Diagnóstico Modal] Comparação Category: product?.categoryId =", product?.categoryId, "| freshProduct?.categoryId =", freshProduct?.categoryId, "| selectedCategory (hook) =", selectedCategory);
+      console.log("[Diagnóstico Modal] Comparação Category: product?.categoryId =", product?.categoryId, "| freshProduct?.categoryId =", freshProduct?.categoryId, "| selectedCategory =", selectedCategory);
     }
   }, [open, product, freshProduct, selectedCategory]);
 
-  // === GARANTIR REIDRATAÇÃO MANUAL caso necessário ===
-  // Se freshProduct existir e categoria divergente do selectedCategory, forçamos sincronização
   useEffect(() => {
     if (open && freshProduct?.categoryId && freshProduct.categoryId !== selectedCategory) {
-      console.log("[Diagnóstico Modal] Corrigindo selectedCategory (force sync) para UUID do banco:", freshProduct.categoryId);
+      console.log("[Diagnóstico Modal] Corrigindo selectedCategory para UUID do banco:", freshProduct.categoryId);
       setSelectedCategory(freshProduct.categoryId);
     }
-    // Não depende de selectedCategory para evitar loop
     // eslint-disable-next-line
   }, [open, freshProduct?.categoryId]);
 
   useEffect(() => {
-    if (!open) return;
-    // Nada a fazer aqui; hook reidrata o produto fresh de qualquer forma
-    // eslint-disable-next-line
-  }, [open, productId]);
-
-  useEffect(() => {
     if (!open) {
       setSelectedCategory("");
-      setSubcategoryValues({});
       setImages([]);
       setImagePreviewUrls([]);
       setDeletedImageIds([]);
-      console.log("[Modal] Fechando modal: Resetei todos os campos internos de edição!");
+      console.log("[Modal] Fechando modal: Reset campos internos de edição!");
     }
     // eslint-disable-next-line
   }, [open]);
@@ -104,7 +87,6 @@ const ProductEditDialog = ({ product, open, onOpenChange, onClose }: ProductEdit
     console.log("[Modal] Submissão iniciada. Dados do formulário:", {
       formData,
       selectedCategory,
-      subcategoryValues,
       images,
       imagePreviewUrls,
       selectedSubcategoryId,
@@ -137,16 +119,15 @@ const ProductEditDialog = ({ product, open, onOpenChange, onClose }: ProductEdit
                     handleFormChange(field, value);
                   }}
                 />
-                {/* DIAGNÓSTICO: log para value do Select */}
                 <div>
                   <span style={{fontSize:10, color:"#6c6"}}>[DEBUG: selectedCategory = {selectedCategory}]</span>
                 </div>
                 <CategorySelector
                   selectedCategory={selectedCategory}
-                  subcategoryValues={subcategoryValues}
+                  subcategoryValues={{}} // não usar mais subcategoryValues da API
                   selectedSubcategoryId={selectedSubcategoryId}
                   onCategoryChange={handleCategoryChange}
-                  onSubcategoryChange={handleSubcategoryChange}
+                  onSubcategoryChange={() => {}}
                   onSubcategoryIdChange={handleSubcatIdChange}
                   onAttributeIdChange={handleAttributeChange}
                 />
@@ -173,4 +154,3 @@ const ProductEditDialog = ({ product, open, onOpenChange, onClose }: ProductEdit
 };
 
 export default ProductEditDialog;
-

@@ -2,7 +2,6 @@
 import React, { useState, useEffect } from "react";
 import { Product } from "@/types/product";
 import { useFormState } from "@/hooks/product-edit/use-form-state";
-import { useCategorySelection } from "@/hooks/product-edit/use-category-selection";
 import { useImageManagement } from "@/hooks/product-edit/use-image-management";
 import { useProductSubmit } from "@/hooks/product-edit/use-product-submit";
 import { useProductAdd } from "@/hooks/product-edit/use-product-add";
@@ -16,16 +15,13 @@ export const useProductEdit = (
 ) => {
   const { formData, handleFormChange, setFormData } = useFormState(product);
 
-  // ---- SÍNCRONO ----
-  // Ao receber freshProduct, sincronizar estados internos: categoria, subcategoria, atributo
   const [selectedCategory, setSelectedCategory] = useState<string>(product?.categoryId ?? "");
   const [selectedSubcategoryId, setSelectedSubcategoryId] = useState<string | null>(product?.subcategoryId ?? null);
   const [selectedAttributeId, setSelectedAttributeId] = useState<string | null>(product?.attributeId ?? null);
-  const [subcategoryValues, setSubcategoryValues] = useState<Record<string, string>>(product?.subcategoryValues ?? {});
 
+  // Sempre que o produto fresh chegar, reidrata os campos pelos uuid
   useEffect(() => {
     if (product) {
-      // Se algum dos campos mudou, atualiza o estado
       if (selectedCategory !== (product.categoryId ?? "")) {
         setSelectedCategory(product.categoryId ?? "");
       }
@@ -35,10 +31,6 @@ export const useProductEdit = (
       if (!isEqual(selectedAttributeId, product.attributeId ?? null)) {
         setSelectedAttributeId(product.attributeId ?? null);
       }
-      if (!isEqual(subcategoryValues, product.subcategoryValues ?? {})) {
-        setSubcategoryValues(product.subcategoryValues ?? {});
-      }
-      // Formulário textual já era reidratado antes
       setFormData({
         name: product.name,
         shortDescription: product.shortDescription || "",
@@ -49,38 +41,35 @@ export const useProductEdit = (
         published: product.published,
         featured: product.featured
       });
-      console.log("[useProductEdit] Estados sincronizados com produto fresh:", {
+      console.log("[useProductEdit] Estados sincronizados:", {
         categoria: product.categoryId,
         subcategoria: product.subcategoryId,
         atributo: product.attributeId,
-        valores: product.subcategoryValues,
       });
     }
     // eslint-disable-next-line
   }, [product?.id]);
 
-  // ---- SELEÇÃO DE CATEGORIA/SUBCATEGORIA/Atributo ----
-  // Garante que os handlers atualizem o estado sincronizando
+  // --- Handlers principais ---
   const handleCategoryChange = (categoryId: string) => {
     setSelectedCategory(categoryId);
-    setSubcategoryValues({});
-    setSelectedSubcategoryId(null); // Reseta subcategoria
-    setSelectedAttributeId(null); // Reseta atributo
-    console.log("[useProductEdit] Categoria alterada (resetou subcat e attr):", categoryId);
+    setSelectedSubcategoryId(null); // Reseta subcategoria ao trocar categoria
+    setSelectedAttributeId(null);   // Reseta atributo
+    console.log("[useProductEdit] Categoria alterada:", categoryId);
   };
 
   const handleSubcategoryIdChange = (subcategoryId: string | null) => {
     setSelectedSubcategoryId(subcategoryId);
     setSelectedAttributeId(null); // reset atributo ao trocar subcat
-    console.log("[useProductEdit] setSelectedSubcategoryId (UUID):", subcategoryId);
+    console.log("[useProductEdit] setSelectedSubcategoryId:", subcategoryId);
   };
 
   const handleAttributeChange = (attributeId: string | null) => {
     setSelectedAttributeId(attributeId);
-    console.log("[useProductEdit] setSelectedAttributeId (UUID):", attributeId);
+    console.log("[useProductEdit] setSelectedAttributeId:", attributeId);
   };
 
-  // Síncrono com outros hooks do produto
+  // Hooks auxiliares para imagem
   const {
     images,
     imagePreviewUrls,
@@ -92,11 +81,12 @@ export const useProductEdit = (
     setDeletedImageIds
   } = useImageManagement(product);
 
+  // Submitters
   const { isSubmitting: isUpdating, handleUpdateProduct } = useProductSubmit(
     product,
     formData,
     selectedCategory,
-    subcategoryValues,
+    {},
     images,
     deletedImageIds,
     onClose,
@@ -107,7 +97,7 @@ export const useProductEdit = (
   const { isSubmitting: isAdding, handleAddProduct } = useProductAdd(
     formData,
     selectedCategory,
-    subcategoryValues,
+    {},
     images,
     onClose,
     selectedSubcategoryId,
@@ -121,23 +111,16 @@ export const useProductEdit = (
   return {
     formData,
     selectedCategory,
-    subcategoryValues,
     images,
     imagePreviewUrls,
     isSubmitting,
     handleFormChange,
     handleCategoryChange,
-    handleSubcategoryChange: (type: string, value: string) => {
-      setSubcategoryValues(prev => ({
-        ...prev,
-        [type]: value,
-      }));
-    },
+    handleSubcategoryChange: () => {},
     handleImageChange,
     handleRemoveImage,
     handleSubmit,
     setSelectedCategory,
-    setSubcategoryValues,
     setImages,
     setImagePreviewUrls,
     setDeletedImageIds,
