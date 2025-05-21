@@ -22,7 +22,11 @@ const ImageUpload: React.FC<ImageUploadProps> = ({
 }) => {
   const isDisabled = false;
   const fallbackImg = "/placeholder.svg";
-  // Ajuste robusto para array de imagens válidas (filtra url não vazia)
+
+  // LOG para debug do array de imagens existentes (no modal de edição)
+  console.log("[ImageUpload] existingImages (do modal):", existingImages);
+
+  // Sempre filtra imagens com url válida
   const validExistingImages =
     Array.isArray(existingImages)
       ? existingImages.filter(img =>
@@ -31,7 +35,6 @@ const ImageUpload: React.FC<ImageUploadProps> = ({
           !img.url.endsWith('/products/')
         )
       : [];
-  // Usa todas as imagens, sem limitar (corrige preview)
   const hasImages = (validExistingImages.length > 0 || imagePreviewUrls.length > 0);
 
   return (
@@ -73,7 +76,7 @@ const ImageUpload: React.FC<ImageUploadProps> = ({
                   gridTemplateColumns: `repeat(auto-fill, minmax(120px, 1fr))`
                 }}
               >
-                {/* Somente imagens existentes realmente válidas */}
+                {/* Imagens persistidas */}
                 {validExistingImages.map((image, index) => (
                   <div
                     key={`existing-${image.id}`}
@@ -98,7 +101,7 @@ const ImageUpload: React.FC<ImageUploadProps> = ({
                     </Button>
                   </div>
                 ))}
-                {/* Todas as previews locais*/}
+                {/* Previews de upload local */}
                 {imagePreviewUrls.slice(validExistingImages.length).map((url, index) => (
                   <div
                     key={`new-${index}`}

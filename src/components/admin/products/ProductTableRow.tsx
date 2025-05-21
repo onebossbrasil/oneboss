@@ -1,4 +1,3 @@
-
 import { Eye, EyeOff, Edit, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { TableCell, TableRow } from "@/components/ui/table";
@@ -28,22 +27,28 @@ const ProductTableRow = ({
   const [isToggling, setIsToggling] = useState(false);
   const fallbackImg = "/placeholder.svg";
 
-  // Novo: Função robusta para pegar a imagem
+  // DEBUG: Log cada produto e suas imagens
+  console.log("[ProductTableRow] Renderizando produto", product?.name, product?.id, "imagens:", product?.images);
+
+  // Função robusta para pegar a primeira imagem real
   const getFirstValidImageUrl = () => {
-    // Checa se existe array, ao menos um objeto, e se url não é vazia
     if (
       Array.isArray(product.images) &&
-      product.images.length > 0 &&
-      typeof product.images[0].url === "string" &&
-      product.images[0].url.trim() !== "" &&
-      !product.images[0].url.endsWith('/products/') // evita URL bucket "vazia"
+      product.images.length > 0
     ) {
-      return product.images[0].url;
+      // Busca a primeira imagem realmente válida
+      const validImg = product.images.find(
+        img =>
+          img &&
+          typeof img.url === "string" &&
+          img.url.trim() !== "" &&
+          !img.url.endsWith('/products/')
+      );
+      return validImg?.url || null;
     }
     return null;
   };
 
-  // Fix: only update the row, don't refresh the whole list immediately
   const handleVisibilityToggle = async (product: Product) => {
     setIsToggling(true);
     try {
@@ -68,7 +73,7 @@ const ProductTableRow = ({
   const imageUrl = getFirstValidImageUrl();
 
   return (
-    <TableRow className={isSelectedToDelete ? "bg-red-50 dark:bg-red-900/20" : ""}>
+    <TableRow className={isSelectedToDelete ? "bg-red-50 dark:bg-red-900/20" : ""} data-product-id={product.id}>
       <TableCell className="text-center">
         {selectionCheckbox}
       </TableCell>
