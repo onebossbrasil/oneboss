@@ -32,20 +32,11 @@ const CategorySelectorContent = ({
   // Sincronizar com prop corretamente pelos UUIDs sempre!
   useEffect(() => {
     setActiveSubcategoryId(selectedSubcategoryId ?? null);
-    if (selectedCategory) {
-      console.log("[LOG CategorySelector] selectedCategory:", selectedCategory, "selectedSubcategoryId (prop):", selectedSubcategoryId, "typeof:", typeof selectedSubcategoryId);
-    }
   }, [selectedSubcategoryId, selectedCategory]);
 
   // Busca subcategoria ativa pelo id
   const activeSubcatObj = category?.subcategories.find(
-    sc => {
-      const match = sc.id === activeSubcategoryId;
-      if (activeSubcategoryId && match) {
-        console.log("[LOG CategorySelector] found subcat:", sc, "for id:", activeSubcategoryId);
-      }
-      return match;
-    }
+    sc => sc.id === activeSubcategoryId
   );
 
   // Notifica mudança por ID
@@ -53,22 +44,16 @@ const CategorySelectorContent = ({
     if (onSubcategoryIdChange) {
       onSubcategoryIdChange(activeSubcategoryId);
     }
-    if (activeSubcategoryId) {
-      console.log("[LOG CategorySelector] activeSubcategoryId:", activeSubcategoryId, "typeof:", typeof activeSubcategoryId);
-    }
-    // eslint-disable-next-line
   }, [activeSubcategoryId]);
 
   // Notifica alteração dos atributos via prop sempre por UUID
   useEffect(() => {
     if (onAttributeIdChange && activeSubcatObj && activeSubcategoryId) {
-      // BUSCA PRIMEIRO ATRIBUTO DISPONÍVEL AO TROCAR SUBCATEGORIA
       const firstAttr = activeSubcatObj.attributes.length > 0 ? activeSubcatObj.attributes[0].id : null;
       onAttributeIdChange(firstAttr);
     } else if (onAttributeIdChange && !activeSubcategoryId) {
       onAttributeIdChange(null);
     }
-    // eslint-disable-next-line
   }, [activeSubcatObj, onAttributeIdChange, activeSubcategoryId]);
 
   if (isLoading) {
@@ -87,7 +72,6 @@ const CategorySelectorContent = ({
           onValueChange={(catId) => {
             onCategoryChange(catId);
             setActiveSubcategoryId(null);
-            console.log("[LOG CategorySelector] Categoria mudou:", catId);
           }}
           value={selectedCategory}
           disabled={categories.length === 0}
@@ -106,9 +90,6 @@ const CategorySelectorContent = ({
             ))}
           </SelectContent>
         </Select>
-        <div>
-          <span style={{fontSize:10, color:"#6c6"}}>[DEBUG: selectedCategory = {selectedCategory}]</span>
-        </div>
       </div>
 
       {selectedCategory && (
@@ -117,7 +98,6 @@ const CategorySelectorContent = ({
           <Select 
             onValueChange={(subcatId) => {
               setActiveSubcategoryId(subcatId);
-              console.log("[LOG CategorySelector] Subcategoria mudou para:", subcatId);
               if (onSubcategoryIdChange) onSubcategoryIdChange(subcatId);
               if (onAttributeIdChange) onAttributeIdChange(null);
             }}
@@ -136,9 +116,6 @@ const CategorySelectorContent = ({
                 : null}
             </SelectContent>
           </Select>
-          <div>
-            <span style={{fontSize:10, color:"#cc6"}}>[DEBUG: activeSubcategoryId = {activeSubcategoryId ?? "(nenhuma)"}]</span>
-          </div>
         </div>
       )}
 
@@ -154,7 +131,6 @@ const CategorySelectorContent = ({
               }
             }}
             value={
-              // valor atribuído ao atributo ativo principal
               activeSubcatObj.attributes.length && activeSubcatObj.attributes.some(attr => attr.id === activeSubcategoryId)
                 ? activeSubcategoryId
                 : ""
@@ -175,7 +151,6 @@ const CategorySelectorContent = ({
                 : null}
             </SelectContent>
           </Select>
-          <div>[DEBUG: activeSubcatObj = {JSON.stringify(activeSubcatObj)}]</div>
         </div>
       )}
     </div>

@@ -29,14 +29,6 @@ const ProductEditDialog = ({ product, open, onOpenChange, onClose }: ProductEdit
   const productId = product?.id || null;
   const { product: freshProduct, isLoading } = useFetchProductById(productId, open);
 
-  useEffect(() => {
-    if (open) {
-      console.log("[LOG MODAL] Produto freshProduct:", freshProduct);
-      console.log("[LOG MODAL] Produto original prop:", product);
-      console.log("[LOG MODAL] freshProduct.subcategoryId:", freshProduct?.subcategoryId, typeof freshProduct?.subcategoryId);
-    }
-  }, [open, freshProduct, product]);
-
   const {
     formData,
     selectedCategory,
@@ -59,40 +51,7 @@ const ProductEditDialog = ({ product, open, onOpenChange, onClose }: ProductEdit
     handleSubcatIdChange
   } = useProductEdit(freshProduct, handleDialogClose);
 
-  useEffect(() => {
-    if (open) {
-      console.log("[LOG MODAL] selectedCategory:", selectedCategory, "selectedSubcategoryId:", selectedSubcategoryId, typeof selectedSubcategoryId);
-    }
-  }, [open, selectedCategory, selectedSubcategoryId]);
-
-  useEffect(() => {
-    if (open && freshProduct?.categoryId && freshProduct.categoryId !== selectedCategory) {
-      console.log("[Diagnóstico Modal] Corrigindo selectedCategory para UUID do banco:", freshProduct.categoryId);
-      setSelectedCategory(freshProduct.categoryId);
-    }
-    // eslint-disable-next-line
-  }, [open, freshProduct?.categoryId]);
-
-  useEffect(() => {
-    if (!open) {
-      setSelectedCategory("");
-      setImages([]);
-      setImagePreviewUrls([]);
-      setDeletedImageIds([]);
-      console.log("[Modal] Fechando modal: Reset campos internos de edição!");
-    }
-    // eslint-disable-next-line
-  }, [open]);
-
   const wrappedHandleSubmit = (e: React.FormEvent) => {
-    console.log("[Modal] Submissão iniciada. Dados do formulário:", {
-      formData,
-      selectedCategory,
-      images,
-      imagePreviewUrls,
-      selectedSubcategoryId,
-      selectedAttributeId
-    });
     handleSubmit(e);
   };
 
@@ -121,10 +80,6 @@ const ProductEditDialog = ({ product, open, onOpenChange, onClose }: ProductEdit
                       handleFormChange(field, value);
                     }}
                   />
-                  <div>
-                    <span style={{fontSize:10, color:"#6c6"}}>[DEBUG: selectedCategory = {selectedCategory}]</span>
-                    <span style={{fontSize:10, color:"#ccf"}}>[DEBUG: selectedSubcategoryId = {selectedSubcategoryId ?? "(nenhuma)"}]</span>
-                  </div>
                   <CategorySelector
                     selectedCategory={selectedCategory}
                     subcategoryValues={{}}

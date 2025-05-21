@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { Product } from "@/types/product";
 import { useFormState } from "@/hooks/product-edit/use-form-state";
@@ -39,17 +38,6 @@ export const useProductEdit = (
         stockQuantity: product.stockQuantity.toString(),
         published: product.published,
         featured: product.featured
-      });
-      console.log("[LOG useProductEdit] Sync produtct:", {
-        categoria: product.categoryId,
-        subcategoria: product.subcategoryId,
-        atributo: product.attributeId,
-        typeof_subcat: typeof product.subcategoryId
-      });
-      console.log("[LOG useProductEdit] Estados internos atualizados:", {
-        selectedCategory,
-        selectedSubcategoryId,
-        selectedAttributeId
       });
     }
     // eslint-disable-next-line
@@ -135,4 +123,3 @@ export const useProductEdit = (
     handleSubcatIdChange: handleSubcategoryIdChange
   };
 };
-
