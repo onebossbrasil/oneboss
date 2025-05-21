@@ -1,9 +1,11 @@
+
 import React, { useState, useEffect } from "react";
 import { Product } from "@/types/product";
 import { useFormState } from "@/hooks/product-edit/use-form-state";
 import { useImageManagement } from "@/hooks/product-edit/use-image-management";
 import { useProductSubmit } from "@/hooks/product-edit/use-product-submit";
 import { useProductAdd } from "@/hooks/product-edit/use-product-add";
+import { useCategories } from "@/contexts/CategoryContext";
 
 // Novo helper para comparar IDs (evita repetição/SW bugs)
 const isEqual = (a: any, b: any) => JSON.stringify(a) === JSON.stringify(b);
@@ -14,21 +16,16 @@ export const useProductEdit = (
 ) => {
   const { formData, handleFormChange, setFormData } = useFormState(product);
 
+  // Busca categorias do contexto (para garantir ressincronização quando carregam)
+  const { categories, isLoading: catLoading } = useCategories();
+
   const [selectedCategory, setSelectedCategory] = useState<string>(product?.categoryId ?? "");
   const [selectedSubcategoryId, setSelectedSubcategoryId] = useState<string | null>(product?.subcategoryId ?? null);
   const [selectedAttributeId, setSelectedAttributeId] = useState<string | null>(product?.attributeId ?? null);
 
+  // Mantém IDs bufferizados para prevenir sobrescrita errada em re-render, enquanto as categories podem chegar assincronamente
   useEffect(() => {
     if (product) {
-      if (selectedCategory !== (product.categoryId ?? "")) {
-        setSelectedCategory(product.categoryId ?? "");
-      }
-      if (selectedSubcategoryId !== (product.subcategoryId ?? null)) {
-        setSelectedSubcategoryId(product.subcategoryId ?? null);
-      }
-      if (selectedAttributeId !== (product.attributeId ?? null)) {
-        setSelectedAttributeId(product.attributeId ?? null);
-      }
       setFormData({
         name: product.name,
         shortDescription: product.shortDescription || "",
@@ -39,9 +36,45 @@ export const useProductEdit = (
         published: product.published,
         featured: product.featured
       });
+
+      // Buffer ids de produto (não depende do carregamento das categorias/subs ainda!)
+      setSelectedCategory(product.categoryId ?? "");
+      setSelectedSubcategoryId(product.subcategoryId ?? null);
+      setSelectedAttributeId(product.attributeId ?? null);
     }
     // eslint-disable-next-line
   }, [product?.id]);
+
+  // Novo: Sincroniza os selects assim que categories terminam de carregar
+  useEffect(() => {
+    if (!catLoading && categories.length > 0 && product) {
+      // Busca se categoria existe
+      const cat = categories.find(cat => cat.id === product.categoryId);
+      if (cat) {
+        setSelectedCategory(product.categoryId ?? "");
+        // Busca subcat válida
+        const subcat = cat.subcategories.find(sc => sc.id === product.subcategoryId);
+        if (subcat) {
+          setSelectedSubcategoryId(product.subcategoryId ?? null);
+          // Busca atributo válido
+          const attr = subcat.attributes.find(at => at.id === product.attributeId);
+          if (attr) {
+            setSelectedAttributeId(product.attributeId ?? null);
+          } else {
+            setSelectedAttributeId(null); // Atributo não existe nessa subcat
+          }
+        } else {
+          setSelectedSubcategoryId(null);
+          setSelectedAttributeId(null);
+        }
+      } else {
+        setSelectedCategory("");
+        setSelectedSubcategoryId(null);
+        setSelectedAttributeId(null);
+      }
+    }
+    // eslint-disable-next-line
+  }, [categories, catLoading, product?.id]);
 
   // --- Handlers principais ---
   const handleCategoryChange = (categoryId: string) => {
