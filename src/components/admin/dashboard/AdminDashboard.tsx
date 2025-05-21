@@ -58,22 +58,24 @@ const AdminDashboard = ({ onLogout }: AdminDashboardProps) => {
         </nav>
         <div className="flex-1 p-2">
           {/* Adiciona renderização dos parceiros */}
-          <ProductProvider>
-            {activeTab === "produtos" && (
-              <div className="w-full">
-                <ProductList />
-              </div>
-            )}
-            {activeTab === "categorias" && (
-              <CategoryManager />
-            )}
-            {activeTab === "leads" && (
-              <LeadsManager />
-            )}
-            {activeTab === "parceiros" && (
-              <AdminPartnerManager />
-            )}
-          </ProductProvider>
+          <CategoryProvider>
+            <ProductProvider>
+              {activeTab === "produtos" && (
+                <div className="w-full">
+                  <ProductList />
+                </div>
+              )}
+              {activeTab === "categorias" && (
+                <CategoryManager />
+              )}
+              {activeTab === "leads" && (
+                <LeadsManager />
+              )}
+              {activeTab === "parceiros" && (
+                <AdminPartnerManager />
+              )}
+            </ProductProvider>
+          </CategoryProvider>
         </div>
       </div>
     );
@@ -83,14 +85,16 @@ const AdminDashboard = ({ onLogout }: AdminDashboardProps) => {
   return (
     <SidebarProvider>
       <AdminLayout activeTab={activeTab} onTabChange={setActiveTab} onLogout={onLogout}>
-        <ProductProvider>
-          <div>
-            {activeTab === "produtos" && <ProductList />}
-            {activeTab === "categorias" && <CategoryManager />}
-            {activeTab === "leads" && <LeadsManager />}
-            {activeTab === "parceiros" && <AdminPartnerManager />}
-          </div>
-        </ProductProvider>
+        <CategoryProvider>
+          <ProductProvider>
+            <div>
+              {activeTab === "produtos" && <ProductList />}
+              {activeTab === "categorias" && <CategoryManager />}
+              {activeTab === "leads" && <LeadsManager />}
+              {activeTab === "parceiros" && <AdminPartnerManager />}
+            </div>
+          </ProductProvider>
+        </CategoryProvider>
       </AdminLayout>
     </SidebarProvider>
   );
