@@ -1,4 +1,3 @@
-
 import { Product, ProductImage } from "@/types/product";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -24,13 +23,12 @@ const fetchWithTimeout = async <T>(promise: Promise<T>, timeoutMs = 10000): Prom
 export const fetchProductsFromSupabase = async (): Promise<{ products: Product[], error: string | null }> => {
   try {
     console.log("Fetching products from Supabase");
-    // Fetch products from Supabase with timeout
+
+    // Busca principal dos produtos
     const productsPromise = supabase
       .from('products')
       .select('*')
-      .order('name', { ascending: true }); // Ordenar por nome
-
-    // Create a proper Promise from the Supabase query
+      .order('name', { ascending: true });
     const productsResult = await fetchWithTimeout(Promise.resolve(productsPromise));
 
     if (productsResult.error) {
@@ -38,13 +36,11 @@ export const fetchProductsFromSupabase = async (): Promise<{ products: Product[]
       throw productsResult.error;
     }
 
-    // Fetch all product images with timeout
+    // Busca todas imagens, sem limite
     const imagesPromise = supabase
       .from('product_images')
       .select('*')
       .order('sort_order');
-      
-    // Create a proper Promise from the Supabase query
     const imagesResult = await fetchWithTimeout(Promise.resolve(imagesPromise));
 
     if (imagesResult.error) {
@@ -52,22 +48,21 @@ export const fetchProductsFromSupabase = async (): Promise<{ products: Product[]
       throw imagesResult.error;
     }
 
-    // Map images to their products
+    // Mapeia todas imagens para products
     const imagesByProduct: Record<string, ProductImage[]> = {};
-    
     imagesResult.data.forEach((image: any) => {
+      if (!image.product_id) return; // sanidade
       if (!imagesByProduct[image.product_id]) {
         imagesByProduct[image.product_id] = [];
       }
-      
       imagesByProduct[image.product_id].push({
         id: image.id,
         url: image.url,
-        sortOrder: image.sort_order
+        sortOrder: image.sort_order,
       });
     });
 
-    // Create final products array with images
+    // Cria array final, agora garantindo todas imagens relacionadas
     const formattedProducts: Product[] = productsResult.data.map((product: any) => ({
       id: product.id,
       name: product.name,
@@ -76,13 +71,15 @@ export const fetchProductsFromSupabase = async (): Promise<{ products: Product[]
       price: parseFloat(product.price),
       salePrice: product.sale_price ? parseFloat(product.sale_price) : null,
       categoryId: product.category_id,
+      subcategoryId: product.subcategory_id ?? null,
+      attributeId: product.attribute_id ?? null,
       subcategoryValues: product.subcategory_values || {},
-      featured: product.featured || false,
+      featured: product.featured ?? false,
       published: product.published !== undefined ? product.published : true,
       stockQuantity: product.stock_quantity || 0,
-      images: imagesByProduct[product.id] || [],
+      images: (imagesByProduct[product.id] || []).sort((a, b) => (a.sortOrder ?? 0) - (b.sortOrder ?? 0)),
       createdAt: product.created_at,
-      updatedAt: product.updated_at
+      updatedAt: product.updated_at,
     }));
 
     return { products: formattedProducts, error: null };

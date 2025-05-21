@@ -22,9 +22,8 @@ const ImageUpload: React.FC<ImageUploadProps> = ({
 }) => {
   const isDisabled = false;
 
-  // Mostra imagem preview: sempre mostra todas do banco (existingImages), e previews das novas depois
-  // A responsabilidade de manter imagePreviewUrls como [existing...novas] fica no hook
-  
+  // Garantir preview completo: todas do banco (existingImages) + todas novas (seguindo ordenação dos previews!)
+  // A grid adapta conforme quantidade
   return (
     <Card>
       <CardContent className="pt-6">
@@ -32,8 +31,8 @@ const ImageUpload: React.FC<ImageUploadProps> = ({
           <div>
             <h3 className="text-sm font-medium mb-2">Imagens do Produto</h3>
             <p className="text-sm text-muted-foreground mb-4">
-              Arraste e solte ou clique para adicionar imagens do produto. 
-              Recomendado: 800x800px, máximo 5MB.
+              Arraste e solte ou clique para adicionar imagens. 
+              Recomendado: 800x800px, máximo 5MB por arquivo. Não há limite para quantidade.
             </p>
             <div className="border-2 border-dashed border-muted-foreground/25 rounded-md p-8 text-center">
               <input
@@ -50,19 +49,20 @@ const ImageUpload: React.FC<ImageUploadProps> = ({
                 className={`cursor-pointer flex flex-col items-center justify-center ${isDisabled ? "opacity-50 pointer-events-none" : ""}`}
               >
                 <Upload className="h-10 w-10 text-muted-foreground mb-2" />
-                <span className="text-sm text-muted-foreground">
-                  Clique para fazer upload ou arraste e solte
-                </span>
-                <span className="text-xs text-muted-foreground mt-1">
-                  PNG, JPG, GIF até 5MB
-                </span>
+                <span className="text-sm text-muted-foreground">Clique para fazer upload ou arraste e solte</span>
+                <span className="text-xs text-muted-foreground mt-1">PNG, JPG, GIF até 5MB</span>
               </label>
             </div>
           </div>
           {(imagePreviewUrls.length > 0 || existingImages.length > 0) && (
             <div>
               <h4 className="text-sm font-medium mb-2">Imagens adicionadas</h4>
-              <div className="grid grid-cols-3 gap-4">
+              <div
+                className={`grid gap-4`}
+                style={{
+                  gridTemplateColumns: `repeat(auto-fill, minmax(120px, 1fr))`
+                }}
+              >
                 {/* Imagens do banco */}
                 {existingImages.map((image, index) => (
                   <div
@@ -81,12 +81,13 @@ const ImageUpload: React.FC<ImageUploadProps> = ({
                       className="absolute top-1 right-1 h-6 w-6 rounded-full"
                       onClick={() => handleRemoveImage(index)}
                       type="button"
+                      aria-label="Excluir imagem"
                     >
                       <X className="h-3 w-3" />
                     </Button>
                   </div>
                 ))}
-                {/* Novas imagens, previews */}
+                {/* Previews das novas imagens */}
                 {imagePreviewUrls.slice(existingImages.length).map((url, index) => (
                   <div
                     key={`new-${index}`}
@@ -104,11 +105,15 @@ const ImageUpload: React.FC<ImageUploadProps> = ({
                       className="absolute top-1 right-1 h-6 w-6 rounded-full"
                       onClick={() => handleRemoveImage(index + existingImages.length)}
                       type="button"
+                      aria-label="Remover imagem carregada"
                     >
                       <X className="h-3 w-3" />
                     </Button>
                   </div>
                 ))}
+              </div>
+              <div className="text-xs text-muted-foreground mt-2">
+                {existingImages.length + images.length} imagem(ns) no total.
               </div>
             </div>
           )}

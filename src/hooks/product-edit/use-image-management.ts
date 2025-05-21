@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { Product, ProductImage } from "@/types/product";
 
@@ -6,29 +7,29 @@ export const useImageManagement = (product: Product | null) => {
   const [imagePreviewUrls, setImagePreviewUrls] = useState<string[]>([]);
   const [deletedImageIds, setDeletedImageIds] = useState<string[]>([]);
 
-  // Sempre reseta previews e deletes ao receber um novo produto fresh (após fetch atualizado)
   useEffect(() => {
+    // Sempre reseta previews corretamente ao receber novo produto
     if (product?.images) {
+      // Garante que todas do banco (não só 2) vão para o preview
       setImagePreviewUrls(product.images.map(img => img.url));
-      setImages([]); // Limpa uploads pendentes, só mostra já salvas!
-      setDeletedImageIds([]); // Limpa a lista de imagens a excluir
-      console.log("[useImageManagement] Carregando imagens fresh do produto:", product.images);
+      setImages([]); // Limpa uploads novos
+      setDeletedImageIds([]); // Limpa deleções pendentes
+      console.log("[useImageManagement] Imagens fresh do produto:", product.images.length, product.images);
     } else {
       setImagePreviewUrls([]);
       setImages([]);
       setDeletedImageIds([]);
       console.log("[useImageManagement] Resetou imagens (novo produto ou sem produto)");
     }
-  }, [product?.id, product?.images?.length]); // now use product id and image count as dep
+  }, [product?.id, product?.images?.length]);
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) {
       const newFiles = Array.from(e.target.files);
-      // Evitar duplicidade apenas entre imagens novas (mas pode reenviar imagem igual se user precisar)
-      const uniqueNewFiles = newFiles.filter(newFile => (
+      // Evita duplicidade só nos novos arquivos (user pode re-adicionar imagem igual)
+      const uniqueNewFiles = newFiles.filter(newFile =>
         !images.some(existing => existing.name === newFile.name && existing.size === newFile.size)
-      ));
-
+      );
       const newPreviewUrls = uniqueNewFiles.map(file => URL.createObjectURL(file));
       setImages(prev => [...prev, ...uniqueNewFiles]);
       setImagePreviewUrls(prev => [...prev, ...newPreviewUrls]);
@@ -38,16 +39,16 @@ export const useImageManagement = (product: Product | null) => {
 
   const handleRemoveImage = (index: number) => {
     if (product && index < (product.images?.length ?? 0)) {
-      // Remover imagem existente (index responde ao array imagePreviewUrls, que é sempre [imagens-db,...imagens-uploadadas])
+      // Remove imagem do banco
       const imageToDelete = product.images[index];
       setDeletedImageIds(prev => [...prev, imageToDelete.id]);
-      // Remove do preview e mantém ordem das novas/antigas
+      // Remove do preview (mantém ordem)
       const newPreviewUrls = [...imagePreviewUrls];
       newPreviewUrls.splice(index, 1);
       setImagePreviewUrls(newPreviewUrls);
-      console.log("[useImageManagement] Marcou imagem BD para deleção", imageToDelete.id);
+      console.log("[useImageManagement] Marcou imagem BD p/ deleção", imageToDelete.id);
     } else {
-      // Nova imagem enviada nesta sessão (ainda não foi persistida)
+      // Imagem nova ainda não persistida
       const newImageIndex = index - (product?.images?.length ?? 0);
       const newImages = [...images];
       const previewUrl = imagePreviewUrls[index];
@@ -57,7 +58,7 @@ export const useImageManagement = (product: Product | null) => {
       newPreviewUrls.splice(index, 1);
       setImages(newImages);
       setImagePreviewUrls(newPreviewUrls);
-      console.log("[useImageManagement] Removeu nova imagem local, previews restantes:", newPreviewUrls.length);
+      console.log("[useImageManagement] Removeu imagem local, restantes:", newPreviewUrls.length);
     }
   };
 
