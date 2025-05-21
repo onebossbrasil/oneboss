@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { Product } from "@/types/product";
 import { useFormState } from "@/hooks/product-edit/use-form-state";
 import { useImageManagement } from "@/hooks/product-edit/use-image-management";
@@ -23,10 +23,12 @@ export const useProductEdit = (
   const [selectedSubcategoryId, setSelectedSubcategoryId] = useState<string | null>(product?.subcategoryId ?? null);
   const [selectedAttributeId, setSelectedAttributeId] = useState<string | null>(product?.attributeId ?? null);
 
-  // Sincroniza selects com o produto E categorias carregadas
+  // Para evitar trigger desnecessário
+  const lastProductId = useRef<string | null>(null);
+
+  // Sincroniza selects APENAS na troca de produto ou ao carregar categorias pela primeira vez (evita reset indiscriminado)
   useEffect(() => {
-    // Só executa se o produto mudou (edição)
-    if (product) {
+    if (product && product.id !== lastProductId.current) {
       setFormData({
         name: product.name,
         shortDescription: product.shortDescription || "",
@@ -37,15 +39,13 @@ export const useProductEdit = (
         published: product.published,
         featured: product.featured
       });
-      // Mantém SEMPRE os valores originais do produto
       setSelectedCategory(product.categoryId ?? "");
       setSelectedSubcategoryId(product.subcategoryId ?? null);
       setSelectedAttributeId(product.attributeId ?? null);
+      lastProductId.current = product.id;
       console.log(
         "[useProductEdit] Produto fresh recebido. Setando IDs:",
-        "Categoria =", product.categoryId,
-        "Subcategoria =", product.subcategoryId,
-        "Atributo =", product.attributeId
+        product.categoryId, product.subcategoryId, product.attributeId
       );
     }
     // eslint-disable-next-line
@@ -53,33 +53,23 @@ export const useProductEdit = (
 
   // Sincroniza selects após carregar categorias e atualizar produto
   useEffect(() => {
-    if (!catLoading && categories.length > 0 && product) {
+    if (!catLoading && categories.length > 0 && product && product.id === lastProductId.current) {
       const cat = categories.find(cat => cat.id === product.categoryId);
       if (cat) {
         setSelectedCategory(product.categoryId ?? "");
         const subcat = cat.subcategories.find(sc => sc.id === product.subcategoryId);
         if (subcat) {
           setSelectedSubcategoryId(product.subcategoryId ?? null);
-          // Busca e só atualiza selectedAttributeId se a id ainda existir na lista
-          const attr = subcat.attributes.find(at => at.id === product.attributeId);
-          if (attr) {
-            setSelectedAttributeId(product.attributeId ?? null);
-            console.log("[useProductEdit] IDs sincronizados:", {
-              categoria: cat.name, subcat: subcat.name, atributo: attr.name
-            });
-          } else if (subcat.attributes.length > 0) {
-            setSelectedAttributeId(subcat.attributes[0].id); // Seleciona primeiro atributo válido
-          } else {
-            setSelectedAttributeId(null);
+          // Só seta selectedAttributeId se não existe ou não está na lista
+          const attrExists = subcat.attributes.find(at => at.id === selectedAttributeId);
+          if (!attrExists) {
+            if (subcat.attributes.length > 0) {
+              setSelectedAttributeId(subcat.attributes[0].id);
+            } else {
+              setSelectedAttributeId(null);
+            }
           }
-        } else {
-          setSelectedSubcategoryId(null);
-          setSelectedAttributeId(null);
         }
-      } else {
-        setSelectedCategory("");
-        setSelectedSubcategoryId(null);
-        setSelectedAttributeId(null);
       }
     }
     // eslint-disable-next-line
