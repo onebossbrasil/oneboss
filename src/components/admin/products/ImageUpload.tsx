@@ -22,8 +22,17 @@ const ImageUpload: React.FC<ImageUploadProps> = ({
 }) => {
   const isDisabled = false;
   const fallbackImg = "/placeholder.svg";
+  // Ajuste robusto para array de imagens válidas (filtra url não vazia)
+  const validExistingImages =
+    Array.isArray(existingImages)
+      ? existingImages.filter(img =>
+          typeof img.url === "string" &&
+          img.url.trim() !== "" &&
+          !img.url.endsWith('/products/')
+        )
+      : [];
   // Usa todas as imagens, sem limitar (corrige preview)
-  const hasImages = (existingImages.length > 0 || imagePreviewUrls.length > 0);
+  const hasImages = (validExistingImages.length > 0 || imagePreviewUrls.length > 0);
 
   return (
     <Card>
@@ -64,8 +73,8 @@ const ImageUpload: React.FC<ImageUploadProps> = ({
                   gridTemplateColumns: `repeat(auto-fill, minmax(120px, 1fr))`
                 }}
               >
-                {/* Todas as imagens existentes */}
-                {existingImages.map((image, index) => (
+                {/* Somente imagens existentes realmente válidas */}
+                {validExistingImages.map((image, index) => (
                   <div
                     key={`existing-${image.id}`}
                     className="relative aspect-square border rounded-md overflow-hidden bg-gray-50"
@@ -90,7 +99,7 @@ const ImageUpload: React.FC<ImageUploadProps> = ({
                   </div>
                 ))}
                 {/* Todas as previews locais*/}
-                {imagePreviewUrls.slice(existingImages.length).map((url, index) => (
+                {imagePreviewUrls.slice(validExistingImages.length).map((url, index) => (
                   <div
                     key={`new-${index}`}
                     className="relative aspect-square border rounded-md overflow-hidden bg-gray-50"
@@ -106,7 +115,7 @@ const ImageUpload: React.FC<ImageUploadProps> = ({
                       size="icon"
                       disabled={isDisabled}
                       className="absolute top-1 right-1 h-6 w-6 rounded-full"
-                      onClick={() => handleRemoveImage(index + existingImages.length)}
+                      onClick={() => handleRemoveImage(index + validExistingImages.length)}
                       type="button"
                       aria-label="Remover imagem carregada"
                     >
@@ -116,7 +125,7 @@ const ImageUpload: React.FC<ImageUploadProps> = ({
                 ))}
               </div>
               <div className="text-xs text-muted-foreground mt-2">
-                {existingImages.length + images.length} imagem(ns) no total.
+                {validExistingImages.length + images.length} imagem(ns) no total.
               </div>
             </div>
           )}
