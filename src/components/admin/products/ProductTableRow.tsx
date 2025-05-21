@@ -1,4 +1,3 @@
-
 import { Eye, EyeOff, Edit, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { TableCell, TableRow } from "@/components/ui/table";
@@ -26,6 +25,7 @@ const ProductTableRow = ({
   const { updateProduct } = useProducts();
   const { toast } = useToast();
   const [isToggling, setIsToggling] = useState(false);
+  const fallbackImg = "/placeholder.svg";
 
   // Fix: only update the row, don't refresh the whole list immediately
   const handleVisibilityToggle = async (product: Product) => {
@@ -55,12 +55,13 @@ const ProductTableRow = ({
         {selectionCheckbox}
       </TableCell>
       <TableCell>
-        {product.images.length > 0 ? (
+        {product.images && product.images.length > 0 && product.images[0]?.url ? (
           <img
             src={product.images[0].url}
             alt={product.name}
             className="w-16 h-16 object-cover rounded-lg"
             style={{ minWidth: 52, minHeight: 52 }}
+            onError={e => { e.currentTarget.onerror = null; e.currentTarget.src = fallbackImg; }}
           />
         ) : (
           <div className="w-16 h-16 bg-muted rounded-lg flex items-center justify-center text-xs text-muted-foreground">

@@ -21,8 +21,8 @@ const ImageUpload: React.FC<ImageUploadProps> = ({
   handleRemoveImage
 }) => {
   const isDisabled = false;
-
-  // Calcula o número total de imagens (do banco + previews)
+  const fallbackImg = "/placeholder.svg";
+  // Usa todas as imagens, sem limitar (corrige preview)
   const hasImages = (existingImages.length > 0 || imagePreviewUrls.length > 0);
 
   return (
@@ -64,7 +64,7 @@ const ImageUpload: React.FC<ImageUploadProps> = ({
                   gridTemplateColumns: `repeat(auto-fill, minmax(120px, 1fr))`
                 }}
               >
-                {/* Imagens existentes no banco */}
+                {/* Todas as imagens existentes */}
                 {existingImages.map((image, index) => (
                   <div
                     key={`existing-${image.id}`}
@@ -74,7 +74,7 @@ const ImageUpload: React.FC<ImageUploadProps> = ({
                       src={image.url}
                       alt={`Imagem do produto ${index + 1}`}
                       className="w-full h-full object-cover"
-                      onError={e => { e.currentTarget.src = '/placeholder.svg'; }}
+                      onError={e => { e.currentTarget.onerror = null; e.currentTarget.src = fallbackImg; }}
                     />
                     <Button
                       variant="destructive"
@@ -89,7 +89,7 @@ const ImageUpload: React.FC<ImageUploadProps> = ({
                     </Button>
                   </div>
                 ))}
-                {/* Previews das novas imagens (sempre após as existentes, sem limite de quantidade) */}
+                {/* Todas as previews locais*/}
                 {imagePreviewUrls.slice(existingImages.length).map((url, index) => (
                   <div
                     key={`new-${index}`}
@@ -99,7 +99,7 @@ const ImageUpload: React.FC<ImageUploadProps> = ({
                       src={url}
                       alt={`Nova imagem ${index + 1}`}
                       className="w-full h-full object-cover"
-                      onError={e => { e.currentTarget.src = '/placeholder.svg'; }}
+                      onError={e => { e.currentTarget.onerror = null; e.currentTarget.src = fallbackImg; }}
                     />
                     <Button
                       variant="destructive"

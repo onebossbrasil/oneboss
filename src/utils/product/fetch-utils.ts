@@ -48,21 +48,29 @@ export const fetchProductsFromSupabase = async (): Promise<{ products: Product[]
       throw imagesResult.error;
     }
 
-    // Mapeia todas imagens para products
+    // Mapeia todas imagens para products, garantindo sempre array válido
     const imagesByProduct: Record<string, ProductImage[]> = {};
-    imagesResult.data.forEach((image: any) => {
-      if (!image.product_id) return; // sanidade
-      if (!imagesByProduct[image.product_id]) {
-        imagesByProduct[image.product_id] = [];
-      }
-      imagesByProduct[image.product_id].push({
-        id: image.id,
-        url: image.url,
-        sortOrder: image.sort_order,
+    if (imagesResult.data && Array.isArray(imagesResult.data)) {
+      imagesResult.data.forEach((image: any) => {
+        if (!image.product_id || !image.url) return; // só imagens válidas
+        if (!imagesByProduct[image.product_id]) {
+          imagesByProduct[image.product_id] = [];
+        }
+        // Sanitização de url: só entra se começar com https://gytzdhfbmmrsanrhquut.supabase.co/
+        if (
+          typeof image.url === 'string' &&
+          image.url.startsWith('https://gytzdhfbmmrsanrhquut.supabase.co/storage/v1/object/public/products/')
+        ) {
+          imagesByProduct[image.product_id].push({
+            id: image.id,
+            url: image.url,
+            sortOrder: image.sort_order ?? 0,
+          });
+        }
       });
-    });
+    }
 
-    // Cria array final, garantindo todas imagens relacionadas (SEM FATIAR)
+    // Garante que nunca será undefined, sempre [] se não houver imagens
     const formattedProducts: Product[] = productsResult.data.map((product: any) => ({
       id: product.id,
       name: product.name,
@@ -77,8 +85,7 @@ export const fetchProductsFromSupabase = async (): Promise<{ products: Product[]
       featured: product.featured ?? false,
       published: product.published !== undefined ? product.published : true,
       stockQuantity: product.stock_quantity || 0,
-      // Aqui: SEM fatiar, pega todas as imagens já ordenadas
-      images: (imagesByProduct[product.id] || []).sort((a, b) => (a.sortOrder ?? 0) - (b.sortOrder ?? 0)),
+      images: (imagesByProduct[product.id] || []), // nunca retorna null
       createdAt: product.created_at,
       updatedAt: product.updated_at,
     }));
