@@ -23,7 +23,8 @@ export const useProductEdit = (
   const [selectedSubcategoryId, setSelectedSubcategoryId] = useState<string | null>(product?.subcategoryId ?? null);
   const [selectedAttributeId, setSelectedAttributeId] = useState<string | null>(product?.attributeId ?? null);
 
-  // Mantém IDs bufferizados para prevenir sobrescrita errada em re-render, enquanto as categories podem chegar assincronamente
+  // Buffer states para manter sincronismo pós-carregamento de categorias
+  // 1) Reinicializa form com os dados do produto ao editar/cadastrar
   useEffect(() => {
     if (product) {
       setFormData({
@@ -36,23 +37,27 @@ export const useProductEdit = (
         published: product.published,
         featured: product.featured
       });
-
-      // Buffer ids de produto (não depende do carregamento das categorias/subs ainda!)
       setSelectedCategory(product.categoryId ?? "");
       setSelectedSubcategoryId(product.subcategoryId ?? null);
       setSelectedAttributeId(product.attributeId ?? null);
+      console.log(
+        "[useProductEdit] Produto fresh recebido. Setando IDs:",
+        "Categoria =", product.categoryId,
+        "Subcategoria =", product.subcategoryId,
+        "Atributo =", product.attributeId
+      );
     }
     // eslint-disable-next-line
   }, [product?.id]);
 
-  // Novo: Sincroniza os selects assim que categories terminam de carregar
+  // 2) Sincroniza selects somente após categorias carregarem
   useEffect(() => {
     if (!catLoading && categories.length > 0 && product) {
-      // Busca se categoria existe
+      // Buscar categoria existente
       const cat = categories.find(cat => cat.id === product.categoryId);
       if (cat) {
         setSelectedCategory(product.categoryId ?? "");
-        // Busca subcat válida
+        // Busca subcategoria válida
         const subcat = cat.subcategories.find(sc => sc.id === product.subcategoryId);
         if (subcat) {
           setSelectedSubcategoryId(product.subcategoryId ?? null);
@@ -60,17 +65,23 @@ export const useProductEdit = (
           const attr = subcat.attributes.find(at => at.id === product.attributeId);
           if (attr) {
             setSelectedAttributeId(product.attributeId ?? null);
+            console.log("[useProductEdit] IDs sincronizados:", {
+              categoria: cat.name, subcat: subcat.name, atributo: attr.name
+            });
           } else {
-            setSelectedAttributeId(null); // Atributo não existe nessa subcat
+            setSelectedAttributeId(null); // Atributo não existe mais nessa subcat
+            console.log("[useProductEdit] Atributo não encontrado, zerando.");
           }
         } else {
           setSelectedSubcategoryId(null);
           setSelectedAttributeId(null);
+          console.log("[useProductEdit] Subcategoria não encontrada, zerando sub e atributo.");
         }
       } else {
         setSelectedCategory("");
         setSelectedSubcategoryId(null);
         setSelectedAttributeId(null);
+        console.log("[useProductEdit] Categoria não encontrada, zerando todos IDs.");
       }
     }
     // eslint-disable-next-line
