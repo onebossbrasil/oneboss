@@ -1,3 +1,4 @@
+
 import { Eye, EyeOff, Edit, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { TableCell, TableRow } from "@/components/ui/table";
@@ -27,27 +28,21 @@ const ProductTableRow = ({
   const [isToggling, setIsToggling] = useState(false);
   const fallbackImg = "/placeholder.svg";
 
-  // DEBUG: Log cada produto e suas imagens
-  console.log("[ProductTableRow] Renderizando produto", product?.name, product?.id, "imagens:", product?.images);
+  // LOG COMPLETO do array de imagens recebidas:
+  console.log("[ProductTableRow] Product id:", product?.id, "name:", product?.name, "product.images:", product?.images);
 
-  // Função robusta para pegar a primeira imagem real
-  const getFirstValidImageUrl = () => {
-    if (
-      Array.isArray(product.images) &&
-      product.images.length > 0
-    ) {
-      // Busca a primeira imagem realmente válida
-      const validImg = product.images.find(
-        img =>
-          img &&
-          typeof img.url === "string" &&
-          img.url.trim() !== "" &&
-          !img.url.endsWith('/products/')
-      );
-      return validImg?.url || null;
-    }
-    return null;
-  };
+  // Detecção VISUAL no admin de problema:
+  let imageUrl: string | null = null;
+  if (Array.isArray(product?.images) && product.images.length > 0) {
+    imageUrl = product.images.find(img =>
+      img &&
+      typeof img.url === "string" &&
+      img.url.trim() !== "" &&
+      !img.url.endsWith('/products/')
+    )?.url || null;
+  }
+  // LOG: qual image será renderizada
+  console.log("[ProductTableRow] Renderizando imagem para produto:", product.name, "=>", imageUrl);
 
   const handleVisibilityToggle = async (product: Product) => {
     setIsToggling(true);
@@ -62,15 +57,12 @@ const ProductTableRow = ({
           product.published ? "não será exibido" : "será exibido"
         } na loja.`,
       });
-      // Não há mais refreshProducts automático aqui!
     } catch (error) {
       console.error("Error toggling product visibility:", error);
     } finally {
       setIsToggling(false);
     }
   };
-
-  const imageUrl = getFirstValidImageUrl();
 
   return (
     <TableRow className={isSelectedToDelete ? "bg-red-50 dark:bg-red-900/20" : ""} data-product-id={product.id}>
@@ -91,7 +83,11 @@ const ProductTableRow = ({
           />
         ) : (
           <div className="w-16 h-16 bg-muted rounded-lg flex items-center justify-center text-xs text-muted-foreground border border-dashed">
-            Sem imagem
+            <span>Nenhuma imagem</span>
+            {(!product.images || product.images.length === 0) && (
+              <span className="text-red-600 block text-[10px]">Array vazio</span>
+            )}
+            {/* Extra diagnóstico visual */}
           </div>
         )}
       </TableCell>
@@ -119,7 +115,6 @@ const ProductTableRow = ({
         )}
       </TableCell>
       <TableCell>{product.stockQuantity}</TableCell>
-      {/* Removido a coluna de publicado */}
       <TableCell className="text-right">
         <div className="flex justify-end gap-2">
           <ProductVisibilityButton
@@ -150,3 +145,4 @@ const ProductTableRow = ({
 };
 
 export default ProductTableRow;
+

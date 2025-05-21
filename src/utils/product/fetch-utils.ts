@@ -1,3 +1,4 @@
+
 import { Product, ProductImage } from "@/types/product";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -62,6 +63,7 @@ export const fetchProductsFromSupabase = async (): Promise<{ products: Product[]
         // Aqui, inclui toda url que seja string válida
         if (
           typeof image.url === 'string' &&
+          image.url.trim() !== '' &&
           image.url.startsWith('https://gytzdhfbmmrsanrhquut.supabase.co/storage/v1/object/public/products/')
         ) {
           imagesByProduct[image.product_id].push({
@@ -80,6 +82,7 @@ export const fetchProductsFromSupabase = async (): Promise<{ products: Product[]
     const formattedProducts: Product[] = productsResult.data.map((product: any) => {
       // LOG para cada produto e suas imagens mapeadas
       const mappedImgs = imagesByProduct[product.id] || [];
+      // Mostrando como será o array images no console
       console.log("[fetch-utils] Produto montado:", product.name, product.id, mappedImgs);
 
       return {
@@ -96,17 +99,19 @@ export const fetchProductsFromSupabase = async (): Promise<{ products: Product[]
         featured: product.featured ?? false,
         published: product.published !== undefined ? product.published : true,
         stockQuantity: product.stock_quantity || 0,
-        images: mappedImgs, // array correto!
+        images: Array.isArray(mappedImgs) ? mappedImgs : [], // SAFE!
         createdAt: product.created_at,
         updatedAt: product.updated_at,
       };
     });
 
+    // LOG: Array final de produtos com imagens
+    console.log("[fetch-utils] formattedProducts:", formattedProducts);
+
     return { products: formattedProducts, error: null };
   } catch (err: any) {
     console.error('Error fetching products:', err);
     
-    // Categorize error messages for better user feedback
     let errorMessage: string;
     if (err.code === 'PGRST301') {
       errorMessage = 'Erro de autenticação. Faça login novamente.';
@@ -121,3 +126,4 @@ export const fetchProductsFromSupabase = async (): Promise<{ products: Product[]
     return { products: [], error: errorMessage };
   }
 };
+

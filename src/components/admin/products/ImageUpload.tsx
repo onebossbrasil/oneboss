@@ -23,8 +23,8 @@ const ImageUpload: React.FC<ImageUploadProps> = ({
   const isDisabled = false;
   const fallbackImg = "/placeholder.svg";
 
-  // LOG para debug do array de imagens existentes (no modal de edição)
-  console.log("[ImageUpload] existingImages (do modal):", existingImages);
+  // Diagnóstico: mostrar todas imagens persistidas
+  console.log("[ImageUpload] existingImages do modal:", existingImages);
 
   // Sempre filtra imagens com url válida
   const validExistingImages =
@@ -36,6 +36,11 @@ const ImageUpload: React.FC<ImageUploadProps> = ({
         )
       : [];
   const hasImages = (validExistingImages.length > 0 || imagePreviewUrls.length > 0);
+
+  // Diagnóstico visual extra
+  if (!hasImages) {
+    console.warn("[ImageUpload] Nenhuma imagem existente, nem preview local -- EXISTING:", existingImages, "PREVIEW URLs:", imagePreviewUrls);
+  }
 
   return (
     <Card>
@@ -67,6 +72,11 @@ const ImageUpload: React.FC<ImageUploadProps> = ({
               </label>
             </div>
           </div>
+          {!hasImages && (
+            <div className="text-red-700 text-xs py-2">
+              Nenhuma imagem disponível para este produto do banco ou local. Verifique o cadastro ou upload.
+            </div>
+          )}
           {hasImages && (
             <div>
               <h4 className="text-sm font-medium mb-2">Imagens adicionadas</h4>
