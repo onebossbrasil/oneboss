@@ -1,4 +1,3 @@
-
 import React from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -29,17 +28,23 @@ const ImageUpload: React.FC<ImageUploadProps> = ({
   // Sempre filtra imagens com url válida
   const validExistingImages =
     Array.isArray(existingImages)
-      ? existingImages.filter(img =>
-          typeof img.url === "string" &&
-          img.url.trim() !== "" &&
-          !img.url.endsWith('/products/')
+      ? existingImages.filter(
+          img =>
+            img &&
+            typeof img.url === "string" &&
+            img.url.trim() !== ""
         )
       : [];
   const hasImages = (validExistingImages.length > 0 || imagePreviewUrls.length > 0);
 
   // Diagnóstico visual extra
   if (!hasImages) {
-    console.warn("[ImageUpload] Nenhuma imagem existente, nem preview local -- EXISTING:", existingImages, "PREVIEW URLs:", imagePreviewUrls);
+    console.warn(
+      "[ImageUpload] Nenhuma imagem existente, nem preview local -- EXISTING:",
+      existingImages,
+      "PREVIEW URLs:",
+      imagePreviewUrls
+    );
   }
 
   return (

@@ -28,21 +28,33 @@ const ProductTableRow = ({
   const [isToggling, setIsToggling] = useState(false);
   const fallbackImg = "/placeholder.svg";
 
-  // LOG COMPLETO do array de imagens recebidas:
-  console.log("[ProductTableRow] Product id:", product?.id, "name:", product?.name, "product.images:", product?.images);
+  // Diagnóstico completo
+  console.log("[ProductTableRow] product.id:", product?.id, "product.images:", product?.images);
 
-  // Detecção VISUAL no admin de problema:
+  /**
+   * Seleciona sempre a primeira imagem válida.
+   */
   let imageUrl: string | null = null;
-  if (Array.isArray(product?.images) && product.images.length > 0) {
-    imageUrl = product.images.find(img =>
-      img &&
-      typeof img.url === "string" &&
-      img.url.trim() !== "" &&
-      !img.url.endsWith('/products/')
-    )?.url || null;
+  let imageReason: string = "";
+  if (Array.isArray(product?.images)) {
+    if (product.images.length > 0) {
+      const validImgs = product.images.filter((img) =>
+        img && typeof img.url === "string" && img.url.trim() !== ""
+      );
+      if (validImgs.length > 0) {
+        imageUrl = validImgs[0].url;
+      } else {
+        imageReason = "Imagens do array são inválidas (url vazia ou tipo errado)";
+      }
+    } else {
+      imageReason = "Array de imagens está vazio";
+    }
+  } else {
+    imageReason = "product.images não é um array";
   }
-  // LOG: qual image será renderizada
-  console.log("[ProductTableRow] Renderizando imagem para produto:", product.name, "=>", imageUrl);
+
+  // Log visual
+  console.log("[ProductTableRow] imageUrl selecionada:", imageUrl, "Motivo se ausente:", imageReason);
 
   const handleVisibilityToggle = async (product: Product) => {
     setIsToggling(true);
@@ -65,10 +77,11 @@ const ProductTableRow = ({
   };
 
   return (
-    <TableRow className={isSelectedToDelete ? "bg-red-50 dark:bg-red-900/20" : ""} data-product-id={product.id}>
-      <TableCell className="text-center">
-        {selectionCheckbox}
-      </TableCell>
+    <TableRow
+      className={isSelectedToDelete ? "bg-red-50 dark:bg-red-900/20" : ""}
+      data-product-id={product.id}
+    >
+      <TableCell className="text-center">{selectionCheckbox}</TableCell>
       <TableCell>
         {imageUrl ? (
           <img
@@ -76,26 +89,25 @@ const ProductTableRow = ({
             alt={product.name}
             className="w-16 h-16 object-cover rounded-lg"
             style={{ minWidth: 52, minHeight: 52 }}
-            onError={e => {
+            onError={(e) => {
               e.currentTarget.onerror = null;
               e.currentTarget.src = fallbackImg;
             }}
           />
         ) : (
-          <div className="w-16 h-16 bg-muted rounded-lg flex items-center justify-center text-xs text-muted-foreground border border-dashed">
+          <div className="w-16 h-16 bg-muted rounded-lg flex items-center justify-center text-xs text-muted-foreground border border-dashed flex-col">
             <span>Nenhuma imagem</span>
-            {(!product.images || product.images.length === 0) && (
-              <span className="text-red-600 block text-[10px]">Array vazio</span>
+            {imageReason && (
+              <span className="text-red-600 block text-[10px]">{imageReason}</span>
             )}
-            {/* Extra diagnóstico visual */}
           </div>
         )}
       </TableCell>
       <TableCell className="font-medium min-w-[220px] max-w-[360px] whitespace-nowrap overflow-hidden text-ellipsis group relative">
-        <span 
+        <span
           title={product.name}
           className="block overflow-hidden text-ellipsis"
-          style={{ maxWidth: 340, display: "inline-block"}}
+          style={{ maxWidth: 340, display: "inline-block" }}
         >
           {product.name}
         </span>
@@ -122,20 +134,10 @@ const ProductTableRow = ({
             onClick={() => handleVisibilityToggle(product)}
             disabled={isToggling}
           />
-          <Button
-            variant="outline"
-            size="icon"
-            onClick={() => onEditClick(product)}
-            title="Editar produto"
-          >
+          <Button variant="outline" size="icon" onClick={() => onEditClick(product)} title="Editar produto">
             <Edit className="h-4 w-4" />
           </Button>
-          <Button
-            variant="destructive"
-            size="icon"
-            onClick={() => onSelectDelete(product)}
-            title="Excluir produto"
-          >
+          <Button variant="destructive" size="icon" onClick={() => onSelectDelete(product)} title="Excluir produto">
             <Trash2 className="h-4 w-4" />
           </Button>
         </div>
@@ -145,4 +147,3 @@ const ProductTableRow = ({
 };
 
 export default ProductTableRow;
-
