@@ -15,8 +15,10 @@ export function useSubcategoryMutations(
     try {
       setIsLoading(true);
       await createSubcategory(categoryId, name, type);
-      await fetchCategories();
-      
+      // Forçar fetch com "force = true"
+      if (fetchCategories) {
+        await fetchCategories(true);
+      }
       toast({
         title: 'Subcategoria adicionada',
         description: `${name} foi adicionada com sucesso.`,
@@ -46,8 +48,7 @@ export function useSubcategoryMutations(
     try {
       setIsLoading(true);
       await deleteSubcategory(subcategoryId as any);
-      await fetchCategories();
-      
+      await fetchCategories(true); // força após remoção também!
       toast({
         title: 'Subcategoria removida',
         description: 'A subcategoria foi removida com sucesso.',
