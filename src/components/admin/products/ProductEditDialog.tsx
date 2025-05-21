@@ -12,7 +12,6 @@ import ProductEditActions from "./edit/ProductEditActions";
 import { useProductEdit } from "@/hooks/use-product-edit";
 import { useFetchProductById } from "@/hooks/use-fetch-product-by-id";
 import { useEffect } from "react";
-import CategoryDebugPanel from "./CategoryDebugPanel";
 
 interface ProductEditDialogProps {
   product: Product | null;
