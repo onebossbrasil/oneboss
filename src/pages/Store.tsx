@@ -1,10 +1,11 @@
+
 import React, { useState, useEffect } from "react";
 import { useSearchParams } from "react-router-dom";
 import { useProducts } from "@/contexts/ProductContext";
 import { useCategories } from "@/contexts/CategoryContext";
 import ProductCard from "@/components/ProductCard";
 import CategoryFilter from "@/components/store/CategoryFilter";
-import Pagination from "@/components/ui/pagination";
+import { Pagination } from "@/components/ui/pagination";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Search } from "lucide-react";
@@ -51,6 +52,33 @@ const Store = () => {
     setCurrentPage(page);
   };
 
+  // Utility for formatting a product for card display
+  function formatProduct(product: Product) {
+    const categoryName =
+      categories.find(cat => cat.id === product.categoryId)?.name || "";
+    const price =
+      typeof product.price === "number"
+        ? new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" }).format(product.price)
+        : product.price?.toString?.() || "";
+    const imageUrl =
+      product.images?.[0]?.url ||
+      "https://images.unsplash.com/photo-1503376780353-7e6692767b70?auto=format&fit=crop&q=80&w=600&h=400";
+    return {
+      id: product.id,
+      name: product.name,
+      price,
+      salePrice:
+        product.salePrice && typeof product.salePrice === "number"
+          ? new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" }).format(product.salePrice)
+          : undefined,
+      category: categoryName,
+      subcategory: "", // Could resolve by subcategoryId if you wish
+      imageUrl,
+      featured: !!product.featured,
+      description: product.shortDescription || product.description,
+    };
+  }
+
   return (
     <div className="container mx-auto px-4 py-8">
       <h1 className="text-2xl font-bold mb-4">Loja</h1>
@@ -68,7 +96,6 @@ const Store = () => {
             <Search className="h-4 w-4" />
           </Button>
         </div>
-
         <CategoryFilter
           categories={categories}
           selectedCategory={selectedCategory}
@@ -84,7 +111,7 @@ const Store = () => {
         <>
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
             {paginatedProducts.map(product => (
-              <ProductCard key={product.id} product={product} />
+              <ProductCard key={product.id} product={formatProduct(product)} />
             ))}
           </div>
 
