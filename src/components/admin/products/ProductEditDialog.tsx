@@ -31,8 +31,9 @@ const ProductEditDialog = ({ product, open, onOpenChange, onClose }: ProductEdit
 
   useEffect(() => {
     if (open) {
-      console.log("[Diagnóstico Modal] Produto do banco:", freshProduct);
-      console.log("[Diagnóstico Modal] Produto prop:", product);
+      console.log("[LOG MODAL] Produto freshProduct:", freshProduct);
+      console.log("[LOG MODAL] Produto original prop:", product);
+      console.log("[LOG MODAL] freshProduct.subcategoryId:", freshProduct?.subcategoryId, typeof freshProduct?.subcategoryId);
     }
   }, [open, freshProduct, product]);
 
@@ -60,9 +61,9 @@ const ProductEditDialog = ({ product, open, onOpenChange, onClose }: ProductEdit
 
   useEffect(() => {
     if (open) {
-      console.log("[Diagnóstico Modal] Comparação Category: product?.categoryId =", product?.categoryId, "| freshProduct?.categoryId =", freshProduct?.categoryId, "| selectedCategory =", selectedCategory);
+      console.log("[LOG MODAL] selectedCategory:", selectedCategory, "selectedSubcategoryId:", selectedSubcategoryId, typeof selectedSubcategoryId);
     }
-  }, [open, product, freshProduct, selectedCategory]);
+  }, [open, selectedCategory, selectedSubcategoryId]);
 
   useEffect(() => {
     if (open && freshProduct?.categoryId && freshProduct.categoryId !== selectedCategory) {
@@ -122,10 +123,11 @@ const ProductEditDialog = ({ product, open, onOpenChange, onClose }: ProductEdit
                   />
                   <div>
                     <span style={{fontSize:10, color:"#6c6"}}>[DEBUG: selectedCategory = {selectedCategory}]</span>
+                    <span style={{fontSize:10, color:"#ccf"}}>[DEBUG: selectedSubcategoryId = {selectedSubcategoryId ?? "(nenhuma)"}]</span>
                   </div>
                   <CategorySelector
                     selectedCategory={selectedCategory}
-                    subcategoryValues={{}} // não usar mais subcategoryValues da API
+                    subcategoryValues={{}}
                     selectedSubcategoryId={selectedSubcategoryId}
                     onCategoryChange={handleCategoryChange}
                     onSubcategoryChange={() => {}}

@@ -19,16 +19,15 @@ export const useProductEdit = (
   const [selectedSubcategoryId, setSelectedSubcategoryId] = useState<string | null>(product?.subcategoryId ?? null);
   const [selectedAttributeId, setSelectedAttributeId] = useState<string | null>(product?.attributeId ?? null);
 
-  // Sempre que o produto fresh chegar, reidrata os campos pelos uuid
   useEffect(() => {
     if (product) {
       if (selectedCategory !== (product.categoryId ?? "")) {
         setSelectedCategory(product.categoryId ?? "");
       }
-      if (!isEqual(selectedSubcategoryId, product.subcategoryId ?? null)) {
+      if (selectedSubcategoryId !== (product.subcategoryId ?? null)) {
         setSelectedSubcategoryId(product.subcategoryId ?? null);
       }
-      if (!isEqual(selectedAttributeId, product.attributeId ?? null)) {
+      if (selectedAttributeId !== (product.attributeId ?? null)) {
         setSelectedAttributeId(product.attributeId ?? null);
       }
       setFormData({
@@ -41,10 +40,16 @@ export const useProductEdit = (
         published: product.published,
         featured: product.featured
       });
-      console.log("[useProductEdit] Estados sincronizados:", {
+      console.log("[LOG useProductEdit] Sync produtct:", {
         categoria: product.categoryId,
         subcategoria: product.subcategoryId,
         atributo: product.attributeId,
+        typeof_subcat: typeof product.subcategoryId
+      });
+      console.log("[LOG useProductEdit] Estados internos atualizados:", {
+        selectedCategory,
+        selectedSubcategoryId,
+        selectedAttributeId
       });
     }
     // eslint-disable-next-line
@@ -130,3 +135,4 @@ export const useProductEdit = (
     handleSubcatIdChange: handleSubcategoryIdChange
   };
 };
+

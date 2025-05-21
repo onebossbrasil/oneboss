@@ -32,17 +32,29 @@ const CategorySelectorContent = ({
   // Sincronizar com prop corretamente pelos UUIDs sempre!
   useEffect(() => {
     setActiveSubcategoryId(selectedSubcategoryId ?? null);
-  }, [selectedSubcategoryId]);
+    if (selectedCategory) {
+      console.log("[LOG CategorySelector] selectedCategory:", selectedCategory, "selectedSubcategoryId (prop):", selectedSubcategoryId, "typeof:", typeof selectedSubcategoryId);
+    }
+  }, [selectedSubcategoryId, selectedCategory]);
 
   // Busca subcategoria ativa pelo id
   const activeSubcatObj = category?.subcategories.find(
-    sc => sc.id === activeSubcategoryId
+    sc => {
+      const match = sc.id === activeSubcategoryId;
+      if (activeSubcategoryId && match) {
+        console.log("[LOG CategorySelector] found subcat:", sc, "for id:", activeSubcategoryId);
+      }
+      return match;
+    }
   );
 
   // Notifica mudança por ID
   useEffect(() => {
     if (onSubcategoryIdChange) {
       onSubcategoryIdChange(activeSubcategoryId);
+    }
+    if (activeSubcategoryId) {
+      console.log("[LOG CategorySelector] activeSubcategoryId:", activeSubcategoryId, "typeof:", typeof activeSubcategoryId);
     }
     // eslint-disable-next-line
   }, [activeSubcategoryId]);
@@ -75,6 +87,7 @@ const CategorySelectorContent = ({
           onValueChange={(catId) => {
             onCategoryChange(catId);
             setActiveSubcategoryId(null);
+            console.log("[LOG CategorySelector] Categoria mudou:", catId);
           }}
           value={selectedCategory}
           disabled={categories.length === 0}
@@ -104,8 +117,8 @@ const CategorySelectorContent = ({
           <Select 
             onValueChange={(subcatId) => {
               setActiveSubcategoryId(subcatId);
+              console.log("[LOG CategorySelector] Subcategoria mudou para:", subcatId);
               if (onSubcategoryIdChange) onSubcategoryIdChange(subcatId);
-              // ao trocar subcategoria, zera atributo na tela superior
               if (onAttributeIdChange) onAttributeIdChange(null);
             }}
             value={activeSubcategoryId ?? ""}
@@ -124,7 +137,7 @@ const CategorySelectorContent = ({
             </SelectContent>
           </Select>
           <div>
-            <span style={{fontSize:10, color:"#cc6"}}>[DEBUG: activeSubcategoryId = {activeSubcategoryId ?? "(nenhuma)"}</span>
+            <span style={{fontSize:10, color:"#cc6"}}>[DEBUG: activeSubcategoryId = {activeSubcategoryId ?? "(nenhuma)"}]</span>
           </div>
         </div>
       )}
@@ -162,6 +175,7 @@ const CategorySelectorContent = ({
                 : null}
             </SelectContent>
           </Select>
+          <div>[DEBUG: activeSubcatObj = {JSON.stringify(activeSubcatObj)}]</div>
         </div>
       )}
     </div>
