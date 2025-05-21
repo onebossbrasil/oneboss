@@ -20,8 +20,11 @@ const ImageUpload: React.FC<ImageUploadProps> = ({
   handleImageChange,
   handleRemoveImage
 }) => {
-  const isDisabled = false; // Poderia ser passado como prop para "isSubmitting", mas mantemos simples
+  const isDisabled = false;
 
+  // Mostra imagem preview: sempre mostra todas do banco (existingImages), e previews das novas depois
+  // A responsabilidade de manter imagePreviewUrls como [existing...novas] fica no hook
+  
   return (
     <Card>
       <CardContent className="pt-6">
@@ -60,6 +63,7 @@ const ImageUpload: React.FC<ImageUploadProps> = ({
             <div>
               <h4 className="text-sm font-medium mb-2">Imagens adicionadas</h4>
               <div className="grid grid-cols-3 gap-4">
+                {/* Imagens do banco */}
                 {existingImages.map((image, index) => (
                   <div
                     key={`existing-${image.id}`}
@@ -82,6 +86,7 @@ const ImageUpload: React.FC<ImageUploadProps> = ({
                     </Button>
                   </div>
                 ))}
+                {/* Novas imagens, previews */}
                 {imagePreviewUrls.slice(existingImages.length).map((url, index) => (
                   <div
                     key={`new-${index}`}

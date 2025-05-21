@@ -6,56 +6,52 @@ export const useImageManagement = (product: Product | null) => {
   const [imagePreviewUrls, setImagePreviewUrls] = useState<string[]>([]);
   const [deletedImageIds, setDeletedImageIds] = useState<string[]>([]);
 
-  // Reset images when product changes ou após update bem sucedido
+  // Sempre reseta previews e deletes ao receber um novo produto fresh (após fetch atualizado)
   useEffect(() => {
-    if (product) {
+    if (product?.images) {
       setImagePreviewUrls(product.images.map(img => img.url));
-      setImages([]);
-      setDeletedImageIds([]); // Reset deleted image IDs
+      setImages([]); // Limpa uploads pendentes, só mostra já salvas!
+      setDeletedImageIds([]); // Limpa a lista de imagens a excluir
       console.log("[useImageManagement] Carregando imagens fresh do produto:", product.images);
     } else {
       setImagePreviewUrls([]);
       setImages([]);
       setDeletedImageIds([]);
-      console.log("[useImageManagement] Resetou imagens (novo produto)");
+      console.log("[useImageManagement] Resetou imagens (novo produto ou sem produto)");
     }
-  }, [product]);
+  }, [product?.id, product?.images?.length]); // now use product id and image count as dep
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) {
       const newFiles = Array.from(e.target.files);
-
-      // Filtra arquivos já existentes por nome para evitar duplicata
+      // Evitar duplicidade apenas entre imagens novas (mas pode reenviar imagem igual se user precisar)
       const uniqueNewFiles = newFiles.filter(newFile => (
         !images.some(existing => existing.name === newFile.name && existing.size === newFile.size)
       ));
 
-      // Create preview URLs
       const newPreviewUrls = uniqueNewFiles.map(file => URL.createObjectURL(file));
-
       setImages(prev => [...prev, ...uniqueNewFiles]);
       setImagePreviewUrls(prev => [...prev, ...newPreviewUrls]);
-
-      console.log("[useImageManagement] Imagens novas adicionadas:", uniqueNewFiles.map(f => f.name), "Total previews:", newPreviewUrls);
+      console.log("[useImageManagement] Imagens novas adicionadas:", uniqueNewFiles.map(f => f.name));
     }
   };
 
   const handleRemoveImage = (index: number) => {
-    if (product && index < product.images.length) {
-      // Remove imagem existente, guarda id para deleção
+    if (product && index < (product.images?.length ?? 0)) {
+      // Remover imagem existente (index responde ao array imagePreviewUrls, que é sempre [imagens-db,...imagens-uploadadas])
       const imageToDelete = product.images[index];
       setDeletedImageIds(prev => [...prev, imageToDelete.id]);
-      // Remove do preview também
+      // Remove do preview e mantém ordem das novas/antigas
       const newPreviewUrls = [...imagePreviewUrls];
       newPreviewUrls.splice(index, 1);
       setImagePreviewUrls(newPreviewUrls);
-      console.log("[useImageManagement] Marcou imagem para deleção (no banco)", imageToDelete.id, "deletedImageIds agora:", [...deletedImageIds, imageToDelete.id]);
+      console.log("[useImageManagement] Marcou imagem BD para deleção", imageToDelete.id);
     } else {
-      // Nova imagem (ainda não foi enviada ao banco)
+      // Nova imagem enviada nesta sessão (ainda não foi persistida)
       const newImageIndex = index - (product?.images?.length ?? 0);
       const newImages = [...images];
-      const newImagePreview = imagePreviewUrls[index];
-      if (newImagePreview) URL.revokeObjectURL(newImagePreview);
+      const previewUrl = imagePreviewUrls[index];
+      if (previewUrl) URL.revokeObjectURL(previewUrl);
       newImages.splice(newImageIndex, 1);
       const newPreviewUrls = [...imagePreviewUrls];
       newPreviewUrls.splice(index, 1);
