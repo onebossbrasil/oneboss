@@ -146,6 +146,9 @@ const Store = () => {
         </div>
       </div>
 
+      {/* Espaçamento novo entre banner e o restante */}
+      <div className="mb-8" />
+
       {/* Estrutura principal: sidebar + conteúdo */}
       <div className="max-w-7xl mx-auto px-2 md:px-6 flex mt-0 gap-6">
         {/* Sidebar de Filtros */}

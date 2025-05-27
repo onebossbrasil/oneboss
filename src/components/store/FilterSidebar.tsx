@@ -1,13 +1,20 @@
-import { useState } from "react";
-import { Filter, X } from "lucide-react";
+
+import { useState, useMemo } from "react";
+import { X, Circle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Sidebar, SidebarContent, SidebarHeader, SidebarFooter } from "@/components/ui/sidebar";
+import { SidebarHeader, SidebarFooter } from "@/components/ui/sidebar";
 import { useCategories } from "@/contexts/CategoryContext";
 import { SubcategoryType, AttributeType } from "@/types/category";
 import { Product } from "@/types/product";
 import AttributeListDisplay from "@/components/categories/AttributeListDisplay";
+
+// Estilos inspirados no sidebar admin
+const highlightCls = "bg-gold/90 text-gray-900 font-bold shadow";
+const hoverCls = "hover:bg-gold/10 text-gold";
+const normalCatCls = "text-gray-800";
+const subcatDivider = "border-l-[3px] border-gold/30 pl-2 ml-3";
 
 type FilterSidebarProps = {
   selectedCategory: string | null;
@@ -32,43 +39,34 @@ const FilterSidebar = ({
 }: FilterSidebarProps) => {
   const { categories } = useCategories();
 
-  // Get subcategories for the selected category
-  const getSubcategories = () => {
+  // Filtra subcategorias e atributos com produto associado na categoria selecionada
+  const visibleSubcategories = useMemo(() => {
     if (!selectedCategory) return [];
-    const category = categories.find(cat => cat.value === selectedCategory);
-    if (!category) return [];
-    return category.subcategories || [];
-  };
-
-  // Subcategory will be visible if at least ONE published product has subcategoryValue equal to any of its attributes
-  const getActiveSubcategories = (): SubcategoryType[] => {
-    const subcategories = getSubcategories();
-
-    return subcategories
-      .map((subcat) => {
-        // For each attribute of the subcategory:
-        const activeAttributes = subcat.attributes.filter((attr: AttributeType) =>
-          publishedProducts.some(
-            (product) =>
-              false // subcategoryValues removido; nunca há valores vinculados
-          )
-        );
-        // Only return subcategory if there is at least 1 active attribute
-        return activeAttributes.length > 0
-          ? {
-              ...subcat,
-              attributes: activeAttributes
-            }
-          : null;
-      })
-      .filter((item): item is SubcategoryType => !!item);
-  };
-
-  const subcategories = getActiveSubcategories();
+    const cat = categories.find(cat => cat.value === selectedCategory);
+    if (!cat) return [];
+    // Só mostra subcategorias com ao menos 1 atributo que aparece em produtos publicados
+    return (cat.subcategories || []).map(subcat => {
+      const activeAttrs = subcat.attributes.filter(attr =>
+        publishedProducts.some(
+          prod =>
+            String(prod.categoryId) === String(selectedCategory) &&
+            String(prod.attributeId) === String(attr.id)
+        )
+      );
+      return activeAttrs.length
+        ? { ...subcat, attributes: activeAttrs }
+        : null;
+    }).filter(Boolean);
+  }, [categories, selectedCategory, publishedProducts]);
 
   return (
     <>
-      <aside className={`fixed md:static inset-0 z-40 bg-background/95 md:bg-transparent backdrop-blur-md md:backdrop-blur-none md:w-64 flex-shrink-0 md:glassmorphism p-6 rounded-lg self-start md:sticky md:top-24 transition-all duration-300 transform ${isMobileFiltersOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'} overflow-auto max-h-screen md:max-h-[calc(100vh-120px)] md:block`}>
+      <aside className={`fixed md:static inset-0 z-40 bg-background/95 md:bg-[#F6F6F7] backdrop-blur-md 
+        md:backdrop-blur-none md:w-64 flex-shrink-0 md:glassmorphism p-6 rounded-lg self-start 
+        md:sticky md:top-24 transition-all duration-300 transform 
+        ${isMobileFiltersOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'}
+        overflow-auto max-h-screen md:max-h-[calc(100vh-120px)] md:block border-r border-gray-200 shadow`}
+      >
         <SidebarHeader className="mb-6">
           <div className="flex items-center justify-between">
             <h2 className="font-semibold text-lg">Filtros</h2>
@@ -80,48 +78,46 @@ const FilterSidebar = ({
             Limpar Filtros
           </Button>
         </SidebarHeader>
-        <SidebarContent>
-          <div className="space-y-6">
-            <h3 className="font-medium">Categorias</h3>
-            <ScrollArea className="h-[400px] pr-4">
-              {/* Categories */}
-              <div className="space-y-1 mb-6">
-                {categories.map(category => (
-                  <div key={category.id} className="flex flex-col">
-                    <Button
-                      variant="ghost"
-                      className={`justify-start font-normal h-8 px-2 w-full text-left ${selectedCategory === category.value ? 'bg-gold/10 text-gold' : ''}`}
-                      onClick={() => onCategorySelect(category.value)}
-                    >
-                      {category.name}
-                    </Button>
-                  </div>
-                ))}
-              </div>
-              {/* Subcategories */}
-              {selectedCategory && subcategories.length > 0 && (
-                <>
-                  <Separator className="my-4" />
-                  <div className="space-y-2">
-                    <h3 className="font-medium mb-2">Subcategorias</h3>
-                    {subcategories.map((subcategory: SubcategoryType) => (
-                      <div key={subcategory.id}>
-                        {subcategories.length > 1 && (
-                          <span className="block text-xs text-muted-foreground font-medium ml-2 mb-1">{subcategory.name}</span>
-                        )}
-                        <AttributeListDisplay
-                          attributes={subcategory.attributes}
-                          selectedAttributes={selectedSubcategories}
-                          onAttributeToggle={onSubcategoryToggle}
-                        />
+        <Separator className="mb-4" />
+        <ScrollArea className="h-[400px] pr-4">
+          {/* Categorias */}
+          <div className="space-y-1 mb-6">
+            {categories.map(category => (
+              <div key={category.id} className="flex flex-col">
+                <Button
+                  variant="ghost"
+                  className={`justify-start font-medium h-9 px-2 w-full text-left rounded-md transition-all
+                  ${selectedCategory === category.value ? highlightCls : normalCatCls}
+                  ${hoverCls}`}
+                  onClick={() => onCategorySelect(category.value)}
+                >
+                  <Circle
+                    size={18}
+                    className={`mr-2 ${selectedCategory === category.value ? "text-gold" : "text-gray-300"}`}
+                  />
+                  {category.name}
+                </Button>
+                {/* Se categoria está selecionada, mostrar subcats (com filtro dinâmico) */}
+                {selectedCategory === category.value && visibleSubcategories.length > 0 && (
+                  <div className="mt-1 mb-3">
+                    {visibleSubcategories.map((subcategory: SubcategoryType) => (
+                      <div key={subcategory.id} className="ml-4">
+                        <span className="block text-xs text-muted-foreground font-semibold mb-1 mt-2">{subcategory.name}</span>
+                        <div className={subcatDivider}>
+                          <AttributeListDisplay
+                            attributes={subcategory.attributes}
+                            selectedAttributes={selectedSubcategories}
+                            onAttributeToggle={onSubcategoryToggle}
+                          />
+                        </div>
                       </div>
                     ))}
                   </div>
-                </>
-              )}
-            </ScrollArea>
+                )}
+              </div>
+            ))}
           </div>
-        </SidebarContent>
+        </ScrollArea>
         <SidebarFooter className="fixed bottom-0 left-0 right-0 p-4 bg-background border-t border-border md:hidden">
           <Button className="w-full bg-gold hover:bg-gold-light text-white" onClick={() => setIsMobileFiltersOpen(false)}>
             Aplicar Filtros
