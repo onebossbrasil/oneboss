@@ -1,64 +1,78 @@
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import { useSearchParams } from "react-router-dom";
 import { useProducts } from "@/contexts/ProductContext";
 import { useCategories } from "@/contexts/CategoryContext";
-import ProductCard from "@/components/ProductCard";
+import StoreHeader from "@/components/store/StoreHeader";
+import ResultsHeader from "@/components/store/ResultsHeader";
 import CategoryFilter from "@/components/store/CategoryFilter";
+import ProductGrid from "@/components/store/ProductGrid";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Search } from "lucide-react";
-import { Product } from "@/types/product";
+import { Search, RefreshCw } from "lucide-react";
 
 const Store = () => {
   const { products, isLoading, error } = useProducts();
   const { categories } = useCategories();
   const [searchParams, setSearchParams] = useSearchParams();
+
   const [searchTerm, setSearchTerm] = useState<string>(searchParams.get("search") || "");
   const [selectedCategory, setSelectedCategory] = useState<string>(searchParams.get("category") || "");
   const [currentPage, setCurrentPage] = useState<number>(Number(searchParams.get("page")) || 1);
+
+  // Ordenação — pode ser expandido depois
+  const [sortOption, setSortOption] = useState<"relevance"|"price-asc"|"price-desc"|"newest">(searchParams.get("sort") as any || "relevance");
+
   const productsPerPage = 12;
 
-  // === DEBUG LOGS ========
-  console.log("[Store] products recebidos do contexto:", products);
-  console.log("[Store] categorias disponíveis:", categories);
-  console.log("[Store] selectedCategory = ", selectedCategory);
-  // ========================
-
+  // Sincronizar estado->URL (query string)
   useEffect(() => {
     const newParams = new URLSearchParams();
     if (searchTerm) newParams.set("search", searchTerm);
     if (selectedCategory) newParams.set("category", selectedCategory);
     if (currentPage > 1) newParams.set("page", currentPage.toString());
+    if (sortOption && sortOption !== "relevance") newParams.set("sort", sortOption);
+    setSearchParams(newParams, { replace: true });
+    // eslint-disable-next-line
+  }, [searchTerm, selectedCategory, currentPage, sortOption]);
 
-    setSearchParams(newParams);
-  }, [searchTerm, selectedCategory, currentPage, setSearchParams]);
+  // Função para resetar filtro/busca/página
+  const resetFilters = () => {
+    setSearchTerm("");
+    setSelectedCategory("");
+    setCurrentPage(1);
+    setSortOption("relevance");
+  };
 
-  // Corrigido: garantir que comparação de categoria está correta
-  const filteredProducts = products.filter(product => {
-    const searchMatch = product.name.toLowerCase().includes(searchTerm.toLowerCase());
-    const categoryMatch = selectedCategory ? String(product.categoryId) === String(selectedCategory) : true;
-    return searchMatch && categoryMatch;
-  });
+  // Tratamento de busca/filter
+  const filteredProducts = useMemo(() => {
+    let result = products.filter(product => {
+      const searchMatch = product.name?.toLowerCase().includes(searchTerm.toLowerCase()) || false;
+      const categoryMatch = selectedCategory ? String(product.categoryId) === String(selectedCategory) : true;
+      return searchMatch && categoryMatch;
+    });
+    // Ordenação
+    if (sortOption === "price-asc") {
+      result = [...result].sort((a, b) => Number(a.price) - Number(b.price));
+    } else if (sortOption === "price-desc") {
+      result = [...result].sort((a, b) => Number(b.price) - Number(a.price));
+    } else if (sortOption === "newest") {
+      result = [...result].sort((a, b) => {
+        if (!a.createdAt || !b.createdAt) return 0;
+        return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+      });
+    }
+    return result;
+  }, [products, searchTerm, selectedCategory, sortOption]);
 
   const totalPages = Math.max(1, Math.ceil(filteredProducts.length / productsPerPage));
-  const paginatedProducts = filteredProducts.slice((currentPage - 1) * productsPerPage, currentPage * productsPerPage);
+  const paginatedProducts = useMemo(
+    () => filteredProducts.slice((currentPage - 1) * productsPerPage, currentPage * productsPerPage),
+    [filteredProducts, currentPage, productsPerPage]
+  );
 
-  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setSearchTerm(e.target.value);
-    setCurrentPage(1);
-  };
-
-  const handleCategoryChange = (category: string) => {
-    setSelectedCategory(category);
-    setCurrentPage(1);
-  };
-
-  const handlePageChange = (page: number) => {
-    setCurrentPage(page);
-  };
-
-  function formatProduct(product: Product) {
+  // Format product for Grid
+  function formatProduct(product) {
     const categoryName = categories.find(cat => String(cat.id) === String(product.categoryId))?.name || "";
     let price: string;
     if (typeof product.price === "number") {
@@ -80,105 +94,106 @@ const Store = () => {
           ? new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" }).format(product.salePrice)
           : undefined,
       category: categoryName,
-      subcategory: "", // Could resolve by subcategoryId if you wish
+      subcategory: "", // Pode adicionar subcategoria resolvida aqui depois
       imageUrl,
       featured: !!product.featured,
       description: product.shortDescription || product.description,
     };
   }
 
-  const Pagination = ({
-    currentPage,
-    totalPages,
-    onPageChange
-  }: {
-    currentPage: number;
-    totalPages: number;
-    onPageChange: (page: number) => void;
-  }) => {
-    if (totalPages < 2) return null;
-    return (
-      <div className="flex justify-center mt-6 gap-2">
-        <button
-          className="rounded px-3 py-1 bg-gray-200 text-gray-700 disabled:opacity-50"
-          disabled={currentPage === 1}
-          onClick={() => onPageChange(currentPage - 1)}
-        >
-          Anterior
-        </button>
-        {[...Array(totalPages)].map((_, idx) => (
-          <button
-            key={idx}
-            className={`rounded px-3 py-1 ${currentPage === idx + 1
-              ? "bg-gold text-white"
-              : "bg-gray-200 text-gray-700"
-              }`}
-            onClick={() => onPageChange(idx + 1)}
-            disabled={currentPage === idx + 1}
-          >
-            {idx + 1}
-          </button>
-        ))}
-        <button
-          className="rounded px-3 py-1 bg-gray-200 text-gray-700 disabled:opacity-50"
-          disabled={currentPage === totalPages}
-          onClick={() => onPageChange(currentPage + 1)}
-        >
-          Próxima
-        </button>
-      </div>
-    );
+  // Busca: submit com Enter ou clique
+  const onSearch = (e) => {
+    e.preventDefault();
+    setCurrentPage(1);
   };
 
-  return (
-    <div className="container mx-auto px-4 py-8">
-      <h1 className="text-2xl font-bold mb-4">Loja</h1>
-      <div className="flex flex-col md:flex-row items-center justify-between mb-4 gap-2">
-        <div className="flex items-center w-full md:w-auto">
-          <Input
-            type="search"
-            placeholder="Pesquisar produtos..."
-            value={searchTerm}
-            onChange={handleSearchChange}
-            className="w-full md:w-64"
-          />
-          <Button variant="outline" size="icon" className="ml-2">
-            <Search className="h-4 w-4" />
-          </Button>
-        </div>
-        <CategoryFilter
-          categories={categories}
-          selectedCategory={selectedCategory}
-          onCategoryChange={handleCategoryChange}
-        />
-      </div>
+  // Cabeçalho de busca+filtro
+  const showClearButton = !!searchTerm || !!selectedCategory || sortOption !== "relevance";
 
-      {isLoading ? (
-        <div className="text-center">Carregando produtos...</div>
-      ) : error ? (
-        <div className="text-red-500 text-center">Erro ao carregar produtos.</div>
-      ) : (
-        <>
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-            {paginatedProducts.length === 0 && (
-              <div className="col-span-full text-center text-muted-foreground py-8">
-                Nenhum produto encontrado.
-              </div>
-            )}
-            {paginatedProducts.map(product => (
-              <ProductCard key={product.id} product={formatProduct(product)} />
-            ))}
+  return (
+    <div className="min-h-screen bg-muted/50 pb-20">
+      <div className="max-w-7xl mx-auto px-4 py-8">
+        <StoreHeader />
+        {/* Barra de busca e filtros */}
+        <form onSubmit={onSearch} className="flex flex-col md:flex-row items-center gap-2 mb-7">
+          <div className="relative w-full md:w-4/12">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
+            <Input
+              type="search"
+              placeholder="Buscar produtos..."
+              className="pl-9 rounded-r-none"
+              value={searchTerm}
+              onChange={e => {
+                setSearchTerm(e.target.value);
+                setCurrentPage(1);
+              }}
+              autoFocus
+            />
           </div>
-          <Pagination
-            currentPage={currentPage}
-            totalPages={totalPages}
-            onPageChange={handlePageChange}
+          <span className="hidden md:block w-5" />
+          <CategoryFilter
+            categories={categories}
+            selectedCategory={selectedCategory}
+            onCategoryChange={catId => { setSelectedCategory(catId); setCurrentPage(1); }}
           />
-        </>
-      )}
+          {showClearButton && (
+            <Button
+              type="button"
+              variant="ghost"
+              className="ml-2 text-muted-foreground"
+              onClick={resetFilters}
+            >
+              <RefreshCw className="w-4 h-4 mr-1" />
+              Limpar filtros
+            </Button>
+          )}
+        </form>
+
+        {/* Header de resultados e ordenação */}
+        <ResultsHeader
+          productCount={filteredProducts.length}
+          sortOption={sortOption}
+          setSortOption={setSortOption}
+        />
+
+        {/* Estado de carregando/erro */}
+        {isLoading ? (
+          <div className="text-center py-16 text-xl text-muted-foreground animate-pulse">
+            Carregando produtos...
+          </div>
+        ) : error ? (
+          <div className="text-center py-16 text-red-500">
+            Erro ao carregar produtos.
+          </div>
+        ) : (
+          <ProductGrid
+            products={paginatedProducts.map(formatProduct)}
+            resetFilters={resetFilters}
+          />
+        )}
+
+        {/* Paginação */}
+        <div className="mt-8">
+          {totalPages > 1 && (
+            <nav className="flex justify-center">
+              {Array.from({ length: totalPages }, (_, idx) => (
+                <Button
+                  key={idx}
+                  size="sm"
+                  variant={currentPage === idx + 1 ? "default" : "outline"}
+                  className={`mx-1 ${currentPage === idx + 1 ? "font-bold" : ""}`}
+                  onClick={() => setCurrentPage(idx + 1)}
+                  disabled={currentPage === idx + 1}
+                >
+                  {idx + 1}
+                </Button>
+              ))}
+            </nav>
+          )}
+        </div>
+      </div>
     </div>
   );
 };
 
 export default Store;
-
