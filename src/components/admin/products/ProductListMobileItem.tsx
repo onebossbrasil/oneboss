@@ -23,8 +23,17 @@ const ProductListMobileItem = ({
   isSelectedToDelete,
 }: ProductListMobileItemProps) => {
   const fallbackImg = "/placeholder.svg";
-  const hasImg = Array.isArray(product?.images) && product.images.length > 0;
+  // Ajuste condicional: impedir SVG e URL inválida
+  const hasImg =
+    Array.isArray(product?.images) &&
+    product.images.length > 0 &&
+    typeof product.images[0]?.url === "string" &&
+    product.images[0].url.trim() !== "" &&
+    !product.images[0].url.endsWith(".svg");
   const imgUrl = hasImg ? product.images[0].url : "";
+
+  // Diagnóstico: log das imagens recebidas
+  console.log("[ProductListMobileItem] product.images=", product?.images);
 
   return (
     <li className={`rounded-xl border shadow bg-white relative ${isSelectedToDelete ? "border-red-300 bg-red-50" : "border-gray-200"}`}>
@@ -50,7 +59,10 @@ const ProductListMobileItem = ({
             ) : (
               <div className="w-16 h-16 rounded-lg flex items-center justify-center text-xs text-muted-foreground bg-muted flex-col border">
                 <ImageOff className="w-6 h-6 mb-1 text-red-400" />
-                Sem imagem
+                {/* AVISO DEBUG */}
+                {product.images && product.images.length > 0
+                  ? "URL inválida ou formato não suportado"
+                  : "Sem imagem"}
               </div>
             )}
           </div>
@@ -70,7 +82,6 @@ const ProductListMobileItem = ({
           </div>
         </div>
       </div>
-      {/* Nova linha de ícones fixa na parte inferior do card */}
       <div className="flex justify-end items-center border-t pt-2 px-3 pb-2 gap-2">
         <ProductVisibilityButton
           published={product.published}

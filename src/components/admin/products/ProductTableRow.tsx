@@ -1,4 +1,3 @@
-
 import { Eye, EyeOff, Edit, Trash2, ImageOff } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { TableCell, TableRow } from "@/components/ui/table";
@@ -47,8 +46,16 @@ const ProductTableRow = ({
     }
   };
 
-  const hasImg = Array.isArray(product?.images) && product.images.length > 0;
+  const hasImg =
+    Array.isArray(product?.images) &&
+    product.images.length > 0 &&
+    typeof product.images[0]?.url === "string" &&
+    product.images[0].url.trim() !== "" &&
+    !product.images[0].url.endsWith(".svg");
   const imgUrl = hasImg ? product.images[0].url : "";
+
+  // Diagnóstico: loga imagens recebidas
+  console.log("[ProductTableRow] product.images=", product?.images);
 
   return (
     <TableRow
@@ -71,7 +78,12 @@ const ProductTableRow = ({
         ) : (
           <div className="w-16 h-16 bg-muted rounded-lg flex items-center justify-center text-xs text-muted-foreground border border-dashed flex-col">
             <ImageOff className="w-6 h-6 mb-1 text-red-400" />
-            <span>Nenhuma imagem</span>
+            {/* AVISO DEBUG */}
+            <span>
+              {product.images && product.images.length > 0
+                ? "URL inválida ou formato não suportado"
+                : "Nenhuma imagem"}
+            </span>
           </div>
         )}
       </TableCell>
