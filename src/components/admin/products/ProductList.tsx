@@ -50,7 +50,7 @@ export default function ProductList() {
 
   return (
     <div>
-      <ProductImagesAuditReport />
+      {/* Painel de auditoria removido */}
       {isMobile ? (
         <ProductListMobilePanel
           products={filteredProducts}
