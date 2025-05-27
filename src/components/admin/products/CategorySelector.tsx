@@ -28,12 +28,23 @@ const CategorySelectorContent = ({
   const { categories, isLoading, error } = useCategories();
 
   const category = categories.find(cat => cat.id === selectedCategory);
-  // Remove controle interno de atributo/subcategoria: só use props
 
   // Busca subcategoria ativa pelo id
   const activeSubcatObj = category?.subcategories.find(
     sc => sc.id === selectedSubcategoryId
   );
+
+  // LOGS DE DIAGNÓSTICO
+  if (process.env.NODE_ENV !== "production") {
+    console.log("[CategorySelector] categories:", categories);
+    console.log("[CategorySelector] selectedCategory:", selectedCategory);
+    console.log("[CategorySelector] selectedSubcategoryId:", selectedSubcategoryId);
+    console.log("[CategorySelector] activeSubcatObj:", activeSubcatObj);
+    if (activeSubcatObj) {
+      console.log("[CategorySelector] activeSubcatObj.attributes:", activeSubcatObj.attributes);
+    }
+    console.log("[CategorySelector] selectedAttributeId:", selectedAttributeId);
+  }
 
   // Quando muda subcategoria, notifica parent e reseta apenas se mudou de fato
   useEffect(() => {
@@ -116,7 +127,8 @@ const CategorySelectorContent = ({
         </div>
       )}
 
-      {selectedSubcategoryId && activeSubcatObj && activeSubcatObj.attributes && activeSubcatObj.attributes.length > 0 && (
+      {/* Corrigido: Garante map de atributos apenas se array com length > 0 */}
+      {selectedSubcategoryId && activeSubcatObj && Array.isArray(activeSubcatObj.attributes) && activeSubcatObj.attributes.length > 0 && (
         <div>
           <Label htmlFor="subcategoryValue">
             {activeSubcatObj.name + " - Atributos"}
@@ -128,6 +140,7 @@ const CategorySelectorContent = ({
               }
             }}
             value={selectedAttributeId ?? ""}
+            disabled={activeSubcatObj.attributes.length === 0}
           >
             <SelectTrigger>
               <SelectValue placeholder={
@@ -135,7 +148,7 @@ const CategorySelectorContent = ({
               } />
             </SelectTrigger>
             <SelectContent>
-              {activeSubcatObj.attributes.map((attr: any) => (
+              {activeSubcatObj.attributes.map((attr: { id: string; name: string; }) => (
                 <SelectItem key={attr.id} value={attr.id}>
                   {attr.name}
                 </SelectItem>
@@ -145,6 +158,7 @@ const CategorySelectorContent = ({
         </div>
       )}
 
+      {/* Mensagem, caso não haja atributos */}
       {selectedSubcategoryId && activeSubcatObj && (!activeSubcatObj.attributes || activeSubcatObj.attributes.length === 0) && (
         <div className="text-sm text-muted-foreground italic">
           Esta subcategoria não possui atributos cadastrados.
