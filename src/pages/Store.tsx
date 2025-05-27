@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from "react";
 import { useSearchParams } from "react-router-dom";
 import { useProducts } from "@/contexts/ProductContext";
@@ -18,6 +19,12 @@ const Store = () => {
   const [currentPage, setCurrentPage] = useState<number>(Number(searchParams.get("page")) || 1);
   const productsPerPage = 12;
 
+  // === DEBUG LOGS ========
+  console.log("[Store] products recebidos do contexto:", products);
+  console.log("[Store] categorias disponíveis:", categories);
+  console.log("[Store] selectedCategory = ", selectedCategory);
+  // ========================
+
   useEffect(() => {
     const newParams = new URLSearchParams();
     if (searchTerm) newParams.set("search", searchTerm);
@@ -27,13 +34,14 @@ const Store = () => {
     setSearchParams(newParams);
   }, [searchTerm, selectedCategory, currentPage, setSearchParams]);
 
+  // Corrigido: garantir que comparação de categoria está correta
   const filteredProducts = products.filter(product => {
     const searchMatch = product.name.toLowerCase().includes(searchTerm.toLowerCase());
-    const categoryMatch = selectedCategory ? product.categoryId === selectedCategory : true;
+    const categoryMatch = selectedCategory ? String(product.categoryId) === String(selectedCategory) : true;
     return searchMatch && categoryMatch;
   });
 
-  const totalPages = Math.ceil(filteredProducts.length / productsPerPage);
+  const totalPages = Math.max(1, Math.ceil(filteredProducts.length / productsPerPage));
   const paginatedProducts = filteredProducts.slice((currentPage - 1) * productsPerPage, currentPage * productsPerPage);
 
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -50,10 +58,8 @@ const Store = () => {
     setCurrentPage(page);
   };
 
-  // Utility for formatting a product for card display
   function formatProduct(product: Product) {
-    const categoryName =
-      categories.find(cat => cat.id === product.categoryId)?.name || "";
+    const categoryName = categories.find(cat => String(cat.id) === String(product.categoryId))?.name || "";
     let price: string;
     if (typeof product.price === "number") {
       price = new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" }).format(product.price);
@@ -81,7 +87,6 @@ const Store = () => {
     };
   }
 
-  // Custom simple pagination
   const Pagination = ({
     currentPage,
     totalPages,
@@ -155,6 +160,11 @@ const Store = () => {
       ) : (
         <>
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+            {paginatedProducts.length === 0 && (
+              <div className="col-span-full text-center text-muted-foreground py-8">
+                Nenhum produto encontrado.
+              </div>
+            )}
             {paginatedProducts.map(product => (
               <ProductCard key={product.id} product={formatProduct(product)} />
             ))}
@@ -171,3 +181,4 @@ const Store = () => {
 };
 
 export default Store;
+
