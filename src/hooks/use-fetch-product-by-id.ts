@@ -52,8 +52,8 @@ export const useFetchProductById = (productId: string | null, open: boolean) => 
         name: prodData.name,
         shortDescription: prodData.short_description || "",
         description: prodData.description || "",
-        price: parseFloat(prodData.price),
-        salePrice: prodData.sale_price ? parseFloat(prodData.sale_price) : null,
+        price: prodData.price, // Corrigido: não usa parseFloat
+        salePrice: prodData.sale_price ?? null, // Também corrigido
         categoryId: prodData.category_id,
         subcategoryId: prodData.subcategory_id ?? null,
         attributeId: prodData.attribute_id ?? null,
