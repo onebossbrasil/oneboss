@@ -5,27 +5,43 @@ export const useImageManagement = (product: Product | null) => {
   const [images, setImages] = useState<File[]>([]);
   const [imagePreviewUrls, setImagePreviewUrls] = useState<string[]>([]);
   const [deletedImageIds, setDeletedImageIds] = useState<string[]>([]);
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
   useEffect(() => {
     if (product?.images) {
-      // Agora SEMPRE traz todas imagens do banco para o preview (sem fatiar)
       setImagePreviewUrls(product.images.map(img => img.url));
-      setImages([]); // Limpa uploads novos
+      setImages([]);
       setDeletedImageIds([]);
+      setErrorMsg(null);
       console.log("[useImageManagement] Imagens fresh do produto:", product.images.length, product.images);
     } else {
       setImagePreviewUrls([]);
       setImages([]);
       setDeletedImageIds([]);
+      setErrorMsg(null);
       console.log("[useImageManagement] Resetou imagens (novo produto ou sem produto)");
     }
   }, [product?.id, product?.images?.length]);
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setErrorMsg(null);
     if (e.target.files) {
+      const ALLOWED_TYPES = [
+        "image/png",
+        "image/jpeg",
+        "image/jpg",
+        "image/webp"
+      ];
       const newFiles = Array.from(e.target.files);
+      // Não aceita arquivos de tipo proibido
+      const acceptedFiles = newFiles.filter(file => ALLOWED_TYPES.includes(file.type));
+      const rejectedFiles = newFiles.filter(file => !ALLOWED_TYPES.includes(file.type));
+      if (rejectedFiles.length > 0) {
+        setErrorMsg("Formato inválido detectado. Apenas PNG, JPG, JPEG ou WEBP são suportados.");
+        return;
+      }
       // Evita duplicidade
-      const uniqueNewFiles = newFiles.filter(newFile =>
+      const uniqueNewFiles = acceptedFiles.filter(newFile =>
         !images.some(existing => existing.name === newFile.name && existing.size === newFile.size)
       );
       const newPreviewUrls = uniqueNewFiles.map(file => URL.createObjectURL(file));
@@ -68,6 +84,8 @@ export const useImageManagement = (product: Product | null) => {
     handleRemoveImage,
     setImages,
     setImagePreviewUrls,
-    setDeletedImageIds
+    setDeletedImageIds,
+    errorMsg,
+    setErrorMsg
   };
 };

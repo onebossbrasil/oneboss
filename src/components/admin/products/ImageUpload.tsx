@@ -22,23 +22,44 @@ const ImageUpload: React.FC<ImageUploadProps> = ({
   const isDisabled = false;
   const fallbackImg = "/placeholder.svg";
 
+  // Estado para exibir mensagem de erro de formato
+  const [errorMsg, setErrorMsg] = React.useState<string | null>(null);
+
   // Diagnóstico: mostrar todas imagens persistidas
   console.log("[ImageUpload-DIAG] existingImages:", existingImages);
 
-  // Sempre filtra imagens com url válida
-  const validExistingImages =
-    Array.isArray(existingImages)
-      ? existingImages.filter(
-          img =>
-            img &&
-            typeof img.url === "string" &&
-            img.url.trim() !== ""
-        )
-      : [];
+  // Apenas imagens existentes com URL válida
+  const validExistingImages = Array.isArray(existingImages)
+    ? existingImages.filter(
+        img =>
+          img &&
+          typeof img.url === "string" &&
+          img.url.trim() !== ""
+      )
+    : [];
   const hasImages = (validExistingImages.length > 0 || imagePreviewUrls.length > 0);
-
-  // Badge contagem imagens exibidas (persistidas + upload local)
   const totalImagens = validExistingImages.length + images.length;
+
+  // Novo handle para filtrar extensões no upload
+  const handleInputChange: React.ChangeEventHandler<HTMLInputElement> = (e) => {
+    setErrorMsg(null); // Limpa erro antes de tentar
+    if (e.target.files) {
+      const ALLOWED_TYPES = [
+        "image/png",
+        "image/jpeg",
+        "image/jpg",
+        "image/webp"
+      ];
+      const newFiles = Array.from(e.target.files);
+
+      const invalid = newFiles.find(file => !ALLOWED_TYPES.includes(file.type));
+      if (invalid) {
+        setErrorMsg("Formato inválido. Suporte apenas PNG, JPG, JPEG ou WEBP.");
+        return;
+      }
+      handleImageChange(e);
+    }
+  };
 
   return (
     <Card>
@@ -47,7 +68,8 @@ const ImageUpload: React.FC<ImageUploadProps> = ({
           <div>
             <h3 className="text-sm font-medium mb-2">Imagens do Produto</h3>
             <p className="text-sm text-muted-foreground mb-4">
-              Arraste e solte ou clique para adicionar imagens. 
+              Arraste e solte ou clique para adicionar imagens.&nbsp;
+              <span className="font-semibold">Formatos permitidos: PNG, JPG, JPEG, WEBP.</span><br />
               Recomendado: 800x800px, máximo 5MB por arquivo. Não há limite para quantidade.
             </p>
             <div className="border-2 border-dashed border-muted-foreground/25 rounded-md p-8 text-center">
@@ -55,9 +77,9 @@ const ImageUpload: React.FC<ImageUploadProps> = ({
                 type="file"
                 id="image-upload"
                 multiple
-                accept="image/*"
+                accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp"
                 className="hidden"
-                onChange={handleImageChange}
+                onChange={handleInputChange}
                 disabled={isDisabled}
               />
               <label
@@ -66,10 +88,15 @@ const ImageUpload: React.FC<ImageUploadProps> = ({
               >
                 <Upload className="h-10 w-10 text-muted-foreground mb-2" />
                 <span className="text-sm text-muted-foreground">Clique para fazer upload ou arraste e solte</span>
-                <span className="text-xs text-muted-foreground mt-1">PNG, JPG, GIF até 5MB</span>
+                <span className="text-xs text-muted-foreground mt-1">PNG, JPG, JPEG ou WEBP até 5MB</span>
               </label>
             </div>
           </div>
+          {errorMsg && (
+            <div className="text-red-700 text-xs py-2 flex items-center gap-2">
+              <ImageOff className="w-4 h-4" /> {errorMsg}
+            </div>
+          )}
           {!hasImages && (
             <div className="text-red-700 text-xs py-2 flex items-center gap-2">
               <ImageOff className="w-4 h-4" /> Nenhuma imagem disponível para este produto do banco ou local. Verifique o cadastro ou upload.
