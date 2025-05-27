@@ -23,17 +23,24 @@ const ProductListMobileItem = ({
   isSelectedToDelete,
 }: ProductListMobileItemProps) => {
   const fallbackImg = "/placeholder.svg";
-  // Ajuste condicional: impedir SVG e URL inválida
-  const hasImg =
-    Array.isArray(product?.images) &&
-    product.images.length > 0 &&
-    typeof product.images[0]?.url === "string" &&
-    product.images[0].url.trim() !== "" &&
-    !product.images[0].url.endsWith(".svg");
-  const imgUrl = hasImg ? product.images[0].url : "";
+  // Seleciona a PRIMEIRA imagem real (não SVG, não inválida)
+  const getFirstValidImage = (images: any[]) => {
+    if (!Array.isArray(images)) return null;
+    return images.find(img =>
+      img &&
+      typeof img.url === "string" &&
+      img.url.trim() !== "" &&
+      !img.url.trim().toLowerCase().endsWith(".svg") &&
+      /^https:\/\/.+\.(jpg|jpeg|png|webp)$/i.test(img.url.trim())
+    );
+  };
+  const validImgObj = getFirstValidImage(product?.images || []);
+  const hasImg = !!validImgObj;
+  const imgUrl = hasImg ? validImgObj.url : "";
 
-  // Diagnóstico: log das imagens recebidas
+  // Diagnóstico DETALHADO das imagens recebidas
   console.log("[ProductListMobileItem] product.images=", product?.images);
+  console.log("[ProductListMobileItem] imagem válida escolhida:", imgUrl);
 
   return (
     <li className={`rounded-xl border shadow bg-white relative ${isSelectedToDelete ? "border-red-300 bg-red-50" : "border-gray-200"}`}>
@@ -52,7 +59,7 @@ const ProductListMobileItem = ({
                 alt={`Imagem de ${product.name}`}
                 className="w-10 h-10 object-cover rounded border"
                 onError={e => {
-                  console.error("Erro ao carregar imagem:", imgUrl, e.nativeEvent);
+                  console.error("[FRONT] Erro ao carregar imagem:", imgUrl, e.nativeEvent);
                   (e.currentTarget as HTMLImageElement).src = fallbackImg;
                 }}
               />
@@ -109,3 +116,4 @@ const ProductListMobileItem = ({
 };
 
 export default ProductListMobileItem;
+

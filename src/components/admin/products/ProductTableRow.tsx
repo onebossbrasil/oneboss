@@ -46,16 +46,23 @@ const ProductTableRow = ({
     }
   };
 
-  const hasImg =
-    Array.isArray(product?.images) &&
-    product.images.length > 0 &&
-    typeof product.images[0]?.url === "string" &&
-    product.images[0].url.trim() !== "" &&
-    !product.images[0].url.endsWith(".svg");
-  const imgUrl = hasImg ? product.images[0].url : "";
+  const getFirstValidImage = (images: any[]) => {
+    if (!Array.isArray(images)) return null;
+    return images.find(img =>
+      img &&
+      typeof img.url === "string" &&
+      img.url.trim() !== "" &&
+      !img.url.trim().toLowerCase().endsWith(".svg") &&
+      /^https:\/\/.+\.(jpg|jpeg|png|webp)$/i.test(img.url.trim())
+    );
+  };
+  const validImgObj = getFirstValidImage(product?.images || []);
+  const hasImg = !!validImgObj;
+  const imgUrl = hasImg ? validImgObj.url : "";
 
-  // Diagnóstico: loga imagens recebidas
+  // LOG: diagnóstico detalhado
   console.log("[ProductTableRow] product.images=", product?.images);
+  console.log("[ProductTableRow] imagem válida escolhida:", imgUrl);
 
   return (
     <TableRow
@@ -71,7 +78,7 @@ const ProductTableRow = ({
             className="w-10 h-10 object-cover rounded border"
             style={{ minWidth: 40, minHeight: 40 }}
             onError={e => {
-              console.error("Erro ao carregar imagem:", imgUrl, e.nativeEvent);
+              console.error("[FRONT] Erro ao carregar imagem:", imgUrl, e.nativeEvent);
               (e.currentTarget as HTMLImageElement).src = fallbackImg;
             }}
           />
