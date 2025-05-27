@@ -4,6 +4,7 @@ import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { useAuth } from "@/contexts/AuthContext";
 import { LogOut } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Link } from "react-router-dom";
 
 interface AdminHeaderBarProps {
   onLogout: () => void;
@@ -25,12 +26,14 @@ const AdminHeaderBar = ({ onLogout }: AdminHeaderBarProps) => {
     <header className="w-full bg-white border-b-2 border-gold shadow-sm fixed z-40 left-0 top-0 h-20 flex items-center px-8">
       <div className="flex justify-between items-center w-full">
         <div className="flex items-center">
-          {/* LOGO */}
-          <img
-            src="/lovable-uploads/cc202675-942c-4f4f-9e0c-0ba81e060e33.png"
-            alt="OneBoss"
-            className="h-12 w-auto mr-0"
-          />
+          {/* LOGO - Agora clicável */}
+          <Link to="/">
+            <img
+              src="/lovable-uploads/cc202675-942c-4f4f-9e0c-0ba81e060e33.png"
+              alt="OneBoss"
+              className="h-12 w-auto mr-0 cursor-pointer"
+            />
+          </Link>
           {/* Removido o texto OneBoss e Premium Panel */}
         </div>
         <div className="flex gap-4 items-center">
