@@ -26,35 +26,15 @@ export const addSubcategoryValue = async (subcategoryId: number | string, attrib
 };
 
 // Remove an attribute from a subcategory
-export const removeSubcategoryValue = async (subcategoryId: number | string, attribute: string, categoryId: number | string) => {
+export const removeSubcategoryValue = async (categoryId: number | string, subcategoryId: number | string, attributeId: string) => {
   try {
-    logServiceAction("Removendo atributo da subcategoria", { subcategoryId, attribute });
+    logServiceAction("Removendo atributo da subcategoria", { subcategoryId, attributeId });
 
-    // Find the attribute first
-    const { data: attributeData, error: findError } = await supabase
-      .from('attributes')
-      .select('id')
-      .eq('subcategory_id', subcategoryId.toString())
-      .eq('attribute', attribute)
-      .single();
-
-    if (findError) {
-      console.error("Erro ao buscar atributo da subcategoria:", findError);
-      throw findError;
-    }
-
-    if (!attributeData) {
-      console.error("Atributo não encontrado");
-      throw new Error('Atributo não encontrado');
-    }
-
-    logServiceAction("Atributo encontrado, ID:", attributeData.id);
-
-    // Delete the attribute
+    // Busca e deleta pelo id (direto!), não pelo nome
     const { error } = await supabase
       .from('attributes')
       .delete()
-      .eq('id', attributeData.id);
+      .eq('id', attributeId);
 
     if (error) {
       console.error("Erro ao deletar atributo da subcategoria:", error);
@@ -70,27 +50,16 @@ export const removeSubcategoryValue = async (subcategoryId: number | string, att
 
 export const updateSubcategoryValue = async (
   subcategoryId: string,
-  oldAttribute: string,
+  attributeId: string, // <--- ID, não mais o name antigo
   newAttribute: string
 ) => {
   try {
-    logServiceAction("Atualizando atributo da subcategoria", { subcategoryId, oldAttribute, newAttribute });
-    // Encontrar ID do atributo antigo
-    const { data: attrData, error: findError } = await supabase
-      .from('attributes')
-      .select('id')
-      .eq('subcategory_id', subcategoryId)
-      .eq('attribute', oldAttribute)
-      .maybeSingle();
-
-    if (findError || !attrData) {
-      throw findError || new Error("Atributo não encontrado");
-    }
-    // Atualizar atributo
+    logServiceAction("Atualizando atributo da subcategoria", { subcategoryId, attributeId, newAttribute });
+    // Atualizar atributo diretamente pelo id
     const { error } = await supabase
       .from('attributes')
       .update({ attribute: newAttribute })
-      .eq('id', attrData.id);
+      .eq('id', attributeId);
 
     if (error) {
       console.error("Erro ao atualizar atributo:", error);

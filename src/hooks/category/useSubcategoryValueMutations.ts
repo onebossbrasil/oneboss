@@ -34,7 +34,8 @@ export function useSubcategoryValueMutations(
     }
   };
 
-  const removeSubcategoryValue = async (categoryId: string, subcategoryId: string, value: string) => {
+  // Corrigido: utiliza o ID do atributo
+  const removeSubcategoryValue = async (categoryId: string, subcategoryId: string, attributeId: string) => {
     if (!isValidUuid(String(subcategoryId))) {
       toast({
         title: "ID de subcategoria inválido",
@@ -45,12 +46,12 @@ export function useSubcategoryValueMutations(
     }
     try {
       setIsLoading(true);
-      await removeSubcategoryValueService(subcategoryId as any, value, categoryId as any);
+      await removeSubcategoryValueService(categoryId as any, subcategoryId as any, attributeId);
       await fetchCategories();
 
       toast({
         title: 'Atributo removido',
-        description: `${value} foi removido com sucesso.`,
+        description: `O atributo foi removido com sucesso.`,
       });
     } catch (err: any) {
       console.error('Error removing subcategory attribute:', err);

@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -7,7 +8,7 @@ import { useToast } from "@/hooks/use-toast";
 import { useCategories, CategoryType, SubcategoryType } from "@/contexts/CategoryContext";
 import InlineEditInput from "./InlineEditInput";
 import { updateSubcategoryValue } from "@/services/category/valueOperations";
-import { AttributeType } from "@/types/category"; // <-- Import type
+import { AttributeType } from "@/types/category";
 import AttributeListDisplay from "@/components/categories/AttributeListDisplay";
 
 type AttributeListProps = {
@@ -41,7 +42,7 @@ const AttributeList = ({
   const category = getCurrentCategory();
   const subcategory = getCurrentSubcategory();
 
-  // Check for duplicate attribute name
+  // Verifica duplicidade de nome do atributo
   const attributeNameExists = (name: string) => {
     return subcategory?.attributes.some(attr => attr.name === name);
   };
@@ -74,11 +75,12 @@ const AttributeList = ({
     }
   };
 
+  // ATUALIZADO: Excluir pelo id (NÃO pelo nome)
   const handleRemoveAttribute = async (attr: AttributeType) => {
     if (!selectedCategory || !selectedSubcategory) return;
     if (!category || !subcategory) return;
     try {
-      await removeSubcategoryValue(category.id, subcategory.id, attr.id);
+      await removeSubcategoryValue(category.id, subcategory.id, attr.id); // <-- passa ID do atributo
       toast({
         title: "Atributo removido",
         description: `${attr.name} foi removido com sucesso.`,
@@ -97,7 +99,7 @@ const AttributeList = ({
     if (!category || !subcategory) return;
     setSavingEdit(true);
     try {
-      await updateSubcategoryValue(subcategory.id, oldAttr.id, editValue);
+      await updateSubcategoryValue(subcategory.id, oldAttr.id, editValue); // presume oldAttr.id, editValue = novo nome
       toast({
         title: "Atributo atualizado",
         description: `${editValue} editado com sucesso.`,
@@ -206,3 +208,4 @@ const AttributeList = ({
 };
 
 export default AttributeList;
+

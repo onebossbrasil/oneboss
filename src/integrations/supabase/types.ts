@@ -241,9 +241,7 @@ export type Database = {
           short_description: string | null
           stock_quantity: number | null
           subcategory_id: string | null
-          subcategory_values: Json | null
           updated_at: string | null
-          url: string | null
         }
         Insert: {
           attribute_id?: string | null
@@ -259,9 +257,7 @@ export type Database = {
           short_description?: string | null
           stock_quantity?: number | null
           subcategory_id?: string | null
-          subcategory_values?: Json | null
           updated_at?: string | null
-          url?: string | null
         }
         Update: {
           attribute_id?: string | null
@@ -277,9 +273,7 @@ export type Database = {
           short_description?: string | null
           stock_quantity?: number | null
           subcategory_id?: string | null
-          subcategory_values?: Json | null
           updated_at?: string | null
-          url?: string | null
         }
         Relationships: [
           {

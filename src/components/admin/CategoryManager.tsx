@@ -1,5 +1,4 @@
-
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useCategories } from "@/contexts/CategoryContext";
 import CategoryList from "./categories/CategoryList";
 import SubcategoryList from "./categories/SubcategoryList";
@@ -9,11 +8,42 @@ import { AlertCircle, Loader2, RefreshCw } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
+const LOCAL_STORAGE_KEYS = {
+  selectedCategory: "catman_selectedCategory_v1",
+  selectedSubcategory: "catman_selectedSubcategory_v1",
+  activeTab: "catman_activeTab_v1"
+};
+
 const CategoryManager = () => {
-  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
-  const [selectedSubcategory, setSelectedSubcategory] = useState<string | null>(null);
-  const [activeTab, setActiveTab] = useState<string>("categories");
+  // 1. Tenta restaurar estado salvo
+  const [selectedCategory, setSelectedCategory] = useState<string | null>(() => {
+    return localStorage.getItem(LOCAL_STORAGE_KEYS.selectedCategory) || null;
+  });
+  const [selectedSubcategory, setSelectedSubcategory] = useState<string | null>(() => {
+    return localStorage.getItem(LOCAL_STORAGE_KEYS.selectedSubcategory) || null;
+  });
+  const [activeTab, setActiveTab] = useState<string>(() => {
+    return localStorage.getItem(LOCAL_STORAGE_KEYS.activeTab) || "categories";
+  });
   const { isLoading, error, refreshCategories } = useCategories();
+
+  // 2. Seta persistência ao mudar cada estado relevante
+  useEffect(() => {
+    localStorage.setItem(LOCAL_STORAGE_KEYS.selectedCategory, selectedCategory ?? "");
+  }, [selectedCategory]);
+  useEffect(() => {
+    localStorage.setItem(LOCAL_STORAGE_KEYS.selectedSubcategory, selectedSubcategory ?? "");
+  }, [selectedSubcategory]);
+  useEffect(() => {
+    localStorage.setItem(LOCAL_STORAGE_KEYS.activeTab, activeTab);
+  }, [activeTab]);
+
+  // Limpeza (opcional): Limpa subcategoria se categoria muda
+  useEffect(() => {
+    if (!selectedCategory) {
+      setSelectedSubcategory(null);
+    }
+  }, [selectedCategory]);
 
   // Reset subcategory selection when changing to categories tab on mobile
   const handleTabChange = (value: string) => {
