@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useMemo } from "react";
 import { useSearchParams } from "react-router-dom";
 import { useProducts } from "@/contexts/ProductContext";
@@ -56,9 +55,10 @@ const Store = () => {
       const searchMatch = product.name?.toLowerCase().includes(searchTerm.toLowerCase()) || false;
       // Categoria
       const categoryMatch = selectedCategory ? String(product.categoryId) === String(selectedCategory) : true;
-      // Subcategorias (considera múltiplas)
+      // Subcategorias/Atributos (considera múltiplas)
+      // Corrigido: Para cada atributo selecionado, verifica se o product.attributeId corresponde
       const subcategoriesOk = selectedSubcategories.length > 0
-        ? selectedSubcategories.every((subcat: any) => product.subcategoryValues?.includes(subcat.id))
+        ? selectedSubcategories.some((subcat: any) => String(product.attributeId) === String(subcat.id))
         : true;
       return searchMatch && categoryMatch && subcategoriesOk;
     });
