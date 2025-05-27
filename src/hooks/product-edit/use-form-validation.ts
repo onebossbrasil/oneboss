@@ -1,5 +1,5 @@
-
 import { useToast } from "@/hooks/use-toast";
+import { brlStringToFloat } from "@/utils/product/price-utils";
 
 export const useFormValidation = () => {
   const { toast } = useToast();
@@ -21,9 +21,9 @@ export const useFormValidation = () => {
       return false;
     }
     
-    // Convert price to a number
-    const numericPrice = parseFloat(price.replace(/[^\d,.-]/g, '').replace(',', '.'));
-    if (isNaN(numericPrice)) {
+    // Usar função padronizada para validar preço
+    const numericPrice = brlStringToFloat(price);
+    if (isNaN(numericPrice) || numericPrice <= 0) {
       toast({
         title: "Preço inválido",
         description: "Por favor, insira um preço válido.",
@@ -34,7 +34,7 @@ export const useFormValidation = () => {
     
     // Convert sale price to a number if provided
     if (salePrice) {
-      const numericSalePrice = parseFloat(salePrice.replace(/[^\d,.-]/g, '').replace(',', '.'));
+      const numericSalePrice = brlStringToFloat(salePrice);
       if (isNaN(numericSalePrice)) {
         toast({
           title: "Preço promocional inválido",
@@ -59,9 +59,9 @@ export const useFormValidation = () => {
     return true;
   };
 
-  // Helper to convert string price to number
+  // Helper adaptado para cenário BRL
   const convertPriceToNumber = (priceString: string) => {
-    return parseFloat(priceString.replace(/[^\d,.-]/g, '').replace(',', '.'));
+    return brlStringToFloat(priceString);
   };
 
   return {

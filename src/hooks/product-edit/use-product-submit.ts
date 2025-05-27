@@ -3,6 +3,7 @@ import { useProducts } from "@/contexts/ProductContext";
 import { useToast } from "@/hooks/use-toast";
 import { Product } from "@/types/product";
 import { useFormValidation } from "./use-form-validation";
+import { brlStringToFloat } from "@/utils/product/price-utils";
 
 interface ProductFormData {
   name: string;
@@ -71,10 +72,11 @@ export const useProductSubmit = (
         return;
       }
 
-      const price = convertPriceToNumber(formData.price);
+      // Usa função padronizada BRL
+      const price = brlStringToFloat(formData.price);
       let salePrice = undefined;
       if (formData.salePrice) {
-        salePrice = convertPriceToNumber(formData.salePrice);
+        salePrice = brlStringToFloat(formData.salePrice);
       }
       const stockQuantity = parseInt(formData.stockQuantity, 10);
 

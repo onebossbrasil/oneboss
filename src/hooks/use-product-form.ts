@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useProducts } from "@/contexts/ProductContext";
 import { useToast } from "@/hooks/use-toast";
+import { brlStringToFloat } from "@/utils/product/price-utils";
 
 export const useProductForm = () => {
   const { toast } = useToast();
@@ -103,8 +104,8 @@ export const useProductForm = () => {
         return;
       }
       
-      // Convert price to a number
-      const price = parseFloat(formData.price.replace(/[^\d,.-]/g, '').replace(',', '.'));
+      // Utiliza função padronizada de conversão para float
+      const price = brlStringToFloat(formData.price);
       if (isNaN(price)) {
         toast({
           title: "Preço inválido",
@@ -117,7 +118,7 @@ export const useProductForm = () => {
       // Convert sale price to a number if provided
       let salePrice = undefined;
       if (formData.salePrice) {
-        salePrice = parseFloat(formData.salePrice.replace(/[^\d,.-]/g, '').replace(',', '.'));
+        salePrice = brlStringToFloat(formData.salePrice);
         if (isNaN(salePrice)) {
           toast({
             title: "Preço promocional inválido",
