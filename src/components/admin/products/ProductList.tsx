@@ -1,10 +1,10 @@
-
 import { useProducts } from "@/contexts/ProductContext";
 import { useIsMobile } from "@/hooks/useIsMobile";
 import { useProductFilters } from "./hooks/useProductFilters";
 import { useProductListLogic } from "./hooks/useProductListLogic";
 import ProductListMobilePanel from "./ProductListMobilePanel";
 import ProductListDesktopPanel from "./ProductListDesktopPanel";
+import ProductImagesAuditReport from "./ProductImagesAuditReport";
 
 export default function ProductList() {
   const { products, isLoading, error } = useProducts();
@@ -48,71 +48,72 @@ export default function ProductList() {
     if (p >= 1 && p <= pageCount) setPage(p);
   };
 
-  if (isMobile) {
-    return (
-      <ProductListMobilePanel
-        products={filteredProducts}
-        paginatedProducts={paginatedProducts}
-        search={search}
-        setSearch={setSearch}
-        filterCategory={filterCategory}
-        setFilterCategory={setFilterCategory}
-        categoryOptions={categories || []}
-        filterStatus={filterStatus}
-        setFilterStatus={setFilterStatus}
-        selectedIds={selectedIds}
-        onEditClick={handleEditClick}
-        onSelectDelete={() => {}} // pode-se implementar
-        onToggleProduct={handleToggleProduct}
-        dialogOpen={dialogOpen}
-        handleOpenCreate={handleOpenCreate}
-        showCreate={showCreate}
-        selectedProduct={selectedProduct}
-        handleDialogClose={handleDialogClose}
-        confirmDelete={confirmDelete}
-        isDeleting={isLoading}
-        handleConfirmDelete={() => {}} // pode-se implementar
-        isRefreshing={isRefreshing}
-        handleManualRefresh={handleManualRefresh}
-        page={page}
-        pageCount={pageCount}
-        handlePageChange={handlePageChange}
-        error={error}
-      />
-    );
-  }
-
   return (
-    <ProductListDesktopPanel
-      products={filteredProducts}
-      paginatedProducts={paginatedProducts}
-      search={search}
-      setSearch={setSearch}
-      filterCategory={filterCategory}
-      setFilterCategory={setFilterCategory}
-      categoryOptions={categories || []}
-      filterStatus={filterStatus}
-      setFilterStatus={setFilterStatus}
-      selectedIds={selectedIds}
-      allSelected={allSelected}
-      onEditClick={handleEditClick}
-      onSelectDelete={() => {}} // pode-se implementar
-      onToggleAll={checked => handleToggleAll(paginatedIds, checked)}
-      onToggleProduct={handleToggleProduct}
-      dialogOpen={dialogOpen}
-      handleOpenCreate={handleOpenCreate}
-      showCreate={showCreate}
-      selectedProduct={selectedProduct}
-      handleDialogClose={handleDialogClose}
-      confirmDelete={confirmDelete}
-      isDeleting={isLoading}
-      handleConfirmDelete={() => {}} // pode-se implementar
-      isRefreshing={isRefreshing}
-      handleManualRefresh={handleManualRefresh}
-      page={page}
-      pageCount={pageCount}
-      handlePageChange={handlePageChange}
-      error={error}
-    />
+    <div>
+      <ProductImagesAuditReport />
+      {isMobile ? (
+        <ProductListMobilePanel
+          products={filteredProducts}
+          paginatedProducts={paginatedProducts}
+          search={search}
+          setSearch={setSearch}
+          filterCategory={filterCategory}
+          setFilterCategory={setFilterCategory}
+          categoryOptions={categories || []}
+          filterStatus={filterStatus}
+          setFilterStatus={setFilterStatus}
+          selectedIds={selectedIds}
+          onEditClick={handleEditClick}
+          onSelectDelete={() => {}} // pode-se implementar
+          onToggleProduct={handleToggleProduct}
+          dialogOpen={dialogOpen}
+          handleOpenCreate={handleOpenCreate}
+          showCreate={showCreate}
+          selectedProduct={selectedProduct}
+          handleDialogClose={handleDialogClose}
+          confirmDelete={confirmDelete}
+          isDeleting={isLoading}
+          handleConfirmDelete={() => {}} // pode-se implementar
+          isRefreshing={isRefreshing}
+          handleManualRefresh={handleManualRefresh}
+          page={page}
+          pageCount={pageCount}
+          handlePageChange={handlePageChange}
+          error={error}
+        />
+      ) : (
+        <ProductListDesktopPanel
+          products={filteredProducts}
+          paginatedProducts={paginatedProducts}
+          search={search}
+          setSearch={setSearch}
+          filterCategory={filterCategory}
+          setFilterCategory={setFilterCategory}
+          categoryOptions={categories || []}
+          filterStatus={filterStatus}
+          setFilterStatus={setFilterStatus}
+          selectedIds={selectedIds}
+          allSelected={allSelected}
+          onEditClick={handleEditClick}
+          onSelectDelete={() => {}} // pode-se implementar
+          onToggleAll={checked => handleToggleAll(paginatedIds, checked)}
+          onToggleProduct={handleToggleProduct}
+          dialogOpen={dialogOpen}
+          handleOpenCreate={handleOpenCreate}
+          showCreate={showCreate}
+          selectedProduct={selectedProduct}
+          handleDialogClose={handleDialogClose}
+          confirmDelete={confirmDelete}
+          isDeleting={isLoading}
+          handleConfirmDelete={() => {}} // pode-se implementar
+          isRefreshing={isRefreshing}
+          handleManualRefresh={handleManualRefresh}
+          page={page}
+          pageCount={pageCount}
+          handlePageChange={handlePageChange}
+          error={error}
+        />
+      )}
+    </div>
   );
 }
