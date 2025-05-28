@@ -1,3 +1,4 @@
+
 import { useState, useMemo } from "react";
 import { X, ChevronDown, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -7,18 +8,6 @@ import { SidebarHeader, SidebarFooter } from "@/components/ui/sidebar";
 import { useCategories } from "@/contexts/CategoryContext";
 import { SubcategoryType } from "@/types/category";
 import { Product } from "@/types/product";
-
-// CLASSES UNIFICADAS
-const baseBtn =
-  "w-full flex items-center justify-between text-left rounded-md transition-all px-2";
-const activeCls = "bg-gold/90 text-white font-bold shadow";
-const hoverCls = "hover:bg-gold/10 text-gold";
-const normalCatCls = "text-gray-700";
-const subcatDivider = "border-l-4 border-gold/60 pl-3 ml-3";
-const activeSubcatCls = "bg-gold/15 text-gold font-semibold";
-const subcatHoverCls = "hover:bg-gold/10 hover:text-gold";
-const subcatCls =
-  "justify-start w-full text-left px-3 rounded-md transition-all h-8";
 
 type FilterSidebarProps = {
   selectedCategory: string | null;
@@ -115,14 +104,18 @@ const FilterSidebar = ({
           <div className="space-y-1 mb-6">
             {categories.map((category) => {
               const productCount = getProductCountForCategory(category.id);
+              const isSelected = selectedCategory === category.id;
+              
               return (
                 <div key={category.id}>
                   {/* Categoria */}
                   <Button
                     variant="ghost"
-                    className={`${baseBtn} h-9 text-base ${
-                      selectedCategory === category.id ? activeCls : normalCatCls
-                    } ${hoverCls}`}
+                    className={`w-full flex items-center justify-between text-left rounded-md transition-all px-2 h-9 text-base ${
+                      isSelected 
+                        ? "bg-gold/90 text-white font-bold shadow" 
+                        : "text-gray-700 hover:bg-gold/10 hover:text-gold"
+                    }`}
                     onClick={() => {
                       console.log(`[FilterSidebar] Categoria clicada: ${category.id}`);
                       if (selectedCategory === category.id) {
@@ -137,9 +130,9 @@ const FilterSidebar = ({
                       <span className="text-xs opacity-60">({productCount})</span>
                     </span>
                     <span className={`ml-1 transition-colors ${
-                      selectedCategory === category.id ? "text-white" : "text-gray-400 group-hover:text-gold"
+                      isSelected ? "text-white" : "text-gray-400"
                     }`}>
-                      {selectedCategory === category.id ? (
+                      {isSelected ? (
                         <ChevronDown size={18} />
                       ) : (
                         <ChevronRight size={18} />
@@ -150,7 +143,7 @@ const FilterSidebar = ({
                   {selectedCategory === category.id && visibleSubcategories.length > 0 && (
                     <div className="mt-2 mb-2 ml-4">
                       {visibleSubcategories.map((subcategory) => {
-                        const isSelected = isSubcategorySelected(subcategory.id);
+                        const isSubSelected = isSubcategorySelected(subcategory.id);
                         const productCount = getProductCountForSubcategory(subcategory.id);
                         
                         return (
@@ -158,16 +151,18 @@ const FilterSidebar = ({
                             {/* Subcategoria */}
                             <Button
                               variant="ghost"
-                              className={`${subcatCls} ${
-                                isSelected ? activeSubcatCls : "text-gray-700"
-                              } ${subcatHoverCls}`}
+                              className={`justify-start w-full text-left px-3 rounded-md transition-all h-8 ${
+                                isSubSelected 
+                                  ? "bg-gold/15 text-gold font-semibold" 
+                                  : "text-gray-700 hover:bg-gold/10 hover:text-gold"
+                              }`}
                               onClick={() => handleSubcategoryToggle(subcategory)}
                             >
                               <span className="flex-1 flex items-center justify-between">
                                 <span>{subcategory.name}</span>
                                 <span className="text-xs opacity-60">({productCount})</span>
                               </span>
-                              {isSelected && (
+                              {isSubSelected && (
                                 <span className="ml-2 w-2 h-2 bg-gold rounded-full"></span>
                               )}
                             </Button>
