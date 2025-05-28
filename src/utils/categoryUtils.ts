@@ -1,3 +1,4 @@
+
 import { CategoryType, SubcategoryType } from "@/types/category";
 
 // Group subcategories by category ID
@@ -14,22 +15,32 @@ export const groupSubcategoriesByCategory = (subcategoriesData: any[]) => {
   return subcategoriesByCategory;
 };
 
-// Group attributes by subcategory ID (agora usando tabela "attributes" corretamente)
+// Group attributes by subcategory ID - CORRIGIDO para mapear corretamente o campo 'attribute' para 'name'
 export const groupValuesBySubcategory = (attributesData: any[]) => {
   const attributesBySubcategory: Record<string, { id: string; name: string }[]> = {};
 
+  console.log("[categoryUtils] Raw attributesData from DB:", attributesData);
+
   attributesData.forEach((row: any) => {
-    // row vem de attributes (não mais subcategory_attributes)
     if (!attributesBySubcategory[row.subcategory_id]) {
       attributesBySubcategory[row.subcategory_id] = [];
     }
-    // Garantir formato { id, name }
-    attributesBySubcategory[row.subcategory_id].push({
-      id: row.id ? row.id.toString() : row.attribute, // use id se houver, fallback para attribute string só para legado
-      name: row.attribute
+    
+    // CORREÇÃO PRINCIPAL: mapear 'attribute' do banco para 'name' no frontend
+    const attributeObj = {
+      id: row.id.toString(),
+      name: row.attribute // campo 'attribute' do banco vira 'name' no frontend
+    };
+    
+    console.log("[categoryUtils] Mapeando atributo:", {
+      rawRow: row,
+      mapped: attributeObj
     });
+    
+    attributesBySubcategory[row.subcategory_id].push(attributeObj);
   });
 
+  console.log("[categoryUtils] Final attributesBySubcategory:", attributesBySubcategory);
   return attributesBySubcategory;
 };
 
