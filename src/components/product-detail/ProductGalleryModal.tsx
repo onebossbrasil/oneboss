@@ -12,8 +12,6 @@ interface ProductGalleryModalProps {
   onNavigate: (index: number) => void;
 }
 
-const MAX_GALLERY_IMAGES = 30;
-
 const ProductGalleryModal = ({
   open,
   onOpenChange,
@@ -21,30 +19,31 @@ const ProductGalleryModal = ({
   currentIndex,
   onNavigate,
 }: ProductGalleryModalProps) => {
-  // Exibe no máximo 30 imagens cadastradas
-  const limitedImages = images.slice(0, MAX_GALLERY_IMAGES);
+  // CORREÇÃO: Removido limite artificial de 30 imagens - agora exibe TODAS as imagens
+  console.log(`[ProductGalleryModal] Exibindo ${images.length} imagens sem limitação`);
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === "ArrowLeft") {
-        onNavigate((currentIndex - 1 + limitedImages.length) % limitedImages.length);
+        onNavigate((currentIndex - 1 + images.length) % images.length);
       }
       if (e.key === "ArrowRight") {
-        onNavigate((currentIndex + 1) % limitedImages.length);
+        onNavigate((currentIndex + 1) % images.length);
       }
     };
     if (open) window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
     // eslint-disable-next-line
-  }, [open, currentIndex, limitedImages.length]);
+  }, [open, currentIndex, images.length]);
 
-  if (!limitedImages.length) return null;
+  if (!images.length) return null;
+  
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="p-0 max-w-2xl rounded-xl overflow-hidden bg-black">
         <div className="relative w-full h-[70vh] bg-black flex items-center justify-center">
           <img
-            src={limitedImages[currentIndex].url}
+            src={images[currentIndex].url}
             alt={`Imagem ampliada ${currentIndex + 1}`}
             className="w-full h-full object-contain"
             draggable={false}
@@ -56,12 +55,12 @@ const ProductGalleryModal = ({
           >
             <X />
           </button>
-          {limitedImages.length > 1 && (
+          {images.length > 1 && (
             <>
               <button
                 aria-label="Anterior"
                 onClick={() =>
-                  onNavigate((currentIndex - 1 + limitedImages.length) % limitedImages.length)
+                  onNavigate((currentIndex - 1 + images.length) % images.length)
                 }
                 className="absolute left-2 top-1/2 -translate-y-1/2 bg-black/60 hover:bg-black/90 p-2 rounded-full text-white"
               >
@@ -70,7 +69,7 @@ const ProductGalleryModal = ({
               <button
                 aria-label="Próxima"
                 onClick={() =>
-                  onNavigate((currentIndex + 1) % limitedImages.length)
+                  onNavigate((currentIndex + 1) % images.length)
                 }
                 className="absolute right-2 top-1/2 -translate-y-1/2 bg-black/60 hover:bg-black/90 p-2 rounded-full text-white"
               >
@@ -80,7 +79,7 @@ const ProductGalleryModal = ({
           )}
         </div>
         <div className="flex justify-center py-3 gap-2 bg-zinc-950 overflow-x-auto">
-          {limitedImages.map((img, idx) => (
+          {images.map((img, idx) => (
             <button
               key={img.id}
               className={`w-14 h-14 rounded border-2 ${currentIndex === idx ? "border-primary" : "border-transparent"}`}
@@ -95,6 +94,10 @@ const ProductGalleryModal = ({
               />
             </button>
           ))}
+        </div>
+        {/* ADICIONADO: Contador de imagens para debug */}
+        <div className="absolute bottom-2 left-2 bg-black/70 text-white px-2 py-1 rounded text-xs">
+          {currentIndex + 1} de {images.length}
         </div>
       </DialogContent>
     </Dialog>
