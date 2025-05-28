@@ -26,7 +26,7 @@ const AttributeItem = ({
         onClick={() => onToggle(attribute)}
       >
         <span className="flex-1 flex items-center justify-between">
-          <span>{attribute.attribute}</span>
+          <span>{attribute.name}</span>
           <span className="text-xs opacity-60">({productCount})</span>
         </span>
         {isSelected && (
