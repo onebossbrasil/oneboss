@@ -10,11 +10,17 @@ import { SubcategoryType, AttributeType } from "@/types/category";
 import { Product } from "@/types/product";
 import AttributeListDisplay from "@/components/categories/AttributeListDisplay";
 
-// Estilos inspirados no sidebar admin
-const highlightCls = "bg-gold/90 text-gray-900 font-bold shadow";
+// CLASSES UNIFICADAS
+const baseBtn =
+  "w-full flex items-center justify-between text-left rounded-md transition-all px-2";
+const activeCls = "bg-gold/90 text-gray-900 font-bold shadow";
 const hoverCls = "hover:bg-gold/10 text-gold";
 const normalCatCls = "text-gray-800";
-const subcatDivider = "border-l-[3px] border-gold/30 pl-2 ml-3";
+const subcatDivider = "border-l-4 border-gold/60 pl-3 ml-3";
+const activeAttrCls = "bg-gold/15 text-gold font-semibold";
+const attrHoverCls = "hover:bg-gold/10 hover:text-gold";
+const attrCls =
+  "justify-start w-full text-left px-3 rounded-md transition-all h-8";
 
 type FilterSidebarProps = {
   selectedCategory: string | null;
@@ -38,7 +44,6 @@ const FilterSidebar = ({
   publishedProducts,
 }: FilterSidebarProps) => {
   const { categories } = useCategories();
-
   // Estado: subcategoria expandida
   const [expandedSubcatId, setExpandedSubcatId] = useState<string | null>(null);
 
@@ -56,6 +61,11 @@ const FilterSidebar = ({
   // Handler para expand/collapse a subcategoria selecionada
   const handleSubcatExpand = (subcatId: string) => {
     setExpandedSubcatId((prev) => (prev === subcatId ? null : subcatId));
+  };
+
+  // Handler para toggle atributo: passa para cima
+  const handleAttrToggle = (attr: AttributeType) => {
+    onSubcategoryToggle(attr);
   };
 
   return (
@@ -94,12 +104,13 @@ const FilterSidebar = ({
           <div className="space-y-1 mb-6">
             {categories.map((category) => (
               <div key={category.id}>
+                {/* Categoria */}
                 <Button
                   variant="ghost"
-                  className={`justify-start font-medium h-9 w-full text-left rounded-md transition-all
-                    px-2 ${selectedCategory === category.id ? highlightCls : normalCatCls} ${hoverCls}`}
+                  className={`${baseBtn} h-9 text-base ${
+                    selectedCategory === category.id ? activeCls : normalCatCls
+                  } ${hoverCls}`}
                   onClick={() => {
-                    // Se já está selecionada, desmarca
                     if (selectedCategory === category.id) {
                       onCategorySelect(null);
                       setExpandedSubcatId(null);
@@ -109,9 +120,10 @@ const FilterSidebar = ({
                     }
                   }}
                 >
-                  {/* Sem bolinha! */}
-                  {category.name}
-                  <span className="ml-auto">
+                  <span className="flex-1">{category.name}</span>
+                  <span className={`ml-1 transition-colors ${
+                    selectedCategory === category.id ? "text-gold" : "text-gray-400 group-hover:text-gold"
+                  }`}>
                     {selectedCategory === category.id ? (
                       <ChevronDown size={18} />
                     ) : (
@@ -119,19 +131,25 @@ const FilterSidebar = ({
                     )}
                   </span>
                 </Button>
-                {/* Exibir subcategorias somente da categoria selecionada */}
+                {/* Subcategorias da categoria selecionada */}
                 {selectedCategory === category.id && visibleSubcategories.length > 0 && (
-                  <div className="mt-1 mb-2">
+                  <div className="mt-2 mb-2">
                     {visibleSubcategories.map((subcategory) => (
                       <div key={subcategory.id} className="ml-3">
+                        {/* Subcategoria */}
                         <Button
                           variant="ghost"
-                          className={`justify-start h-8 w-full text-sm rounded-md px-3 text-left transition-all
-                            ${expandedSubcatId === subcategory.id ? "bg-gold/15 text-gold font-semibold" : "text-gray-700"} ${hoverCls}`}
+                          className={`${baseBtn} h-8 text-sm ${
+                            expandedSubcatId === subcategory.id
+                              ? activeCls
+                              : "text-gray-700"
+                          } ${hoverCls}`}
                           onClick={() => handleSubcatExpand(subcategory.id)}
                         >
-                          {subcategory.name}
-                          <span className="ml-auto">
+                          <span className="flex-1">{subcategory.name}</span>
+                          <span className={`ml-1 transition-colors ${
+                            expandedSubcatId === subcategory.id ? "text-gold" : "text-gray-400 group-hover:text-gold"
+                          }`}>
                             {expandedSubcatId === subcategory.id ? (
                               <ChevronDown size={16} />
                             ) : (
@@ -139,16 +157,18 @@ const FilterSidebar = ({
                             )}
                           </span>
                         </Button>
-                        {/* Exibir atributos (valores) só da subcategoria expandida */}
-                        {expandedSubcatId === subcategory.id && subcategory.attributes.length > 0 && (
-                          <div className={`${subcatDivider} py-1`}>
-                            <AttributeListDisplay
-                              attributes={subcategory.attributes}
-                              selectedAttributes={selectedSubcategories}
-                              onAttributeToggle={onSubcategoryToggle}
-                            />
-                          </div>
-                        )}
+                        {/* Atributos apenas da subcategoria expandida */}
+                        {expandedSubcatId === subcategory.id &&
+                          subcategory.attributes.length > 0 && (
+                            <div className={`${subcatDivider} py-1`}>
+                              <AttributeListDisplay
+                                attributes={subcategory.attributes}
+                                selectedAttributes={selectedSubcategories}
+                                onAttributeToggle={handleAttrToggle}
+                                unifedStyles={true}
+                              />
+                            </div>
+                          )}
                       </div>
                     ))}
                   </div>
@@ -177,4 +197,3 @@ const FilterSidebar = ({
 };
 
 export default FilterSidebar;
-
