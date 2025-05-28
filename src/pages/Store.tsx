@@ -4,7 +4,9 @@ import { useProducts } from "@/contexts/ProductContext";
 import { useCategories } from "@/contexts/CategoryContext";
 import ResultsHeader from "@/components/store/ResultsHeader";
 import ProductGrid from "@/components/store/ProductGrid";
+import ProductGridSkeleton from "@/components/store/ProductGridSkeleton";
 import FilterSidebar from "@/components/store/FilterSidebar";
+import MobileFilterSheet from "@/components/store/filter/MobileFilterSheet";
 import StoreBanner from "@/components/store/StoreBanner";
 import StoreSearchBar from "@/components/store/StoreSearchBar";
 import StorePagination from "@/components/store/StorePagination";
@@ -51,103 +53,115 @@ const Store = () => {
   const hasActiveFilters = !!(searchTerm || selectedCategory || selectedSubcategories.length > 0 || selectedAttributes.length > 0 || sortOption !== "relevance");
 
   return (
-    <div className="min-h-screen w-full bg-muted/50 pb-16 pt-0">
-      {/* Banner visual com o título da loja */}
+    <div className="min-h-screen w-full bg-gradient-to-b from-muted/30 to-background pb-16 pt-0">
+      {/* Banner */}
       <StoreBanner />
 
-      {/* Espaçamento novo entre banner e o restante */}
-      <div className="mb-8" />
-
-      {/* Estrutura principal: sidebar + conteúdo */}
-      <div className="max-w-7xl mx-auto px-2 md:px-6 flex mt-0 gap-6">
-        {/* Sidebar de Filtros */}
-        <div className="hidden md:block w-64 shrink-0">
-          <FilterSidebar
-            selectedCategory={selectedCategory}
-            selectedSubcategories={selectedSubcategories}
-            selectedAttributes={selectedAttributes}
-            onCategorySelect={handleCategorySelect}
-            onSubcategoryToggle={handleSubcategoryToggle}
-            onAttributeToggle={handleAttributeToggle}
-            isMobileFiltersOpen={false}
-            setIsMobileFiltersOpen={() => {}}
-            resetFilters={resetFilters}
-            publishedProducts={products}
-          />
-        </div>
+      {/* Container principal com padding responsivo */}
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8 xl:px-12 mt-8">
         
-        {/* Mobile sidebar (drawer) */}
-        <div className="block md:hidden">
-          <Button variant="outline" size="sm" className="mb-4" onClick={() => setIsMobileFiltersOpen(true)}>
-            Filtros
-          </Button>
-          <FilterSidebar
-            selectedCategory={selectedCategory}
-            selectedSubcategories={selectedSubcategories}
-            selectedAttributes={selectedAttributes}
-            onCategorySelect={handleCategorySelect}
-            onSubcategoryToggle={handleSubcategoryToggle}
-            onAttributeToggle={handleAttributeToggle}
-            isMobileFiltersOpen={isMobileFiltersOpen}
-            setIsMobileFiltersOpen={setIsMobileFiltersOpen}
-            resetFilters={resetFilters}
-            publishedProducts={products}
-          />
-        </div>
-        
-        {/* Conteúdo principal */}
-        <main className="flex-1">
-          {/* Barra de busca */}
-          <StoreSearchBar
-            searchTerm={searchTerm}
-            setSearchTerm={setSearchTerm}
-            setCurrentPage={setCurrentPage}
-            hasActiveFilters={hasActiveFilters}
-            resetFilters={resetFilters}
-          />
+        {/* Layout: Sidebar + Conteúdo */}
+        <div className="flex gap-8">
           
-          {/* Header de resultados e ordenação */}
-          <ResultsHeader
-            productCount={filteredProducts.length}
-            sortOption={sortOption}
-            setSortOption={setSortOption}
-          />
+          {/* Sidebar Desktop */}
+          <aside className="hidden lg:block w-72 xl:w-80 shrink-0">
+            <div className="sticky top-24">
+              <FilterSidebar
+                selectedCategory={selectedCategory}
+                selectedSubcategories={selectedSubcategories}
+                selectedAttributes={selectedAttributes}
+                onCategorySelect={handleCategorySelect}
+                onSubcategoryToggle={handleSubcategoryToggle}
+                onAttributeToggle={handleAttributeToggle}
+                isMobileFiltersOpen={false}
+                setIsMobileFiltersOpen={() => {}}
+                resetFilters={resetFilters}
+                publishedProducts={products}
+              />
+            </div>
+          </aside>
           
-          {/* Estado de carregando/erro */}
-          {isLoading ? (
-            <div className="text-center py-16 text-xl text-muted-foreground animate-pulse">
-              Carregando produtos...
+          {/* Conteúdo Principal */}
+          <main className="flex-1 min-w-0">
+            
+            {/* Barra de busca e filtro mobile */}
+            <div className="flex items-center gap-4 mb-6">
+              <div className="flex-1">
+                <StoreSearchBar
+                  searchTerm={searchTerm}
+                  setSearchTerm={setSearchTerm}
+                  setCurrentPage={setCurrentPage}
+                  hasActiveFilters={hasActiveFilters}
+                  resetFilters={resetFilters}
+                />
+              </div>
+              
+              {/* Mobile Filter Sheet */}
+              <div className="lg:hidden">
+                <MobileFilterSheet
+                  selectedCategory={selectedCategory}
+                  selectedSubcategories={selectedSubcategories}
+                  selectedAttributes={selectedAttributes}
+                  onCategorySelect={handleCategorySelect}
+                  onSubcategoryToggle={handleSubcategoryToggle}
+                  onAttributeToggle={handleAttributeToggle}
+                  resetFilters={resetFilters}
+                  publishedProducts={products}
+                  isOpen={isMobileFiltersOpen}
+                  onOpenChange={setIsMobileFiltersOpen}
+                />
+              </div>
             </div>
-          ) : error ? (
-            <div className="text-center py-16 text-red-500">
-              Erro ao carregar produtos.
-            </div>
-          ) : filteredProducts.length === 0 ? (
-            <div className="text-center py-16">
-              <p className="text-xl text-muted-foreground mb-4">
-                Nenhum produto encontrado
-              </p>
-              <p className="text-sm text-muted-foreground mb-6">
-                Tente ajustar os filtros ou fazer uma nova busca
-              </p>
-              <Button onClick={resetFilters} variant="outline">
-                Limpar todos os filtros
-              </Button>
-            </div>
-          ) : (
-            <ProductGrid
-              products={paginatedProducts.map(product => formatProductForGrid(product, categories))}
-              resetFilters={resetFilters}
+            
+            {/* Header de resultados */}
+            <ResultsHeader
+              productCount={filteredProducts.length}
+              sortOption={sortOption}
+              setSortOption={setSortOption}
             />
-          )}
-          
-          {/* Paginação */}
-          <StorePagination
-            currentPage={currentPage}
-            totalPages={totalPages}
-            setCurrentPage={setCurrentPage}
-          />
-        </main>
+            
+            {/* Estados de carregamento/erro */}
+            {isLoading ? (
+              <ProductGridSkeleton />
+            ) : error ? (
+              <div className="text-center py-16">
+                <div className="text-red-500 text-lg mb-4">
+                  Erro ao carregar produtos
+                </div>
+                <Button onClick={() => window.location.reload()} variant="outline">
+                  Tentar novamente
+                </Button>
+              </div>
+            ) : filteredProducts.length === 0 ? (
+              <div className="text-center py-16">
+                <p className="text-xl text-muted-foreground mb-4">
+                  Nenhum produto encontrado
+                </p>
+                <p className="text-sm text-muted-foreground mb-6">
+                  Tente ajustar os filtros ou fazer uma nova busca
+                </p>
+                <Button onClick={resetFilters} variant="outline" className="border-gold text-gold hover:bg-gold/10">
+                  Limpar todos os filtros
+                </Button>
+              </div>
+            ) : (
+              <ProductGrid
+                products={paginatedProducts.map(product => formatProductForGrid(product, categories))}
+                resetFilters={resetFilters}
+                isLoading={isLoading}
+              />
+            )}
+            
+            {/* Paginação */}
+            {!isLoading && filteredProducts.length > 0 && (
+              <StorePagination
+                currentPage={currentPage}
+                totalPages={totalPages}
+                setCurrentPage={setCurrentPage}
+              />
+            )}
+          </main>
+        </div>
       </div>
     </div>
   );
