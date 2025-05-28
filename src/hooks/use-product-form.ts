@@ -27,11 +27,19 @@ export const useProductForm = () => {
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) {
       const newFiles = Array.from(e.target.files);
-      
-      // Create preview URLs
-      const newPreviewUrls = newFiles.map(file => URL.createObjectURL(file));
-      
-      setImages(prev => [...prev, ...newFiles]);
+
+      // Remove duplicatas: bloquear arquivos com mesmo nome e tamanho já presentes
+      const alreadyPresent = new Set(images.map(f => `${f.name}-${f.size}`));
+      const trulyUniqueFiles = newFiles.filter(
+        file => !alreadyPresent.has(`${file.name}-${file.size}`)
+      );
+
+      // Se não há arquivos novos, não atualiza nada
+      if (trulyUniqueFiles.length === 0) return;
+
+      // Cria preview só das imagens únicas
+      const newPreviewUrls = trulyUniqueFiles.map(file => URL.createObjectURL(file));
+      setImages(prev => [...prev, ...trulyUniqueFiles]);
       setImagePreviewUrls(prev => [...prev, ...newPreviewUrls]);
     }
   };
