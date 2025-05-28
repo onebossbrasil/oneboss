@@ -1,7 +1,8 @@
+
 import React from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { Upload, X, ImageOff } from "lucide-react";
+import { Upload, X, ImageOff, Loader2 } from "lucide-react";
 import { ProductImage } from "@/types/product";
 
 interface ImageUploadProps {
@@ -10,6 +11,8 @@ interface ImageUploadProps {
   existingImages?: ProductImage[];
   handleImageChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   handleRemoveImage: (index: number) => void;
+  errorMsg?: string | null;
+  isUploading?: boolean;
 }
 
 const ImageUpload: React.FC<ImageUploadProps> = ({
@@ -17,13 +20,12 @@ const ImageUpload: React.FC<ImageUploadProps> = ({
   imagePreviewUrls,
   existingImages = [],
   handleImageChange,
-  handleRemoveImage
+  handleRemoveImage,
+  errorMsg = null,
+  isUploading = false
 }) => {
-  const isDisabled = false;
+  const isDisabled = isUploading;
   const fallbackImg = "/placeholder.svg";
-
-  // Estado para exibir mensagem de erro de formato
-  const [errorMsg, setErrorMsg] = React.useState<string | null>(null);
 
   // Diagnóstico: mostrar todas imagens persistidas
   console.log("[ImageUpload-DIAG] existingImages:", existingImages);
@@ -40,27 +42,6 @@ const ImageUpload: React.FC<ImageUploadProps> = ({
   const hasImages = (validExistingImages.length > 0 || imagePreviewUrls.length > 0);
   const totalImagens = validExistingImages.length + images.length;
 
-  // Novo handle para filtrar extensões no upload
-  const handleInputChange: React.ChangeEventHandler<HTMLInputElement> = (e) => {
-    setErrorMsg(null); // Limpa erro antes de tentar
-    if (e.target.files) {
-      const ALLOWED_TYPES = [
-        "image/png",
-        "image/jpeg",
-        "image/jpg",
-        "image/webp"
-      ];
-      const newFiles = Array.from(e.target.files);
-
-      const invalid = newFiles.find(file => !ALLOWED_TYPES.includes(file.type));
-      if (invalid) {
-        setErrorMsg("Formato inválido. Suporte apenas PNG, JPG, JPEG ou WEBP.");
-        return;
-      }
-      handleImageChange(e);
-    }
-  };
-
   return (
     <Card>
       <CardContent className="pt-6">
@@ -72,22 +53,28 @@ const ImageUpload: React.FC<ImageUploadProps> = ({
               <span className="font-semibold">Formatos permitidos: PNG, JPG, JPEG, WEBP.</span><br />
               Recomendado: 800x800px, máximo 5MB por arquivo. Não há limite para quantidade.
             </p>
-            <div className="border-2 border-dashed border-muted-foreground/25 rounded-md p-8 text-center">
+            <div className={`border-2 border-dashed border-muted-foreground/25 rounded-md p-8 text-center ${isDisabled ? 'opacity-50' : ''}`}>
               <input
                 type="file"
                 id="image-upload"
                 multiple
                 accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp"
                 className="hidden"
-                onChange={handleInputChange}
+                onChange={handleImageChange}
                 disabled={isDisabled}
               />
               <label
                 htmlFor="image-upload"
                 className={`cursor-pointer flex flex-col items-center justify-center ${isDisabled ? "opacity-50 pointer-events-none" : ""}`}
               >
-                <Upload className="h-10 w-10 text-muted-foreground mb-2" />
-                <span className="text-sm text-muted-foreground">Clique para fazer upload ou arraste e solte</span>
+                {isUploading ? (
+                  <Loader2 className="h-10 w-10 text-muted-foreground mb-2 animate-spin" />
+                ) : (
+                  <Upload className="h-10 w-10 text-muted-foreground mb-2" />
+                )}
+                <span className="text-sm text-muted-foreground">
+                  {isUploading ? "Processando imagens..." : "Clique para fazer upload ou arraste e solte"}
+                </span>
                 <span className="text-xs text-muted-foreground mt-1">PNG, JPG, JPEG ou WEBP até 5MB</span>
               </label>
             </div>
@@ -97,7 +84,7 @@ const ImageUpload: React.FC<ImageUploadProps> = ({
               <ImageOff className="w-4 h-4" /> {errorMsg}
             </div>
           )}
-          {!hasImages && (
+          {!hasImages && !isUploading && (
             <div className="text-red-700 text-xs py-2 flex items-center gap-2">
               <ImageOff className="w-4 h-4" /> Nenhuma imagem disponível para este produto do banco ou local. Verifique o cadastro ou upload.
             </div>
@@ -109,6 +96,11 @@ const ImageUpload: React.FC<ImageUploadProps> = ({
                 <span className="inline-block px-2 py-0.5 rounded-full bg-gray-200 text-gray-700 text-xs border">
                   {totalImagens} imagem(ns) exibidas
                 </span>
+                {isUploading && (
+                  <span className="inline-block px-2 py-0.5 rounded-full bg-blue-100 text-blue-700 text-xs border">
+                    Processando...
+                  </span>
+                )}
               </div>
               <div
                 className="grid gap-4"
@@ -153,6 +145,11 @@ const ImageUpload: React.FC<ImageUploadProps> = ({
                       className="w-full h-full object-cover"
                       onError={e => { e.currentTarget.onerror = null; e.currentTarget.src = fallbackImg; }}
                     />
+                    {isUploading && (
+                      <div className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center">
+                        <Loader2 className="h-6 w-6 text-white animate-spin" />
+                      </div>
+                    )}
                     <Button
                       variant="destructive"
                       size="icon"

@@ -103,7 +103,9 @@ export const useProductEdit = (
     handleRemoveImage,
     setImages,
     setImagePreviewUrls,
-    setDeletedImageIds
+    setDeletedImageIds,
+    errorMsg,
+    isUploading
   } = useImageManagement(product);
 
   // Submitters
@@ -152,6 +154,8 @@ export const useProductEdit = (
     selectedSubcategoryId,
     selectedAttributeId,
     handleAttributeChange,
-    handleSubcatIdChange: handleSubcategoryIdChange
+    handleSubcatIdChange: handleSubcategoryIdChange,
+    errorMsg,
+    isUploading
   };
 };

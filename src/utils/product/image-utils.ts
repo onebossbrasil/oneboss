@@ -1,8 +1,10 @@
+
 import { supabase } from "@/integrations/supabase/client";
 
 export const uploadProductImage = async (productId: string, imageFile: File, sortOrder: number = 0) => {
   try {
     console.log("Uploading image for product:", productId);
+    
     // Create a unique file name
     const fileExt = imageFile.name.split('.').pop();
     const fileName = `${productId}/${Date.now()}.${fileExt}`;
@@ -25,6 +27,24 @@ export const uploadProductImage = async (productId: string, imageFile: File, sor
     const publicUrl = urlData.publicUrl;
     console.log("Image uploaded, public URL:", publicUrl);
     
+    // NOVO: Verificar se a URL já existe para este produto antes de inserir
+    const { data: existingImage, error: checkError } = await supabase
+      .from('product_images')
+      .select('id')
+      .eq('product_id', productId)
+      .eq('url', publicUrl)
+      .maybeSingle();
+    
+    if (checkError) {
+      console.error("Error checking for existing image:", checkError);
+      throw checkError;
+    }
+    
+    if (existingImage) {
+      console.log("Image already exists, skipping database insert");
+      return existingImage;
+    }
+    
     // Save image information to the database
     const { data: imageData, error: imageError } = await supabase
       .from('product_images')
@@ -38,6 +58,17 @@ export const uploadProductImage = async (productId: string, imageFile: File, sor
     
     if (imageError) {
       console.error("Error saving image to database:", imageError);
+      // Se der erro de constraint (duplicata), não falhar
+      if (imageError.code === '23505') {
+        console.log("Duplicate image detected by constraint, returning existing");
+        const { data: existingData } = await supabase
+          .from('product_images')
+          .select()
+          .eq('product_id', productId)
+          .eq('url', publicUrl)
+          .single();
+        return existingData;
+      }
       throw imageError;
     }
     

@@ -1,3 +1,4 @@
+
 import { Product } from "@/types/product";
 import {
   Dialog,
@@ -48,10 +49,17 @@ const ProductEditDialog = ({ product, open, onOpenChange, onClose }: ProductEdit
     selectedSubcategoryId,
     selectedAttributeId,
     handleAttributeChange,
-    handleSubcatIdChange
+    handleSubcatIdChange,
+    errorMsg,
+    isUploading
   } = useProductEdit(freshProduct, handleDialogClose);
 
   const wrappedHandleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (isUploading) {
+      console.log("Aguardando upload terminar antes de submeter...");
+      return;
+    }
     handleSubmit(e);
   };
 
@@ -97,12 +105,14 @@ const ProductEditDialog = ({ product, open, onOpenChange, onClose }: ProductEdit
                     handleImageChange={handleImageChange}
                     handleRemoveImage={handleRemoveImage}
                     existingImages={freshProduct?.images || []}
+                    errorMsg={errorMsg}
+                    isUploading={isUploading}
                   />
                 </div>
               </div>
               <ProductEditActions 
                 onCancel={handleDialogClose} 
-                isSubmitting={isSubmitting} 
+                isSubmitting={isSubmitting || isUploading}
               />
             </form>
           </>
