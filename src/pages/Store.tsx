@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useMemo } from "react";
 import { useSearchParams } from "react-router-dom";
 import { useProducts } from "@/contexts/ProductContext";
@@ -15,10 +16,17 @@ const Store = () => {
   const { categories } = useCategories();
   const [searchParams, setSearchParams] = useSearchParams();
 
-  // Busca, filtro (utilizaremos a sidebar para categorias e subcategorias)
+  // Busca, filtro
+  // Garanta que pegamos sempre o `id` da categoria.
+  const paramCategory = searchParams.get("category");
+  const initCategoryId =
+    categories.find(c => c.id === paramCategory) // já é id
+      ? paramCategory
+      : categories.find(c => c.value === paramCategory)?.id || "";
+
   const [searchTerm, setSearchTerm] = useState<string>(searchParams.get("search") || "");
-  const [selectedCategory, setSelectedCategory] = useState<string | null>(searchParams.get("category") || "");
-  const [selectedSubcategories, setSelectedSubcategories] = useState<any[]>([]); // Ajusta para o tipo de atributo correto após integração total
+  const [selectedCategory, setSelectedCategory] = useState<string | null>(initCategoryId || null);
+  const [selectedSubcategories, setSelectedSubcategories] = useState<any[]>([]);
   const [isMobileFiltersOpen, setIsMobileFiltersOpen] = useState(false);
   const [currentPage, setCurrentPage] = useState<number>(Number(searchParams.get("page")) || 1);
 
@@ -42,7 +50,7 @@ const Store = () => {
   // Limpa todos filtros
   const resetFilters = () => {
     setSearchTerm("");
-    setSelectedCategory("");
+    setSelectedCategory(null);
     setSelectedSubcategories([]);
     setCurrentPage(1);
     setSortOption("relevance");
@@ -53,10 +61,9 @@ const Store = () => {
     let result = products.filter(product => {
       // Busca textual
       const searchMatch = product.name?.toLowerCase().includes(searchTerm.toLowerCase()) || false;
-      // Categoria
+      // Categoria - agora compara sempre ID (string)
       const categoryMatch = selectedCategory ? String(product.categoryId) === String(selectedCategory) : true;
       // Subcategorias/Atributos (considera múltiplas)
-      // Corrigido: Para cada atributo selecionado, verifica se o product.attributeId corresponde
       const subcategoriesOk = selectedSubcategories.length > 0
         ? selectedSubcategories.some((subcat: any) => String(product.attributeId) === String(subcat.id))
         : true;
@@ -106,7 +113,7 @@ const Store = () => {
           ? new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" }).format(product.salePrice)
           : undefined,
       category: categoryName,
-      subcategory: "", // Adicione se necessário
+      subcategory: "",
       imageUrl,
       featured: !!product.featured,
       description: product.shortDescription || product.description,
@@ -114,8 +121,8 @@ const Store = () => {
   }
 
   // Handlers sidebar
-  const handleCategorySelect = (catValue: string) => {
-    setSelectedCategory(catValue);
+  const handleCategorySelect = (catId: string | null) => {
+    setSelectedCategory(catId);
     setSelectedSubcategories([]);
     setCurrentPage(1);
   };
@@ -253,3 +260,4 @@ const Store = () => {
 };
 
 export default Store;
+

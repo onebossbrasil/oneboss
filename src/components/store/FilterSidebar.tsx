@@ -19,7 +19,7 @@ const subcatDivider = "border-l-[3px] border-gold/30 pl-2 ml-3";
 type FilterSidebarProps = {
   selectedCategory: string | null;
   selectedSubcategories: AttributeType[];
-  onCategorySelect: (categoryId: string) => void;
+  onCategorySelect: (categoryId: string | null) => void;
   onSubcategoryToggle: (attr: AttributeType) => void;
   isMobileFiltersOpen: boolean;
   setIsMobileFiltersOpen: (isOpen: boolean) => void;
@@ -42,26 +42,16 @@ const FilterSidebar = ({
   // Estado: subcategoria expandida
   const [expandedSubcatId, setExpandedSubcatId] = useState<string | null>(null);
 
-  // Só mostra subcategorias com atributos ativos
+  // Buscar a categoria selecionada pelo id (UUID)
+  const currentCategory = selectedCategory
+    ? categories.find((cat) => String(cat.id) === String(selectedCategory))
+    : null;
+
+  // Exibir todas as subcategorias da categoria selecionada
   const visibleSubcategories = useMemo(() => {
-    if (!selectedCategory) return [];
-    const cat = categories.find((cat) => cat.value === selectedCategory);
-    if (!cat) return [];
-    return (cat.subcategories || [])
-      .map((subcat) => {
-        const activeAttrs = subcat.attributes.filter((attr) =>
-          publishedProducts.some(
-            (prod) =>
-              String(prod.categoryId) === String(selectedCategory) &&
-              String(prod.attributeId) === String(attr.id)
-          )
-        );
-        return activeAttrs.length
-          ? { ...subcat, attributes: activeAttrs }
-          : null;
-      })
-      .filter(Boolean) as SubcategoryType[];
-  }, [categories, selectedCategory, publishedProducts]);
+    if (!currentCategory) return [];
+    return currentCategory.subcategories || [];
+  }, [currentCategory]);
 
   // Handler para expand/collapse a subcategoria selecionada
   const handleSubcatExpand = (subcatId: string) => {
@@ -107,30 +97,30 @@ const FilterSidebar = ({
                 <Button
                   variant="ghost"
                   className={`justify-start font-medium h-9 w-full text-left rounded-md transition-all
-                    px-2 ${selectedCategory === category.value ? highlightCls : normalCatCls} ${hoverCls}`}
+                    px-2 ${selectedCategory === category.id ? highlightCls : normalCatCls} ${hoverCls}`}
                   onClick={() => {
                     // Se já está selecionada, desmarca
-                    if (selectedCategory === category.value) {
-                      onCategorySelect("");
+                    if (selectedCategory === category.id) {
+                      onCategorySelect(null);
                       setExpandedSubcatId(null);
                     } else {
-                      onCategorySelect(category.value);
+                      onCategorySelect(category.id);
                       setExpandedSubcatId(null);
                     }
                   }}
                 >
-                  {/* REMOVIDO o <Circle /> */}
+                  {/* Sem bolinha! */}
                   {category.name}
                   <span className="ml-auto">
-                    {selectedCategory === category.value ? (
+                    {selectedCategory === category.id ? (
                       <ChevronDown size={18} />
                     ) : (
                       <ChevronRight size={18} />
                     )}
                   </span>
                 </Button>
-                {/* Exibir subcategorias somente da selecionada */}
-                {selectedCategory === category.value && visibleSubcategories.length > 0 && (
+                {/* Exibir subcategorias somente da categoria selecionada */}
+                {selectedCategory === category.id && visibleSubcategories.length > 0 && (
                   <div className="mt-1 mb-2">
                     {visibleSubcategories.map((subcategory) => (
                       <div key={subcategory.id} className="ml-3">
@@ -187,3 +177,4 @@ const FilterSidebar = ({
 };
 
 export default FilterSidebar;
+
