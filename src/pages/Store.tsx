@@ -22,6 +22,7 @@ const Store = () => {
     setSearchTerm,
     selectedCategory,
     selectedSubcategories,
+    selectedAttributes,
     isMobileFiltersOpen,
     setIsMobileFiltersOpen,
     currentPage,
@@ -30,7 +31,8 @@ const Store = () => {
     setSortOption,
     resetFilters,
     handleCategorySelect,
-    handleSubcategoryToggle
+    handleSubcategoryToggle,
+    handleAttributeToggle
   } = useStoreFilters();
 
   const productsPerPage = 12;
@@ -40,12 +42,13 @@ const Store = () => {
     searchTerm,
     selectedCategory,
     selectedSubcategories,
+    selectedAttributes,
     sortOption,
     currentPage,
     productsPerPage
   });
 
-  const hasActiveFilters = !!(searchTerm || selectedCategory || selectedSubcategories.length > 0 || sortOption !== "relevance");
+  const hasActiveFilters = !!(searchTerm || selectedCategory || selectedSubcategories.length > 0 || selectedAttributes.length > 0 || sortOption !== "relevance");
 
   return (
     <div className="min-h-screen w-full bg-muted/50 pb-16 pt-0">
@@ -62,8 +65,10 @@ const Store = () => {
           <FilterSidebar
             selectedCategory={selectedCategory}
             selectedSubcategories={selectedSubcategories}
+            selectedAttributes={selectedAttributes}
             onCategorySelect={handleCategorySelect}
             onSubcategoryToggle={handleSubcategoryToggle}
+            onAttributeToggle={handleAttributeToggle}
             isMobileFiltersOpen={false}
             setIsMobileFiltersOpen={() => {}}
             resetFilters={resetFilters}
@@ -79,8 +84,10 @@ const Store = () => {
           <FilterSidebar
             selectedCategory={selectedCategory}
             selectedSubcategories={selectedSubcategories}
+            selectedAttributes={selectedAttributes}
             onCategorySelect={handleCategorySelect}
             onSubcategoryToggle={handleSubcategoryToggle}
+            onAttributeToggle={handleAttributeToggle}
             isMobileFiltersOpen={isMobileFiltersOpen}
             setIsMobileFiltersOpen={setIsMobileFiltersOpen}
             resetFilters={resetFilters}

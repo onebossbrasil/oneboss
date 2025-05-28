@@ -1,5 +1,5 @@
 
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -14,8 +14,10 @@ import ActiveFilters from "./filter/ActiveFilters";
 type FilterSidebarProps = {
   selectedCategory: string | null;
   selectedSubcategories: SubcategoryType[];
+  selectedAttributes: any[];
   onCategorySelect: (categoryId: string | null) => void;
   onSubcategoryToggle: (subcategory: SubcategoryType) => void;
+  onAttributeToggle: (attribute: any) => void;
   isMobileFiltersOpen: boolean;
   setIsMobileFiltersOpen: (isOpen: boolean) => void;
   resetFilters: () => void;
@@ -25,14 +27,17 @@ type FilterSidebarProps = {
 const FilterSidebar = ({
   selectedCategory,
   selectedSubcategories,
+  selectedAttributes,
   onCategorySelect,
   onSubcategoryToggle,
+  onAttributeToggle,
   isMobileFiltersOpen,
   setIsMobileFiltersOpen,
   resetFilters,
   publishedProducts,
 }: FilterSidebarProps) => {
   const { categories } = useCategories();
+  const [expandedSubcategories, setExpandedSubcategories] = useState<Set<string>>(new Set());
 
   // Buscar a categoria selecionada pelo id (UUID)
   const currentCategory = selectedCategory
@@ -51,9 +56,37 @@ const FilterSidebar = ({
     onSubcategoryToggle(subcategory);
   };
 
+  // Handler para toggle atributo
+  const handleAttributeToggle = (attribute: any) => {
+    console.log(`[FilterSidebar] Toggle atributo:`, attribute);
+    onAttributeToggle(attribute);
+  };
+
   // Verificar se uma subcategoria está selecionada
   const isSubcategorySelected = (subcategoryId: string) => {
     return selectedSubcategories.some(subcat => subcat.id === subcategoryId);
+  };
+
+  // Verificar se um atributo está selecionado
+  const isAttributeSelected = (attributeId: string) => {
+    return selectedAttributes.some(attr => attr.id === attributeId);
+  };
+
+  // Controlar expansão de subcategorias
+  const handleSubcategoryExpandToggle = (subcategoryId: string) => {
+    const newExpanded = new Set(expandedSubcategories);
+    if (newExpanded.has(subcategoryId)) {
+      newExpanded.delete(subcategoryId);
+    } else {
+      newExpanded.add(subcategoryId);
+    }
+    setExpandedSubcategories(newExpanded);
+  };
+
+  // Buscar atributos de uma subcategoria
+  const getAttributesForSubcategory = (subcategoryId: string) => {
+    const subcategory = currentCategory?.subcategories.find(sub => sub.id === subcategoryId);
+    return subcategory?.attributes || [];
   };
 
   // Contar produtos por categoria
@@ -67,6 +100,13 @@ const FilterSidebar = ({
   const getProductCountForSubcategory = (subcategoryId: string) => {
     return publishedProducts.filter(product => 
       String(product.subcategoryId) === String(subcategoryId)
+    ).length;
+  };
+
+  // Contar produtos por atributo
+  const getProductCountForAttribute = (attributeId: string) => {
+    return publishedProducts.filter(product => 
+      String(product.attributeId) === String(attributeId)
     ).length;
   };
 
@@ -101,11 +141,18 @@ const FilterSidebar = ({
                   isSelected={isSelected}
                   visibleSubcategories={visibleSubcategories}
                   selectedSubcategories={selectedSubcategories}
+                  selectedAttributes={selectedAttributes}
                   productCount={productCount}
                   onCategorySelect={onCategorySelect}
                   onSubcategoryToggle={handleSubcategoryToggle}
+                  onAttributeToggle={handleAttributeToggle}
                   getProductCountForSubcategory={getProductCountForSubcategory}
+                  getProductCountForAttribute={getProductCountForAttribute}
                   isSubcategorySelected={isSubcategorySelected}
+                  isAttributeSelected={isAttributeSelected}
+                  expandedSubcategories={expandedSubcategories}
+                  onSubcategoryExpandToggle={handleSubcategoryExpandToggle}
+                  getAttributesForSubcategory={getAttributesForSubcategory}
                 />
               );
             })}
@@ -113,7 +160,9 @@ const FilterSidebar = ({
           
           <ActiveFilters
             selectedSubcategories={selectedSubcategories}
+            selectedAttributes={selectedAttributes}
             onSubcategoryToggle={handleSubcategoryToggle}
+            onAttributeToggle={handleAttributeToggle}
           />
         </ScrollArea>
         

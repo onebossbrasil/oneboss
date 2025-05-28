@@ -17,6 +17,7 @@ export const useStoreFilters = () => {
   const [searchTerm, setSearchTerm] = useState<string>(searchParams.get("search") || "");
   const [selectedCategory, setSelectedCategory] = useState<string | null>(initCategoryId || null);
   const [selectedSubcategories, setSelectedSubcategories] = useState<any[]>([]);
+  const [selectedAttributes, setSelectedAttributes] = useState<any[]>([]);
   const [isMobileFiltersOpen, setIsMobileFiltersOpen] = useState(false);
   const [currentPage, setCurrentPage] = useState<number>(Number(searchParams.get("page")) || 1);
   const [sortOption, setSortOption] = useState<"relevance"|"price-asc"|"price-desc"|"newest">(searchParams.get("sort") as any || "relevance");
@@ -27,17 +28,19 @@ export const useStoreFilters = () => {
     if (searchTerm) newParams.set("search", searchTerm);
     if (selectedCategory) newParams.set("category", selectedCategory);
     if (selectedSubcategories.length > 0) newParams.set("subcategories", selectedSubcategories.map(s => s.id).join(","));
+    if (selectedAttributes.length > 0) newParams.set("attributes", selectedAttributes.map(a => a.id).join(","));
     if (currentPage > 1) newParams.set("page", currentPage.toString());
     if (sortOption && sortOption !== "relevance") newParams.set("sort", sortOption);
     setSearchParams(newParams, { replace: true });
     // eslint-disable-next-line
-  }, [searchTerm, selectedCategory, selectedSubcategories, currentPage, sortOption]);
+  }, [searchTerm, selectedCategory, selectedSubcategories, selectedAttributes, currentPage, sortOption]);
 
   // Limpa todos filtros
   const resetFilters = () => {
     setSearchTerm("");
     setSelectedCategory(null);
     setSelectedSubcategories([]);
+    setSelectedAttributes([]);
     setCurrentPage(1);
     setSortOption("relevance");
   };
@@ -47,6 +50,7 @@ export const useStoreFilters = () => {
     console.log(`[Store] Categoria selecionada: ${catId}`);
     setSelectedCategory(catId);
     setSelectedSubcategories([]);
+    setSelectedAttributes([]);
     setCurrentPage(1);
   };
   
@@ -61,6 +65,22 @@ export const useStoreFilters = () => {
       console.log(`[Store] Nova seleção de subcategorias:`, newSelection);
       return newSelection;
     });
+    // Limpar atributos quando subcategoria muda
+    setSelectedAttributes([]);
+    setCurrentPage(1);
+  };
+
+  const handleAttributeToggle = (attribute: any) => {
+    console.log(`[Store] Toggle atributo:`, attribute);
+    setSelectedAttributes(prev => {
+      const isAlreadySelected = prev.some((attr: any) => attr.id === attribute.id);
+      const newSelection = isAlreadySelected
+        ? prev.filter((attr: any) => attr.id !== attribute.id)
+        : [...prev, attribute];
+      
+      console.log(`[Store] Nova seleção de atributos:`, newSelection);
+      return newSelection;
+    });
     setCurrentPage(1);
   };
 
@@ -69,6 +89,7 @@ export const useStoreFilters = () => {
     setSearchTerm,
     selectedCategory,
     selectedSubcategories,
+    selectedAttributes,
     isMobileFiltersOpen,
     setIsMobileFiltersOpen,
     currentPage,
@@ -77,6 +98,7 @@ export const useStoreFilters = () => {
     setSortOption,
     resetFilters,
     handleCategorySelect,
-    handleSubcategoryToggle
+    handleSubcategoryToggle,
+    handleAttributeToggle
   };
 };

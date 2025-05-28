@@ -7,6 +7,7 @@ interface UseProductFilteringProps {
   searchTerm: string;
   selectedCategory: string | null;
   selectedSubcategories: any[];
+  selectedAttributes: any[];
   sortOption: "relevance" | "price-asc" | "price-desc" | "newest";
   currentPage: number;
   productsPerPage: number;
@@ -17,11 +18,12 @@ export const useProductFiltering = ({
   searchTerm,
   selectedCategory,
   selectedSubcategories,
+  selectedAttributes,
   sortOption,
   currentPage,
   productsPerPage
 }: UseProductFilteringProps) => {
-  // Filtro de produtos c/ busca, categoria, subcategoria + ordenação
+  // Filtro de produtos c/ busca, categoria, subcategoria, atributos + ordenação
   const filteredProducts = useMemo(() => {
     let result = products.filter(product => {
       // Busca textual
@@ -30,22 +32,30 @@ export const useProductFiltering = ({
       // Categoria - agora compara sempre ID (string)
       const categoryMatch = selectedCategory ? String(product.categoryId) === String(selectedCategory) : true;
       
-      // Subcategorias - agora usa subcategoryId em vez de attributeId
+      // Subcategorias - agora usa subcategoryId
       const subcategoriesOk = selectedSubcategories.length > 0
         ? selectedSubcategories.some((subcat: any) => String(product.subcategoryId) === String(subcat.id))
+        : true;
+
+      // Atributos - usa attributeId
+      const attributesOk = selectedAttributes.length > 0
+        ? selectedAttributes.some((attr: any) => String(product.attributeId) === String(attr.id))
         : true;
 
       console.log(`[ProductFiltering] Produto: ${product.name}`, {
         searchMatch,
         categoryMatch,
         subcategoriesOk,
+        attributesOk,
         productSubcategoryId: product.subcategoryId,
+        productAttributeId: product.attributeId,
         selectedSubcategories: selectedSubcategories.map(s => s.id),
+        selectedAttributes: selectedAttributes.map(a => a.id),
         productCategoryId: product.categoryId,
         selectedCategory
       });
 
-      return searchMatch && categoryMatch && subcategoriesOk;
+      return searchMatch && categoryMatch && subcategoriesOk && attributesOk;
     });
 
     // Ordenação
@@ -62,7 +72,7 @@ export const useProductFiltering = ({
 
     console.log(`[ProductFiltering] Produtos filtrados: ${result.length} de ${products.length}`);
     return result;
-  }, [products, searchTerm, selectedCategory, selectedSubcategories, sortOption]);
+  }, [products, searchTerm, selectedCategory, selectedSubcategories, selectedAttributes, sortOption]);
 
   const totalPages = Math.max(1, Math.ceil(filteredProducts.length / productsPerPage));
   const paginatedProducts = useMemo(

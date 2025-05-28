@@ -9,11 +9,18 @@ interface CategoryItemProps {
   isSelected: boolean;
   visibleSubcategories: any[];
   selectedSubcategories: any[];
+  selectedAttributes: any[];
   productCount: number;
   onCategorySelect: (categoryId: string | null) => void;
   onSubcategoryToggle: (subcategory: any) => void;
+  onAttributeToggle: (attribute: any) => void;
   getProductCountForSubcategory: (subcategoryId: string) => number;
+  getProductCountForAttribute: (attributeId: string) => number;
   isSubcategorySelected: (subcategoryId: string) => boolean;
+  isAttributeSelected: (attributeId: string) => boolean;
+  expandedSubcategories: Set<string>;
+  onSubcategoryExpandToggle: (subcategoryId: string) => void;
+  getAttributesForSubcategory: (subcategoryId: string) => any[];
 }
 
 const CategoryItem = ({
@@ -21,11 +28,18 @@ const CategoryItem = ({
   isSelected,
   visibleSubcategories,
   selectedSubcategories,
+  selectedAttributes,
   productCount,
   onCategorySelect,
   onSubcategoryToggle,
+  onAttributeToggle,
   getProductCountForSubcategory,
+  getProductCountForAttribute,
   isSubcategorySelected,
+  isAttributeSelected,
+  expandedSubcategories,
+  onSubcategoryExpandToggle,
+  getAttributesForSubcategory,
 }: CategoryItemProps) => {
   const handleCategoryClick = () => {
     console.log(`[FilterSidebar] Categoria clicada: ${category.id}`);
@@ -73,6 +87,13 @@ const CategoryItem = ({
               isSelected={isSubcategorySelected(subcategory.id)}
               productCount={getProductCountForSubcategory(subcategory.id)}
               onToggle={onSubcategoryToggle}
+              attributes={getAttributesForSubcategory(subcategory.id)}
+              selectedAttributes={selectedAttributes}
+              onAttributeToggle={onAttributeToggle}
+              getProductCountForAttribute={getProductCountForAttribute}
+              isAttributeSelected={isAttributeSelected}
+              isExpanded={expandedSubcategories.has(subcategory.id)}
+              onExpandToggle={onSubcategoryExpandToggle}
             />
           ))}
         </div>
