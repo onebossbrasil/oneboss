@@ -1,4 +1,3 @@
-
 import { useState, useMemo } from "react";
 import { X, ChevronDown, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -12,9 +11,9 @@ import { Product } from "@/types/product";
 // CLASSES UNIFICADAS
 const baseBtn =
   "w-full flex items-center justify-between text-left rounded-md transition-all px-2";
-const activeCls = "bg-gold/90 text-gray-900 font-bold shadow";
+const activeCls = "bg-gold/90 text-white font-bold shadow";
 const hoverCls = "hover:bg-gold/10 text-gold";
-const normalCatCls = "text-gray-800";
+const normalCatCls = "text-gray-700";
 const subcatDivider = "border-l-4 border-gold/60 pl-3 ml-3";
 const activeSubcatCls = "bg-gold/15 text-gold font-semibold";
 const subcatHoverCls = "hover:bg-gold/10 hover:text-gold";
@@ -138,7 +137,7 @@ const FilterSidebar = ({
                       <span className="text-xs opacity-60">({productCount})</span>
                     </span>
                     <span className={`ml-1 transition-colors ${
-                      selectedCategory === category.id ? "text-gold" : "text-gray-400 group-hover:text-gold"
+                      selectedCategory === category.id ? "text-white" : "text-gray-400 group-hover:text-gold"
                     }`}>
                       {selectedCategory === category.id ? (
                         <ChevronDown size={18} />
