@@ -71,12 +71,11 @@ const FilterSidebar = ({
   return (
     <>
       <aside
-        className={`
-          fixed md:static inset-0 z-40 bg-background/95 md:bg-[#F6F6F7] backdrop-blur-md 
-          md:backdrop-blur-none md:w-64 flex-shrink-0 md:glassmorphism p-6 rounded-lg self-start 
-          md:sticky md:top-24 transition-all duration-300 transform 
-          ${isMobileFiltersOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0"}
-          overflow-auto max-h-screen md:max-h-[calc(100vh-120px)] md:block border-r border-gray-200 shadow`}
+        className={`fixed md:static inset-0 z-40 bg-background/95 md:bg-[#F6F6F7] backdrop-blur-md 
+        md:backdrop-blur-none md:w-64 flex-shrink-0 md:glassmorphism p-6 rounded-lg self-start 
+        md:sticky md:top-24 transition-all duration-300 transform 
+        ${isMobileFiltersOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0"}
+        overflow-auto max-h-screen md:max-h-[calc(100vh-120px)] md:block border-r border-gray-200 shadow`}
       >
         <SidebarHeader className="mb-6">
           <div className="flex items-center justify-between">
@@ -109,9 +108,7 @@ const FilterSidebar = ({
                 <Button
                   variant="ghost"
                   className={`${baseBtn} h-9 text-base ${
-                    selectedCategory === category.id
-                      ? "bg-gold/90 text-white font-bold shadow"
-                      : normalCatCls
+                    selectedCategory === category.id ? activeCls : normalCatCls
                   } ${hoverCls}`}
                   onClick={() => {
                     if (selectedCategory === category.id) {
@@ -125,9 +122,7 @@ const FilterSidebar = ({
                 >
                   <span className="flex-1">{category.name}</span>
                   <span className={`ml-1 transition-colors ${
-                    selectedCategory === category.id
-                      ? "text-white"
-                      : "text-gray-400 group-hover:text-gold"
+                    selectedCategory === category.id ? "text-gold" : "text-gray-400 group-hover:text-gold"
                   }`}>
                     {selectedCategory === category.id ? (
                       <ChevronDown size={18} />
@@ -139,41 +134,32 @@ const FilterSidebar = ({
                 {/* Subcategorias da categoria selecionada */}
                 {selectedCategory === category.id && visibleSubcategories.length > 0 && (
                   <div className="mt-2 mb-2">
-                    {visibleSubcategories.map((subcategory) => {
-                      const hasAttributes = subcategory.attributes.length > 0;
-                      const isExpanded = expandedSubcatId === subcategory.id;
-                      return (
-                        <div key={subcategory.id} className="ml-3">
-                          {/* Subcategoria */}
-                          <Button
-                            variant="ghost"
-                            className={`${baseBtn} h-8 text-sm ${
-                              isExpanded
-                                ? "bg-gold/90 text-white font-bold shadow"
-                                : "text-gray-700"
-                            } ${hoverCls} ${!hasAttributes ? "cursor-default opacity-60" : ""}`}
-                            onClick={() => {
-                              if (!hasAttributes) return;
-                              handleSubcatExpand(subcategory.id);
-                            }}
-                            disabled={!hasAttributes}
-                          >
-                            <span className="flex-1">{subcategory.name}</span>
-                            {/* Mostrar seta só se houver atributos */}
-                            {hasAttributes && (
-                              <span className={`ml-1 transition-colors ${
-                                isExpanded ? "text-white" : "text-gray-400 group-hover:text-gold"
-                              }`}>
-                                {isExpanded ? (
-                                  <ChevronDown size={16} />
-                                ) : (
-                                  <ChevronRight size={16} />
-                                )}
-                              </span>
+                    {visibleSubcategories.map((subcategory) => (
+                      <div key={subcategory.id} className="ml-3">
+                        {/* Subcategoria */}
+                        <Button
+                          variant="ghost"
+                          className={`${baseBtn} h-8 text-sm ${
+                            expandedSubcatId === subcategory.id
+                              ? activeCls
+                              : "text-gray-700"
+                          } ${hoverCls}`}
+                          onClick={() => handleSubcatExpand(subcategory.id)}
+                        >
+                          <span className="flex-1">{subcategory.name}</span>
+                          <span className={`ml-1 transition-colors ${
+                            expandedSubcatId === subcategory.id ? "text-gold" : "text-gray-400 group-hover:text-gold"
+                          }`}>
+                            {expandedSubcatId === subcategory.id ? (
+                              <ChevronDown size={16} />
+                            ) : (
+                              <ChevronRight size={16} />
                             )}
-                          </Button>
-                          {/* Atributos apenas da subcategoria expandida */}
-                          {isExpanded && hasAttributes && (
+                          </span>
+                        </Button>
+                        {/* Atributos apenas da subcategoria expandida */}
+                        {expandedSubcatId === subcategory.id &&
+                          subcategory.attributes.length > 0 && (
                             <div className={`${subcatDivider} py-1`}>
                               <AttributeListDisplay
                                 attributes={subcategory.attributes}
@@ -183,9 +169,8 @@ const FilterSidebar = ({
                               />
                             </div>
                           )}
-                        </div>
-                      );
-                    })}
+                      </div>
+                    ))}
                   </div>
                 )}
               </div>
