@@ -1,6 +1,6 @@
 
 import { useState, useMemo } from "react";
-import { X, Circle } from "lucide-react";
+import { X, ChevronDown, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -35,46 +35,66 @@ const FilterSidebar = ({
   isMobileFiltersOpen,
   setIsMobileFiltersOpen,
   resetFilters,
-  publishedProducts
+  publishedProducts,
 }: FilterSidebarProps) => {
   const { categories } = useCategories();
 
-  // Filtra subcategorias e atributos com produto associado na categoria selecionada
+  // Estado: subcategoria expandida
+  const [expandedSubcatId, setExpandedSubcatId] = useState<string | null>(null);
+
+  // Só mostra subcategorias com atributos ativos
   const visibleSubcategories = useMemo(() => {
     if (!selectedCategory) return [];
-    const cat = categories.find(cat => cat.value === selectedCategory);
+    const cat = categories.find((cat) => cat.value === selectedCategory);
     if (!cat) return [];
-    // Só mostra subcategorias com ao menos 1 atributo que aparece em produtos publicados
-    return (cat.subcategories || []).map(subcat => {
-      const activeAttrs = subcat.attributes.filter(attr =>
-        publishedProducts.some(
-          prod =>
-            String(prod.categoryId) === String(selectedCategory) &&
-            String(prod.attributeId) === String(attr.id)
-        )
-      );
-      return activeAttrs.length
-        ? { ...subcat, attributes: activeAttrs }
-        : null;
-    }).filter(Boolean);
+    return (cat.subcategories || [])
+      .map((subcat) => {
+        const activeAttrs = subcat.attributes.filter((attr) =>
+          publishedProducts.some(
+            (prod) =>
+              String(prod.categoryId) === String(selectedCategory) &&
+              String(prod.attributeId) === String(attr.id)
+          )
+        );
+        return activeAttrs.length
+          ? { ...subcat, attributes: activeAttrs }
+          : null;
+      })
+      .filter(Boolean) as SubcategoryType[];
   }, [categories, selectedCategory, publishedProducts]);
+
+  // Handler para expand/collapse a subcategoria selecionada
+  const handleSubcatExpand = (subcatId: string) => {
+    setExpandedSubcatId((prev) => (prev === subcatId ? null : subcatId));
+  };
 
   return (
     <>
-      <aside className={`fixed md:static inset-0 z-40 bg-background/95 md:bg-[#F6F6F7] backdrop-blur-md 
+      <aside
+        className={`fixed md:static inset-0 z-40 bg-background/95 md:bg-[#F6F6F7] backdrop-blur-md 
         md:backdrop-blur-none md:w-64 flex-shrink-0 md:glassmorphism p-6 rounded-lg self-start 
         md:sticky md:top-24 transition-all duration-300 transform 
-        ${isMobileFiltersOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'}
+        ${isMobileFiltersOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0"}
         overflow-auto max-h-screen md:max-h-[calc(100vh-120px)] md:block border-r border-gray-200 shadow`}
       >
         <SidebarHeader className="mb-6">
           <div className="flex items-center justify-between">
             <h2 className="font-semibold text-lg">Filtros</h2>
-            <Button variant="ghost" size="sm" className="md:hidden text-muted-foreground" onClick={() => setIsMobileFiltersOpen(false)}>
+            <Button
+              variant="ghost"
+              size="sm"
+              className="md:hidden text-muted-foreground"
+              onClick={() => setIsMobileFiltersOpen(false)}
+            >
               <X size={18} />
             </Button>
           </div>
-          <Button variant="outline" size="sm" className="mt-4 text-xs w-full border-gold/40 text-gold hover:bg-gold/10 hover:text-gold" onClick={resetFilters}>
+          <Button
+            variant="outline"
+            size="sm"
+            className="mt-4 text-xs w-full border-gold/40 text-gold hover:bg-gold/10 hover:text-gold"
+            onClick={resetFilters}
+          >
             Limpar Filtros
           </Button>
         </SidebarHeader>
@@ -82,34 +102,63 @@ const FilterSidebar = ({
         <ScrollArea className="h-[400px] pr-4">
           {/* Categorias */}
           <div className="space-y-1 mb-6">
-            {categories.map(category => (
-              <div key={category.id} className="flex flex-col">
+            {categories.map((category) => (
+              <div key={category.id}>
                 <Button
                   variant="ghost"
-                  className={`justify-start font-medium h-9 px-2 w-full text-left rounded-md transition-all
-                  ${selectedCategory === category.value ? highlightCls : normalCatCls}
-                  ${hoverCls}`}
-                  onClick={() => onCategorySelect(category.value)}
+                  className={`justify-start font-medium h-9 w-full text-left rounded-md transition-all
+                    px-2 ${selectedCategory === category.value ? highlightCls : normalCatCls} ${hoverCls}`}
+                  onClick={() => {
+                    // Se já está selecionada, desmarca
+                    if (selectedCategory === category.value) {
+                      onCategorySelect("");
+                      setExpandedSubcatId(null);
+                    } else {
+                      onCategorySelect(category.value);
+                      setExpandedSubcatId(null);
+                    }
+                  }}
                 >
-                  <Circle
-                    size={18}
-                    className={`mr-2 ${selectedCategory === category.value ? "text-gold" : "text-gray-300"}`}
-                  />
+                  {/* REMOVIDO o <Circle /> */}
                   {category.name}
+                  <span className="ml-auto">
+                    {selectedCategory === category.value ? (
+                      <ChevronDown size={18} />
+                    ) : (
+                      <ChevronRight size={18} />
+                    )}
+                  </span>
                 </Button>
-                {/* Se categoria está selecionada, mostrar subcats (com filtro dinâmico) */}
+                {/* Exibir subcategorias somente da selecionada */}
                 {selectedCategory === category.value && visibleSubcategories.length > 0 && (
-                  <div className="mt-1 mb-3">
-                    {visibleSubcategories.map((subcategory: SubcategoryType) => (
-                      <div key={subcategory.id} className="ml-4">
-                        <span className="block text-xs text-muted-foreground font-semibold mb-1 mt-2">{subcategory.name}</span>
-                        <div className={subcatDivider}>
-                          <AttributeListDisplay
-                            attributes={subcategory.attributes}
-                            selectedAttributes={selectedSubcategories}
-                            onAttributeToggle={onSubcategoryToggle}
-                          />
-                        </div>
+                  <div className="mt-1 mb-2">
+                    {visibleSubcategories.map((subcategory) => (
+                      <div key={subcategory.id} className="ml-3">
+                        <Button
+                          variant="ghost"
+                          className={`justify-start h-8 w-full text-sm rounded-md px-3 text-left transition-all
+                            ${expandedSubcatId === subcategory.id ? "bg-gold/15 text-gold font-semibold" : "text-gray-700"} ${hoverCls}`}
+                          onClick={() => handleSubcatExpand(subcategory.id)}
+                        >
+                          {subcategory.name}
+                          <span className="ml-auto">
+                            {expandedSubcatId === subcategory.id ? (
+                              <ChevronDown size={16} />
+                            ) : (
+                              <ChevronRight size={16} />
+                            )}
+                          </span>
+                        </Button>
+                        {/* Exibir atributos (valores) só da subcategoria expandida */}
+                        {expandedSubcatId === subcategory.id && subcategory.attributes.length > 0 && (
+                          <div className={`${subcatDivider} py-1`}>
+                            <AttributeListDisplay
+                              attributes={subcategory.attributes}
+                              selectedAttributes={selectedSubcategories}
+                              onAttributeToggle={onSubcategoryToggle}
+                            />
+                          </div>
+                        )}
                       </div>
                     ))}
                   </div>
@@ -119,12 +168,20 @@ const FilterSidebar = ({
           </div>
         </ScrollArea>
         <SidebarFooter className="fixed bottom-0 left-0 right-0 p-4 bg-background border-t border-border md:hidden">
-          <Button className="w-full bg-gold hover:bg-gold-light text-white" onClick={() => setIsMobileFiltersOpen(false)}>
+          <Button
+            className="w-full bg-gold hover:bg-gold-light text-white"
+            onClick={() => setIsMobileFiltersOpen(false)}
+          >
             Aplicar Filtros
           </Button>
         </SidebarFooter>
       </aside>
-      {isMobileFiltersOpen && <div className="fixed inset-0 bg-black/30 z-30 md:hidden" onClick={() => setIsMobileFiltersOpen(false)} />}
+      {isMobileFiltersOpen && (
+        <div
+          className="fixed inset-0 bg-black/30 z-30 md:hidden"
+          onClick={() => setIsMobileFiltersOpen(false)}
+        />
+      )}
     </>
   );
 };
