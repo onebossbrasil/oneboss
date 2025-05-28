@@ -92,6 +92,7 @@ const ProductEditDialog = ({ product, open, onOpenChange, onClose }: ProductEdit
                     selectedCategory={selectedCategory}
                     subcategoryValues={{}}
                     selectedSubcategoryId={selectedSubcategoryId}
+                    selectedAttributeId={selectedAttributeId}
                     onCategoryChange={handleCategoryChange}
                     onSubcategoryChange={() => {}}
                     onSubcategoryIdChange={handleSubcatIdChange}

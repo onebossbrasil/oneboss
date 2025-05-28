@@ -15,6 +15,16 @@ type CategorySelectorProps = {
   onAttributeIdChange?: (attributeId: string | null) => void;
 };
 
+// Helper function to ensure we always have a valid string for selectedAttributeId
+const sanitizeAttributeId = (value: any): string => {
+  if (value === null || value === undefined) return "";
+  if (typeof value === "object") {
+    console.warn("[CategorySelector] selectedAttributeId is an object, converting to empty string:", value);
+    return "";
+  }
+  return String(value);
+};
+
 const CategorySelectorContent = ({
   selectedCategory,
   subcategoryValues,
@@ -34,32 +44,44 @@ const CategorySelectorContent = ({
     sc => sc.id === selectedSubcategoryId
   );
 
+  // Sanitize selectedAttributeId to ensure it's always a string
+  const sanitizedAttributeId = sanitizeAttributeId(selectedAttributeId);
+
   // LOGS DE DIAGNÓSTICO
   if (process.env.NODE_ENV !== "production") {
     console.log("[CategorySelector] categories:", categories);
     console.log("[CategorySelector] selectedCategory:", selectedCategory);
     console.log("[CategorySelector] selectedSubcategoryId:", selectedSubcategoryId);
+    console.log("[CategorySelector] selectedAttributeId (raw):", selectedAttributeId);
+    console.log("[CategorySelector] selectedAttributeId (sanitized):", sanitizedAttributeId);
     console.log("[CategorySelector] activeSubcatObj:", activeSubcatObj);
     if (activeSubcatObj) {
       console.log("[CategorySelector] activeSubcatObj.attributes:", activeSubcatObj.attributes);
     }
-    console.log("[CategorySelector] selectedAttributeId:", selectedAttributeId);
   }
 
-  // Quando muda subcategoria, notifica parent e reseta apenas se mudou de fato
+  // Quando muda subcategoria, notifica parent e configura atributo padrão
   useEffect(() => {
     if (onSubcategoryIdChange) {
       onSubcategoryIdChange(selectedSubcategoryId ?? null);
     }
-    // Apenas set o atributo default se mudou de subcategoria e não tem nenhum atrib selecionado
+    
+    // Se há uma subcategoria ativa com atributos
     if (
       onAttributeIdChange &&
       activeSubcatObj &&
       selectedSubcategoryId &&
-      activeSubcatObj.attributes.length > 0 &&
-      (!selectedAttributeId || !activeSubcatObj.attributes.some(a => a.id === selectedAttributeId))
+      activeSubcatObj.attributes &&
+      activeSubcatObj.attributes.length > 0
     ) {
-      onAttributeIdChange(activeSubcatObj.attributes[0].id);
+      // Verifica se o atributo atual é válido
+      const currentAttributeExists = activeSubcatObj.attributes.some(a => a.id === sanitizedAttributeId);
+      
+      // Se não há atributo selecionado ou o atual não existe na lista, seleciona o primeiro
+      if (!sanitizedAttributeId || !currentAttributeExists) {
+        console.log("[CategorySelector] Setting default attribute:", activeSubcatObj.attributes[0].id);
+        onAttributeIdChange(activeSubcatObj.attributes[0].id);
+      }
     }
     // eslint-disable-next-line
   }, [selectedSubcategoryId, activeSubcatObj]);
@@ -127,7 +149,7 @@ const CategorySelectorContent = ({
         </div>
       )}
 
-      {/* Corrigido: Garante map de atributos apenas se array com length > 0 */}
+      {/* Modal de atributos - corrigido para garantir que o valor seja sempre string */}
       {selectedSubcategoryId && activeSubcatObj && Array.isArray(activeSubcatObj.attributes) && activeSubcatObj.attributes.length > 0 && (
         <div>
           <Label htmlFor="subcategoryValue">
@@ -135,11 +157,12 @@ const CategorySelectorContent = ({
           </Label>
           <Select 
             onValueChange={(attributeId) => {
+              console.log("[CategorySelector] Attribute selected:", attributeId);
               if (onAttributeIdChange) {
                 onAttributeIdChange(attributeId);
               }
             }}
-            value={selectedAttributeId ?? ""}
+            value={sanitizedAttributeId}
             disabled={activeSubcatObj.attributes.length === 0}
           >
             <SelectTrigger>
@@ -148,11 +171,14 @@ const CategorySelectorContent = ({
               } />
             </SelectTrigger>
             <SelectContent>
-              {activeSubcatObj.attributes.map((attr: { id: string; name: string; }) => (
-                <SelectItem key={attr.id} value={attr.id}>
-                  {attr.name}
-                </SelectItem>
-              ))}
+              {activeSubcatObj.attributes.map((attr: { id: string; name: string; }) => {
+                console.log("[CategorySelector] Rendering attribute option:", attr);
+                return (
+                  <SelectItem key={attr.id} value={attr.id}>
+                    {attr.name}
+                  </SelectItem>
+                );
+              })}
             </SelectContent>
           </Select>
         </div>
@@ -173,4 +199,3 @@ const CategorySelector = (props: CategorySelectorProps) => {
 };
 
 export default CategorySelector;
-
