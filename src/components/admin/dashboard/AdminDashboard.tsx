@@ -39,42 +39,41 @@ const AdminDashboard = ({ onLogout }: AdminDashboardProps) => {
   }, [activeTab]);
 
   if (isMobile) {
-    // MOBILE LAYOUT
+    // MOBILE LAYOUT - wrap everything with providers
     return (
-      <div className="w-full min-h-screen bg-[#F1F1F1] flex flex-col">
-        {/* Mobile Header */}
-        <header className="bg-white border-b-2 border-gold flex items-center justify-between px-4 py-3 sticky top-0 z-40 shadow-sm">
-          <img
-            src="/lovable-uploads/cc202675-942c-4f4f-9e0c-0ba81e060e33.png"
-            alt="OneBoss"
-            className="h-8 w-auto"
-          />
-          <button
-            onClick={onLogout}
-            className="ml-2 rounded-full border border-gold bg-gold/10 text-gold px-3 py-2 text-xs font-semibold shadow hover:bg-gold/20"
-          >
-            Sair
-          </button>
-        </header>
-        {/* Mobile Abas/Navegação */}
-        <nav className="flex w-full border-b bg-[#fcf7ea]">
-          {TABS.map(tab => (
-            <button
-              key={tab.key}
-              onClick={() => setActiveTab(tab.key)}
-              className={`flex-1 px-4 py-2 text-sm font-semibold transition ${activeTab === tab.key
-                ? "border-b-2 border-gold text-gold bg-white shadow"
-                : "text-gray-600 hover:bg-gold/10"
-              }`}
-            >
-              {tab.label}
-            </button>
-          ))}
-        </nav>
-        <div className="flex-1 p-2">
-          {/* Adiciona renderização dos parceiros */}
-          <CategoryProvider>
-            <ProductProvider>
+      <CategoryProvider>
+        <ProductProvider>
+          <div className="w-full min-h-screen bg-[#F1F1F1] flex flex-col">
+            {/* Mobile Header */}
+            <header className="bg-white border-b-2 border-gold flex items-center justify-between px-4 py-3 sticky top-0 z-40 shadow-sm">
+              <img
+                src="/lovable-uploads/cc202675-942c-4f4f-9e0c-0ba81e060e33.png"
+                alt="OneBoss"
+                className="h-8 w-auto"
+              />
+              <button
+                onClick={onLogout}
+                className="ml-2 rounded-full border border-gold bg-gold/10 text-gold px-3 py-2 text-xs font-semibold shadow hover:bg-gold/20"
+              >
+                Sair
+              </button>
+            </header>
+            {/* Mobile Abas/Navegação */}
+            <nav className="flex w-full border-b bg-[#fcf7ea]">
+              {TABS.map(tab => (
+                <button
+                  key={tab.key}
+                  onClick={() => setActiveTab(tab.key)}
+                  className={`flex-1 px-4 py-2 text-sm font-semibold transition ${activeTab === tab.key
+                    ? "border-b-2 border-gold text-gold bg-white shadow"
+                    : "text-gray-600 hover:bg-gold/10"
+                  }`}
+                >
+                  {tab.label}
+                </button>
+              ))}
+            </nav>
+            <div className="flex-1 p-2">
               {activeTab === "produtos" && (
                 <div className="w-full">
                   <ProductList />
@@ -89,14 +88,14 @@ const AdminDashboard = ({ onLogout }: AdminDashboardProps) => {
               {activeTab === "parceiros" && (
                 <AdminPartnerManager />
               )}
-            </ProductProvider>
-          </CategoryProvider>
-        </div>
-      </div>
+            </div>
+          </div>
+        </ProductProvider>
+      </CategoryProvider>
     );
   }
 
-  // DESKTOP LAYOUT igual antes
+  // DESKTOP LAYOUT - wrap everything with providers
   return (
     <SidebarProvider>
       <AdminLayout activeTab={activeTab} onTabChange={setActiveTab} onLogout={onLogout}>
@@ -116,4 +115,3 @@ const AdminDashboard = ({ onLogout }: AdminDashboardProps) => {
 };
 
 export default AdminDashboard;
-
