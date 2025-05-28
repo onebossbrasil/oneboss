@@ -60,13 +60,26 @@ const Store = () => {
   const filteredProducts = useMemo(() => {
     let result = products.filter(product => {
       // Busca textual
-      const searchMatch = product.name?.toLowerCase().includes(searchTerm.toLowerCase()) || false;
+      const searchMatch = searchTerm === "" || product.name?.toLowerCase().includes(searchTerm.toLowerCase());
+      
       // Categoria - agora compara sempre ID (string)
       const categoryMatch = selectedCategory ? String(product.categoryId) === String(selectedCategory) : true;
-      // Subcategorias/Atributos (considera múltiplas)
+      
+      // CORREÇÃO: Subcategorias - agora usa subcategoryId em vez de attributeId
       const subcategoriesOk = selectedSubcategories.length > 0
-        ? selectedSubcategories.some((subcat: any) => String(product.attributeId) === String(subcat.id))
+        ? selectedSubcategories.some((subcat: any) => String(product.subcategoryId) === String(subcat.id))
         : true;
+
+      console.log(`[Store] Produto: ${product.name}`, {
+        searchMatch,
+        categoryMatch,
+        subcategoriesOk,
+        productSubcategoryId: product.subcategoryId,
+        selectedSubcategories: selectedSubcategories.map(s => s.id),
+        productCategoryId: product.categoryId,
+        selectedCategory
+      });
+
       return searchMatch && categoryMatch && subcategoriesOk;
     });
 
@@ -81,6 +94,8 @@ const Store = () => {
         return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
       });
     }
+
+    console.log(`[Store] Produtos filtrados: ${result.length} de ${products.length}`);
     return result;
   }, [products, searchTerm, selectedCategory, selectedSubcategories, sortOption]);
 
@@ -122,16 +137,23 @@ const Store = () => {
 
   // Handlers sidebar
   const handleCategorySelect = (catId: string | null) => {
+    console.log(`[Store] Categoria selecionada: ${catId}`);
     setSelectedCategory(catId);
     setSelectedSubcategories([]);
     setCurrentPage(1);
   };
+  
   const handleSubcategoryToggle = (subcat: any) => {
-    setSelectedSubcategories(prev =>
-      prev.some((sc: any) => sc.id === subcat.id)
+    console.log(`[Store] Toggle subcategoria:`, subcat);
+    setSelectedSubcategories(prev => {
+      const isAlreadySelected = prev.some((sc: any) => sc.id === subcat.id);
+      const newSelection = isAlreadySelected
         ? prev.filter((sc: any) => sc.id !== subcat.id)
-        : [...prev, subcat]
-    );
+        : [...prev, subcat];
+      
+      console.log(`[Store] Nova seleção de subcategorias:`, newSelection);
+      return newSelection;
+    });
     setCurrentPage(1);
   };
 
@@ -228,6 +250,18 @@ const Store = () => {
             <div className="text-center py-16 text-red-500">
               Erro ao carregar produtos.
             </div>
+          ) : filteredProducts.length === 0 ? (
+            <div className="text-center py-16">
+              <p className="text-xl text-muted-foreground mb-4">
+                Nenhum produto encontrado
+              </p>
+              <p className="text-sm text-muted-foreground mb-6">
+                Tente ajustar os filtros ou fazer uma nova busca
+              </p>
+              <Button onClick={resetFilters} variant="outline">
+                Limpar todos os filtros
+              </Button>
+            </div>
           ) : (
             <ProductGrid
               products={paginatedProducts.map(formatProduct)}
@@ -260,4 +294,3 @@ const Store = () => {
 };
 
 export default Store;
-
