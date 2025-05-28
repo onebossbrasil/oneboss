@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useRef } from "react";
 import { Product } from "@/types/product";
 import { useFormState } from "@/hooks/product-edit/use-form-state";
@@ -29,6 +30,9 @@ export const useProductEdit = (
   // Sincroniza selects APENAS na troca de produto ou ao carregar categorias pela primeira vez (evita reset indiscriminado)
   useEffect(() => {
     if (product && product.id !== lastProductId.current) {
+      console.log("[useProductEdit] Novo produto carregado:", product.id);
+      console.log("[useProductEdit] Dados do produto - categoryId:", product.categoryId, "subcategoryId:", product.subcategoryId, "attributeId:", product.attributeId);
+      
       setFormData({
         name: product.name,
         shortDescription: product.shortDescription || "",
@@ -43,37 +47,58 @@ export const useProductEdit = (
       setSelectedSubcategoryId(product.subcategoryId ?? null);
       setSelectedAttributeId(product.attributeId ?? null);
       lastProductId.current = product.id;
-      console.log(
-        "[useProductEdit] Produto fresh recebido. Setando IDs:",
-        product.categoryId, product.subcategoryId, product.attributeId
-      );
+      
+      console.log("[useProductEdit] Estados setados - categoria:", product.categoryId, "subcategoria:", product.subcategoryId, "atributo:", product.attributeId);
     }
     // eslint-disable-next-line
   }, [product?.id]);
 
-  // Sincroniza selects após carregar categorias e atualizar produto
+  // Sincroniza selects após carregar categorias - PRESERVA o valor do produto
   useEffect(() => {
     if (!catLoading && categories.length > 0 && product && product.id === lastProductId.current) {
+      console.log("[useProductEdit] Sincronizando com categorias carregadas...");
+      
       const cat = categories.find(cat => cat.id === product.categoryId);
       if (cat) {
+        console.log("[useProductEdit] Categoria encontrada:", cat.name);
         setSelectedCategory(product.categoryId ?? "");
+        
         const subcat = cat.subcategories.find(sc => sc.id === product.subcategoryId);
         if (subcat) {
+          console.log("[useProductEdit] Subcategoria encontrada:", subcat.name, "com", subcat.attributes.length, "atributos");
           setSelectedSubcategoryId(product.subcategoryId ?? null);
-          // Só seta selectedAttributeId se não existe ou não está na lista
-          const attrExists = subcat.attributes.find(at => at.id === selectedAttributeId);
-          if (!attrExists) {
-            if (subcat.attributes.length > 0) {
-              setSelectedAttributeId(subcat.attributes[0].id);
+          
+          // CORREÇÃO PRINCIPAL: Preservar o attributeId do produto se ele existir na lista
+          if (product.attributeId && subcat.attributes.length > 0) {
+            const attrExists = subcat.attributes.find(at => at.id === product.attributeId);
+            if (attrExists) {
+              console.log("[useProductEdit] Preservando atributo do produto:", product.attributeId, ":", attrExists.name);
+              setSelectedAttributeId(product.attributeId);
             } else {
-              setSelectedAttributeId(null);
+              console.log("[useProductEdit] Atributo do produto não encontrado na lista, usando primeiro disponível");
+              setSelectedAttributeId(subcat.attributes[0].id);
             }
+          } else if (subcat.attributes.length > 0) {
+            console.log("[useProductEdit] Produto sem atributo, selecionando primeiro disponível");
+            setSelectedAttributeId(subcat.attributes[0].id);
+          } else {
+            console.log("[useProductEdit] Subcategoria sem atributos");
+            setSelectedAttributeId(null);
           }
+        } else {
+          console.log("[useProductEdit] Subcategoria não encontrada");
+          setSelectedSubcategoryId(null);
+          setSelectedAttributeId(null);
         }
+      } else {
+        console.log("[useProductEdit] Categoria não encontrada");
+        setSelectedCategory("");
+        setSelectedSubcategoryId(null);
+        setSelectedAttributeId(null);
       }
     }
     // eslint-disable-next-line
-  }, [categories, catLoading, product?.id]);
+  }, [categories, catLoading, product?.id, product?.categoryId, product?.subcategoryId, product?.attributeId]);
 
   // --- Handlers principais ---
   const handleCategoryChange = (categoryId: string) => {
