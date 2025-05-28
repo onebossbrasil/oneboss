@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { Product, ProductImage } from "@/types/product";
 
@@ -40,14 +41,27 @@ export const useImageManagement = (product: Product | null) => {
         setErrorMsg("Formato inválido detectado. Apenas PNG, JPG, JPEG ou WEBP são suportados.");
         return;
       }
-      // Evita duplicidade
+      // Evita duplicidade local (nome + size)
       const uniqueNewFiles = acceptedFiles.filter(newFile =>
-        !images.some(existing => existing.name === newFile.name && existing.size === newFile.size)
+        !images.some(
+          existing => existing.name === newFile.name && existing.size === newFile.size
+        )
       );
-      const newPreviewUrls = uniqueNewFiles.map(file => URL.createObjectURL(file));
-      setImages(prev => [...prev, ...uniqueNewFiles]);
+      // Também evita adicionar em sequência no mesmo upload
+      const trulyUniqueFiles: File[] = [];
+      const seen = new Set<string>();
+      for (const file of uniqueNewFiles) {
+        const key = `${file.name}-${file.size}`;
+        if (!seen.has(key)) {
+          trulyUniqueFiles.push(file);
+          seen.add(key);
+        }
+      }
+
+      const newPreviewUrls = trulyUniqueFiles.map(file => URL.createObjectURL(file));
+      setImages(prev => [...prev, ...trulyUniqueFiles]);
       setImagePreviewUrls(prev => [...prev, ...newPreviewUrls]);
-      console.log("[useImageManagement] Imagens novas adicionadas:", uniqueNewFiles.map(f => f.name));
+      console.log("[useImageManagement] Imagens novas adicionadas (sem duplicadas):", trulyUniqueFiles.map(f => f.name));
     }
   };
 
@@ -89,3 +103,4 @@ export const useImageManagement = (product: Product | null) => {
     setErrorMsg
   };
 };
+
