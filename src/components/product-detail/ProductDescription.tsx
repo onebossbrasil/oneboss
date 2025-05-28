@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { Product } from "@/types/product";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -24,7 +25,6 @@ const ProductDescription = ({ product }: ProductDescriptionProps) => {
             <TabsList>
               <TabsTrigger value="descricao">Descrição</TabsTrigger>
               <TabsTrigger value="especificacoes">Especificações</TabsTrigger>
-              <TabsTrigger value="garantia">Garantia</TabsTrigger>
             </TabsList>
           </div>
         </CardHeader>
@@ -65,24 +65,6 @@ const ProductDescription = ({ product }: ProductDescriptionProps) => {
                   )}
                 </tbody>
               </table>
-            </div>
-          </TabsContent>
-          
-          <TabsContent value="garantia" className="mt-0">
-            <div className="prose prose-stone max-w-none">
-              <h3>Política de Garantia</h3>
-              <p>
-                Todos os produtos da ONE BOSS Luxury Marketplace possuem garantia contra defeitos de fabricação conforme as políticas de cada fabricante.
-              </p>
-              <p>
-                Itens exclusivos e raros podem ter condições especiais de garantia. Entre em contato com nosso time de atendimento para informações detalhadas sobre a garantia deste item específico.
-              </p>
-              <h4>Importante:</h4>
-              <ul>
-                <li>A garantia cobre apenas defeitos de fabricação</li>
-                <li>Danos causados por mau uso não são cobertos pela garantia</li>
-                <li>É necessário apresentar comprovante de compra para acionar a garantia</li>
-              </ul>
             </div>
           </TabsContent>
         </CardContent>
