@@ -29,7 +29,7 @@ const AttributeListDisplay: React.FC<AttributeListDisplayProps> = ({
   // Classes para visual unificado do sidebar de filtros
   const attrBtnBase =
     "w-full flex items-center justify-between text-left px-2 rounded-md transition-all h-8 text-sm";
-  const attrActive = "bg-gold/15 text-gold font-semibold";
+  const attrActive = "bg-gold/90 text-white font-semibold"; // text-white on gold background
   const attrHover = "hover:bg-gold/10 hover:text-gold";
   const attrNormal = "text-gray-700";
 
@@ -52,7 +52,7 @@ const AttributeListDisplay: React.FC<AttributeListDisplayProps> = ({
                     isSelected(attr) ? attrActive : attrNormal
                   } ${attrHover}`
                 : `text-left justify-start flex-1 px-2 h-8 font-normal ${
-                    isSelected(attr) ? "bg-gold/10 text-gold" : ""
+                    isSelected(attr) ? "bg-gold/90 text-white" : ""
                   }`
             }
             onClick={() => onAttributeToggle && onAttributeToggle(attr)}
