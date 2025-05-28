@@ -1,3 +1,4 @@
+
 import { useProducts } from "@/contexts/ProductContext";
 import { useIsMobile } from "@/hooks/useIsMobile";
 import { useProductFilters } from "./hooks/useProductFilters";
@@ -32,12 +33,15 @@ export default function ProductList() {
     confirmDelete,
     selectedIds,
     isRefreshing,
+    isDeleting,
     handleOpenCreate,
     handleEditClick,
     handleDialogClose,
     handleToggleAll,
     handleToggleProduct,
     handleManualRefresh,
+    handleSelectDelete,
+    handleConfirmDelete,
     setConfirmDelete
   } = useProductListLogic(products);
 
@@ -47,16 +51,6 @@ export default function ProductList() {
 
   const handlePageChange = (p: number) => {
     if (p >= 1 && p <= pageCount) setPage(p);
-  };
-
-  // Funções de exclusão
-  const handleSelectDelete = (product) => {
-    setConfirmDelete(product);
-  };
-  const handleConfirmDelete = async () => {
-    if (!confirmDelete) return;
-    await useProducts().deleteProduct(confirmDelete.id);
-    setConfirmDelete(null);
   };
 
   return (
@@ -83,7 +77,7 @@ export default function ProductList() {
           selectedProduct={selectedProduct}
           handleDialogClose={handleDialogClose}
           confirmDelete={confirmDelete}
-          isDeleting={isLoading}
+          isDeleting={isDeleting}
           handleConfirmDelete={handleConfirmDelete}
           isRefreshing={isRefreshing}
           handleManualRefresh={handleManualRefresh}
@@ -115,7 +109,7 @@ export default function ProductList() {
           selectedProduct={selectedProduct}
           handleDialogClose={handleDialogClose}
           confirmDelete={confirmDelete}
-          isDeleting={isLoading}
+          isDeleting={isDeleting}
           handleConfirmDelete={handleConfirmDelete}
           isRefreshing={isRefreshing}
           handleManualRefresh={handleManualRefresh}

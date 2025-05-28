@@ -15,6 +15,7 @@ export function useProductListLogic(products: Product[]) {
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [lastRefreshTime, setLastRefreshTime] = useState(0);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   // Seleção em massa (só ids visiveis)
   const handleToggleAll = (paginatedIds: string[], checked: boolean) => {
@@ -77,6 +78,28 @@ export function useProductListLogic(products: Product[]) {
     }
   }, [refreshProducts, lastRefreshTime, toast]);
 
+  // Exclusão segura
+  const handleSelectDelete = (product: Product|null) => {
+    setConfirmDelete(product);
+  };
+
+  const handleConfirmDelete = useCallback(async () => {
+    if (!confirmDelete) return;
+    setIsDeleting(true);
+    try {
+      await deleteProduct(confirmDelete.id);
+      setConfirmDelete(null);
+      toast({
+        title: "Produto excluído",
+        description: "O produto foi removido com sucesso.",
+      });
+    } catch (err) {
+      // O erro já é tratado em deleteProduct e toast mostrado lá.
+    } finally {
+      setIsDeleting(false);
+    }
+  }, [confirmDelete, deleteProduct, toast]);
+
   return {
     selectedProduct, setSelectedProduct,
     dialogOpen, setDialogOpen,
@@ -84,11 +107,14 @@ export function useProductListLogic(products: Product[]) {
     confirmDelete, setConfirmDelete,
     selectedIds, setSelectedIds,
     isRefreshing,
+    isDeleting,
     handleOpenCreate,
     handleEditClick,
     handleDialogClose,
     handleToggleAll,
     handleToggleProduct,
-    handleManualRefresh
+    handleManualRefresh,
+    handleSelectDelete,
+    handleConfirmDelete
   }
 }
