@@ -21,7 +21,7 @@ const AttributeItem = ({
         className={`justify-start w-full text-left px-3 rounded-md transition-all h-7 text-sm ${
           isSelected 
             ? "bg-gold/20 text-gold font-medium" 
-            : "text-gray-700 hover:bg-gold/10 hover:text-gold"
+            : "text-gray-800 hover:bg-gold/10 hover:text-gold"
         }`}
         onClick={() => onToggle(attribute)}
       >
