@@ -5,8 +5,8 @@ const StoreBanner = () => {
   return (
     <div className="w-full relative h-[220px] md:h-[340px] flex items-center justify-center bg-gradient-to-br from-gold/80 via-gold/40 to-muted rounded-b-3xl mb-0 shadow-lg overflow-hidden">
       <img
-        src="https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=1400&q=80"
-        alt="Banner loja"
+        src="/lovable-uploads/ea5e00ad-4293-4c9d-b6a5-80a544366ed4.png"
+        alt="Banner loja - Lamborghini"
         className="absolute inset-0 object-cover w-full h-full opacity-35 z-0"
         draggable={false}
       />
