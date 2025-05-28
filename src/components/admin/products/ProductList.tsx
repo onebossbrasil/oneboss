@@ -37,7 +37,8 @@ export default function ProductList() {
     handleDialogClose,
     handleToggleAll,
     handleToggleProduct,
-    handleManualRefresh
+    handleManualRefresh,
+    setConfirmDelete
   } = useProductListLogic(products);
 
   // Seleção de IDs para a página
@@ -46,6 +47,16 @@ export default function ProductList() {
 
   const handlePageChange = (p: number) => {
     if (p >= 1 && p <= pageCount) setPage(p);
+  };
+
+  // Funções de exclusão
+  const handleSelectDelete = (product) => {
+    setConfirmDelete(product);
+  };
+  const handleConfirmDelete = async () => {
+    if (!confirmDelete) return;
+    await useProducts().deleteProduct(confirmDelete.id);
+    setConfirmDelete(null);
   };
 
   return (
@@ -64,7 +75,7 @@ export default function ProductList() {
           setFilterStatus={setFilterStatus}
           selectedIds={selectedIds}
           onEditClick={handleEditClick}
-          onSelectDelete={() => {}} // pode-se implementar
+          onSelectDelete={handleSelectDelete}
           onToggleProduct={handleToggleProduct}
           dialogOpen={dialogOpen}
           handleOpenCreate={handleOpenCreate}
@@ -73,7 +84,7 @@ export default function ProductList() {
           handleDialogClose={handleDialogClose}
           confirmDelete={confirmDelete}
           isDeleting={isLoading}
-          handleConfirmDelete={() => {}} // pode-se implementar
+          handleConfirmDelete={handleConfirmDelete}
           isRefreshing={isRefreshing}
           handleManualRefresh={handleManualRefresh}
           page={page}
@@ -95,7 +106,7 @@ export default function ProductList() {
           selectedIds={selectedIds}
           allSelected={allSelected}
           onEditClick={handleEditClick}
-          onSelectDelete={() => {}} // pode-se implementar
+          onSelectDelete={handleSelectDelete}
           onToggleAll={checked => handleToggleAll(paginatedIds, checked)}
           onToggleProduct={handleToggleProduct}
           dialogOpen={dialogOpen}
@@ -105,7 +116,7 @@ export default function ProductList() {
           handleDialogClose={handleDialogClose}
           confirmDelete={confirmDelete}
           isDeleting={isLoading}
-          handleConfirmDelete={() => {}} // pode-se implementar
+          handleConfirmDelete={handleConfirmDelete}
           isRefreshing={isRefreshing}
           handleManualRefresh={handleManualRefresh}
           page={page}
