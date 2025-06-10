@@ -82,17 +82,37 @@ const FilterSidebar = ({
     ).length;
   };
 
+  // CORREÇÃO: Contar apenas produtos que realmente têm subcategoria definida
   const getProductCountForSubcategory = (subcategoryId: string) => {
-    return publishedProducts.filter(product => 
+    const count = publishedProducts.filter(product => 
+      product.subcategoryId !== null && 
+      product.subcategoryId !== undefined &&
       String(product.subcategoryId) === String(subcategoryId)
     ).length;
+    
+    console.log(`[FilterSidebar] Contagem para subcategoria ${subcategoryId}:`, count);
+    return count;
   };
 
+  // CORREÇÃO: Contar apenas produtos que realmente têm atributo definido
   const getProductCountForAttribute = (attributeId: string) => {
-    return publishedProducts.filter(product => 
+    const count = publishedProducts.filter(product => 
+      product.attributeId !== null && 
+      product.attributeId !== undefined &&
       String(product.attributeId) === String(attributeId)
     ).length;
+    
+    console.log(`[FilterSidebar] Contagem para atributo ${attributeId}:`, count);
+    return count;
   };
+
+  // Debug: Log produtos sem subcategoria/atributo
+  console.log(`[FilterSidebar] Produtos sem subcategoria:`, 
+    publishedProducts.filter(p => p.subcategoryId === null || p.subcategoryId === undefined).length
+  );
+  console.log(`[FilterSidebar] Produtos sem atributo:`, 
+    publishedProducts.filter(p => p.attributeId === null || p.attributeId === undefined).length
+  );
 
   return (
     <div className="bg-white rounded-xl border border-gold/10 shadow-sm overflow-hidden">

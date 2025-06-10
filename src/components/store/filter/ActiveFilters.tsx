@@ -40,10 +40,10 @@ const ActiveFilters = ({
           </div>
         ))}
         
-        {/* Atributos selecionados */}
+        {/* CORREÇÃO: Atributos selecionados - usar 'name' em vez de 'attribute' */}
         {selectedAttributes.map((attribute) => (
           <div key={`attr-${attribute.id}`} className="flex items-center justify-between bg-blue-50 px-3 py-2 rounded-md">
-            <span className="text-sm text-blue-700 font-medium">{attribute.attribute}</span>
+            <span className="text-sm text-blue-700 font-medium">{attribute.name}</span>
             <Button
               variant="ghost"
               size="sm"

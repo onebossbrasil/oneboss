@@ -32,15 +32,17 @@ export const useProductFiltering = ({
       // Categoria - agora compara sempre ID (string)
       const categoryMatch = selectedCategory ? String(product.categoryId) === String(selectedCategory) : true;
       
-      // Subcategorias - agora usa subcategoryId
+      // CORREÇÃO: Subcategorias - agora trata null/undefined adequadamente
       const subcategoriesOk = selectedSubcategories.length > 0
-        ? selectedSubcategories.some((subcat: any) => String(product.subcategoryId) === String(subcat.id))
-        : true;
+        ? (product.subcategoryId !== null && product.subcategoryId !== undefined && 
+           selectedSubcategories.some((subcat: any) => String(product.subcategoryId) === String(subcat.id)))
+        : true; // Se nenhuma subcategoria selecionada, todos passam
 
-      // Atributos - usa attributeId
+      // CORREÇÃO: Atributos - agora trata null/undefined adequadamente
       const attributesOk = selectedAttributes.length > 0
-        ? selectedAttributes.some((attr: any) => String(product.attributeId) === String(attr.id))
-        : true;
+        ? (product.attributeId !== null && product.attributeId !== undefined &&
+           selectedAttributes.some((attr: any) => String(product.attributeId) === String(attr.id)))
+        : true; // Se nenhum atributo selecionado, todos passam
 
       console.log(`[ProductFiltering] Produto: ${product.name}`, {
         searchMatch,
@@ -52,7 +54,9 @@ export const useProductFiltering = ({
         selectedSubcategories: selectedSubcategories.map(s => s.id),
         selectedAttributes: selectedAttributes.map(a => a.id),
         productCategoryId: product.categoryId,
-        selectedCategory
+        selectedCategory,
+        hasSubcategoryId: product.subcategoryId !== null && product.subcategoryId !== undefined,
+        hasAttributeId: product.attributeId !== null && product.attributeId !== undefined
       });
 
       return searchMatch && categoryMatch && subcategoriesOk && attributesOk;
@@ -71,6 +75,13 @@ export const useProductFiltering = ({
     }
 
     console.log(`[ProductFiltering] Produtos filtrados: ${result.length} de ${products.length}`);
+    console.log(`[ProductFiltering] Filtros ativos:`, {
+      searchTerm,
+      selectedCategory,
+      selectedSubcategoriesCount: selectedSubcategories.length,
+      selectedAttributesCount: selectedAttributes.length
+    });
+    
     return result;
   }, [products, searchTerm, selectedCategory, selectedSubcategories, selectedAttributes, sortOption]);
 
