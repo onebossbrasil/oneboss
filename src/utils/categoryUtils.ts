@@ -15,7 +15,7 @@ export const groupSubcategoriesByCategory = (subcategoriesData: any[]) => {
   return subcategoriesByCategory;
 };
 
-// Group attributes by subcategory ID - CORRIGIDO para mapear corretamente o campo 'attribute' para 'name'
+// Group attributes by subcategory ID - handle the 'attribute' field mapping
 export const groupValuesBySubcategory = (attributesData: any[]) => {
   const attributesBySubcategory: Record<string, { id: string; name: string }[]> = {};
 
@@ -26,13 +26,13 @@ export const groupValuesBySubcategory = (attributesData: any[]) => {
       attributesBySubcategory[row.subcategory_id] = [];
     }
     
-    // CORREÇÃO PRINCIPAL: mapear 'attribute' do banco para 'name' no frontend
+    // Map database 'attribute' field to frontend 'name' field
     const attributeObj = {
       id: row.id.toString(),
-      name: row.attribute // campo 'attribute' do banco vira 'name' no frontend
+      name: row.attribute // 'attribute' from database becomes 'name' in frontend
     };
     
-    console.log("[categoryUtils] Mapeando atributo:", {
+    console.log("[categoryUtils] Mapping attribute:", {
       rawRow: row,
       mapped: attributeObj
     });
@@ -44,7 +44,7 @@ export const groupValuesBySubcategory = (attributesData: any[]) => {
   return attributesBySubcategory;
 };
 
-// Format categories data into the expected structure (IDs sempre string)
+// Format categories data into the expected structure
 export const formatCategoriesData = (
   categoriesData: any[],
   subcategoriesByCategory: Record<string, any[]>,
@@ -66,12 +66,12 @@ export const formatCategoriesData = (
   });
 };
 
-// Find category by ID (id: string)
+// Find category by ID
 export const findCategoryById = (categories: CategoryType[], categoryId: string): CategoryType | undefined => {
   return categories.find(cat => cat.id === categoryId);
 };
 
-// Find subcategory by ID (ids sempre string)
+// Find subcategory by ID
 export const findSubcategoryById = (
   categories: CategoryType[], 
   categoryId: string, 

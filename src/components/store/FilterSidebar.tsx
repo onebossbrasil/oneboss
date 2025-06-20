@@ -82,7 +82,7 @@ const FilterSidebar = ({
     ).length;
   };
 
-  // CORREÇÃO: Contar apenas produtos que realmente têm subcategoria definida
+  // Count products that have subcategory defined
   const getProductCountForSubcategory = (subcategoryId: string) => {
     const count = publishedProducts.filter(product => 
       product.subcategoryId !== null && 
@@ -90,11 +90,11 @@ const FilterSidebar = ({
       String(product.subcategoryId) === String(subcategoryId)
     ).length;
     
-    console.log(`[FilterSidebar] Contagem para subcategoria ${subcategoryId}:`, count);
+    console.log(`[FilterSidebar] Count for subcategory ${subcategoryId}:`, count);
     return count;
   };
 
-  // CORREÇÃO: Contar apenas produtos que realmente têm atributo definido
+  // Count products that have attribute defined
   const getProductCountForAttribute = (attributeId: string) => {
     const count = publishedProducts.filter(product => 
       product.attributeId !== null && 
@@ -102,15 +102,15 @@ const FilterSidebar = ({
       String(product.attributeId) === String(attributeId)
     ).length;
     
-    console.log(`[FilterSidebar] Contagem para atributo ${attributeId}:`, count);
+    console.log(`[FilterSidebar] Count for attribute ${attributeId}:`, count);
     return count;
   };
 
-  // Debug: Log produtos sem subcategoria/atributo
-  console.log(`[FilterSidebar] Produtos sem subcategoria:`, 
+  // Debug: Log products without subcategory/attribute
+  console.log(`[FilterSidebar] Products without subcategory:`, 
     publishedProducts.filter(p => p.subcategoryId === null || p.subcategoryId === undefined).length
   );
-  console.log(`[FilterSidebar] Produtos sem atributo:`, 
+  console.log(`[FilterSidebar] Products without attribute:`, 
     publishedProducts.filter(p => p.attributeId === null || p.attributeId === undefined).length
   );
 

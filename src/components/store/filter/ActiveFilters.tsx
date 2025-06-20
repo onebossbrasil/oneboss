@@ -25,7 +25,7 @@ const ActiveFilters = ({
     <div className="mt-6">
       <h3 className="font-medium text-sm text-gray-700 mb-3">Filtros Ativos:</h3>
       <div className="space-y-2">
-        {/* Subcategorias selecionadas */}
+        {/* Selected subcategories */}
         {selectedSubcategories.map((subcategory) => (
           <div key={`sub-${subcategory.id}`} className="flex items-center justify-between bg-gold/10 px-3 py-2 rounded-md">
             <span className="text-sm text-gold font-medium">{subcategory.name}</span>
@@ -40,7 +40,7 @@ const ActiveFilters = ({
           </div>
         ))}
         
-        {/* CORREÇÃO: Atributos selecionados - usar 'name' em vez de 'attribute' */}
+        {/* Selected attributes - use 'name' field instead of 'attribute' */}
         {selectedAttributes.map((attribute) => (
           <div key={`attr-${attribute.id}`} className="flex items-center justify-between bg-blue-50 px-3 py-2 rounded-md">
             <span className="text-sm text-blue-700 font-medium">{attribute.name}</span>

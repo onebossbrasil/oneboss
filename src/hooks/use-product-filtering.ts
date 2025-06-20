@@ -23,28 +23,28 @@ export const useProductFiltering = ({
   currentPage,
   productsPerPage
 }: UseProductFilteringProps) => {
-  // Filtro de produtos c/ busca, categoria, subcategoria, atributos + ordenação
+  // Filter products with search, category, subcategory, attributes + sorting
   const filteredProducts = useMemo(() => {
     let result = products.filter(product => {
-      // Busca textual
+      // Text search
       const searchMatch = searchTerm === "" || product.name?.toLowerCase().includes(searchTerm.toLowerCase());
       
-      // Categoria - agora compara sempre ID (string)
+      // Category - compare IDs as strings
       const categoryMatch = selectedCategory ? String(product.categoryId) === String(selectedCategory) : true;
       
-      // CORREÇÃO: Subcategorias - agora trata null/undefined adequadamente
+      // Subcategories - handle null/undefined properly
       const subcategoriesOk = selectedSubcategories.length > 0
         ? (product.subcategoryId !== null && product.subcategoryId !== undefined && 
            selectedSubcategories.some((subcat: any) => String(product.subcategoryId) === String(subcat.id)))
-        : true; // Se nenhuma subcategoria selecionada, todos passam
+        : true; // If no subcategory selected, all pass
 
-      // CORREÇÃO: Atributos - agora trata null/undefined adequadamente
+      // Attributes - handle null/undefined properly
       const attributesOk = selectedAttributes.length > 0
         ? (product.attributeId !== null && product.attributeId !== undefined &&
            selectedAttributes.some((attr: any) => String(product.attributeId) === String(attr.id)))
-        : true; // Se nenhum atributo selecionado, todos passam
+        : true; // If no attribute selected, all pass
 
-      console.log(`[ProductFiltering] Produto: ${product.name}`, {
+      console.log(`[ProductFiltering] Product: ${product.name}`, {
         searchMatch,
         categoryMatch,
         subcategoriesOk,
@@ -62,7 +62,7 @@ export const useProductFiltering = ({
       return searchMatch && categoryMatch && subcategoriesOk && attributesOk;
     });
 
-    // Ordenação
+    // Sorting
     if (sortOption === "price-asc") {
       result = [...result].sort((a, b) => Number(a.price) - Number(b.price));
     } else if (sortOption === "price-desc") {
@@ -74,8 +74,8 @@ export const useProductFiltering = ({
       });
     }
 
-    console.log(`[ProductFiltering] Produtos filtrados: ${result.length} de ${products.length}`);
-    console.log(`[ProductFiltering] Filtros ativos:`, {
+    console.log(`[ProductFiltering] Filtered products: ${result.length} of ${products.length}`);
+    console.log(`[ProductFiltering] Active filters:`, {
       searchTerm,
       selectedCategory,
       selectedSubcategoriesCount: selectedSubcategories.length,
