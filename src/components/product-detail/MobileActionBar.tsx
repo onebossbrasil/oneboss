@@ -45,8 +45,8 @@ const MobileActionBar = ({ product }: MobileActionBarProps) => {
   };
 
   const openWhatsApp = () => {
-    const message = `Olá, gostaria de mais informações sobre o produto: ${product.name} (${window.location.href})`;
-    const whatsappUrl = `https://wa.me/5500000000000?text=${encodeURIComponent(message)}`;
+    const message = `Olá, vim do site e quero saber mais sobre o produto "${product.name}"`;
+    const whatsappUrl = `https://wa.me/5562982801810?text=${encodeURIComponent(message)}`;
     window.open(whatsappUrl, "_blank");
   };
 
