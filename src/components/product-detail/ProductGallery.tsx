@@ -142,7 +142,7 @@ const ProductGallery = ({ images, productName }: ProductGalleryProps) => {
           >
             <CarouselContent>
               {images.map((image, index) => (
-                <CarouselItem key={image.id} className="basis-1/5 sm:basis-1/5 lg:basis-1/6">
+                <CarouselItem key={image.id} className="basis-1/4 sm:basis-1/5 lg:basis-1/6">
                   <AspectRatio ratio={1} className="bg-muted">
                     <button
                       className={`w-full h-full p-0.5 relative ${
@@ -162,13 +162,19 @@ const ProductGallery = ({ images, productName }: ProductGalleryProps) => {
                 </CarouselItem>
               ))}
             </CarouselContent>
-            {images.length > 5 && (
+            {images.length > 4 && (
               <>
-                <CarouselPrevious className="left-1" />
-                <CarouselNext className="right-1" />
+                <CarouselPrevious className="left-1 bg-white/90 hover:bg-white shadow-md" />
+                <CarouselNext className="right-1 bg-white/90 hover:bg-white shadow-md" />
               </>
             )}
           </Carousel>
+          {/* Image counter */}
+          {images.length > 1 && (
+            <div className="text-center mt-2 text-sm text-muted-foreground">
+              {selectedImage + 1} de {images.length} imagens
+            </div>
+          )}
         </div>
       )}
     </div>
