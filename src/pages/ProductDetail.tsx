@@ -23,6 +23,7 @@ const ProductDetail = () => {
     if (productId && products.length > 0) {
       const foundProduct = products.find(p => p.id === productId);
       if (foundProduct) {
+        console.log(`[ProductDetail] Produto encontrado: ${foundProduct.name}, ${foundProduct.images.length} imagens:`, foundProduct.images);
         setProduct(foundProduct);
       }
     }

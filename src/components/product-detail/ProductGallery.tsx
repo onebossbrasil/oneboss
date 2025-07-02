@@ -22,6 +22,9 @@ const ProductGallery = ({ images, productName }: ProductGalleryProps) => {
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
   const [showModal, setShowModal] = useState(false);
 
+  // DEBUG: Log para verificar quantas imagens chegaram
+  console.log(`[ProductGallery] ${productName}: recebeu ${images.length} imagens:`, images);
+
   // Set first image as selected when images change
   useEffect(() => {
     if (images.length > 0) {
