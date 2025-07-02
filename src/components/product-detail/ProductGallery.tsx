@@ -137,6 +137,8 @@ const ProductGallery = ({ images, productName }: ProductGalleryProps) => {
             opts={{
               align: "start",
               loop: images.length > 4,
+              dragFree: true,
+              containScroll: "trimSnaps",
             }}
             className="w-full"
           >
