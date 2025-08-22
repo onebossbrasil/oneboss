@@ -13,7 +13,7 @@ const CategoryCard = ({ title, icon, slug }: CategoryCardProps) => {
   
   return (
     <Link 
-      to={`/loja?categoria=${slug}`}
+      to={`/loja/${slug}`}
       className="group animate-scale-in w-full block"
     >
       <div className="glassmorphism rounded-xl p-4 md:p-6 flex flex-row md:flex-col items-center transition-all duration-300 group-hover:shadow-lg group-hover:shadow-gold/20 group-hover:-translate-y-1 h-full">

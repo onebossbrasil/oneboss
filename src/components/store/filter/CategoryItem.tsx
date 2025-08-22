@@ -1,4 +1,3 @@
-
 import { Button } from "@/components/ui/button";
 import { ChevronDown, ChevronRight } from "lucide-react";
 import { CategoryType } from "@/types/category";
@@ -42,10 +41,19 @@ const CategoryItem = ({
   getAttributesForSubcategory,
 }: CategoryItemProps) => {
   const handleCategoryClick = () => {
-    console.log(`[FilterSidebar] Categoria clicada: ${category.id}`);
+    console.log(`[CategoryItem] ===== CATEGORIA CLICADA =====`);
+    console.log(`[CategoryItem] Categoria:`, {
+      id: category.id,
+      name: category.name,
+      isSelected,
+      productCount
+    });
+    
     if (isSelected) {
+      console.log(`[CategoryItem] Desmarcando categoria: ${category.name}`);
       onCategorySelect(null);
     } else {
+      console.log(`[CategoryItem] Selecionando categoria: ${category.name} (ID: ${category.id})`);
       onCategorySelect(category.id);
     }
   };

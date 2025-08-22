@@ -1,4 +1,3 @@
-
 import { Link } from "react-router-dom";
 import { FormattedProduct } from "@/types/product";
 
@@ -7,10 +6,17 @@ type ProductItemProps = {
 };
 
 const ProductItem = ({ product }: ProductItemProps) => {
+  const formatPrice = (price: number) => {
+    return new Intl.NumberFormat("pt-BR", {
+      style: "currency",
+      currency: "BRL"
+    }).format(price);
+  };
+
   return (
     <Link
       key={product.id}
-      to={`/produto/${product.id}`}
+      to={`/produto/${product.slug || product.id}`}
       className="product-card h-full block"
     >
       <div className="relative aspect-[4/3] rounded-t-lg overflow-hidden">
@@ -26,13 +32,25 @@ const ProductItem = ({ product }: ProductItemProps) => {
       <div className="glassmorphism rounded-b-lg p-4">
         <h3 className="font-playfair font-medium text-lg">{product.name}</h3>
         <div className="mt-1">
-          {product.salePrice ? (
-            <>
-              <span className="text-gold font-semibold">{product.salePrice}</span>
-              <span className="text-sm text-muted-foreground line-through ml-2">{product.price}</span>
-            </>
+          {product.priceOnRequest ? (
+            <span className="text-gold font-semibold">Sob Consulta</span>
           ) : (
-            <span className="text-gold font-semibold">{product.price}</span>
+            <>
+              {typeof product.salePrice === 'number' ? (
+                <>
+                  <span className="text-gold font-semibold">
+                    {formatPrice(product.salePrice)}
+                  </span>
+                  <span className="text-sm text-muted-foreground line-through ml-2">
+                    {formatPrice(product.price)}
+                  </span>
+                </>
+              ) : (
+                <span className="text-gold font-semibold">
+                  {formatPrice(product.price)}
+                </span>
+              )}
+            </>
           )}
         </div>
       </div>

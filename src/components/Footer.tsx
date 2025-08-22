@@ -51,11 +51,11 @@ const Footer = () => {
           <div>
             <h4 className="font-playfair text-lg font-semibold text-gold mb-4">Categorias</h4>
             <ul className="space-y-2">
-              <li><Link to="/loja?categoria=imoveis" className="text-zinc-400 hover:text-white">Imóveis</Link></li>
-              <li><Link to="/loja?categoria=automoveis" className="text-zinc-400 hover:text-white">Automóveis</Link></li>
-              <li><Link to="/loja?categoria=embarcacoes" className="text-zinc-400 hover:text-white">Embarcações</Link></li>
-              <li><Link to="/loja?categoria=relogios" className="text-zinc-400 hover:text-white">Relógios</Link></li>
-              <li><Link to="/loja?categoria=decoracao" className="text-zinc-400 hover:text-white">Decoração</Link></li>
+              <li><Link to="/loja/imoveis" className="text-zinc-400 hover:text-white">Imóveis</Link></li>
+              <li><Link to="/loja/veiculos" className="text-zinc-400 hover:text-white">Automóveis</Link></li>
+              <li><Link to="/loja/embarcacoes" className="text-zinc-400 hover:text-white">Embarcações</Link></li>
+              <li><Link to="/loja/relogios" className="text-zinc-400 hover:text-white">Relógios</Link></li>
+              <li><Link to="/loja/decoracao" className="text-zinc-400 hover:text-white">Decoração</Link></li>
             </ul>
           </div>
 

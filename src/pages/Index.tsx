@@ -8,6 +8,7 @@ import WhyChooseUs from "../components/WhyChooseUs";
 import SponsorsBanner from "../components/SponsorsBanner";
 import AdvertiseWithUs from "../components/AdvertiseWithUs";
 import PartnersCarousel from "../components/PartnersCarousel";
+import { FeaturedProductProvider } from "@/contexts/product/FeaturedProductProvider";
 
 const Index = () => {
   useEffect(() => {
@@ -21,7 +22,9 @@ const Index = () => {
         <Hero />
         <PartnersCarousel />
         <CategoryBanners />
-        <FeaturedProducts />
+        <FeaturedProductProvider>
+          <FeaturedProducts />
+        </FeaturedProductProvider>
         <WhyChooseUs />
         <SponsorsBanner />
         <AdvertiseWithUs />

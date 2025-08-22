@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { FormattedProduct } from "@/types/product";
@@ -25,7 +24,8 @@ export const useRelatedProducts = (currentProductId: string, categoryId: string 
             category_id, 
             featured,
             published,
-            short_description
+            short_description,
+            price_on_request
           `)
           .eq("published", true)
           .eq(categoryId ? "category_id" : "featured", categoryId || true) // If no category, show featured products
@@ -66,14 +66,13 @@ export const useRelatedProducts = (currentProductId: string, categoryId: string 
           return {
             id: product.id,
             name: product.name,
-            price: new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" }).format(product.price),
-            salePrice: product.sale_price 
-              ? new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" }).format(product.sale_price)
-              : undefined,
+            price: product.price_on_request ? null : Number(product.price),
+            salePrice: product.sale_price ? Number(product.sale_price) : undefined,
             category: category?.name || "",
             description: product.short_description,
             imageUrl: imagesByProduct[product.id] || "https://images.unsplash.com/photo-1567899378494-47b22a2ae96a?auto=format&fit=crop&q=80&w=600&h=400",
             featured: product.featured,
+            priceOnRequest: !!product.price_on_request,
           };
         });
 

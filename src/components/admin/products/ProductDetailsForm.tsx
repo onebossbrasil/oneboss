@@ -1,4 +1,3 @@
-
 import React from "react";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -16,6 +15,7 @@ interface ProductDetailsFormProps {
     stockQuantity: string;
     published: boolean;
     featured: boolean;
+    priceOnRequest?: boolean;
   };
   onChange: (field: string, value: any) => void;
 }
@@ -61,8 +61,10 @@ const ProductDetailsForm: React.FC<ProductDetailsFormProps> = ({ formData, onCha
       <PriceFields 
         price={formData.price} 
         salePrice={formData.salePrice}
+        priceOnRequest={formData.priceOnRequest || false}
         onPriceChange={(value) => onChange("price", value)}
         onSalePriceChange={(value) => onChange("salePrice", value)}
+        onPriceOnRequestChange={(checked) => onChange("priceOnRequest", checked)}
       />
       
       <FormField id="stockQuantity" label="Quantidade em Estoque">

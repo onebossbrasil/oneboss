@@ -1,10 +1,11 @@
-
 import { Product } from "@/types/product";
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
+  DialogPortal,
+  DialogOverlay
 } from "@/components/ui/dialog";
 import ProductDetailsForm from "./ProductDetailsForm";
 import CategorySelector from "./CategorySelector";
@@ -68,57 +69,60 @@ const ProductEditDialog = ({ product, open, onOpenChange, onClose }: ProductEdit
       onOpenChange(isOpen);
       if (!isOpen && onClose) onClose();
     }}>
-      <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
-        <DialogHeader>
-          <DialogTitle>{freshProduct ? "Editar Produto" : "Cadastrar Produto"}</DialogTitle>
-        </DialogHeader>
-        {isLoading ? (
-          <div className="flex justify-center items-center py-8">
-            <span className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900"></span>
-            <span className="ml-4 text-muted-foreground">Carregando dados do produto...</span>
-          </div>
-        ) : (
-          <>
-            <form onSubmit={wrappedHandleSubmit} className="space-y-6">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div className="space-y-4">
-                  <ProductDetailsForm 
-                    formData={formData}
-                    onChange={(field, value) => {
-                      handleFormChange(field, value);
-                    }}
-                  />
-                  <CategorySelector
-                    selectedCategory={selectedCategory}
-                    subcategoryValues={{}}
-                    selectedSubcategoryId={selectedSubcategoryId}
-                    selectedAttributeId={selectedAttributeId}
-                    onCategoryChange={handleCategoryChange}
-                    onSubcategoryChange={() => {}}
-                    onSubcategoryIdChange={handleSubcatIdChange}
-                    onAttributeIdChange={handleAttributeChange}
-                  />
+      <DialogPortal>
+        <DialogOverlay className="bg-black/80" />
+        <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>{freshProduct ? "Editar Produto" : "Cadastrar Produto"}</DialogTitle>
+          </DialogHeader>
+          {isLoading ? (
+            <div className="flex justify-center items-center py-8">
+              <span className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900"></span>
+              <span className="ml-4 text-muted-foreground">Carregando dados do produto...</span>
+            </div>
+          ) : (
+            <>
+              <form onSubmit={wrappedHandleSubmit} className="space-y-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="space-y-4">
+                    <ProductDetailsForm 
+                      formData={formData}
+                      onChange={(field, value) => {
+                        handleFormChange(field, value);
+                      }}
+                    />
+                    <CategorySelector
+                      selectedCategory={selectedCategory}
+                      subcategoryValues={{}}
+                      selectedSubcategoryId={selectedSubcategoryId}
+                      selectedAttributeId={selectedAttributeId}
+                      onCategoryChange={handleCategoryChange}
+                      onSubcategoryChange={() => {}}
+                      onSubcategoryIdChange={handleSubcatIdChange}
+                      onAttributeIdChange={handleAttributeChange}
+                    />
+                  </div>
+                  <div className="space-y-4">
+                    <ImageUpload
+                      images={images}
+                      imagePreviewUrls={imagePreviewUrls}
+                      handleImageChange={handleImageChange}
+                      handleRemoveImage={handleRemoveImage}
+                      existingImages={freshProduct?.images || []}
+                      errorMsg={errorMsg}
+                      isUploading={isUploading}
+                    />
+                  </div>
                 </div>
-                <div className="space-y-4">
-                  <ImageUpload
-                    images={images}
-                    imagePreviewUrls={imagePreviewUrls}
-                    handleImageChange={handleImageChange}
-                    handleRemoveImage={handleRemoveImage}
-                    existingImages={freshProduct?.images || []}
-                    errorMsg={errorMsg}
-                    isUploading={isUploading}
-                  />
-                </div>
-              </div>
-              <ProductEditActions 
-                onCancel={handleDialogClose} 
-                isSubmitting={isSubmitting || isUploading}
-              />
-            </form>
-          </>
-        )}
-      </DialogContent>
+                <ProductEditActions 
+                  onCancel={handleDialogClose} 
+                  isSubmitting={isSubmitting || isUploading}
+                />
+              </form>
+            </>
+          )}
+        </DialogContent>
+      </DialogPortal>
     </Dialog>
   );
 };

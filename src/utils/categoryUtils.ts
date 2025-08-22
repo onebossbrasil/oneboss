@@ -1,17 +1,30 @@
-
 import { CategoryType, SubcategoryType } from "@/types/category";
 
 // Group subcategories by category ID
 export const groupSubcategoriesByCategory = (subcategoriesData: any[]) => {
   const subcategoriesByCategory: Record<string, any[]> = {};
   
+  console.log("[categoryUtils] ===== AGRUPANDO SUBCATEGORIAS =====");
+  console.log("[categoryUtils] Raw subcategoriesData:", subcategoriesData);
+  
   subcategoriesData.forEach((subcategory: any) => {
     if (!subcategoriesByCategory[subcategory.category_id]) {
       subcategoriesByCategory[subcategory.category_id] = [];
     }
     subcategoriesByCategory[subcategory.category_id].push(subcategory);
+    
+    // Log específico para categoria IMÓVEIS
+    if (subcategory.name === "Residencial" || subcategory.name === "Comercial" || subcategory.name === "Rural") {
+      console.log("[categoryUtils] 🏠 Subcategoria IMÓVEIS encontrada:", {
+        id: subcategory.id,
+        name: subcategory.name,
+        category_id: subcategory.category_id,
+        type: subcategory.type
+      });
+    }
   });
   
+  console.log("[categoryUtils] Resultado agrupamento subcategorias:", subcategoriesByCategory);
   return subcategoriesByCategory;
 };
 
@@ -50,20 +63,54 @@ export const formatCategoriesData = (
   subcategoriesByCategory: Record<string, any[]>,
   attributesBySubcategory: Record<string, { id: string; name: string }[]>
 ): CategoryType[] => {
-  return categoriesData.map((category: any) => {
+  console.log("[categoryUtils] ===== FORMATANDO DADOS DE CATEGORIAS =====");
+  console.log("[categoryUtils] categoriesData:", categoriesData);
+  console.log("[categoryUtils] subcategoriesByCategory:", subcategoriesByCategory);
+  
+  const formattedCategories = categoriesData.map((category: any) => {
     const categorySubcategories = subcategoriesByCategory[category.id] || [];
-    return {
+    
+    // Debug específico para categoria IMÓVEIS
+    if (category.name === "Imóveis") {
+      console.log("[categoryUtils] 🏠 ===== PROCESSANDO CATEGORIA IMÓVEIS =====");
+      console.log("[categoryUtils] Categoria IMÓVEIS raw:", category);
+      console.log("[categoryUtils] Subcategorias para IMÓVEIS:", categorySubcategories);
+      console.log("[categoryUtils] Quantidade de subcategorias:", categorySubcategories.length);
+    }
+    
+    const formattedCategory = {
       id: category.id.toString(),
       name: category.name,
       value: category.value,
-      subcategories: categorySubcategories.map((subcategory: any) => ({
-        id: subcategory.id.toString(),
-        name: subcategory.name,
-        type: subcategory.type,
-        attributes: attributesBySubcategory[subcategory.id] || []
-      }))
+      subcategories: categorySubcategories.map((subcategory: any) => {
+        const formattedSubcategory = {
+          id: subcategory.id.toString(),
+          name: subcategory.name,
+          type: subcategory.type,
+          attributes: attributesBySubcategory[subcategory.id] || []
+        };
+        
+        // Debug específico para subcategorias de IMÓVEIS
+        if (category.name === "Imóveis") {
+          console.log("[categoryUtils] 🏠 Subcategoria IMÓVEIS formatada:", formattedSubcategory);
+        }
+        
+        return formattedSubcategory;
+      })
     };
+    
+    // Debug final para categoria IMÓVEIS
+    if (category.name === "Imóveis") {
+      console.log("[categoryUtils] 🏠 CATEGORIA IMÓVEIS FINAL:", formattedCategory);
+    }
+    
+    return formattedCategory;
   });
+  
+  console.log("[categoryUtils] ===== RESULTADO FINAL =====");
+  console.log("[categoryUtils] Todas as categorias formatadas:", formattedCategories);
+  
+  return formattedCategories;
 };
 
 // Find category by ID

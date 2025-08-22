@@ -1,5 +1,5 @@
 
-import { useProducts } from "@/contexts/ProductContext";
+import { useAdminProducts } from "@/contexts/product/AdminProductProvider";
 import { useMemo, useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -16,7 +16,7 @@ function isValidImageUrl(url: string) {
 }
 
 export default function ProductImagesAuditReport() {
-  const { products, isLoading, error } = useProducts();
+  const { products, isLoading, error } = useAdminProducts();
   const [query, setQuery] = useState("");
 
   // Auditoria em memória

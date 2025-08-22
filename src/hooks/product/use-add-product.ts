@@ -17,17 +17,23 @@ export const useAddProduct = () => {
     try {
       setIsLoading(true);
       // LOG de diagnóstico do payload convertido para snake_case
+      // Tratar lógica de "Sob Consulta": quando ativo, forçar price e sale_price para null
+      const isPriceOnRequest = Boolean((product as any).priceOnRequest);
       const dbProduct = {
         name: product.name,
         short_description: product.shortDescription || null,
         description: product.description,
-        price: product.price,
-        sale_price: product.salePrice ?? null,
+        price: isPriceOnRequest ? null : product.price,
+        sale_price: isPriceOnRequest ? null : (product.salePrice ?? null),
         category_id: product.categoryId,
+        subcategory_id: (product as any).subcategoryId ?? null,
+        attribute_id: (product as any).attributeId ?? null,
+        // attribute_id agora substitui subcategory_values
+        price_on_request: isPriceOnRequest,
         featured: product.featured,
         published: product.published,
         stock_quantity: product.stockQuantity
-      };
+      } as Record<string, any>;
       console.log("[useAddProduct] Produto (snake_case):", dbProduct);
 
       if (!session) {

@@ -1,5 +1,5 @@
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import AdminDashboard from "@/components/admin/dashboard";
 import AdminLogin from "@/components/admin/AdminLogin";
@@ -22,21 +22,28 @@ const Admin = () => {
   const [dbConnectionError, setDbConnectionError] = useState<string | null>(null);
   const [isCheckingConnection, setIsCheckingConnection] = useState(true);
 
-  // Check if user is authenticated - optimization to prevent extra renders
+  // Evitar rechecagens desnecessárias ao voltar o foco/refresh de sessão do Supabase
+  const hasCheckedConnectionOnce = useRef(false);
   useEffect(() => {
-    if (!authLoading) {
-      const authenticated = !!user && !!session;
-      console.log("Auth status in Admin:", authenticated ? "logged in" : "not logged in", user?.email);
-      console.log("Admin status:", isAdmin ? "é admin" : "não é admin");
-      setIsAuthenticated(authenticated);
-      
-      if (authenticated) {
+    if (authLoading) return;
+    const authenticated = !!user && !!session;
+    console.log("Auth status in Admin:", authenticated ? "logged in" : "not logged in", user?.email);
+    console.log("Admin status:", isAdmin ? "é admin" : "não é admin");
+    setIsAuthenticated(authenticated);
+
+    if (authenticated) {
+      if (!hasCheckedConnectionOnce.current) {
+        hasCheckedConnectionOnce.current = true;
         checkDatabaseConnection();
       } else {
+        // Já checado: não exibir overlay e não reconsultar a cada mudança de sessão/token
         setIsCheckingConnection(false);
       }
+    } else {
+      setIsCheckingConnection(false);
     }
-  }, [user, session, authLoading, isAdmin]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [authLoading, !!user, !!session, isAdmin]);
 
   const checkDatabaseConnection = async () => {
     setIsCheckingConnection(true);

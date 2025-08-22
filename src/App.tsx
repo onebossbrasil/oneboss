@@ -9,7 +9,6 @@ import Admin from "./pages/Admin";
 import ProductDetail from "./pages/ProductDetail";
 import NotFound from "./pages/NotFound";
 import { CategoryProvider } from "./contexts/CategoryContext";
-import { ProductProvider } from "./contexts/product";
 import { LeadProvider } from "./contexts/LeadContext";
 import { NewsletterProvider } from "./contexts/NewsletterContext";
 import { AuthProvider } from "./contexts/AuthContext";
@@ -28,23 +27,22 @@ const App = () => (
     <AuthProvider>
       <TooltipProvider>
         <CategoryProvider>
-          <ProductProvider>
-            <LeadProvider>
-              <NewsletterProvider>
-                {/* Remover os toasts globais aqui, vão apenas pro Admin */}
-                <BrowserRouter>
-                  <Routes>
-                    <Route path="/" element={<Index />} />
-                    <Route path="/loja" element={<Store />} />
-                    <Route path="/produto/:productId" element={<ProductDetail />} />
-                    <Route path="/admin" element={<Admin />} />
-                    {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-                    <Route path="*" element={<NotFound />} />
-                  </Routes>
-                </BrowserRouter>
-              </NewsletterProvider>
-            </LeadProvider>
-          </ProductProvider>
+          <LeadProvider>
+            <NewsletterProvider>
+              {/* Remover os toasts globais aqui, vão apenas pro Admin */}
+              <BrowserRouter>
+                <Routes>
+                  <Route path="/" element={<Index />} />
+                  <Route path="/loja" element={<Store />} />
+                  <Route path="/loja/:categorySlug" element={<Store />} />
+                  <Route path="/produto/:productSlug" element={<ProductDetail />} />
+                  <Route path="/admin" element={<Admin />} />
+                  {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+                  <Route path="*" element={<NotFound />} />
+                </Routes>
+              </BrowserRouter>
+            </NewsletterProvider>
+          </LeadProvider>
         </CategoryProvider>
       </TooltipProvider>
     </AuthProvider>

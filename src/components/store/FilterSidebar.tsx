@@ -1,5 +1,4 @@
-
-import { useMemo, useState } from "react";
+import { useMemo, useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -9,6 +8,7 @@ import { Product } from "@/types/product";
 import FilterSidebarHeader from "./filter/FilterSidebarHeader";
 import CategoryItem from "./filter/CategoryItem";
 import ActiveFilters from "./filter/ActiveFilters";
+import { useCategoryCounters } from "@/hooks/use-category-counters";
 
 type FilterSidebarProps = {
   selectedCategory: string | null;
@@ -20,7 +20,6 @@ type FilterSidebarProps = {
   isMobileFiltersOpen: boolean;
   setIsMobileFiltersOpen: (isOpen: boolean) => void;
   resetFilters: () => void;
-  publishedProducts: Product[];
 };
 
 const FilterSidebar = ({
@@ -31,19 +30,76 @@ const FilterSidebar = ({
   onSubcategoryToggle,
   onAttributeToggle,
   resetFilters,
-  publishedProducts,
 }: FilterSidebarProps) => {
   const { categories } = useCategories();
   const [expandedSubcategories, setExpandedSubcategories] = useState<Set<string>>(new Set());
+  
+  // Contadores server-side
+  const {
+    getProductCountForCategory,
+    getProductCountForSubcategory,
+    getProductCountForAttribute,
+    loadSubcategoryCounters,
+    loadAttributeCounters
+  } = useCategoryCounters();
 
   const currentCategory = selectedCategory
     ? categories.find((cat) => String(cat.id) === String(selectedCategory))
     : null;
 
+  // Carrega contadores de subcategorias quando categoria é selecionada
+  useEffect(() => {
+    if (selectedCategory) {
+      loadSubcategoryCounters(selectedCategory);
+    }
+  }, [selectedCategory, loadSubcategoryCounters]);
+
   const visibleSubcategories = useMemo(() => {
     if (!currentCategory) return [];
+    
+    // Debug específico para categoria IMÓVEIS
+    if (currentCategory.name === "Imóveis") {
+      console.log(`[FilterSidebar] ===== DEBUG CATEGORIA IMÓVEIS =====`);
+      console.log(`[FilterSidebar] Categoria IMÓVEIS encontrada:`, {
+        id: currentCategory.id,
+        name: currentCategory.name,
+        subcategoriesCount: currentCategory.subcategories?.length || 0,
+        subcategories: currentCategory.subcategories
+      });
+      
+      if (currentCategory.subcategories && currentCategory.subcategories.length > 0) {
+        console.log(`[FilterSidebar] Subcategorias IMÓVEIS:`, 
+          currentCategory.subcategories.map(sub => ({
+            id: sub.id,
+            name: sub.name,
+            attributesCount: sub.attributes?.length || 0,
+            attributes: sub.attributes
+          }))
+        );
+      } else {
+        console.log(`[FilterSidebar] ❌ PROBLEMA: Categoria IMÓVEIS sem subcategorias!`);
+      }
+    }
+    
     return currentCategory.subcategories || [];
   }, [currentCategory]);
+
+  // Debug: Log sempre que selectedCategory mudar
+  console.log(`[FilterSidebar] ===== CATEGORIA SELECIONADA =====`);
+  console.log(`[FilterSidebar] selectedCategory:`, selectedCategory);
+  console.log(`[FilterSidebar] currentCategory:`, currentCategory?.name);
+  console.log(`[FilterSidebar] visibleSubcategories count:`, visibleSubcategories.length);
+  console.log(`[FilterSidebar] Total categories loaded:`, categories.length);
+  console.log(`[FilterSidebar] Categories:`, categories.map(c => ({ 
+    id: c.id, 
+    name: c.name, 
+    subsCount: c.subcategories?.length || 0,
+    subcategories: c.subcategories?.map(sub => ({
+      id: sub.id,
+      name: sub.name,
+      attributesCount: sub.attributes?.length || 0
+    }))
+  })));
 
   const handleSubcategoryToggle = (subcategory: SubcategoryType) => {
     onSubcategoryToggle(subcategory);
@@ -76,47 +132,16 @@ const FilterSidebar = ({
     return subcategory?.attributes || [];
   };
 
-  const getProductCountForCategory = (categoryId: string) => {
-    return publishedProducts.filter(product => 
-      String(product.categoryId) === String(categoryId)
-    ).length;
-  };
-
-  // Count products that have subcategory defined
-  const getProductCountForSubcategory = (subcategoryId: string) => {
-    const count = publishedProducts.filter(product => 
-      product.subcategoryId !== null && 
-      product.subcategoryId !== undefined &&
-      String(product.subcategoryId) === String(subcategoryId)
-    ).length;
-    
-    console.log(`[FilterSidebar] Count for subcategory ${subcategoryId}:`, count);
-    return count;
-  };
-
-  // Count products that have attribute defined
-  const getProductCountForAttribute = (attributeId: string) => {
-    const count = publishedProducts.filter(product => 
-      product.attributeId !== null && 
-      product.attributeId !== undefined &&
-      String(product.attributeId) === String(attributeId)
-    ).length;
-    
-    console.log(`[FilterSidebar] Count for attribute ${attributeId}:`, count);
-    return count;
-  };
-
-  // Debug: Log products without subcategory/attribute
-  console.log(`[FilterSidebar] Products without subcategory:`, 
-    publishedProducts.filter(p => p.subcategoryId === null || p.subcategoryId === undefined).length
-  );
-  console.log(`[FilterSidebar] Products without attribute:`, 
-    publishedProducts.filter(p => p.attributeId === null || p.attributeId === undefined).length
-  );
+  // Load attribute counters when subcategory changes
+  useEffect(() => {
+    selectedSubcategories.forEach(subcategory => {
+      loadAttributeCounters(subcategory.id);
+    });
+  }, [selectedSubcategories, loadAttributeCounters]);
 
   return (
-    <div className="bg-white rounded-xl border border-gold/10 shadow-sm overflow-hidden">
-      <div className="p-6">
+    <div className="bg-white rounded-xl border border-gold/10 shadow-sm overflow-hidden flex flex-col">
+      <div className="p-6 flex-shrink-0">
         <h2 className="font-semibold text-xl mb-2">Filtros</h2>
         <p className="text-sm text-muted-foreground mb-4">
           Encontre exatamente o que você procura
@@ -133,7 +158,7 @@ const FilterSidebar = ({
       
       <Separator />
       
-      <ScrollArea className="h-[calc(100vh-300px)] p-6">
+      <ScrollArea className="flex-1 min-h-0 max-h-[70vh] md:max-h-[calc(100vh-300px)] p-6 overflow-y-auto">
         <div className="space-y-2 mb-6">
           {categories.map((category) => {
             const productCount = getProductCountForCategory(category.id);

@@ -1,6 +1,5 @@
-
 import { useState } from "react";
-import { useProducts } from "@/contexts/ProductContext";
+import { useAdminProducts } from "@/contexts/product/AdminProductProvider";
 import { useToast } from "@/hooks/use-toast";
 import { useFormValidation } from "./use-form-validation";
 // NOVO - para typesafe
@@ -15,6 +14,7 @@ interface ProductFormData {
   stockQuantity: string;
   published: boolean;
   featured: boolean;
+  priceOnRequest?: boolean;
 }
 
 export const useProductAdd = (
@@ -27,7 +27,7 @@ export const useProductAdd = (
   selectedAttributeId?: string | null,
 ) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const { addProduct } = useProducts();
+  const { addProduct } = useAdminProducts();
   const { toast } = useToast();
   const { validateProductData, convertPriceToNumber } = useFormValidation();
 
@@ -49,31 +49,48 @@ export const useProductAdd = (
 
     // IMPORTANTE: Agora subcategoria e atributo são opcionais. Não validar obrigatoriedade!
 
-    const isValid = validateProductData(
-      formData.name,
-      formData.price,
-      formData.salePrice,
-      formData.stockQuantity,
-      selectedCategory
-    );
+    // Validação condicional: se priceOnRequest = true, não valida preço
+    if (!formData.priceOnRequest) {
+      const isValid = validateProductData(
+        formData.name,
+        formData.price,
+        formData.salePrice,
+        formData.stockQuantity,
+        selectedCategory
+      );
 
-    if (!isValid) {
-      setIsSubmitting(false);
-      toast({
-        title: "Erro de validação",
-        description: "Verifique os campos obrigatórios e tente novamente.",
-        variant: "destructive"
-      });
-      return;
+      if (!isValid) {
+        setIsSubmitting(false);
+        toast({
+          title: "Erro de validação",
+          description: "Verifique os campos obrigatórios e tente novamente.",
+          variant: "destructive"
+        });
+        return;
+      }
+    } else {
+      // Validação básica quando "Sob Consulta"
+      if (!formData.name || !selectedCategory) {
+        setIsSubmitting(false);
+        toast({
+          title: "Erro de validação",
+          description: "Nome e categoria são obrigatórios.",
+          variant: "destructive"
+        });
+        return;
+      }
     }
 
     try {
-      // Usa conversão padronizada
-      const price = brlStringToFloat(formData.price);
-
-      let salePrice = undefined;
-      if (formData.salePrice) {
-        salePrice = brlStringToFloat(formData.salePrice);
+      // Processa preços: null quando "Sob Consulta"
+      let price = null;
+      let salePrice = null;
+      
+      if (!formData.priceOnRequest) {
+        price = brlStringToFloat(formData.price);
+        if (formData.salePrice) {
+          salePrice = brlStringToFloat(formData.salePrice);
+        }
       }
 
       const stockQuantity = parseInt(formData.stockQuantity, 10);
@@ -84,14 +101,15 @@ export const useProductAdd = (
         shortDescription: formData.shortDescription || null,
         description: formData.description,
         price,
-        salePrice: salePrice || null,
+        salePrice,
         categoryId: selectedCategory,
         subcategoryId: selectedSubcategoryId ?? null,
         attributeId: selectedAttributeId ?? null,
         subcategoryValues: Object.keys(subcategoryValues).length > 0 ? subcategoryValues : null,
         published: formData.published,
         featured: formData.featured,
-        stockQuantity
+        stockQuantity,
+        priceOnRequest: formData.priceOnRequest || false
       };
 
       await addProduct(productData, images);

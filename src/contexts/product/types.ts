@@ -10,4 +10,10 @@ export type ProductContextType = {
   updateProduct: (id: string, productData: Partial<Product>, newImages?: File[]) => Promise<void>;
   deleteProduct: (id: string) => Promise<void>;
   refreshProducts: (force?: boolean) => Promise<void>;
+  // paginação server-side (Admin)
+  page?: number;
+  setPage?: (p: number) => void;
+  pageSize?: number;
+  setPageSize?: (n: number) => void;
+  totalCount?: number;
 };

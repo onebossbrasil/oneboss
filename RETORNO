@@ -1,0 +1,120 @@
+{search: '', categoryId: 'b84a7f64-5ec2-4c9c-a087-90bda94e62f3', subcategoryIds: Array(0), attributeIds: Array(0), status: 'published'}
+fetch-utils.ts:155 [fetchProductsPageFromSupabase] Parâmetros recebidos: {page: 1, pageSize: 12, search: '', categoryId: 'b84a7f64-5ec2-4c9c-a087-90bda94e62f3', subcategoryIds: Array(0), …}
+fetch-utils.ts:172 [fetchProductsPageFromSupabase] Aplicando filtro de categoria: b84a7f64-5ec2-4c9c-a087-90bda94e62f3
+fetch-utils.ts:184 [fetchProductsPageFromSupabase] Aplicando filtro published = true
+fetch-utils.ts:193 [fetchProductsPageFromSupabase] Aplicando paginação: {offset: 0, limit: 11}
+StoreProductProvider.tsx:153 StoreProductProvider rendering with 12 products, totalCount: 35 currentPage: 1
+use-product-filtering-server.ts:62 [ProductFilteringServer] ===== RESULTADO FINAL =====
+use-product-filtering-server.ts:63 [ProductFilteringServer] Produtos na página: 12, Total: 35, Página: 1/3
+FilterSidebar.tsx:88 [FilterSidebar] ===== CATEGORIA SELECIONADA =====
+FilterSidebar.tsx:89 [FilterSidebar] selectedCategory: b84a7f64-5ec2-4c9c-a087-90bda94e62f3
+FilterSidebar.tsx:90 [FilterSidebar] currentCategory: Decoração
+FilterSidebar.tsx:91 [FilterSidebar] visibleSubcategories count: 3
+FilterSidebar.tsx:92 [FilterSidebar] Total categories loaded: 6
+FilterSidebar.tsx:93 [FilterSidebar] Categories: (6) [{…}, {…}, {…}, {…}, {…}, {…}]
+fetch-utils.ts:201 [fetchProductsPageFromSupabase] Resultado da query: {produtos_retornados: 12, totalCount: 35, count_property: 35}
+category-counters.ts:127 [CategoryCounters] Dados brutos da query: []
+category-counters.ts:128 [CategoryCounters] Contadores de atributos obtidos: []
+FilterSidebar.tsx:88 [FilterSidebar] ===== CATEGORIA SELECIONADA =====
+FilterSidebar.tsx:89 [FilterSidebar] selectedCategory: b84a7f64-5ec2-4c9c-a087-90bda94e62f3
+FilterSidebar.tsx:90 [FilterSidebar] currentCategory: Decoração
+FilterSidebar.tsx:91 [FilterSidebar] visibleSubcategories count: 3
+FilterSidebar.tsx:92 [FilterSidebar] Total categories loaded: 6
+FilterSidebar.tsx:93 [FilterSidebar] Categories: (6) [{…}, {…}, {…}, {…}, {…}, {…}]
+category-counters.ts:127 [CategoryCounters] Dados brutos da query: []
+category-counters.ts:128 [CategoryCounters] Contadores de atributos obtidos: []
+useProductData.ts:105 [useProductData] Produtos obtidos: 12 Total: 35
+StoreProductProvider.tsx:153 StoreProductProvider rendering with 12 products, totalCount: 35 currentPage: 1
+use-product-filtering-server.ts:62 [ProductFilteringServer] ===== RESULTADO FINAL =====
+use-product-filtering-server.ts:63 [ProductFilteringServer] Produtos na página: 12, Total: 35, Página: 1/3
+FilterSidebar.tsx:88 [FilterSidebar] ===== CATEGORIA SELECIONADA =====
+FilterSidebar.tsx:89 [FilterSidebar] selectedCategory: b84a7f64-5ec2-4c9c-a087-90bda94e62f3
+FilterSidebar.tsx:90 [FilterSidebar] currentCategory: Decoração
+FilterSidebar.tsx:91 [FilterSidebar] visibleSubcategories count: 3
+FilterSidebar.tsx:92 [FilterSidebar] Total categories loaded: 6
+FilterSidebar.tsx:93 [FilterSidebar] Categories: (6) [{…}, {…}, {…}, {…}, {…}, {…}]
+useProductData.ts:146 [Diagnóstico Produtos]:
+useProductData.ts:148 [Produto] id=0d675257-5a22-4fed-a075-913fe2323440 nome=A IDADE, APENAS EM NÚMEROS published=true featured=false
+useProductData.ts:148 [Produto] id=dfc782bc-48d6-4e42-8ebd-89ffc7fa2a11 nome=A MELHOR FORMA DE VENCER O INIMIGO published=true featured=false
+useProductData.ts:148 [Produto] id=fadae9f5-206a-4218-a184-1d32ea7ef30b nome=A MELODIA DE DENTRO DA MINHA MENTE published=true featured=false
+useProductData.ts:148 [Produto] id=d40aa1dd-81bd-400d-a4e5-7d67ea7f7bb1 nome=A RESPOSTA QUE VEM DE DEUS published=true featured=false
+useProductData.ts:148 [Produto] id=41895433-0bf5-41b6-afca-2422a2a399eb nome=A TECNOLOGIA ARTÍSTICA published=true featured=false
+useProductData.ts:148 [Produto] id=dff9162e-9fcc-4a30-a8ef-b5f96869bc43 nome=BAD LION ll published=true featured=false
+useProductData.ts:148 [Produto] id=567e8e0e-2bbc-4974-b763-2676d2757225 nome=BLACK PANTHER published=true featured=false
+useProductData.ts:148 [Produto] id=c1db418e-6080-42e2-9976-505d90f35fba nome=COMO VOCÊ TEM CONTROLADO SUA MISSÃO? published=true featured=false
+useProductData.ts:148 [Produto] id=3c74b308-fd00-4d03-ad21-d1e7932049cd nome=CULTIVANDO O FUTURO published=true featured=false
+useProductData.ts:148 [Produto] id=8c58fbe5-db02-4d01-a715-a5ac094e9d40 nome=DEPENDA DE DEUS published=true featured=false
+useProductData.ts:148 [Produto] id=b87f7d84-2af5-46dc-90b2-e00f12788c30 nome=ENTRE RASGOS E CORES, A HERANÇA FAMILIAR published=true featured=false
+useProductData.ts:148 [Produto] id=10b791bd-836d-4772-9d98-932864eb5b7b nome=FINANCIAL BEAR published=true featured=false
+use-store-filters.ts:76 [useStoreFilters] ===== SUBCATEGORIA TOGGLE =====
+use-store-filters.ts:77 [useStoreFilters] Subcategoria: {id: 'fca289d5-28f2-43f4-9539-1573667602a1', name: 'Obras de Arte', type: 'obras-arte', attributes: Array(0)}
+use-store-filters.ts:80 [useStoreFilters] Estado anterior subcategorias: [{…}]
+use-store-filters.ts:81 [useStoreFilters] Subcategoria clicada: {id: 'fca289d5-28f2-43f4-9539-1573667602a1', name: 'Obras de Arte', type: 'obras-arte', attributes: Array(0)}
+use-store-filters.ts:84 [useStoreFilters] Já selecionada?: true
+use-store-filters.ts:90 [useStoreFilters] Nova seleção de subcategorias: []
+use-store-filters.ts:99 [useStoreFilters] Atributos removidos da subcategoria Obras de Arte: []
+use-product-filtering-server.ts:34 [ProductFilteringServer] ===== SINCRONIZANDO FILTROS =====
+use-product-filtering-server.ts:35 [ProductFilteringServer] selectedSubcategories: []
+use-product-filtering-server.ts:36 [ProductFilteringServer] selectedAttributes: []
+use-product-filtering-server.ts:41 [ProductFilteringServer] subcategoryIds processados: []
+use-product-filtering-server.ts:42 [ProductFilteringServer] attributeIds processados: []
+StoreProductProvider.tsx:86 [StoreProductProvider] Atualizando filtros: {search: '', categoryId: 'b84a7f64-5ec2-4c9c-a087-90bda94e62f3', subcategoryIds: Array(0), attributeIds: Array(0), sortOption: 'relevance'}
+StoreProductProvider.tsx:92 [StoreProductProvider] Filtros atualizados: {search: '', categoryId: 'b84a7f64-5ec2-4c9c-a087-90bda94e62f3', subcategoryIds: Array(0), attributeIds: Array(0), sortOption: 'relevance'}
+use-product-filtering-server.ts:62 [ProductFilteringServer] ===== RESULTADO FINAL =====
+use-product-filtering-server.ts:63 [ProductFilteringServer] Produtos na página: 12, Total: 35, Página: 1/3
+FilterSidebar.tsx:88 [FilterSidebar] ===== CATEGORIA SELECIONADA =====
+FilterSidebar.tsx:89 [FilterSidebar] selectedCategory: b84a7f64-5ec2-4c9c-a087-90bda94e62f3
+FilterSidebar.tsx:90 [FilterSidebar] currentCategory: Decoração
+FilterSidebar.tsx:91 [FilterSidebar] visibleSubcategories count: 3
+FilterSidebar.tsx:92 [FilterSidebar] Total categories loaded: 6
+FilterSidebar.tsx:93 [FilterSidebar] Categories: (6) [{…}, {…}, {…}, {…}, {…}, {…}]
+use-store-filters.ts:26 [useStoreFilters] ===== ESTADO ATUAL DOS FILTROS =====
+use-store-filters.ts:27 [useStoreFilters] Estados: {searchTerm: '', selectedCategory: 'b84a7f64-5ec2-4c9c-a087-90bda94e62f3', selectedSubcategoriesCount: 0, selectedAttributesCount: 0, currentPage: 1, …}
+StoreProductProvider.tsx:153 StoreProductProvider rendering with 12 products, totalCount: 35 currentPage: 1
+use-product-filtering-server.ts:62 [ProductFilteringServer] ===== RESULTADO FINAL =====
+use-product-filtering-server.ts:63 [ProductFilteringServer] Produtos na página: 12, Total: 35, Página: 1/3
+FilterSidebar.tsx:88 [FilterSidebar] ===== CATEGORIA SELECIONADA =====
+FilterSidebar.tsx:89 [FilterSidebar] selectedCategory: b84a7f64-5ec2-4c9c-a087-90bda94e62f3
+FilterSidebar.tsx:90 [FilterSidebar] currentCategory: Decoração
+FilterSidebar.tsx:91 [FilterSidebar] visibleSubcategories count: 3
+FilterSidebar.tsx:92 [FilterSidebar] Total categories loaded: 6
+FilterSidebar.tsx:93 [FilterSidebar] Categories: (6) [{…}, {…}, {…}, {…}, {…}, {…}]
+useProductData.ts:171 [useProductData] Filtros mudaram, recarregando página 1
+useProductData.ts:70 [useProductData] Buscando produtos, paged: true filtros: {search: '', categoryId: 'b84a7f64-5ec2-4c9c-a087-90bda94e62f3', subcategoryIds: Array(0), attributeIds: Array(0), status: 'published'}
+fetch-utils.ts:155 [fetchProductsPageFromSupabase] Parâmetros recebidos: {page: 1, pageSize: 12, search: '', categoryId: 'b84a7f64-5ec2-4c9c-a087-90bda94e62f3', subcategoryIds: Array(0), …}
+fetch-utils.ts:172 [fetchProductsPageFromSupabase] Aplicando filtro de categoria: b84a7f64-5ec2-4c9c-a087-90bda94e62f3
+fetch-utils.ts:184 [fetchProductsPageFromSupabase] Aplicando filtro published = true
+fetch-utils.ts:193 [fetchProductsPageFromSupabase] Aplicando paginação: {offset: 0, limit: 11}
+StoreProductProvider.tsx:153 StoreProductProvider rendering with 12 products, totalCount: 35 currentPage: 1
+use-product-filtering-server.ts:62 [ProductFilteringServer] ===== RESULTADO FINAL =====
+use-product-filtering-server.ts:63 [ProductFilteringServer] Produtos na página: 12, Total: 35, Página: 1/3
+FilterSidebar.tsx:88 [FilterSidebar] ===== CATEGORIA SELECIONADA =====
+FilterSidebar.tsx:89 [FilterSidebar] selectedCategory: b84a7f64-5ec2-4c9c-a087-90bda94e62f3
+FilterSidebar.tsx:90 [FilterSidebar] currentCategory: Decoração
+FilterSidebar.tsx:91 [FilterSidebar] visibleSubcategories count: 3
+FilterSidebar.tsx:92 [FilterSidebar] Total categories loaded: 6
+FilterSidebar.tsx:93 [FilterSidebar] Categories: (6) [{…}, {…}, {…}, {…}, {…}, {…}]
+fetch-utils.ts:201 [fetchProductsPageFromSupabase] Resultado da query: {produtos_retornados: 12, totalCount: 35, count_property: 35}
+useProductData.ts:105 [useProductData] Produtos obtidos: 12 Total: 35
+StoreProductProvider.tsx:153 StoreProductProvider rendering with 12 products, totalCount: 35 currentPage: 1
+use-product-filtering-server.ts:62 [ProductFilteringServer] ===== RESULTADO FINAL =====
+use-product-filtering-server.ts:63 [ProductFilteringServer] Produtos na página: 12, Total: 35, Página: 1/3
+FilterSidebar.tsx:88 [FilterSidebar] ===== CATEGORIA SELECIONADA =====
+FilterSidebar.tsx:89 [FilterSidebar] selectedCategory: b84a7f64-5ec2-4c9c-a087-90bda94e62f3
+FilterSidebar.tsx:90 [FilterSidebar] currentCategory: Decoração
+FilterSidebar.tsx:91 [FilterSidebar] visibleSubcategories count: 3
+FilterSidebar.tsx:92 [FilterSidebar] Total categories loaded: 6
+FilterSidebar.tsx:93 [FilterSidebar] Categories: (6) [{…}, {…}, {…}, {…}, {…}, {…}]
+useProductData.ts:146 [Diagnóstico Produtos]:
+useProductData.ts:148 [Produto] id=0d675257-5a22-4fed-a075-913fe2323440 nome=A IDADE, APENAS EM NÚMEROS published=true featured=false
+useProductData.ts:148 [Produto] id=dfc782bc-48d6-4e42-8ebd-89ffc7fa2a11 nome=A MELHOR FORMA DE VENCER O INIMIGO published=true featured=false
+useProductData.ts:148 [Produto] id=fadae9f5-206a-4218-a184-1d32ea7ef30b nome=A MELODIA DE DENTRO DA MINHA MENTE published=true featured=false
+useProductData.ts:148 [Produto] id=d40aa1dd-81bd-400d-a4e5-7d67ea7f7bb1 nome=A RESPOSTA QUE VEM DE DEUS published=true featured=false
+useProductData.ts:148 [Produto] id=41895433-0bf5-41b6-afca-2422a2a399eb nome=A TECNOLOGIA ARTÍSTICA published=true featured=false
+useProductData.ts:148 [Produto] id=dff9162e-9fcc-4a30-a8ef-b5f96869bc43 nome=BAD LION ll published=true featured=false
+useProductData.ts:148 [Produto] id=567e8e0e-2bbc-4974-b763-2676d2757225 nome=BLACK PANTHER published=true featured=false
+useProductData.ts:148 [Produto] id=c1db418e-6080-42e2-9976-505d90f35fba nome=COMO VOCÊ TEM CONTROLADO SUA MISSÃO? published=true featured=false
+useProductData.ts:148 [Produto] id=3c74b308-fd00-4d03-ad21-d1e7932049cd nome=CULTIVANDO O FUTURO published=true featured=false
+useProductData.ts:148 [Produto] id=8c58fbe5-db02-4d01-a715-a5ac094e9d40 nome=DEPENDA DE DEUS published=true featured=false
+useProductData.ts:148 [Produto] id=b87f7d84-2af5-46dc-90b2-e00f12788c30 nome=ENTRE RASGOS E CORES, A HERANÇA FAMILIAR published=true featured=false
+useProductData.ts:148 [Produto] id=10b791bd-836d-4772-9d98-932864eb5b7b nome=FINANCIAL BEAR published=true featured=false

@@ -12,7 +12,7 @@ export const useUpdateProduct = () => {
 
   const updateProduct = async (
     id: string, 
-    productData: Partial<Product> & { deletedImageIds?: string[] }, 
+    productData: Partial<Product> & { deletedImageIds?: string[], priceOnRequest?: boolean }, 
     newImages?: File[]
   ) => {
     try {
@@ -33,6 +33,14 @@ export const useUpdateProduct = () => {
       if (productData.featured !== undefined) updateData.featured = productData.featured;
       if (productData.published !== undefined) updateData.published = productData.published;
       if (productData.stockQuantity !== undefined) updateData.stock_quantity = productData.stockQuantity;
+      if (productData.priceOnRequest !== undefined) {
+        updateData.price_on_request = productData.priceOnRequest;
+        // Se priceOnRequest for true, força price e sale_price para null
+        if (productData.priceOnRequest) {
+          updateData.price = null;
+          updateData.sale_price = null;
+        }
+      }
 
       // LOG de diagnóstico do updateData
       console.log("[useUpdateProduct] updateData (snake_case):", updateData);
@@ -45,7 +53,7 @@ export const useUpdateProduct = () => {
       // Diagnóstico de existência do produto
       const { data: existingProduct, error: checkError } = await supabase
         .from('products')
-        .select('id')
+        .select('id, price_on_request')
         .eq('id', id)
         .single();
         
@@ -53,6 +61,8 @@ export const useUpdateProduct = () => {
         console.warn("[useUpdateProduct] Produto não encontrado antes do update.", checkError);
         throw new Error('Produto não encontrado. Ele pode ter sido excluído.');
       }
+
+      console.log("[useUpdateProduct] Produto existente:", existingProduct);
 
       const { error } = await supabase
         .from('products')

@@ -13,6 +13,8 @@ export const useProductEdit = (
   product: Product | null,
   onClose: () => void
 ) => {
+  // Log inicial removido para evitar logs excessivos
+
   const { formData, handleFormChange, setFormData } = useFormState(product);
 
   // Busca categorias do contexto
@@ -29,23 +31,33 @@ export const useProductEdit = (
   // Sincroniza selects APENAS na troca de produto (carrega dados do produto)
   useEffect(() => {
     if (product && product.id !== lastProductId.current) {
-      console.log("[useProductEdit] ===== NOVO PRODUTO CARREGADO =====");
-      console.log("[useProductEdit] Product:", {
-        id: product.id,
-        categoryId: product.categoryId,
-        subcategoryId: product.subcategoryId,
-        attributeId: product.attributeId
-      });
+      if (false) { // Logs removidos para evitar logs excessivos
+        console.log("[AGUSTA][useProductEdit] Sincronizando dados do produto:", {
+          id: product.id,
+          name: product.name,
+          formData: {
+            name: product.name,
+            shortDescription: product.shortDescription || "",
+            description: product.description,
+            price: product.price?.toString() || "",
+            salePrice: product.salePrice?.toString() || "",
+            stockQuantity: product.stockQuantity.toString(),
+            published: product.published,
+            featured: product.featured
+          }
+        });
+      }
       
       setFormData({
         name: product.name,
         shortDescription: product.shortDescription || "",
         description: product.description,
-        price: product.price.toString(),
-        salePrice: product.salePrice ? product.salePrice.toString() : "",
+        price: product.price?.toString() || "",
+        salePrice: product.salePrice?.toString() || "",
         stockQuantity: product.stockQuantity.toString(),
         published: product.published,
-        featured: product.featured
+        featured: product.featured,
+        priceOnRequest: product.priceOnRequest || false
       });
       
       // Setamos os IDs diretamente do produto
@@ -54,19 +66,28 @@ export const useProductEdit = (
       setSelectedAttributeId(product.attributeId ?? null);
       lastProductId.current = product.id;
       
-      console.log("[useProductEdit] Estados iniciais definidos com valores do produto");
+      if (false) { // Logs removidos para evitar logs excessivos
+        console.log("[AGUSTA][useProductEdit] Estados atualizados:", {
+          selectedCategory: product.categoryId,
+          selectedSubcategoryId: product.subcategoryId,
+          selectedAttributeId: product.attributeId
+        });
+      }
     }
   }, [product?.id, setFormData]);
 
   // NOVA LÓGICA: Preservação prioritária do attributeId após categorias carregarem
   useEffect(() => {
     if (!catLoading && categories.length > 0 && product && product.id === lastProductId.current) {
-      console.log("[useProductEdit] ===== SINCRONIZANDO COM CATEGORIAS CARREGADAS =====");
-      console.log("[useProductEdit] Produto para preservar:", {
-        categoryId: product.categoryId,
-        subcategoryId: product.subcategoryId,
-        attributeId: product.attributeId
-      });
+      if (false) { // Logs removidos para evitar logs excessivos
+        console.log("[AGUSTA][useProductEdit] Sincronizando com categorias:", {
+          productId: product.id,
+          categoryId: product.categoryId,
+          subcategoryId: product.subcategoryId,
+          attributeId: product.attributeId,
+          categoriesLoaded: categories.length
+        });
+      }
       
       const cat = categories.find(cat => cat.id === product.categoryId);
       if (!cat) {
@@ -132,21 +153,36 @@ export const useProductEdit = (
 
   // --- Handlers principais ---
   const handleCategoryChange = (categoryId: string) => {
+    if (false) { // Logs removidos para evitar logs excessivos
+      console.log("[AGUSTA][useProductEdit] Mudança de categoria:", {
+        de: selectedCategory,
+        para: categoryId
+      });
+    }
     setSelectedCategory(categoryId);
     setSelectedSubcategoryId(null);
     setSelectedAttributeId(null);
-    console.log("[useProductEdit] Categoria alterada:", categoryId);
   };
 
   const handleSubcategoryIdChange = (subcategoryId: string | null) => {
+    if (false) { // Logs removidos para evitar logs excessivos
+      console.log("[AGUSTA][useProductEdit] Mudança de subcategoria:", {
+        de: selectedSubcategoryId,
+        para: subcategoryId
+      });
+    }
     setSelectedSubcategoryId(subcategoryId);
     setSelectedAttributeId(null);
-    console.log("[useProductEdit] setSelectedSubcategoryId:", subcategoryId);
   };
 
   const handleAttributeChange = (attributeId: string | null) => {
+    if (false) { // Logs removidos para evitar logs excessivos
+      console.log("[AGUSTA][useProductEdit] Mudança de atributo:", {
+        de: selectedAttributeId,
+        para: attributeId
+      });
+    }
     setSelectedAttributeId(attributeId);
-    console.log("[useProductEdit] setSelectedAttributeId:", attributeId);
   };
 
   // Hooks auxiliares para imagem

@@ -1,12 +1,12 @@
 
 import { useState, useCallback } from "react";
-import { useProducts } from "@/contexts/ProductContext";
+import { useAdminProducts } from "@/contexts/product/AdminProductProvider";
 import { Product } from "@/types/product";
 import { useToast } from "@/hooks/use-toast";
 
 export function useProductListLogic(products: Product[]) {
   const { toast } = useToast();
-  const { refreshProducts, updateProduct, deleteProduct } = useProducts();
+  const { refreshProducts, updateProduct, deleteProduct } = useAdminProducts();
 
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const [dialogOpen, setDialogOpen] = useState(false);

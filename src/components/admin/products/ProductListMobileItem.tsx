@@ -79,10 +79,14 @@ const ProductListMobileItem = ({
             {product.name}
           </div>
           <div className="text-xs text-muted-foreground mt-1">
-            {new Intl.NumberFormat("pt-BR", {
-              style: "currency",
-              currency: "BRL",
-            }).format(product.price)}
+            {product.priceOnRequest ? (
+              <span className="text-blue-600 font-medium">Sob Consulta</span>
+            ) : (
+              new Intl.NumberFormat("pt-BR", {
+                style: "currency",
+                currency: "BRL",
+              }).format(product.price!)
+            )}
           </div>
           <div className="text-xs text-muted-foreground">
             Estoque: {product.stockQuantity}

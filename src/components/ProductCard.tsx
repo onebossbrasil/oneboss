@@ -10,9 +10,19 @@ type ProductCardProps = {
 const ProductCard = ({ product }: ProductCardProps) => {
   const isMobile = useIsMobile();
   
+  const formatPrice = (price: number | null) => {
+    if (price === null) return "Preço não disponível";
+    return new Intl.NumberFormat("pt-BR", {
+      style: "currency",
+      currency: "BRL",
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2
+    }).format(price);
+  };
+  
   return (
     <Link 
-      to={`/produto/${product.id}`} 
+      to={`/produto/${product.slug || product.id}`} 
       className="group block animate-scale-in"
     >
       <div className="product-card h-full flex flex-col">
@@ -45,7 +55,20 @@ const ProductCard = ({ product }: ProductCardProps) => {
             {product.description}
           </p>
           <div className="mt-auto">
-            <p className="text-gold font-semibold text-sm md:text-base">{product.price}</p>
+            {product.priceOnRequest ? (
+              <p className="text-gold font-semibold text-sm md:text-base">
+                Sob Consulta
+              </p>
+            ) : (
+              <p className="text-gold font-semibold text-sm md:text-base">
+                {formatPrice(product.price)}
+                {product.salePrice && (
+                  <span className="ml-2 text-xs text-muted-foreground line-through">
+                    {formatPrice(product.salePrice)}
+                  </span>
+                )}
+              </p>
+            )}
           </div>
         </div>
       </div>

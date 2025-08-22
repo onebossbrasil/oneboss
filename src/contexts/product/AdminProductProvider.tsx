@@ -1,16 +1,38 @@
-import React, { createContext, useContext, useEffect, useMemo, useCallback } from "react";
+import React, { createContext, useContext, useEffect, useMemo, useCallback, useState } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/contexts/AuthContext";
 import { useProductOperations } from "@/hooks/use-product-operations";
 import { useProductData } from "./useProductData";
 import { ProductContextType } from "./types";
 
-const ProductContext = createContext<ProductContextType | undefined>(undefined);
+// Contexto específico para Admin com filtros
+const AdminProductContext = createContext<ProductContextType & {
+  filters: {
+    search: string;
+    categoryId: string;
+    status: string;
+  };
+  setFilters: (filters: { search?: string; categoryId?: string; status?: string }) => void;
+} | undefined>(undefined);
 
-export const ProductProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+export const AdminProductProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { toast } = useToast();
   const { session, user } = useAuth();
   const { addProduct: addProductOperation, updateProduct: updateProductOperation, deleteProduct: deleteProductOperation } = useProductOperations();
+  
+  // Estados dos filtros
+  const [filters, setFiltersState] = useState({
+    search: "",
+    categoryId: "",
+    status: ""
+  });
+
+  console.log("[AdminProductProvider] Filtros para useProductData:", {
+    search: filters.search,
+    categoryId: filters.categoryId,
+    status: filters.status
+  });
+
   const { 
     products, 
     featuredProducts, 
@@ -23,44 +45,47 @@ export const ProductProvider: React.FC<{ children: React.ReactNode }> = ({ child
     pageSize,
     setPageSize,
     totalCount
-  } = useProductData({ paged: false });
+  } = useProductData({ 
+    paged: true, 
+    initialPageSize: 20,
+    filters: {
+      search: filters.search,
+      categoryId: filters.categoryId,
+      status: filters.status
+    }
+  });
 
   // Debug user authentication status
   useEffect(() => {
     if (user) {
-      console.log("ProductContext: Usuario autenticado:", user.email);
+      console.log("AdminProductContext: Usuario autenticado:", user.email);
     } else {
-      console.log("ProductContext: Nenhum usuário autenticado");
+      console.log("AdminProductContext: Nenhum usuário autenticado");
     }
   }, [user]);
   
-  // Faz o carregamento inicial automático, mas apenas UMA vez
-  useEffect(() => {
-    console.log("ProductProvider: Carregando produtos automaticamente na montagem.");
-    fetchProducts(true);
-    // Não ouve por mudanças de foco (no refresh manual, apenas se usuário pedir ou CRUD)
-    // eslint-disable-next-line
-  }, []); // Executa apenas na MONTAGEM do Provider
-
-  // Remover fetchProducts de montagem automática! (Carregamento inicial manual)
-  // useEffect(() => {
-  //   let isMounted = true;
-  //   if (isMounted) {
-  //     console.log("ProductProvider requesting fetchProducts: Initial");
-  //     fetchProducts();
-  //   }
-  //   return () => {
-  //     isMounted = false;
-  //   };
-  // }, [fetchProducts]);
+  // Carregamento inicial removido - useProductData já carrega automaticamente com os filtros
 
   // Stable refreshProducts function with force parameter
   const refreshProducts = useCallback(async (force = true) => {
-    console.log("[ProductProvider] Manual refresh products requested, force =", force);
+    console.log("[AdminProductProvider] Manual refresh products requested, force =", force);
     const res = await fetchProducts(force);
-    console.log("[ProductProvider] refreshProducts completed.");
+    console.log("[AdminProductProvider] refreshProducts completed.");
     return res;
   }, [fetchProducts]);
+
+  // Função para atualizar filtros
+  const setFilters = useCallback((newFilters: { search?: string; categoryId?: string; status?: string }) => {
+    console.log("[AdminProductProvider] Atualizando filtros:", newFilters);
+    setFiltersState(prev => {
+      const updated = {
+        ...prev,
+        ...newFilters
+      };
+      console.log("[AdminProductProvider] Filtros atualizados:", updated);
+      return updated;
+    });
+  }, []);
 
   // Optimized product operations
   const addProduct = useCallback(async (
@@ -76,7 +101,7 @@ export const ProductProvider: React.FC<{ children: React.ReactNode }> = ({ child
         });
         return;
       }
-      console.log("[ProductProvider] Adicionando produto como:", user?.email);
+      console.log("[AdminProductProvider] Adicionando produto como:", user?.email);
       await addProductOperation(product, images);
       await refreshProducts(); 
       toast({
@@ -85,7 +110,7 @@ export const ProductProvider: React.FC<{ children: React.ReactNode }> = ({ child
         variant: "default"
       });
     } catch (err) {
-      console.error("[ProductProvider] Erro ao adicionar produto:", err);
+      console.error("[AdminProductProvider] Erro ao adicionar produto:", err);
       // Error is already handled in the operation
     }
   }, [session, user, addProductOperation, refreshProducts, toast]);
@@ -104,19 +129,17 @@ export const ProductProvider: React.FC<{ children: React.ReactNode }> = ({ child
         });
         return;
       }
-      console.log("[ProductProvider] Atualizando produto como:", user.email, "ProductId:", id);
+      console.log("[AdminProductProvider] Atualizando produto como:", user.email, "ProductId:", id);
       await updateProductOperation(id, productData, newImages);
-      // Só atualiza a lista após confirmação do Supabase!
-      console.log("[ProductProvider] Produto atualizado no Supabase, agora refrescando lista...");
-      await refreshProducts(true); // <--- aguarda atualizar lista!
+      console.log("[AdminProductProvider] Produto atualizado no Supabase, agora refrescando lista...");
+      await refreshProducts(true);
       toast({
         title: "Produto atualizado",
         description: "As alterações foram salvas e sincronizadas!",
         variant: "default"
       });
     } catch (err) {
-      console.error("[ProductProvider] Erro ao atualizar produto:", err);
-      // Error is already handled in the operation
+      console.error("[AdminProductProvider] Erro ao atualizar produto:", err);
     }
   }, [session, user, updateProductOperation, refreshProducts, toast]);
 
@@ -130,7 +153,7 @@ export const ProductProvider: React.FC<{ children: React.ReactNode }> = ({ child
         });
         return;
       }
-      console.log("[ProductProvider] Removendo produto como:", user?.email, "ProductId:", id);
+      console.log("[AdminProductProvider] Removendo produto como:", user?.email, "ProductId:", id);
       await deleteProductOperation(id);
       await refreshProducts();
     } catch (err) {
@@ -152,7 +175,9 @@ export const ProductProvider: React.FC<{ children: React.ReactNode }> = ({ child
     setPage,
     pageSize,
     setPageSize,
-    totalCount
+    totalCount,
+    filters,
+    setFilters
   }), [
     products, 
     featuredProducts, 
@@ -166,22 +191,24 @@ export const ProductProvider: React.FC<{ children: React.ReactNode }> = ({ child
     setPage,
     pageSize,
     setPageSize,
-    totalCount
+    totalCount,
+    filters,
+    setFilters
   ]);
 
-  console.log("ProductProvider rendering with", products.length, "products");
+  console.log("AdminProductProvider rendering with", products.length, "products, totalCount:", totalCount, "filters:", filters);
 
   return (
-    <ProductContext.Provider value={contextValue}>
+    <AdminProductContext.Provider value={contextValue}>
       {children}
-    </ProductContext.Provider>
+    </AdminProductContext.Provider>
   );
 };
 
-export const useProducts = () => {
-  const context = useContext(ProductContext);
+export const useAdminProducts = () => {
+  const context = useContext(AdminProductContext);
   if (context === undefined) {
-    throw new Error("useProducts must be used within a ProductProvider");
+    throw new Error("useAdminProducts must be used within an AdminProductProvider");
   }
   return context;
 };

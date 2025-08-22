@@ -50,7 +50,7 @@ export const importProductToSupabase = async (
         price,
         sale_price: salePrice,
         category_id: categoryObj.id.toString(),
-        subcategory_values: subcategoryValues,
+        // subcategory_values removido - agora usa attribute_id
         featured: product.featured,
         published: product.published,
         stock_quantity: product.stockQuantity

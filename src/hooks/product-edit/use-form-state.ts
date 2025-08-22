@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Product } from "@/types/product";
 
@@ -12,33 +11,79 @@ export const useFormState = (product: Product | null) => {
     salePrice: "",
     stockQuantity: "1",
     published: true,
-    featured: false
+    featured: false,
+    priceOnRequest: false
   });
 
   // Sempre que o produto fresh chegar, RESETA o formulário
   useEffect(() => {
     if (product) {
-      setFormData({
+      // Log específico para AGUSTA
+      if (product.name.includes("AGUSTA")) {
+        console.log("[AGUSTA][useFormState] Dados brutos recebidos:", {
+          id: product.id,
+          name: product.name,
+          price: product.price,
+          priceOnRequest: product.priceOnRequest,
+          salePrice: product.salePrice
+        });
+      }
+
+      const priceOnRequest = product.priceOnRequest === true;
+      
+      const newFormData = {
         name: product.name,
         shortDescription: product.shortDescription || "",
         description: product.description,
-        price: product.price.toString(),
-        salePrice: product.salePrice ? product.salePrice.toString() : "",
+        price: priceOnRequest ? "" : (product.price ? product.price.toString() : ""),
+        salePrice: priceOnRequest ? "" : (product.salePrice ? product.salePrice.toString() : ""),
         stockQuantity: product.stockQuantity.toString(),
         published: product.published,
-        featured: product.featured
-      });
-      console.log("[useFormState] Formulário reidratado com produto fresh:", product.name);
+        featured: product.featured,
+        priceOnRequest
+      };
+
+      // Log específico para AGUSTA
+      if (product.name.includes("AGUSTA")) {
+        console.log("[AGUSTA][useFormState] Formulário formatado:", newFormData);
+      }
+
+      setFormData(newFormData);
     }
   }, [product]);
 
   const handleFormChange = (field: string, value: any) => {
-    setFormData(prev => ({ ...prev, [field]: value }));
+    // Log específico para AGUSTA
+    if (formData.name.includes("AGUSTA")) {
+      console.log("[AGUSTA][useFormState] Alteração de campo:", {
+        campo: field,
+        valorAntigo: formData[field as keyof typeof formData],
+        valorNovo: value
+      });
+    }
+
+    if (field === "priceOnRequest") {
+      const newFormData = {
+        ...formData,
+        priceOnRequest: value,
+        price: value ? "" : formData.price,
+        salePrice: value ? "" : formData.salePrice
+      };
+
+      // Log específico para AGUSTA
+      if (formData.name.includes("AGUSTA")) {
+        console.log("[AGUSTA][useFormState] Formulário atualizado após priceOnRequest:", newFormData);
+      }
+
+      setFormData(newFormData);
+    } else {
+      setFormData(prev => ({ ...prev, [field]: value }));
+    }
   };
 
   return {
     formData,
     handleFormChange,
-    setFormData // exportado se quiser resetar manualmente no futuro
+    setFormData
   };
 };

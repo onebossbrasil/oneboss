@@ -12,6 +12,7 @@ import { Alert, AlertTitle, AlertDescription } from "@/components/ui/alert";
 export default function ProductListMobilePanel({
   products,
   paginatedProducts,
+  totalCount,
   search,
   setSearch,
   filterCategory,
@@ -45,7 +46,7 @@ export default function ProductListMobilePanel({
       </div>
       <div className="w-full flex justify-center mt-2">
         <span className="text-xs text-muted-foreground">
-          Total de produtos: <strong>{products.length}</strong>
+          Total de produtos: <strong>{totalCount}</strong>
         </span>
       </div>
       <div className="w-full flex flex-col gap-2 mt-4 px-2">

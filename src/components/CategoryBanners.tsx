@@ -1,12 +1,13 @@
-
 import { Link } from "react-router-dom";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { Card } from "@/components/ui/card";
+import { useCategories } from "@/contexts/CategoryContext";
+
 const categoryData = [{
   id: 1,
   title: "AUTOMÓVEIS",
   image: "/lovable-uploads/b105ff99-4dec-4198-839a-a2e4e3dc70e9.png",
-  slug: "automoveis",
+  slug: "veiculos",
   size: "full" as const
 }, {
   id: 2,
@@ -39,8 +40,10 @@ const categoryData = [{
   slug: "decoracao",
   size: "half" as const
 }];
+
 const CategoryBanners = () => {
   const isMobile = useIsMobile();
+  const { categories } = useCategories();
   return (
     <section className="py-6 md:py-8 bg-background relative overflow-hidden flex md:justify-center">
       {/* Decorative elements */}
@@ -59,33 +62,39 @@ const CategoryBanners = () => {
         </div>
         
         <div className={`grid grid-cols-1 md:grid-cols-2 ${!isMobile ? "gap-4" : "gap-0"}`}>
-          {categoryData.map(category => <Link key={category.id} to={`/loja?categoria=${category.slug}`} className={`${isMobile ? "animate-slide-in-right" : category.size === "full" ? "md:col-span-2 animate-scale-in" : "animate-scale-in"} group relative overflow-hidden`}>
-              <div className="h-[300px] w-full relative">
-                {/* Full coverage background image */}
-                <img src={category.image} alt={category.title} className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" />
-                
-                {/* Dark overlay for better text visibility */}
-                <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent"></div>
-                
-                {/* Position the content at the bottom with padding */}
-                <div className="absolute inset-0 flex items-end justify-center pb-6">
-                  <div className="glassmorphism text-center px-6 py-4 rounded-lg backdrop-blur-md bg-white/10 border border-white/30 shadow-lg transform transition-all duration-500 group-hover:bg-white/15">
-                    <h3 className="text-white font-playfair text-xl md:text-3xl font-bold mb-2 tracking-wide">
-                      {category.title}
-                    </h3>
-                    
-                    <div className="mt-3">
-                      <span className="inline-block px-4 py-1.5 text-sm md:text-base rounded-full border border-gold/50 text-white transition-colors duration-300 group-hover:border-gold group-hover:text-gold">
-                        VER MAIS
-                      </span>
+          {categoryData.map(category => {
+            const cat = categories.find(c => c.value === category.slug);
+            const categorySlug = cat?.value || category.slug;
+            return (
+              <Link key={category.id} to={`/loja/${categorySlug}`} className={`${isMobile ? "animate-slide-in-right" : category.size === "full" ? "md:col-span-2 animate-scale-in" : "animate-scale-in"} group relative overflow-hidden`}>
+                <div className="h-[300px] w-full relative">
+                  {/* Full coverage background image */}
+                  <img src={category.image} alt={category.title} className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" />
+                  
+                  {/* Dark overlay for better text visibility */}
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent"></div>
+                  
+                  {/* Position the content at the bottom with padding */}
+                  <div className="absolute inset-0 flex items-end justify-center pb-6">
+                    <div className="glassmorphism text-center px-6 py-4 rounded-lg backdrop-blur-md bg-white/10 border border-white/30 shadow-lg transform transition-all duration-500 group-hover:bg-white/15">
+                      <h3 className="text-white font-playfair text-xl md:text-3xl font-bold mb-2 tracking-wide">
+                        {category.title}
+                      </h3>
+                      
+                      <div className="mt-3">
+                        <span className="inline-block px-4 py-1.5 text-sm md:text-base rounded-full border border-gold/50 text-white transition-colors duration-300 group-hover:border-gold group-hover:text-gold">
+                          VER MAIS
+                        </span>
+                      </div>
                     </div>
                   </div>
+                  
+                  {/* Shine effect on hover */}
+                  <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-white/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700"></div>
                 </div>
-                
-                {/* Shine effect on hover */}
-                <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-white/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700"></div>
-              </div>
-            </Link>)}
+              </Link>
+            );
+          })}
         </div>
         
         <div className="mt-6 md:mt-8 flex justify-center px-4">

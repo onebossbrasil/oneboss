@@ -1,10 +1,10 @@
-import { useProducts } from "@/contexts/ProductContext";
+import { useFeaturedProducts } from "@/contexts/product/FeaturedProductProvider";
 import ProductSlider from "./featured/ProductSlider";
 import { useCategories } from "@/contexts/CategoryContext";
 import { FormattedProduct } from "@/types/product";
 
 const FeaturedProducts = () => {
-  const { featuredProducts, isLoading } = useProducts();
+  const { featuredProducts, isLoading } = useFeaturedProducts();
   const { categories } = useCategories();
 
   // Adiciona log de diagnóstico da home
@@ -20,13 +20,13 @@ const FeaturedProducts = () => {
   const formattedProducts: FormattedProduct[] = featuredProducts.map(product => ({
     id: product.id,
     name: product.name,
-    price: typeof product.price === 'number' 
-      ? new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(product.price)
-      : product.price + "",
+    price: product.priceOnRequest ? null : Number(product.price),
+    salePrice: product.salePrice ? Number(product.salePrice) : undefined,
     category: categories.find(cat => cat.id.toString() === product.categoryId)?.name || '',
     imageUrl: product.images.length > 0 ? product.images[0].url : 'https://images.unsplash.com/photo-1503376780353-7e6692767b70?auto=format&fit=crop&q=80&w=600&h=400',
     featured: product.featured,
-    description: product.description
+    description: product.description,
+    priceOnRequest: product.priceOnRequest
   }));
 
   return (

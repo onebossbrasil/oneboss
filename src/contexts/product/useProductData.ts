@@ -1,16 +1,32 @@
 import { useState, useCallback, useRef, useEffect } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { Product } from "@/types/product";
-import { fetchProductsFromSupabase } from "@/utils/product";
+import { fetchProductsFromSupabase, fetchProductsPageFromSupabase } from "@/utils/product";
 import { useAuth } from "@/contexts/AuthContext";
 
-export const useProductData = () => {
+type UseProductDataOptions = {
+  paged?: boolean;
+  initialPageSize?: number;
+  filters?: {
+    search?: string;
+    categoryId?: string;
+    subcategoryIds?: string[];
+    attributeIds?: string[];
+    status?: string;
+  };
+};
+
+export const useProductData = (options: UseProductDataOptions = {}) => {
+  const { paged = false, initialPageSize = 20, filters = {} } = options;
   const { toast } = useToast();
   const { session, user } = useAuth();
   const [products, setProducts] = useState<Product[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [retryCount, setRetryCount] = useState(0);
+  const [page, setPage] = useState(1);
+  const [pageSize, setPageSize] = useState(initialPageSize);
+  const [totalCount, setTotalCount] = useState(0);
   
   // Use a ref to track if a fetch is in progress
   const isFetchingRef = useRef(false);
@@ -23,6 +39,13 @@ export const useProductData = () => {
   useEffect(() => {
     console.log("[useProductData] Inicializado. Session?", session, "User?", user);
   }, [session, user]);
+
+  // Carregamento inicial
+  useEffect(() => {
+    console.log("[useProductData] Carregamento inicial automático");
+    fetchProducts(true);
+    // eslint-disable-next-line
+  }, []); // Apenas na montagem
 
   // Improved fetchProducts with retry logic, debounce and better request management
   const fetchProducts = useCallback(async (force = false) => {
@@ -44,12 +67,30 @@ export const useProductData = () => {
     setError(null);
 
     try {
-      console.log("[useProductData] Buscando produtos (autenticado?", !!session?.access_token, ")");
-      if (user) {
-        console.log("[useProductData] Buscando como usuário:", user.email);
-      }
+      console.log("[useProductData] Buscando produtos, paged:", paged, "filtros:", Object.keys(filters).length > 0 ? filters : "nenhum");
       
-      const { products: fetchedProducts, error: fetchError } = await fetchProductsFromSupabase();
+      let fetchedProducts: Product[] = [];
+      let total = 0;
+      let fetchError: string | null = null;
+      if (paged) {
+        const resp = await fetchProductsPageFromSupabase({ 
+          page, 
+          pageSize, 
+          search: filters.search,
+          categoryId: filters.categoryId,
+          subcategoryIds: filters.subcategoryIds,
+          attributeIds: filters.attributeIds,
+          status: filters.status as "published" | "unpublished" | ""
+        });
+        fetchedProducts = resp.products;
+        total = resp.totalCount;
+        fetchError = resp.error;
+      } else {
+        const resp = await fetchProductsFromSupabase();
+        fetchedProducts = resp.products;
+        total = resp.products.length;
+        fetchError = resp.error;
+      }
 
       if (fetchError) {
         console.error("[useProductData] Erro ao buscar produtos:", fetchError);
@@ -61,16 +102,13 @@ export const useProductData = () => {
         throw new Error(fetchError);
       }
 
-      console.log("[useProductData] Produtos obtidos:", fetchedProducts.length);
+      console.log("[useProductData] Produtos obtidos:", fetchedProducts.length, "Total:", total || fetchedProducts.length);
       setProducts(fetchedProducts);
+      setTotalCount(total);
       lastFetchTimeRef.current = Date.now();
       setRetryCount(0);
 
-      toast({
-        title: 'Sincronização concluída',
-        description: 'Lista de produtos carregada do Supabase.',
-        variant: "default"
-      });
+      // Toast removido para evitar notificações excessivas
     } catch (err: any) {
       console.error('[useProductData] Falha na conexão com Supabase:', err);
       setError(err.message || 'Falha ao conectar com o banco de dados');
@@ -100,7 +138,7 @@ export const useProductData = () => {
       setIsLoading(false);
       isFetchingRef.current = false;
     }
-  }, [toast, retryCount, session, user]);
+  }, [toast, retryCount, session, user, page, pageSize, paged, filters.search, filters.categoryId, filters.status, filters.subcategoryIds, filters.attributeIds]);
   
   // Adiciona diagnóstico para depurar featured/published real vindo do banco
   useEffect(() => {
@@ -119,6 +157,24 @@ export const useProductData = () => {
     (product) => product.featured === true && product.published === true
   );
 
+  // Recarrega ao mudar paginação apenas quando estiver em modo paginado
+  useEffect(() => {
+    if (paged) {
+      fetchProducts(true);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [page, pageSize, paged]);
+
+  // Recarrega ao mudar filtros e reseta para página 1
+  useEffect(() => {
+    if (paged) {
+      console.log("[useProductData] Filtros mudaram, recarregando página 1");
+      setPage(1);
+      fetchProducts(true);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [filters.search, filters.categoryId, filters.status, filters.subcategoryIds, filters.attributeIds]);
+
   return {
     products,
     featuredProducts,
@@ -126,6 +182,9 @@ export const useProductData = () => {
     error,
     fetchProducts,
     setProducts,
-    retryCount
+    retryCount,
+    page, setPage,
+    pageSize, setPageSize,
+    totalCount
   };
 };

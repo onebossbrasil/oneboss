@@ -6,7 +6,6 @@ import ProductList from "../products/ProductList";
 import CategoryManager from "../CategoryManager";
 import LeadsManager from "../LeadsManager";
 import AdminPartnerManager from "../partners/AdminPartnerManager";
-import { ProductProvider } from "@/contexts/product";
 import { CategoryProvider } from "@/contexts/CategoryContext";
 import { useIsMobile } from "@/hooks/useIsMobile";
 
@@ -33,16 +32,28 @@ const AdminDashboard = ({ onLogout }: AdminDashboardProps) => {
   });
   const isMobile = useIsMobile();
 
-  // Salva o valor sempre que mudar
+  // Salva o valor sempre que mudar (com proteção contra QuotaExceededError)
   useEffect(() => {
-    localStorage.setItem(LOCAL_STORAGE_KEY, activeTab);
+    try {
+      localStorage.setItem(LOCAL_STORAGE_KEY, activeTab);
+    } catch (error) {
+      console.warn("Erro ao salvar tab ativa no localStorage:", error);
+      // Em caso de quota excedida, limpa alguns itens e tenta novamente
+      if (error instanceof DOMException && error.name === 'QuotaExceededError') {
+        try {
+          localStorage.clear();
+          localStorage.setItem(LOCAL_STORAGE_KEY, activeTab);
+        } catch {
+          // Se ainda assim falhar, ignora silenciosamente
+        }
+      }
+    }
   }, [activeTab]);
 
   if (isMobile) {
     // MOBILE LAYOUT - wrap everything with providers
     return (
       <CategoryProvider>
-        <ProductProvider>
           <div className="w-full min-h-screen bg-[#F1F1F1] flex flex-col">
             {/* Mobile Header */}
             <header className="bg-white border-b-2 border-gold flex items-center justify-between px-4 py-3 sticky top-0 z-40 shadow-sm">
@@ -90,7 +101,6 @@ const AdminDashboard = ({ onLogout }: AdminDashboardProps) => {
               )}
             </div>
           </div>
-        </ProductProvider>
       </CategoryProvider>
     );
   }
@@ -100,14 +110,12 @@ const AdminDashboard = ({ onLogout }: AdminDashboardProps) => {
     <SidebarProvider>
       <AdminLayout activeTab={activeTab} onTabChange={setActiveTab} onLogout={onLogout}>
         <CategoryProvider>
-          <ProductProvider>
             <div>
               {activeTab === "produtos" && <ProductList />}
               {activeTab === "categorias" && <CategoryManager />}
               {activeTab === "leads" && <LeadsManager />}
               {activeTab === "parceiros" && <AdminPartnerManager />}
             </div>
-          </ProductProvider>
         </CategoryProvider>
       </AdminLayout>
     </SidebarProvider>

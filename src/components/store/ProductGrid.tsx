@@ -1,4 +1,3 @@
-
 import { Link } from "react-router-dom";
 import { Card, CardContent } from "@/components/ui/card";
 import { FormattedProduct } from "@/types/product";
@@ -13,6 +12,16 @@ interface ProductGridProps {
 }
 
 const ProductGrid = ({ products, resetFilters, isLoading = false }: ProductGridProps) => {
+  const formatPrice = (price: number | null) => {
+    if (price === null) return "Preço não disponível";
+    return new Intl.NumberFormat("pt-BR", {
+      style: "currency",
+      currency: "BRL",
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2
+    }).format(price);
+  };
+
   if (products.length === 0 && !isLoading) {
     return (
       <div className="text-center py-16 px-4">
@@ -35,55 +44,46 @@ const ProductGrid = ({ products, resetFilters, isLoading = false }: ProductGridP
         <Link 
           key={product.id} 
           to={`/produto/${product.id}`} 
-          className="group animate-fade-in"
+          className="product-card h-full block animate-fade-in"
         >
-          <Card className="h-full overflow-hidden border hover:border-gold/30 hover:shadow-lg transition-all duration-300 group-hover:scale-[1.02]">
-            <div className="relative">
-              <AspectRatio ratio={4/3}>
-                <img
-                  src={product.imageUrl}
-                  alt={product.name}
-                  className="object-cover w-full h-full group-hover:scale-105 transition-transform duration-500"
-                  loading="lazy"
-                />
-              </AspectRatio>
-              
-              {product.salePrice && (
-                <span className="absolute top-2 right-2 bg-red-500 text-white text-xs font-bold px-2 py-1 rounded-sm shadow-md">
-                  OFERTA
-                </span>
+          <div className="relative aspect-[4/3] rounded-t-lg overflow-hidden">
+            <img
+              src={product.imageUrl}
+              alt={product.name}
+              className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+              loading="lazy"
+            />
+            <div className="absolute top-3 right-3 glassmorphism px-3 py-1 rounded-full text-xs uppercase tracking-wider">
+              {product.category || product.subcategory}
+            </div>
+          </div>
+          <div className="glassmorphism rounded-b-lg p-4">
+            <h3 className="font-playfair font-medium text-lg mb-1 line-clamp-2 group-hover:text-gold transition-colors">
+              {product.name}
+            </h3>
+            <div className="mt-1">
+              {product.priceOnRequest ? (
+                <span className="text-gold font-semibold">Sob Consulta</span>
+              ) : (
+                <>
+                  {typeof product.salePrice === 'number' ? (
+                    <>
+                      <span className="text-gold font-semibold">
+                        {formatPrice(product.salePrice)}
+                      </span>
+                      <span className="text-sm text-muted-foreground line-through ml-2">
+                        {formatPrice(product.price)}
+                      </span>
+                    </>
+                  ) : (
+                    <span className="text-gold font-semibold">
+                      {formatPrice(product.price)}
+                    </span>
+                  )}
+                </>
               )}
             </div>
-            
-            <CardContent className="p-3 md:p-4">
-              <h3 className="font-medium text-foreground line-clamp-2 group-hover:text-gold transition-colors mb-2 leading-tight">
-                {product.name}
-              </h3>
-              
-              <div className="mt-auto">
-                {product.salePrice ? (
-                  <div className="flex flex-col">
-                    <span className="text-sm text-muted-foreground line-through">
-                      {product.price}
-                    </span>
-                    <span className="font-bold text-red-600 text-lg">
-                      {product.salePrice}
-                    </span>
-                  </div>
-                ) : (
-                  <span className="font-bold text-lg text-gold">
-                    {product.price}
-                  </span>
-                )}
-              </div>
-              
-              {product.category && (
-                <div className="mt-2 text-xs text-muted-foreground uppercase tracking-wide">
-                  {product.category}
-                </div>
-              )}
-            </CardContent>
-          </Card>
+          </div>
         </Link>
       ))}
     </div>

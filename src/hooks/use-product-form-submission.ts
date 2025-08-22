@@ -1,11 +1,11 @@
 
-import { useProducts } from "@/contexts/ProductContext";
+import { useAdminProducts } from "@/contexts/product/AdminProductProvider";
 import { useToast } from "@/hooks/use-toast";
 import { brlStringToFloat } from "@/utils/product/price-utils";
 
 export const useProductFormSubmission = () => {
   const { toast } = useToast();
-  const { addProduct } = useProducts();
+  const { addProduct } = useAdminProducts();
 
   const submitProduct = async (
     formData: any,

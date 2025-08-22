@@ -1,5 +1,5 @@
 import React from "react";
-import { useProducts } from "@/contexts/ProductContext";
+import { useFeaturedProducts } from "@/contexts/product/FeaturedProductProvider";
 import { useCategories } from "@/contexts/CategoryContext";
 import ProductSlider from "./featured/ProductSlider";
 import { FormattedProduct } from "@/types/product";
@@ -15,18 +15,14 @@ const FeaturedProductsSection: React.FC<FeaturedProductsSectionProps> = ({
   hideIfNone = false,
   className = "",
 }) => {
-  const { featuredProducts, isLoading } = useProducts();
+  const { featuredProducts, isLoading } = useFeaturedProducts();
   const { categories } = useCategories();
 
   const formattedProducts: FormattedProduct[] = featuredProducts.map(product => ({
     id: product.id,
     name: product.name,
-    price: typeof product.price === 'number'
-      ? new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(product.price)
-      : product.price + "",
-    salePrice: product.salePrice
-      ? new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(product.salePrice)
-      : undefined,
+    price: product.priceOnRequest ? null : Number(product.price),
+    salePrice: product.salePrice ? Number(product.salePrice) : undefined,
     category: categories.find(cat => cat.id.toString() === product.categoryId)?.name || '',
     subcategory: "", // subcategoryValues removed; leave blank or adapt as needed
     imageUrl: product.images.length > 0
@@ -34,6 +30,7 @@ const FeaturedProductsSection: React.FC<FeaturedProductsSectionProps> = ({
       : 'https://images.unsplash.com/photo-1503376780353-7e6692767b70?auto=format&fit=crop&q=80&w=600&h=400',
     featured: product.featured,
     description: product.shortDescription || product.description,
+    priceOnRequest: product.priceOnRequest,
   }));
 
   if (hideIfNone && !isLoading && formattedProducts.length === 0) {

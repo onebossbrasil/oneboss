@@ -39,7 +39,7 @@ const ProductBreadcrumbs = ({ product }: ProductBreadcrumbsProps) => {
         {category && (
           <li className="flex items-center">
             <Link 
-              to={`/loja?categoria=${categorySlug}`}
+              to={`/loja/${categorySlug}`}
               className="text-muted-foreground hover:text-foreground"
             >
               {category.name}

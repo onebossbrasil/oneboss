@@ -1,6 +1,4 @@
-
-import React from "react";
-import { useProducts } from "@/contexts/ProductContext";
+import React, { useEffect } from "react";
 import { useCategories } from "@/contexts/CategoryContext";
 import ResultsHeader from "@/components/store/ResultsHeader";
 import ProductGrid from "@/components/store/ProductGrid";
@@ -12,12 +10,17 @@ import StoreSearchBar from "@/components/store/StoreSearchBar";
 import StorePagination from "@/components/store/StorePagination";
 import { Button } from "@/components/ui/button";
 import { useStoreFilters } from "@/hooks/use-store-filters";
-import { useProductFiltering } from "@/hooks/use-product-filtering";
+import { useProductFilteringServer } from "@/hooks/use-product-filtering-server";
+import { StoreProductProvider, useStoreProducts } from "@/contexts/product/StoreProductProvider";
 import { formatProductForGrid } from "@/utils/store-product-formatter";
+import Header from "@/components/Header";
+import { useSearchParams } from "react-router-dom";
 
-const Store = () => {
-  const { products, isLoading, error } = useProducts();
+// Componente interno que usa o StoreProductProvider
+const StoreContent = () => {
+  const { products, isLoading, error } = useStoreProducts();
   const { categories } = useCategories();
+  const [searchParams] = useSearchParams();
   
   const {
     searchTerm,
@@ -39,8 +42,7 @@ const Store = () => {
 
   const productsPerPage = 12;
   
-  const { filteredProducts, paginatedProducts, totalPages } = useProductFiltering({
-    products,
+  const { filteredProducts, paginatedProducts, totalPages, totalCount } = useProductFilteringServer({
     searchTerm,
     selectedCategory,
     selectedSubcategories,
@@ -52,8 +54,12 @@ const Store = () => {
 
   const hasActiveFilters = !!(searchTerm || selectedCategory || selectedSubcategories.length > 0 || selectedAttributes.length > 0 || sortOption !== "relevance");
 
+  // Sincronização de categoria feita agora no useStoreFilters
+
   return (
     <div className="min-h-screen w-full bg-gradient-to-b from-muted/30 to-background pb-16 pt-0">
+      {/* Header global */}
+      <Header />
       {/* Banner */}
       <StoreBanner />
 
@@ -76,7 +82,6 @@ const Store = () => {
                 isMobileFiltersOpen={false}
                 setIsMobileFiltersOpen={() => {}}
                 resetFilters={resetFilters}
-                publishedProducts={products}
               />
             </div>
           </aside>
@@ -106,7 +111,6 @@ const Store = () => {
                   onSubcategoryToggle={handleSubcategoryToggle}
                   onAttributeToggle={handleAttributeToggle}
                   resetFilters={resetFilters}
-                  publishedProducts={products}
                   isOpen={isMobileFiltersOpen}
                   onOpenChange={setIsMobileFiltersOpen}
                 />
@@ -115,7 +119,7 @@ const Store = () => {
             
             {/* Header de resultados */}
             <ResultsHeader
-              productCount={filteredProducts.length}
+              productCount={totalCount}
               sortOption={sortOption}
               setSortOption={setSortOption}
             />
@@ -164,6 +168,15 @@ const Store = () => {
         </div>
       </div>
     </div>
+  );
+};
+
+// Componente principal que envolve com StoreProductProvider
+const Store = () => {
+  return (
+    <StoreProductProvider>
+      <StoreContent />
+    </StoreProductProvider>
   );
 };
 

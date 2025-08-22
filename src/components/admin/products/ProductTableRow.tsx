@@ -2,7 +2,7 @@ import { Eye, EyeOff, Edit, Trash2, ImageOff } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { TableCell, TableRow } from "@/components/ui/table";
 import { Product } from "@/types/product";
-import { useProducts } from "@/contexts/ProductContext";
+import { useAdminProducts } from "@/contexts/product/AdminProductProvider";
 import { useToast } from "@/hooks/use-toast";
 import { ReactNode, useState } from "react";
 import ProductVisibilityButton from "./ProductVisibilityButton";
@@ -22,10 +22,12 @@ const ProductTableRow = ({
   isSelectedToDelete,
   selectionCheckbox,
 }: ProductTableRowProps) => {
-  const { updateProduct } = useProducts();
+  const { updateProduct } = useAdminProducts();
   const { toast } = useToast();
   const [isToggling, setIsToggling] = useState(false);
   const fallbackImg = "/placeholder.svg";
+
+  // Diagnóstico removido para evitar logs excessivos
 
   const handleVisibilityToggle = async (product: Product) => {
     setIsToggling(true);
@@ -47,7 +49,13 @@ const ProductTableRow = ({
   };
 
   const getFirstValidImage = (images: any[]) => {
-    if (!Array.isArray(images)) return null;
+    if (!Array.isArray(images)) {
+      console.log("[ProductTableRow] images não é um array:", images);
+      return null;
+    }
+    
+    // Log detalhado removido para evitar logs excessivos
+
     return images.find(img =>
       img &&
       typeof img.url === "string" &&
@@ -60,9 +68,11 @@ const ProductTableRow = ({
   const hasImg = !!validImgObj;
   const imgUrl = hasImg ? validImgObj.url : "";
 
-  // LOG: diagnóstico detalhado
-  console.log("[ProductTableRow] product.images=", product?.images);
-  console.log("[ProductTableRow] imagem válida escolhida:", imgUrl);
+  // LOG: diagnóstico removido para evitar logs excessivos
+
+  const handleEdit = () => {
+    onEditClick(product);
+  };
 
   return (
     <TableRow
@@ -104,17 +114,23 @@ const ProductTableRow = ({
         </span>
       </TableCell>
       <TableCell>
-        {new Intl.NumberFormat("pt-BR", {
-          style: "currency",
-          currency: "BRL",
-        }).format(product.price)}
-        {product.salePrice && (
-          <div className="text-sm text-muted-foreground line-through">
+        {product.priceOnRequest ? (
+          <span className="text-blue-600 font-medium">Sob Consulta</span>
+        ) : (
+          <>
             {new Intl.NumberFormat("pt-BR", {
               style: "currency",
               currency: "BRL",
-            }).format(product.salePrice)}
-          </div>
+            }).format(product.price!)}
+            {product.salePrice && (
+              <div className="text-sm text-muted-foreground line-through">
+                {new Intl.NumberFormat("pt-BR", {
+                  style: "currency",
+                  currency: "BRL",
+                }).format(product.salePrice)}
+              </div>
+            )}
+          </>
         )}
       </TableCell>
       <TableCell>{product.stockQuantity}</TableCell>
@@ -125,7 +141,7 @@ const ProductTableRow = ({
             onClick={() => handleVisibilityToggle(product)}
             disabled={isToggling}
           />
-          <Button variant="outline" size="icon" onClick={() => onEditClick(product)} title="Editar produto">
+          <Button variant="outline" size="icon" onClick={handleEdit} title="Editar produto">
             <Edit className="h-4 w-4" />
           </Button>
           <Button variant="destructive" size="icon" onClick={() => onSelectDelete(product)} title="Excluir produto">

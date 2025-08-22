@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useProducts } from "@/contexts/ProductContext";
+import { useAdminProducts } from "@/contexts/product/AdminProductProvider";
 import { useToast } from "@/hooks/use-toast";
 import { Product } from "@/types/product";
 import { useFormValidation } from "./use-form-validation";
@@ -14,6 +14,7 @@ interface ProductFormData {
   stockQuantity: string;
   published: boolean;
   featured: boolean;
+  priceOnRequest?: boolean;
 }
 
 export const useProductSubmit = (
@@ -28,7 +29,7 @@ export const useProductSubmit = (
   selectedAttributeId?: string | null,
 ) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const { updateProduct } = useProducts();
+  const { updateProduct } = useAdminProducts();
   const { toast } = useToast();
   const { validateProductData, convertPriceToNumber } = useFormValidation();
 
@@ -53,31 +54,51 @@ export const useProductSubmit = (
       console.log("[SUBMIT] selectedCategory:", selectedCategory);
       console.log("[SUBMIT] selectedSubcategoryId:", selectedSubcategoryId);
       console.log("[SUBMIT] selectedAttributeId:", selectedAttributeId);
+      console.log("[SUBMIT] priceOnRequest:", formData.priceOnRequest);
 
-      const isValid = validateProductData(
-        formData.name,
-        formData.price,
-        formData.salePrice,
-        formData.stockQuantity,
-        selectedCategory
-      );
+      // Validação condicional: se priceOnRequest = true, não valida preço
+      if (!formData.priceOnRequest) {
+        const isValid = validateProductData(
+          formData.name,
+          formData.price,
+          formData.salePrice,
+          formData.stockQuantity,
+          selectedCategory
+        );
 
-      if (!isValid) {
-        setIsSubmitting(false);
-        toast({
-          title: "Erro de validação",
-          description: "Verifique os campos obrigatórios e tente novamente.",
-          variant: "destructive"
-        });
-        return;
+        if (!isValid) {
+          setIsSubmitting(false);
+          toast({
+            title: "Erro de validação",
+            description: "Verifique os campos obrigatórios e tente novamente.",
+            variant: "destructive"
+          });
+          return;
+        }
+      } else {
+        // Validação básica quando "Sob Consulta"
+        if (!formData.name || !selectedCategory) {
+          setIsSubmitting(false);
+          toast({
+            title: "Erro de validação",
+            description: "Nome e categoria são obrigatórios.",
+            variant: "destructive"
+          });
+          return;
+        }
       }
 
-      // Usa função padronizada BRL
-      const price = brlStringToFloat(formData.price);
-      let salePrice = undefined;
-      if (formData.salePrice) {
-        salePrice = brlStringToFloat(formData.salePrice);
+      // Processa preços: null quando "Sob Consulta"
+      let price = null;
+      let salePrice = null;
+      
+      if (!formData.priceOnRequest) {
+        price = brlStringToFloat(formData.price);
+        if (formData.salePrice) {
+          salePrice = brlStringToFloat(formData.salePrice);
+        }
       }
+
       const stockQuantity = parseInt(formData.stockQuantity, 10);
 
       const productData = {
@@ -85,7 +106,7 @@ export const useProductSubmit = (
         shortDescription: formData.shortDescription || null,
         description: formData.description,
         price,
-        salePrice: salePrice || null,
+        salePrice,
         categoryId: selectedCategory,
         subcategoryId: selectedSubcategoryId ?? null,          // <-- Envia UUID correto
         attributeId: selectedAttributeId ?? null,              // <-- Envia UUID correto
@@ -93,7 +114,8 @@ export const useProductSubmit = (
         published: formData.published,
         featured: formData.featured,
         stockQuantity,
-        deletedImageIds: deletedImageIds
+        deletedImageIds: deletedImageIds,
+        priceOnRequest: formData.priceOnRequest || false
       };
 
       console.log("[SUBMIT] Payload para updateProduct (com UUIDs):", productData);

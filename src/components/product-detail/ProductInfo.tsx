@@ -81,16 +81,24 @@ const ProductInfo = ({
 
       {/* Price Display */}
       <div className="mt-4">
-        {product.salePrice ? <div className="space-y-1">
+        {product.priceOnRequest ? (
+          <div className="text-3xl font-bold text-blue-600">
+            Sob Consulta
+          </div>
+        ) : product.salePrice ? (
+          <div className="space-y-1">
             <div className="text-muted-foreground line-through text-lg">
-              {formatPrice(product.price)}
+              {formatPrice(product.price!)}
             </div>
             <div className="text-3xl font-bold text-red-600">
               {formatPrice(product.salePrice)}
             </div>
-          </div> : <div className="text-3xl font-bold">
-            {formatPrice(product.price)}
-          </div>}
+          </div>
+        ) : (
+          <div className="text-3xl font-bold">
+            {formatPrice(product.price!)}
+          </div>
+        )}
       </div>
 
       {/* Action Buttons - SÓ DESKTOP */}
