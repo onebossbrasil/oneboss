@@ -1,0 +1,15 @@
+Lançamento inicial do OneBoss!
+
+Novidades desta versão:
+- Navegação intuitiva pelo catálogo premium
+- Galeria de imagens em alta qualidade
+- Contato direto com vendedores via WhatsApp
+- Sistema de favoritos para salvar produtos
+- Filtros avançados de busca por categoria
+- Autenticação segura com e-mail
+- Interface moderna e elegante
+- Modo responsivo para todos os tamanhos de tela
+- Splash screen com logo premium
+- Tema dourado sofisticado
+
+Bem-vindo ao universo de luxo da OneBoss!

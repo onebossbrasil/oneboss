@@ -32,8 +32,11 @@ export const useProductFilteringServer = ({
   // Sincroniza filtros com o provider - usando useEffect para garantir execução
   useEffect(() => {
     console.log(`[ProductFilteringServer] ===== SINCRONIZANDO FILTROS =====`);
+    console.log(`[ProductFilteringServer] searchTerm:`, searchTerm);
+    console.log(`[ProductFilteringServer] selectedCategory:`, selectedCategory);
     console.log(`[ProductFilteringServer] selectedSubcategories:`, selectedSubcategories);
     console.log(`[ProductFilteringServer] selectedAttributes:`, selectedAttributes);
+    console.log(`[ProductFilteringServer] sortOption:`, sortOption);
     
     const subcategoryIds = selectedSubcategories.map(sub => sub.id || sub);
     const attributeIds = selectedAttributes.map(attr => attr.id || attr);
@@ -41,13 +44,16 @@ export const useProductFilteringServer = ({
     console.log(`[ProductFilteringServer] subcategoryIds processados:`, subcategoryIds);
     console.log(`[ProductFilteringServer] attributeIds processados:`, attributeIds);
     
-    setFilters({
+    const filters = {
       search: searchTerm,
       categoryId: selectedCategory || "",
       subcategoryIds,
       attributeIds,
       sortOption
-    });
+    };
+    
+    console.log(`[ProductFilteringServer] Enviando filtros para provider:`, filters);
+    setFilters(filters);
   }, [searchTerm, selectedCategory, selectedSubcategories, selectedAttributes, sortOption, setFilters]);
 
   // Sincroniza página

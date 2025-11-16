@@ -5,6 +5,7 @@ import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Share2, MessageCircle, Heart } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { useProtectedAction } from "@/hooks/use-protected-action";
 interface ProductInfoProps {
   product: Product;
 }
@@ -44,11 +45,14 @@ const ProductInfo = ({
       });
     }
   };
-  const openWhatsApp = () => {
+  const openWhatsAppAction = () => {
     const message = `Olá, vim do site e quero saber mais sobre o produto "${product.name}"`;
     const whatsappUrl = `https://wa.me/5562982801810?text=${encodeURIComponent(message)}`;
     window.open(whatsappUrl, "_blank");
   };
+
+  // Protege a ação do WhatsApp - requer login
+  const openWhatsApp = useProtectedAction(openWhatsAppAction);
 
   // Format price in BRL
   const formatPrice = (price: number) => {

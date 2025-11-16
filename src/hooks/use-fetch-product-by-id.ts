@@ -23,17 +23,21 @@ type ProductRow = {
 /**
  * Busca produto por ID, incluindo TODAS as imagens (ordem correta).
  */
-export const useFetchProductById = (productId: string | null, open: boolean) => {
+export const useFetchProductById = (productId: string | null) => {
   const [product, setProduct] = useState<Product | null>(null);
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchProduct = async () => {
-      if (!productId || !open) {
+      if (!productId) {
         setProduct(null);
+        setIsLoading(false);
         return;
       }
+      
       setIsLoading(true);
+      setError(null);
 
       // Busca produto pelo ID
       const { data: prodData, error: prodError } = await supabase
@@ -43,6 +47,8 @@ export const useFetchProductById = (productId: string | null, open: boolean) => 
         .maybeSingle();
 
       if (prodError || !prodData) {
+        console.error("[useFetchProductById] Erro ao buscar produto:", prodError);
+        setError(prodError?.message || "Produto não encontrado");
         setProduct(null);
         setIsLoading(false);
         return;
@@ -104,8 +110,7 @@ export const useFetchProductById = (productId: string | null, open: boolean) => 
     };
 
     fetchProduct();
-    // eslint-disable-next-line
-  }, [productId, open]);
+  }, [productId]);
 
-  return { product, isLoading };
+  return { product, isLoading, error };
 };

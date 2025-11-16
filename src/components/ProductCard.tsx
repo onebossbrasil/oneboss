@@ -22,7 +22,7 @@ const ProductCard = ({ product }: ProductCardProps) => {
   
   return (
     <Link 
-      to={`/produto/${product.slug || product.id}`} 
+      to={`/produto/${product.id}`} 
       className="group block animate-scale-in"
     >
       <div className="product-card h-full flex flex-col">

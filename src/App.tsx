@@ -7,11 +7,21 @@ import Index from "./pages/Index";
 import Store from "./pages/Store";
 import Admin from "./pages/Admin";
 import ProductDetail from "./pages/ProductDetail";
+import PrivacyPolicy from "./pages/PrivacyPolicy";
+import AccountDeletion from "./pages/AccountDeletion";
+import Profile from "./pages/Profile";
+import Login from "./pages/Login";
+import MobileLogin from "./pages/MobileLogin";
+import Register from "./pages/Register";
 import NotFound from "./pages/NotFound";
 import { CategoryProvider } from "./contexts/CategoryContext";
 import { LeadProvider } from "./contexts/LeadContext";
 import { NewsletterProvider } from "./contexts/NewsletterContext";
 import { AuthProvider } from "./contexts/AuthContext";
+import BottomNav from "./components/mobile/BottomNav";
+import { useIsMobile } from "./hooks/use-is-mobile";
+import { useIsNativeApp } from "./hooks/use-platform";
+import { AppInitializer } from "./components/auth/AppInitializer";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -22,6 +32,31 @@ const queryClient = new QueryClient({
   },
 });
 
+const AppContent = () => {
+  const isMobile = useIsMobile();
+  const isNativeApp = useIsNativeApp();
+
+  return (
+    <AppInitializer>
+      <Routes>
+        <Route path="/" element={<Index />} />
+        <Route path="/loja" element={<Store />} />
+        <Route path="/loja/:categorySlug" element={<Store />} />
+        <Route path="/produto/:productId" element={<ProductDetail />} />
+        <Route path="/privacidade" element={<PrivacyPolicy />} />
+        <Route path="/cancelar" element={<AccountDeletion />} />
+        <Route path="/perfil" element={<Profile />} />
+        <Route path="/login" element={<MobileLogin />} />
+        <Route path="/register" element={<Register />} />
+        <Route path="/admin" element={<Admin />} />
+        {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+        <Route path="*" element={<NotFound />} />
+      </Routes>
+      {isMobile && <BottomNav />}
+    </AppInitializer>
+  );
+};
+
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <AuthProvider>
@@ -31,15 +66,7 @@ const App = () => (
             <NewsletterProvider>
               {/* Remover os toasts globais aqui, vão apenas pro Admin */}
               <BrowserRouter>
-                <Routes>
-                  <Route path="/" element={<Index />} />
-                  <Route path="/loja" element={<Store />} />
-                  <Route path="/loja/:categorySlug" element={<Store />} />
-                  <Route path="/produto/:productSlug" element={<ProductDetail />} />
-                  <Route path="/admin" element={<Admin />} />
-                  {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-                  <Route path="*" element={<NotFound />} />
-                </Routes>
+                <AppContent />
               </BrowserRouter>
             </NewsletterProvider>
           </LeadProvider>

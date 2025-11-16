@@ -32,47 +32,58 @@ export const useProductData = (options: UseProductDataOptions = {}) => {
   const isFetchingRef = useRef(false);
   // Track the last successful fetch time to prevent excessive calls
   const lastFetchTimeRef = useRef<number>(0);
+  // Track request ID to ignore stale responses
+  const requestIdRef = useRef<number>(0);
   // Minimum time between fetches (in milliseconds)
-  const MIN_FETCH_INTERVAL = 2000;
+  const MIN_FETCH_INTERVAL = 1000; // Reduzido para 1 segundo para permitir atualizações rápidas
 
   // Diagnóstico extra!
   useEffect(() => {
     console.log("[useProductData] Inicializado. Session?", session, "User?", user);
   }, [session, user]);
 
-  // Carregamento inicial
-  useEffect(() => {
-    console.log("[useProductData] Carregamento inicial automático");
-    fetchProducts(true);
-    // eslint-disable-next-line
-  }, []); // Apenas na montagem
+  // Carregamento inicial removido - será feito pelos filtros
 
   // Improved fetchProducts with retry logic, debounce and better request management
   const fetchProducts = useCallback(async (force = false) => {
     const now = Date.now();
     const timeSinceLastFetch = now - lastFetchTimeRef.current;
     
-    if (isFetchingRef.current) {
-      console.warn("[useProductData] Fetch já em andamento, ignorado.");
+    if (isFetchingRef.current && !force) {
+      console.warn("[useProductData] Fetch já em andamento, ignorado. Force:", force);
       return;
     }
     
     if (!force && timeSinceLastFetch < MIN_FETCH_INTERVAL) {
-      console.log(`[useProductData] Bloqueio temporal. Última busca há ${timeSinceLastFetch}ms.`);
+      console.log(`[useProductData] ⏱️ Bloqueio temporal. Última busca há ${timeSinceLastFetch}ms.`);
       return;
     }
+    
+    // Generate unique request ID to ignore stale responses
+    const requestId = ++requestIdRef.current;
     
     isFetchingRef.current = true;
     setIsLoading(true);
     setError(null);
 
     try {
-      console.log("[useProductData] Buscando produtos, paged:", paged, "filtros:", Object.keys(filters).length > 0 ? filters : "nenhum");
+      console.log("[useProductData] Buscando produtos, requestId:", requestId, "paged:", paged, "filtros:", Object.keys(filters).length > 0 ? filters : "nenhum");
       
       let fetchedProducts: Product[] = [];
       let total = 0;
       let fetchError: string | null = null;
       if (paged) {
+        console.log("[useProductData] ===== CHAMANDO fetchProductsPageFromSupabase =====");
+        console.log("[useProductData] Parâmetros requestId:", requestId, { 
+          page, 
+          pageSize, 
+          search: filters.search,
+          categoryId: filters.categoryId,
+          subcategoryIds: filters.subcategoryIds,
+          attributeIds: filters.attributeIds,
+          status: filters.status
+        });
+        
         const resp = await fetchProductsPageFromSupabase({ 
           page, 
           pageSize, 
@@ -82,11 +93,31 @@ export const useProductData = (options: UseProductDataOptions = {}) => {
           attributeIds: filters.attributeIds,
           status: filters.status as "published" | "unpublished" | ""
         });
+        
+        // Check if this response is still relevant
+        if (requestId !== requestIdRef.current) {
+          console.warn("[useProductData] ⚠️ Ignorando resposta stale, requestId:", requestId, "atual:", requestIdRef.current);
+          return;
+        }
+        
+        console.log("[useProductData] Resposta recebida requestId:", requestId, {
+          produtos: resp.products.length,
+          total: resp.totalCount,
+          erro: resp.error
+        });
+        
         fetchedProducts = resp.products;
         total = resp.totalCount;
         fetchError = resp.error;
       } else {
         const resp = await fetchProductsFromSupabase();
+        
+        // Check if this response is still relevant
+        if (requestId !== requestIdRef.current) {
+          console.warn("[useProductData] ⚠️ Ignorando resposta stale (não paginado), requestId:", requestId, "atual:", requestIdRef.current);
+          return;
+        }
+        
         fetchedProducts = resp.products;
         total = resp.products.length;
         fetchError = resp.error;
@@ -102,7 +133,7 @@ export const useProductData = (options: UseProductDataOptions = {}) => {
         throw new Error(fetchError);
       }
 
-      console.log("[useProductData] Produtos obtidos:", fetchedProducts.length, "Total:", total || fetchedProducts.length);
+      console.log("[useProductData] ✅ Produtos obtidos requestId:", requestId, "produtos:", fetchedProducts.length, "Total:", total || fetchedProducts.length);
       setProducts(fetchedProducts);
       setTotalCount(total);
       lastFetchTimeRef.current = Date.now();
@@ -112,25 +143,30 @@ export const useProductData = (options: UseProductDataOptions = {}) => {
     } catch (err: any) {
       console.error('[useProductData] Falha na conexão com Supabase:', err);
       setError(err.message || 'Falha ao conectar com o banco de dados');
+
+      // CORREÇÃO: Parar loop infinito após 3 tentativas
       if (retryCount < 3) {
         const nextRetryDelay = Math.pow(2, retryCount) * 1000;
-        console.warn(`[useProductData] Tentando reconectar em ${nextRetryDelay / 1000}s...`);
-        
+        console.warn(`[useProductData] Tentando reconectar em ${nextRetryDelay / 1000}s... (tentativa ${retryCount + 1}/3)`);
+
+        setRetryCount(prev => prev + 1);
+
         setTimeout(() => {
-          setRetryCount(prev => prev + 1);
           isFetchingRef.current = false;
-          fetchProducts();
+          fetchProducts(true); // Force retry
         }, nextRetryDelay);
-        
+
         toast({
           title: 'Reconectando ao banco de dados',
           description: `Tentativa ${retryCount + 1} de 3...`,
           variant: 'default',
         });
       } else {
+        console.error('[useProductData] ❌ LIMITE DE TENTATIVAS ATINGIDO. Parando reconexão.');
+        setRetryCount(0); // Reset para futuras tentativas manuais
         toast({
           title: 'Erro ao carregar produtos',
-          description: 'Não foi possível conectar ao banco após várias tentativas.',
+          description: 'Verifique sua conexão com a internet ou entre em contato com o suporte.',
           variant: 'destructive',
         });
       }
@@ -168,9 +204,10 @@ export const useProductData = (options: UseProductDataOptions = {}) => {
   // Recarrega ao mudar filtros e reseta para página 1
   useEffect(() => {
     if (paged) {
-      console.log("[useProductData] Filtros mudaram, recarregando página 1");
+      console.log("🚀 [useProductData] FILTROS MUDARAM, forçando recarga");
+      console.log("🚀 [useProductData] Filtros:", filters);
       setPage(1);
-      fetchProducts(true);
+      fetchProducts(true); // FORÇA a atualização
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [filters.search, filters.categoryId, filters.status, filters.subcategoryIds, filters.attributeIds]);

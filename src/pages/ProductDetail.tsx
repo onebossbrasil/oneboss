@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { useFetchProductBySlug } from "@/hooks/use-fetch-product-by-slug";
+import { useFetchProductById } from "@/hooks/use-fetch-product-by-id";
 import { Product } from "@/types/product";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
@@ -12,11 +12,11 @@ import FeaturedProductsSection from "@/components/FeaturedProductsSection";
 import { FeaturedProductProvider } from "@/contexts/product/FeaturedProductProvider";
 
 const ProductDetail = () => {
-  const { productSlug } = useParams<{ productSlug: string }>();
+  const { productId } = useParams<{ productId: string }>();
   const navigate = useNavigate();
   
-  // Buscar produto por slug amigável
-  const { product, isLoading, error } = useFetchProductBySlug(productSlug || null);
+  // Buscar produto por ID
+  const { product, isLoading, error } = useFetchProductById(productId || null);
 
   // Update page title when product changes
   useEffect(() => {

@@ -88,7 +88,6 @@ export const fetchProductsFromSupabase = async (): Promise<{ products: Product[]
       return {
         id: product.id,
         name: product.name,
-        slug: createProductSlug(product.name, product.id), // Gera slug automaticamente
         shortDescription: product.short_description || '',
         description: product.description || '',
         price: product.price_on_request ? null : (product.price ? parseFloat(product.price) : null),
@@ -154,9 +153,12 @@ export const fetchProductsPageFromSupabase = async (
     } = params;
     const offset = (page - 1) * pageSize;
     
-    console.log("[fetchProductsPageFromSupabase] Parâmetros recebidos:", {
+    console.log("🔍 [fetchProductsPageFromSupabase] ===== FUNÇÃO CHAMADA =====");
+    console.log("🔍 [fetchProductsPageFromSupabase] Parâmetros recebidos:", {
       page, pageSize, search, categoryId, subcategoryIds, attributeIds, status, offset
     });
+    console.log("🔍 [fetchProductsPageFromSupabase] categoryId type:", typeof categoryId, "value:", categoryId);
+    console.log("🔍 [fetchProductsPageFromSupabase] Will apply category filter?", !!categoryId);
 
     // Base query com contagem
     let query = supabase
@@ -171,8 +173,15 @@ export const fetchProductsPageFromSupabase = async (
       query = query.or(`name.ilike.%${search.trim()}%,short_description.ilike.%${search.trim()}%,description.ilike.%${search.trim()}%`);
     }
     if (categoryId) {
-      console.log("[fetchProductsPageFromSupabase] Aplicando filtro de categoria:", categoryId);
+      console.log("🎯 [fetchProductsPageFromSupabase] APLICANDO FILTRO DE CATEGORIA:", categoryId);
+      
+      // Tenta diferentes nomes de campo
+      console.log("🔍 [fetchProductsPageFromSupabase] Testando filtro com category_id");
       query = query.eq('category_id', categoryId);
+      
+      console.log("🎯 [fetchProductsPageFromSupabase] Query com filtro aplicado - category_id =", categoryId);
+    } else {
+      console.log("❌ [fetchProductsPageFromSupabase] SEM FILTRO DE CATEGORIA - categoryId está vazio");
     }
     if (subcategoryIds.length > 0) {
       console.log("[fetchProductsPageFromSupabase] Aplicando filtro de subcategorias:", subcategoryIds);
@@ -195,16 +204,27 @@ export const fetchProductsPageFromSupabase = async (
     console.log("[fetchProductsPageFromSupabase] Aplicando paginação:", { offset, limit: offset + pageSize - 1 });
 
     const productsResult = await fetchWithTimeout(Promise.resolve(query));
-    if (productsResult.error) throw productsResult.error;
+    if (productsResult.error) {
+      console.error("🚨 [fetchProductsPageFromSupabase] ERRO NA QUERY:", productsResult.error);
+      throw productsResult.error;
+    }
 
     const rows: any[] = Array.isArray(productsResult.data) ? productsResult.data : [];
     const totalCount: number = (productsResult as any).count ?? rows.length;
     
-    console.log("[fetchProductsPageFromSupabase] Resultado da query:", {
-      produtos_retornados: rows.length,
-      totalCount: totalCount,
-      count_property: (productsResult as any).count
-    });
+    console.log("📊 [fetchProductsPageFromSupabase] RESULTADO DA QUERY:");
+    console.log("📊 [fetchProductsPageFromSupabase] Produtos retornados:", rows.length);
+    console.log("📊 [fetchProductsPageFromSupabase] Total count:", totalCount);
+    console.log("📊 [fetchProductsPageFromSupabase] Filtros aplicados:", { categoryId, search, subcategoryIds, attributeIds, status });
+    
+    // Debug: mostrar alguns produtos para verificar se estão corretos
+    if (rows.length > 0) {
+      console.log("🔍 [fetchProductsPageFromSupabase] Primeiros produtos:", rows.slice(0, 3).map(p => ({ 
+        id: p.id, 
+        name: p.name, 
+        category_id: p.category_id 
+      })));
+    }
 
     // Buscar imagens apenas dos produtos desta página
     const productIds = rows.map((r: any) => r.id).filter(Boolean);
@@ -245,7 +265,6 @@ export const fetchProductsPageFromSupabase = async (
       return {
         id: product.id,
         name: product.name,
-        slug: createProductSlug(product.name, product.id), // Gera slug automaticamente
         shortDescription: product.short_description || '',
         description: product.description || '',
         price: priceOnRequest ? null : (product.price ? parseFloat(product.price) : null),

@@ -16,7 +16,7 @@ const ProductItem = ({ product }: ProductItemProps) => {
   return (
     <Link
       key={product.id}
-      to={`/produto/${product.slug || product.id}`}
+      to={`/produto/${product.id}`}
       className="product-card h-full block"
     >
       <div className="relative aspect-[4/3] rounded-t-lg overflow-hidden">

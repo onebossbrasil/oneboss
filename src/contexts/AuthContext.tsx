@@ -3,14 +3,27 @@ import { createContext, useContext, useEffect, useState, useMemo } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Session, User } from "@supabase/supabase-js";
 
+type SignUpData = {
+  full_name: string;
+  whatsapp: string;
+  estado: string;
+};
+
 type AuthContextType = {
   session: Session | null;
   user: User | null;
   isLoading: boolean;
   isAdmin: boolean;
-  signIn: (email: string, password: string) => Promise<{ 
+  signIn: (email: string, password: string) => Promise<{
     error: Error | null;
     data: Session | null;
+  }>;
+  signUp: (email: string, password: string, userData: SignUpData) => Promise<{
+    error: Error | null;
+    data: Session | null;
+  }>;
+  signInWithGoogle: () => Promise<{
+    error: Error | null;
   }>;
   signOut: () => Promise<void>;
 };
@@ -135,6 +148,80 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     }
   };
 
+  const signUp = async (email: string, password: string, userData: SignUpData) => {
+    try {
+      console.log("Attempting sign up with:", email);
+      setIsLoading(true);
+
+      const { data, error } = await supabase.auth.signUp({
+        email,
+        password,
+        options: {
+          data: {
+            full_name: userData.full_name,
+            whatsapp: userData.whatsapp,
+            estado: userData.estado,
+          },
+        },
+      });
+
+      if (error) {
+        console.error("Sign up error:", error.message);
+        return { data: null, error };
+      }
+
+      console.log("Sign up successful:", data.user?.email);
+
+      // Criar perfil na tabela profiles
+      if (data.user) {
+        const { error: profileError } = await supabase
+          .from('profiles')
+          .insert({
+            id: data.user.id,
+            full_name: userData.full_name,
+            whatsapp: userData.whatsapp,
+            estado: userData.estado,
+          });
+
+        if (profileError) {
+          console.error("Error creating profile:", profileError);
+        }
+      }
+
+      return { data: data.session, error: null };
+    } catch (error) {
+      console.error("Error signing up:", error);
+      return { data: null, error: error as Error };
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const signInWithGoogle = async () => {
+    try {
+      setIsLoading(true);
+
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider: 'google',
+        options: {
+          redirectTo: window.location.origin,
+        },
+      });
+
+      if (error) {
+        console.error("Google sign in error:", error.message);
+        return { error };
+      }
+
+      return { error: null };
+    } catch (error) {
+      console.error("Error signing in with Google:", error);
+      return { error: error as Error };
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   const signOut = async () => {
     try {
       setIsLoading(true);
@@ -157,6 +244,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     isLoading,
     isAdmin,
     signIn,
+    signUp,
+    signInWithGoogle,
     signOut,
   }), [session, user, isLoading, isAdmin]);
 

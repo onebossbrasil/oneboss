@@ -80,8 +80,11 @@ export const StoreProductProvider: React.FC<{ children: React.ReactNode }> = ({ 
 
   // Debug: Log dos filtros sempre que mudarem
   useEffect(() => {
-    console.log("[StoreProductProvider] Filtros atualizados:", serverFilters);
-  }, [serverFilters]);
+    console.log("[StoreProductProvider] ===== FILTROS SERVIDOR =====");
+    console.log("[StoreProductProvider] Filtros originais:", filters);
+    console.log("[StoreProductProvider] Filtros servidor:", serverFilters);
+    console.log("[StoreProductProvider] categoryId sendo enviado:", serverFilters.categoryId, "tipo:", typeof serverFilters.categoryId);
+  }, [serverFilters, filters]);
 
   // Calcula totalPages baseado no totalCount do servidor
   const totalPages = Math.max(1, Math.ceil(totalCount / productsPerPage));

@@ -17,7 +17,7 @@ const RelatedProductItem = ({ product }: RelatedProductItemProps) => {
 
   return (
     <CarouselItem key={product.id} className="mx-2 md:basis-1/2 lg:basis-1/3 xl:basis-1/4">
-      <Link to={`/produto/${product.slug || product.id}`} className="product-card h-full block">
+      <Link to={`/produto/${product.id}`} className="product-card h-full block">
         <div className="relative aspect-[4/3] rounded-t-lg overflow-hidden">
           <img
             src={product.imageUrl}

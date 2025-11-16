@@ -16,7 +16,6 @@ export function formatProductForGrid(product: Product, categories: CategoryType[
   
   return {
     id: product.id,
-    slug: product.slug, // Inclui o slug gerado
     name: product.name,
     price: priceOnRequest ? null : (product.price ?? null),
     salePrice: priceOnRequest ? null : (product.salePrice ?? null),

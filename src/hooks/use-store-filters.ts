@@ -11,21 +11,39 @@ export const useStoreFilters = () => {
   // Busca, filtro - prioriza slug da URL, depois parâmetro query
   const paramCategory = searchParams.get("category");
   const initCategoryId = useMemo(() => {
+    console.log(`[useStoreFilters] ===== RESOLVENDO CATEGORIA INICIAL =====`);
+    console.log(`[useStoreFilters] categorySlug da URL:`, categorySlug);
+    console.log(`[useStoreFilters] paramCategory da query:`, paramCategory);
+    console.log(`[useStoreFilters] Categorias disponíveis:`, categories.map(c => ({ id: c.id, name: c.name, value: c.value })));
+    
     // 1. Se há slug na URL, procura por slug
     if (categorySlug) {
       const categoryBySlug = categories.find(c => c.value === categorySlug);
-      if (categoryBySlug) return categoryBySlug.id;
+      console.log(`[useStoreFilters] Procurando categoria por slug "${categorySlug}":`, categoryBySlug);
+      if (categoryBySlug) {
+        console.log(`[useStoreFilters] ✅ Categoria encontrada por slug: ${categoryBySlug.name} (ID: ${categoryBySlug.id})`);
+        return categoryBySlug.id;
+      } else {
+        console.log(`[useStoreFilters] ❌ Categoria NÃO encontrada por slug: ${categorySlug}`);
+      }
     }
     
     // 2. Se há parâmetro query, procura por ID ou slug
     if (paramCategory) {
       const categoryById = categories.find(c => c.id === paramCategory);
-      if (categoryById) return categoryById.id;
+      if (categoryById) {
+        console.log(`[useStoreFilters] ✅ Categoria encontrada por ID: ${categoryById.name}`);
+        return categoryById.id;
+      }
       
       const categoryByValue = categories.find(c => c.value === paramCategory);
-      if (categoryByValue) return categoryByValue.id;
+      if (categoryByValue) {
+        console.log(`[useStoreFilters] ✅ Categoria encontrada por value: ${categoryByValue.name}`);
+        return categoryByValue.id;
+      }
     }
     
+    console.log(`[useStoreFilters] ❌ Nenhuma categoria encontrada, retornando vazio`);
     return "";
   }, [categories, categorySlug, paramCategory]);
 
@@ -47,6 +65,50 @@ export const useStoreFilters = () => {
       setSelectedAttributes([]);
     }
   }, [initCategoryId, selectedCategory]);
+
+  // Se há slug na URL mas não conseguiu resolver categoria, 
+  // aplica o filtro usando o ID da categoria correspondente
+  const effectiveCategoryId = useMemo(() => {
+    if (selectedCategory) {
+      console.log(`[useStoreFilters] ✅ Usando categoria resolvida: ${selectedCategory}`);
+      return selectedCategory;
+    }
+    
+    // Se há slug na URL mas não encontrou categoria no banco,
+    // tenta buscar produtos que contenham palavras-chave relacionadas
+    if (categorySlug && !selectedCategory) {
+      console.log(`[useStoreFilters] ⚠️  Slug "${categorySlug}" não encontrou categoria correspondente`);
+      
+      // Para alguns slugs conhecidos, tenta encontrar categoria similar
+      const slugMappings: { [key: string]: string[] } = {
+        'veiculos': ['automoveis', 'carros', 'veiculos', 'motos'],
+        'embarcacoes': ['barcos', 'lanchas', 'embarcacoes', 'nautico'],
+        'aeronaves': ['avioes', 'helicopteros', 'aeronaves', 'aereo'],
+        'imoveis': ['casas', 'apartamentos', 'imoveis', 'imobiliario'],
+        'relogios': ['relogios', 'watches', 'cronometros'],
+        'decoracao': ['decoracao', 'arte', 'design', 'objetos']
+      };
+      
+      const possibleTerms = slugMappings[categorySlug] || [];
+      
+      // Tenta encontrar uma categoria que contenha algum dos termos
+      for (const term of possibleTerms) {
+        const matchingCategory = categories.find(c => 
+          c.name.toLowerCase().includes(term) || 
+          c.value.toLowerCase().includes(term)
+        );
+        if (matchingCategory) {
+          console.log(`[useStoreFilters] ✅ Encontrou categoria similar: ${matchingCategory.name} para slug ${categorySlug}`);
+          return matchingCategory.id;
+        }
+      }
+      
+      console.log(`[useStoreFilters] ❌ Nenhuma categoria similar encontrada para ${categorySlug} - mostrando todos os produtos`);
+      return null;
+    }
+    
+    return null;
+  }, [selectedCategory, categorySlug]);
 
   // Debug: Log do estado atual sempre que mudar
   useEffect(() => {
@@ -173,7 +235,7 @@ export const useStoreFilters = () => {
   return {
     searchTerm,
     setSearchTerm,
-    selectedCategory,
+    selectedCategory: effectiveCategoryId, // Usa categoria efetiva
     selectedSubcategories,
     selectedAttributes,
     isMobileFiltersOpen,

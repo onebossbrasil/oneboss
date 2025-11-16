@@ -7,7 +7,6 @@ export type ProductImage = {
 export type Product = {
   id: string;
   name: string;
-  slug?: string; // Slug URL-amigável gerado do nome
   shortDescription?: string;
   description: string;
   price: number | null;
@@ -28,7 +27,6 @@ export type Product = {
 
 export type FormattedProduct = {
   id: string;
-  slug?: string; // Slug URL-amigável
   name: string;
   price: number | null;
   salePrice?: number | null;

@@ -1,3 +1,4 @@
+import React from "react";
 import { Link } from "react-router-dom";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { Card } from "@/components/ui/card";
@@ -8,42 +9,57 @@ const categoryData = [{
   title: "AUTOMÓVEIS",
   image: "/lovable-uploads/b105ff99-4dec-4198-839a-a2e4e3dc70e9.png",
   slug: "veiculos",
-  size: "full" as const
+  size: "full" as const,
+  fallbackSlugs: ["automoveis", "carros", "veiculos"] // Slugs alternativos
 }, {
   id: 2,
   title: "EMBARCAÇÕES",
   image: "/lovable-uploads/0117fa13-5bd6-4cff-9624-3f067a1761a6.png",
   slug: "embarcacoes",
-  size: "half" as const
+  size: "half" as const,
+  fallbackSlugs: ["embarcacoes", "barcos", "lanchas"]
 }, {
   id: 3,
   title: "AERONAVES",
   image: "/lovable-uploads/3b5c8e74-80cb-4b62-b27a-2ac9cbc286ab.png",
   slug: "aeronaves",
-  size: "half" as const
+  size: "half" as const,
+  fallbackSlugs: ["aeronaves", "avioes", "helicopteros"]
 }, {
   id: 4,
   title: "IMÓVEIS",
   image: "https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?auto=format&fit=crop&q=80&w=1200&h=600",
   slug: "imoveis",
-  size: "full" as const
+  size: "full" as const,
+  fallbackSlugs: ["imoveis", "casas", "apartamentos"]
 }, {
   id: 5,
   title: "RELÓGIOS",
   image: "https://images.unsplash.com/photo-1587836374828-4dbafa94cf0e?auto=format&fit=crop&q=80&w=1200&h=600",
   slug: "relogios",
-  size: "half" as const
+  size: "half" as const,
+  fallbackSlugs: ["relogios", "watches", "cronometros"]
 }, {
   id: 6,
   title: "DECORAÇÃO",
   image: "/lovable-uploads/9f54a112-58fa-494d-bea2-08df57c01fec.png",
   slug: "decoracao",
-  size: "half" as const
+  size: "half" as const,
+  fallbackSlugs: ["decoracao", "objetos-arte", "design"]
 }];
 
 const CategoryBanners = () => {
   const isMobile = useIsMobile();
   const { categories } = useCategories();
+  
+  // Debug: Log das categorias disponíveis
+  React.useEffect(() => {
+    console.log("[CategoryBanners] Categorias disponíveis no banco:", categories.map(c => ({ 
+      id: c.id, 
+      name: c.name, 
+      value: c.value 
+    })));
+  }, [categories]);
   return (
     <section className="py-6 md:py-8 bg-background relative overflow-hidden flex md:justify-center">
       {/* Decorative elements */}
@@ -63,10 +79,33 @@ const CategoryBanners = () => {
         
         <div className={`grid grid-cols-1 md:grid-cols-2 ${!isMobile ? "gap-4" : "gap-0"}`}>
           {categoryData.map(category => {
-            const cat = categories.find(c => c.value === category.slug);
+            // Buscar categoria no banco que corresponde ao slug ou fallbacks
+            let cat = categories.find(c => c.value === category.slug);
+            
+            // Se não encontrou, tenta os fallback slugs
+            if (!cat && category.fallbackSlugs) {
+              for (const fallback of category.fallbackSlugs) {
+                cat = categories.find(c => c.value === fallback);
+                if (cat) break;
+              }
+            }
+            
+            // Se ainda não encontrou, tenta buscar por nome similar
+            if (!cat) {
+              cat = categories.find(c => 
+                c.name.toLowerCase().includes(category.title.toLowerCase().split(' ')[0]) ||
+                category.title.toLowerCase().includes(c.name.toLowerCase())
+              );
+            }
+            
             const categorySlug = cat?.value || category.slug;
+            const linkUrl = cat ? `/loja/${categorySlug}` : '/loja'; // Se não encontrou categoria, vai para loja geral
+            
+            // Debug log para verificar o mapeamento
+            console.log(`[CategoryBanners] Banner: ${category.title}, slug original: ${category.slug}, categoria encontrada:`, cat?.name || "NÃO ENCONTRADA", `URL final: ${linkUrl}`);
+            
             return (
-              <Link key={category.id} to={`/loja/${categorySlug}`} className={`${isMobile ? "animate-slide-in-right" : category.size === "full" ? "md:col-span-2 animate-scale-in" : "animate-scale-in"} group relative overflow-hidden`}>
+              <Link key={category.id} to={linkUrl} className={`${isMobile ? "animate-slide-in-right" : category.size === "full" ? "md:col-span-2 animate-scale-in" : "animate-scale-in"} group relative overflow-hidden`}>
                 <div className="h-[300px] w-full relative">
                   {/* Full coverage background image */}
                   <img src={category.image} alt={category.title} className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" />

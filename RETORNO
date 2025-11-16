@@ -1,120 +1,1548 @@
-{search: '', categoryId: 'b84a7f64-5ec2-4c9c-a087-90bda94e62f3', subcategoryIds: Array(0), attributeIds: Array(0), status: 'published'}
-fetch-utils.ts:155 [fetchProductsPageFromSupabase] Parâmetros recebidos: {page: 1, pageSize: 12, search: '', categoryId: 'b84a7f64-5ec2-4c9c-a087-90bda94e62f3', subcategoryIds: Array(0), …}
-fetch-utils.ts:172 [fetchProductsPageFromSupabase] Aplicando filtro de categoria: b84a7f64-5ec2-4c9c-a087-90bda94e62f3
-fetch-utils.ts:184 [fetchProductsPageFromSupabase] Aplicando filtro published = true
-fetch-utils.ts:193 [fetchProductsPageFromSupabase] Aplicando paginação: {offset: 0, limit: 11}
-StoreProductProvider.tsx:153 StoreProductProvider rendering with 12 products, totalCount: 35 currentPage: 1
-use-product-filtering-server.ts:62 [ProductFilteringServer] ===== RESULTADO FINAL =====
-use-product-filtering-server.ts:63 [ProductFilteringServer] Produtos na página: 12, Total: 35, Página: 1/3
-FilterSidebar.tsx:88 [FilterSidebar] ===== CATEGORIA SELECIONADA =====
-FilterSidebar.tsx:89 [FilterSidebar] selectedCategory: b84a7f64-5ec2-4c9c-a087-90bda94e62f3
-FilterSidebar.tsx:90 [FilterSidebar] currentCategory: Decoração
-FilterSidebar.tsx:91 [FilterSidebar] visibleSubcategories count: 3
-FilterSidebar.tsx:92 [FilterSidebar] Total categories loaded: 6
-FilterSidebar.tsx:93 [FilterSidebar] Categories: (6) [{…}, {…}, {…}, {…}, {…}, {…}]
-fetch-utils.ts:201 [fetchProductsPageFromSupabase] Resultado da query: {produtos_retornados: 12, totalCount: 35, count_property: 35}
-category-counters.ts:127 [CategoryCounters] Dados brutos da query: []
-category-counters.ts:128 [CategoryCounters] Contadores de atributos obtidos: []
-FilterSidebar.tsx:88 [FilterSidebar] ===== CATEGORIA SELECIONADA =====
-FilterSidebar.tsx:89 [FilterSidebar] selectedCategory: b84a7f64-5ec2-4c9c-a087-90bda94e62f3
-FilterSidebar.tsx:90 [FilterSidebar] currentCategory: Decoração
-FilterSidebar.tsx:91 [FilterSidebar] visibleSubcategories count: 3
-FilterSidebar.tsx:92 [FilterSidebar] Total categories loaded: 6
-FilterSidebar.tsx:93 [FilterSidebar] Categories: (6) [{…}, {…}, {…}, {…}, {…}, {…}]
-category-counters.ts:127 [CategoryCounters] Dados brutos da query: []
-category-counters.ts:128 [CategoryCounters] Contadores de atributos obtidos: []
-useProductData.ts:105 [useProductData] Produtos obtidos: 12 Total: 35
-StoreProductProvider.tsx:153 StoreProductProvider rendering with 12 products, totalCount: 35 currentPage: 1
-use-product-filtering-server.ts:62 [ProductFilteringServer] ===== RESULTADO FINAL =====
-use-product-filtering-server.ts:63 [ProductFilteringServer] Produtos na página: 12, Total: 35, Página: 1/3
-FilterSidebar.tsx:88 [FilterSidebar] ===== CATEGORIA SELECIONADA =====
-FilterSidebar.tsx:89 [FilterSidebar] selectedCategory: b84a7f64-5ec2-4c9c-a087-90bda94e62f3
-FilterSidebar.tsx:90 [FilterSidebar] currentCategory: Decoração
-FilterSidebar.tsx:91 [FilterSidebar] visibleSubcategories count: 3
-FilterSidebar.tsx:92 [FilterSidebar] Total categories loaded: 6
-FilterSidebar.tsx:93 [FilterSidebar] Categories: (6) [{…}, {…}, {…}, {…}, {…}, {…}]
-useProductData.ts:146 [Diagnóstico Produtos]:
-useProductData.ts:148 [Produto] id=0d675257-5a22-4fed-a075-913fe2323440 nome=A IDADE, APENAS EM NÚMEROS published=true featured=false
-useProductData.ts:148 [Produto] id=dfc782bc-48d6-4e42-8ebd-89ffc7fa2a11 nome=A MELHOR FORMA DE VENCER O INIMIGO published=true featured=false
-useProductData.ts:148 [Produto] id=fadae9f5-206a-4218-a184-1d32ea7ef30b nome=A MELODIA DE DENTRO DA MINHA MENTE published=true featured=false
-useProductData.ts:148 [Produto] id=d40aa1dd-81bd-400d-a4e5-7d67ea7f7bb1 nome=A RESPOSTA QUE VEM DE DEUS published=true featured=false
-useProductData.ts:148 [Produto] id=41895433-0bf5-41b6-afca-2422a2a399eb nome=A TECNOLOGIA ARTÍSTICA published=true featured=false
-useProductData.ts:148 [Produto] id=dff9162e-9fcc-4a30-a8ef-b5f96869bc43 nome=BAD LION ll published=true featured=false
-useProductData.ts:148 [Produto] id=567e8e0e-2bbc-4974-b763-2676d2757225 nome=BLACK PANTHER published=true featured=false
-useProductData.ts:148 [Produto] id=c1db418e-6080-42e2-9976-505d90f35fba nome=COMO VOCÊ TEM CONTROLADO SUA MISSÃO? published=true featured=false
-useProductData.ts:148 [Produto] id=3c74b308-fd00-4d03-ad21-d1e7932049cd nome=CULTIVANDO O FUTURO published=true featured=false
-useProductData.ts:148 [Produto] id=8c58fbe5-db02-4d01-a715-a5ac094e9d40 nome=DEPENDA DE DEUS published=true featured=false
-useProductData.ts:148 [Produto] id=b87f7d84-2af5-46dc-90b2-e00f12788c30 nome=ENTRE RASGOS E CORES, A HERANÇA FAMILIAR published=true featured=false
-useProductData.ts:148 [Produto] id=10b791bd-836d-4772-9d98-932864eb5b7b nome=FINANCIAL BEAR published=true featured=false
-use-store-filters.ts:76 [useStoreFilters] ===== SUBCATEGORIA TOGGLE =====
-use-store-filters.ts:77 [useStoreFilters] Subcategoria: {id: 'fca289d5-28f2-43f4-9539-1573667602a1', name: 'Obras de Arte', type: 'obras-arte', attributes: Array(0)}
-use-store-filters.ts:80 [useStoreFilters] Estado anterior subcategorias: [{…}]
-use-store-filters.ts:81 [useStoreFilters] Subcategoria clicada: {id: 'fca289d5-28f2-43f4-9539-1573667602a1', name: 'Obras de Arte', type: 'obras-arte', attributes: Array(0)}
-use-store-filters.ts:84 [useStoreFilters] Já selecionada?: true
-use-store-filters.ts:90 [useStoreFilters] Nova seleção de subcategorias: []
-use-store-filters.ts:99 [useStoreFilters] Atributos removidos da subcategoria Obras de Arte: []
-use-product-filtering-server.ts:34 [ProductFilteringServer] ===== SINCRONIZANDO FILTROS =====
-use-product-filtering-server.ts:35 [ProductFilteringServer] selectedSubcategories: []
-use-product-filtering-server.ts:36 [ProductFilteringServer] selectedAttributes: []
-use-product-filtering-server.ts:41 [ProductFilteringServer] subcategoryIds processados: []
-use-product-filtering-server.ts:42 [ProductFilteringServer] attributeIds processados: []
-StoreProductProvider.tsx:86 [StoreProductProvider] Atualizando filtros: {search: '', categoryId: 'b84a7f64-5ec2-4c9c-a087-90bda94e62f3', subcategoryIds: Array(0), attributeIds: Array(0), sortOption: 'relevance'}
-StoreProductProvider.tsx:92 [StoreProductProvider] Filtros atualizados: {search: '', categoryId: 'b84a7f64-5ec2-4c9c-a087-90bda94e62f3', subcategoryIds: Array(0), attributeIds: Array(0), sortOption: 'relevance'}
-use-product-filtering-server.ts:62 [ProductFilteringServer] ===== RESULTADO FINAL =====
-use-product-filtering-server.ts:63 [ProductFilteringServer] Produtos na página: 12, Total: 35, Página: 1/3
-FilterSidebar.tsx:88 [FilterSidebar] ===== CATEGORIA SELECIONADA =====
-FilterSidebar.tsx:89 [FilterSidebar] selectedCategory: b84a7f64-5ec2-4c9c-a087-90bda94e62f3
-FilterSidebar.tsx:90 [FilterSidebar] currentCategory: Decoração
-FilterSidebar.tsx:91 [FilterSidebar] visibleSubcategories count: 3
-FilterSidebar.tsx:92 [FilterSidebar] Total categories loaded: 6
-FilterSidebar.tsx:93 [FilterSidebar] Categories: (6) [{…}, {…}, {…}, {…}, {…}, {…}]
-use-store-filters.ts:26 [useStoreFilters] ===== ESTADO ATUAL DOS FILTROS =====
-use-store-filters.ts:27 [useStoreFilters] Estados: {searchTerm: '', selectedCategory: 'b84a7f64-5ec2-4c9c-a087-90bda94e62f3', selectedSubcategoriesCount: 0, selectedAttributesCount: 0, currentPage: 1, …}
-StoreProductProvider.tsx:153 StoreProductProvider rendering with 12 products, totalCount: 35 currentPage: 1
-use-product-filtering-server.ts:62 [ProductFilteringServer] ===== RESULTADO FINAL =====
-use-product-filtering-server.ts:63 [ProductFilteringServer] Produtos na página: 12, Total: 35, Página: 1/3
-FilterSidebar.tsx:88 [FilterSidebar] ===== CATEGORIA SELECIONADA =====
-FilterSidebar.tsx:89 [FilterSidebar] selectedCategory: b84a7f64-5ec2-4c9c-a087-90bda94e62f3
-FilterSidebar.tsx:90 [FilterSidebar] currentCategory: Decoração
-FilterSidebar.tsx:91 [FilterSidebar] visibleSubcategories count: 3
-FilterSidebar.tsx:92 [FilterSidebar] Total categories loaded: 6
-FilterSidebar.tsx:93 [FilterSidebar] Categories: (6) [{…}, {…}, {…}, {…}, {…}, {…}]
-useProductData.ts:171 [useProductData] Filtros mudaram, recarregando página 1
-useProductData.ts:70 [useProductData] Buscando produtos, paged: true filtros: {search: '', categoryId: 'b84a7f64-5ec2-4c9c-a087-90bda94e62f3', subcategoryIds: Array(0), attributeIds: Array(0), status: 'published'}
-fetch-utils.ts:155 [fetchProductsPageFromSupabase] Parâmetros recebidos: {page: 1, pageSize: 12, search: '', categoryId: 'b84a7f64-5ec2-4c9c-a087-90bda94e62f3', subcategoryIds: Array(0), …}
-fetch-utils.ts:172 [fetchProductsPageFromSupabase] Aplicando filtro de categoria: b84a7f64-5ec2-4c9c-a087-90bda94e62f3
-fetch-utils.ts:184 [fetchProductsPageFromSupabase] Aplicando filtro published = true
-fetch-utils.ts:193 [fetchProductsPageFromSupabase] Aplicando paginação: {offset: 0, limit: 11}
-StoreProductProvider.tsx:153 StoreProductProvider rendering with 12 products, totalCount: 35 currentPage: 1
-use-product-filtering-server.ts:62 [ProductFilteringServer] ===== RESULTADO FINAL =====
-use-product-filtering-server.ts:63 [ProductFilteringServer] Produtos na página: 12, Total: 35, Página: 1/3
-FilterSidebar.tsx:88 [FilterSidebar] ===== CATEGORIA SELECIONADA =====
-FilterSidebar.tsx:89 [FilterSidebar] selectedCategory: b84a7f64-5ec2-4c9c-a087-90bda94e62f3
-FilterSidebar.tsx:90 [FilterSidebar] currentCategory: Decoração
-FilterSidebar.tsx:91 [FilterSidebar] visibleSubcategories count: 3
-FilterSidebar.tsx:92 [FilterSidebar] Total categories loaded: 6
-FilterSidebar.tsx:93 [FilterSidebar] Categories: (6) [{…}, {…}, {…}, {…}, {…}, {…}]
-fetch-utils.ts:201 [fetchProductsPageFromSupabase] Resultado da query: {produtos_retornados: 12, totalCount: 35, count_property: 35}
-useProductData.ts:105 [useProductData] Produtos obtidos: 12 Total: 35
-StoreProductProvider.tsx:153 StoreProductProvider rendering with 12 products, totalCount: 35 currentPage: 1
-use-product-filtering-server.ts:62 [ProductFilteringServer] ===== RESULTADO FINAL =====
-use-product-filtering-server.ts:63 [ProductFilteringServer] Produtos na página: 12, Total: 35, Página: 1/3
-FilterSidebar.tsx:88 [FilterSidebar] ===== CATEGORIA SELECIONADA =====
-FilterSidebar.tsx:89 [FilterSidebar] selectedCategory: b84a7f64-5ec2-4c9c-a087-90bda94e62f3
-FilterSidebar.tsx:90 [FilterSidebar] currentCategory: Decoração
-FilterSidebar.tsx:91 [FilterSidebar] visibleSubcategories count: 3
-FilterSidebar.tsx:92 [FilterSidebar] Total categories loaded: 6
-FilterSidebar.tsx:93 [FilterSidebar] Categories: (6) [{…}, {…}, {…}, {…}, {…}, {…}]
-useProductData.ts:146 [Diagnóstico Produtos]:
-useProductData.ts:148 [Produto] id=0d675257-5a22-4fed-a075-913fe2323440 nome=A IDADE, APENAS EM NÚMEROS published=true featured=false
-useProductData.ts:148 [Produto] id=dfc782bc-48d6-4e42-8ebd-89ffc7fa2a11 nome=A MELHOR FORMA DE VENCER O INIMIGO published=true featured=false
-useProductData.ts:148 [Produto] id=fadae9f5-206a-4218-a184-1d32ea7ef30b nome=A MELODIA DE DENTRO DA MINHA MENTE published=true featured=false
-useProductData.ts:148 [Produto] id=d40aa1dd-81bd-400d-a4e5-7d67ea7f7bb1 nome=A RESPOSTA QUE VEM DE DEUS published=true featured=false
-useProductData.ts:148 [Produto] id=41895433-0bf5-41b6-afca-2422a2a399eb nome=A TECNOLOGIA ARTÍSTICA published=true featured=false
-useProductData.ts:148 [Produto] id=dff9162e-9fcc-4a30-a8ef-b5f96869bc43 nome=BAD LION ll published=true featured=false
-useProductData.ts:148 [Produto] id=567e8e0e-2bbc-4974-b763-2676d2757225 nome=BLACK PANTHER published=true featured=false
-useProductData.ts:148 [Produto] id=c1db418e-6080-42e2-9976-505d90f35fba nome=COMO VOCÊ TEM CONTROLADO SUA MISSÃO? published=true featured=false
-useProductData.ts:148 [Produto] id=3c74b308-fd00-4d03-ad21-d1e7932049cd nome=CULTIVANDO O FUTURO published=true featured=false
-useProductData.ts:148 [Produto] id=8c58fbe5-db02-4d01-a715-a5ac094e9d40 nome=DEPENDA DE DEUS published=true featured=false
-useProductData.ts:148 [Produto] id=b87f7d84-2af5-46dc-90b2-e00f12788c30 nome=ENTRE RASGOS E CORES, A HERANÇA FAMILIAR published=true featured=false
-useProductData.ts:148 [Produto] id=10b791bd-836d-4772-9d98-932864eb5b7b nome=FINANCIAL BEAR published=true featured=false
+[
+  {
+    "schema": "auth",
+    "table_name": "audit_log_entries",
+    "owner": "supabase_auth_admin"
+  },
+  {
+    "schema": "auth",
+    "table_name": "flow_state",
+    "owner": "supabase_auth_admin"
+  },
+  {
+    "schema": "auth",
+    "table_name": "identities",
+    "owner": "supabase_auth_admin"
+  },
+  {
+    "schema": "auth",
+    "table_name": "instances",
+    "owner": "supabase_auth_admin"
+  },
+  {
+    "schema": "auth",
+    "table_name": "mfa_amr_claims",
+    "owner": "supabase_auth_admin"
+  },
+  {
+    "schema": "auth",
+    "table_name": "mfa_challenges",
+    "owner": "supabase_auth_admin"
+  },
+  {
+    "schema": "auth",
+    "table_name": "mfa_factors",
+    "owner": "supabase_auth_admin"
+  },
+  {
+    "schema": "auth",
+    "table_name": "one_time_tokens",
+    "owner": "supabase_auth_admin"
+  },
+  {
+    "schema": "auth",
+    "table_name": "refresh_tokens",
+    "owner": "supabase_auth_admin"
+  },
+  {
+    "schema": "auth",
+    "table_name": "saml_providers",
+    "owner": "supabase_auth_admin"
+  },
+  {
+    "schema": "auth",
+    "table_name": "saml_relay_states",
+    "owner": "supabase_auth_admin"
+  },
+  {
+    "schema": "auth",
+    "table_name": "schema_migrations",
+    "owner": "supabase_auth_admin"
+  },
+  {
+    "schema": "auth",
+    "table_name": "sessions",
+    "owner": "supabase_auth_admin"
+  },
+  {
+    "schema": "auth",
+    "table_name": "sso_domains",
+    "owner": "supabase_auth_admin"
+  },
+  {
+    "schema": "auth",
+    "table_name": "sso_providers",
+    "owner": "supabase_auth_admin"
+  },
+  {
+    "schema": "auth",
+    "table_name": "users",
+    "owner": "supabase_auth_admin"
+  },
+  {
+    "schema": "public",
+    "table_name": "_user_email",
+    "owner": "postgres"
+  },
+  {
+    "schema": "public",
+    "table_name": "admin_permissions",
+    "owner": "postgres"
+  },
+  {
+    "schema": "public",
+    "table_name": "attributes",
+    "owner": "postgres"
+  },
+  {
+    "schema": "public",
+    "table_name": "categories",
+    "owner": "postgres"
+  },
+  {
+    "schema": "public",
+    "table_name": "leads",
+    "owner": "postgres"
+  },
+  {
+    "schema": "public",
+    "table_name": "newsletter_subscribers",
+    "owner": "postgres"
+  },
+  {
+    "schema": "public",
+    "table_name": "partners",
+    "owner": "postgres"
+  },
+  {
+    "schema": "public",
+    "table_name": "product_images",
+    "owner": "postgres"
+  },
+  {
+    "schema": "public",
+    "table_name": "products",
+    "owner": "postgres"
+  },
+  {
+    "schema": "public",
+    "table_name": "profiles",
+    "owner": "postgres"
+  },
+  {
+    "schema": "public",
+    "table_name": "subcategories",
+    "owner": "postgres"
+  },
+  {
+    "schema": "storage",
+    "table_name": "buckets",
+    "owner": "supabase_storage_admin"
+  },
+  {
+    "schema": "storage",
+    "table_name": "buckets_analytics",
+    "owner": "supabase_storage_admin"
+  },
+  {
+    "schema": "storage",
+    "table_name": "migrations",
+    "owner": "supabase_storage_admin"
+  },
+  {
+    "schema": "storage",
+    "table_name": "objects",
+    "owner": "supabase_storage_admin"
+  },
+  {
+    "schema": "storage",
+    "table_name": "prefixes",
+    "owner": "supabase_storage_admin"
+  },
+  {
+    "schema": "storage",
+    "table_name": "s3_multipart_uploads",
+    "owner": "supabase_storage_admin"
+  },
+  {
+    "schema": "storage",
+    "table_name": "s3_multipart_uploads_parts",
+    "owner": "supabase_storage_admin"
+  }
+]
+
+
+[
+  {
+    "column_name": "instance_id",
+    "data_type": "uuid",
+    "character_maximum_length": null,
+    "is_nullable": "YES",
+    "column_default": null
+  },
+  {
+    "column_name": "id",
+    "data_type": "uuid",
+    "character_maximum_length": null,
+    "is_nullable": "NO",
+    "column_default": null
+  },
+  {
+    "column_name": "aud",
+    "data_type": "character varying",
+    "character_maximum_length": 255,
+    "is_nullable": "YES",
+    "column_default": null
+  },
+  {
+    "column_name": "role",
+    "data_type": "character varying",
+    "character_maximum_length": 255,
+    "is_nullable": "YES",
+    "column_default": null
+  },
+  {
+    "column_name": "email",
+    "data_type": "character varying",
+    "character_maximum_length": 255,
+    "is_nullable": "YES",
+    "column_default": null
+  },
+  {
+    "column_name": "encrypted_password",
+    "data_type": "character varying",
+    "character_maximum_length": 255,
+    "is_nullable": "YES",
+    "column_default": null
+  },
+  {
+    "column_name": "email_confirmed_at",
+    "data_type": "timestamp with time zone",
+    "character_maximum_length": null,
+    "is_nullable": "YES",
+    "column_default": null
+  },
+  {
+    "column_name": "invited_at",
+    "data_type": "timestamp with time zone",
+    "character_maximum_length": null,
+    "is_nullable": "YES",
+    "column_default": null
+  },
+  {
+    "column_name": "confirmation_token",
+    "data_type": "character varying",
+    "character_maximum_length": 255,
+    "is_nullable": "YES",
+    "column_default": null
+  },
+  {
+    "column_name": "confirmation_sent_at",
+    "data_type": "timestamp with time zone",
+    "character_maximum_length": null,
+    "is_nullable": "YES",
+    "column_default": null
+  },
+  {
+    "column_name": "recovery_token",
+    "data_type": "character varying",
+    "character_maximum_length": 255,
+    "is_nullable": "YES",
+    "column_default": null
+  },
+  {
+    "column_name": "recovery_sent_at",
+    "data_type": "timestamp with time zone",
+    "character_maximum_length": null,
+    "is_nullable": "YES",
+    "column_default": null
+  },
+  {
+    "column_name": "email_change_token_new",
+    "data_type": "character varying",
+    "character_maximum_length": 255,
+    "is_nullable": "YES",
+    "column_default": null
+  },
+  {
+    "column_name": "email_change",
+    "data_type": "character varying",
+    "character_maximum_length": 255,
+    "is_nullable": "YES",
+    "column_default": null
+  },
+  {
+    "column_name": "email_change_sent_at",
+    "data_type": "timestamp with time zone",
+    "character_maximum_length": null,
+    "is_nullable": "YES",
+    "column_default": null
+  },
+  {
+    "column_name": "last_sign_in_at",
+    "data_type": "timestamp with time zone",
+    "character_maximum_length": null,
+    "is_nullable": "YES",
+    "column_default": null
+  },
+  {
+    "column_name": "raw_app_meta_data",
+    "data_type": "jsonb",
+    "character_maximum_length": null,
+    "is_nullable": "YES",
+    "column_default": null
+  },
+  {
+    "column_name": "raw_user_meta_data",
+    "data_type": "jsonb",
+    "character_maximum_length": null,
+    "is_nullable": "YES",
+    "column_default": null
+  },
+  {
+    "column_name": "is_super_admin",
+    "data_type": "boolean",
+    "character_maximum_length": null,
+    "is_nullable": "YES",
+    "column_default": null
+  },
+  {
+    "column_name": "created_at",
+    "data_type": "timestamp with time zone",
+    "character_maximum_length": null,
+    "is_nullable": "YES",
+    "column_default": null
+  },
+  {
+    "column_name": "updated_at",
+    "data_type": "timestamp with time zone",
+    "character_maximum_length": null,
+    "is_nullable": "YES",
+    "column_default": null
+  },
+  {
+    "column_name": "phone",
+    "data_type": "text",
+    "character_maximum_length": null,
+    "is_nullable": "YES",
+    "column_default": "NULL::character varying"
+  },
+  {
+    "column_name": "phone_confirmed_at",
+    "data_type": "timestamp with time zone",
+    "character_maximum_length": null,
+    "is_nullable": "YES",
+    "column_default": null
+  },
+  {
+    "column_name": "phone_change",
+    "data_type": "text",
+    "character_maximum_length": null,
+    "is_nullable": "YES",
+    "column_default": "''::character varying"
+  },
+  {
+    "column_name": "phone_change_token",
+    "data_type": "character varying",
+    "character_maximum_length": 255,
+    "is_nullable": "YES",
+    "column_default": "''::character varying"
+  },
+  {
+    "column_name": "phone_change_sent_at",
+    "data_type": "timestamp with time zone",
+    "character_maximum_length": null,
+    "is_nullable": "YES",
+    "column_default": null
+  },
+  {
+    "column_name": "confirmed_at",
+    "data_type": "timestamp with time zone",
+    "character_maximum_length": null,
+    "is_nullable": "YES",
+    "column_default": null
+  },
+  {
+    "column_name": "email_change_token_current",
+    "data_type": "character varying",
+    "character_maximum_length": 255,
+    "is_nullable": "YES",
+    "column_default": "''::character varying"
+  },
+  {
+    "column_name": "email_change_confirm_status",
+    "data_type": "smallint",
+    "character_maximum_length": null,
+    "is_nullable": "YES",
+    "column_default": "0"
+  },
+  {
+    "column_name": "banned_until",
+    "data_type": "timestamp with time zone",
+    "character_maximum_length": null,
+    "is_nullable": "YES",
+    "column_default": null
+  },
+  {
+    "column_name": "reauthentication_token",
+    "data_type": "character varying",
+    "character_maximum_length": 255,
+    "is_nullable": "YES",
+    "column_default": "''::character varying"
+  },
+  {
+    "column_name": "reauthentication_sent_at",
+    "data_type": "timestamp with time zone",
+    "character_maximum_length": null,
+    "is_nullable": "YES",
+    "column_default": null
+  },
+  {
+    "column_name": "is_sso_user",
+    "data_type": "boolean",
+    "character_maximum_length": null,
+    "is_nullable": "NO",
+    "column_default": "false"
+  },
+  {
+    "column_name": "deleted_at",
+    "data_type": "timestamp with time zone",
+    "character_maximum_length": null,
+    "is_nullable": "YES",
+    "column_default": null
+  },
+  {
+    "column_name": "is_anonymous",
+    "data_type": "boolean",
+    "character_maximum_length": null,
+    "is_nullable": "NO",
+    "column_default": "false"
+  }
+]
+
+
+[
+  {
+    "column_name": "id",
+    "data_type": "uuid",
+    "character_maximum_length": null,
+    "is_nullable": "NO",
+    "column_default": null
+  },
+  {
+    "column_name": "email",
+    "data_type": "text",
+    "character_maximum_length": null,
+    "is_nullable": "YES",
+    "column_default": null
+  }
+]
+
+
+[
+  {
+    "table_name": "_user_email",
+    "columns": "email (character varying)"
+  },
+  {
+    "table_name": "admin_permissions",
+    "columns": "id (uuid), email (text), role (text), created_at (timestamp with time zone)"
+  },
+  {
+    "table_name": "attributes",
+    "columns": "id (uuid), subcategory_id (uuid), attribute (text), created_at (timestamp with time zone)"
+  },
+  {
+    "table_name": "categories",
+    "columns": "id (uuid), name (text), value (text), created_at (timestamp with time zone)"
+  },
+  {
+    "table_name": "leads",
+    "columns": "id (uuid), name (text), email (text), phone (text), message (text), product_id (uuid), status (text), created_at (timestamp with time zone)"
+  },
+  {
+    "table_name": "newsletter_subscribers",
+    "columns": "id (uuid), email (text), subscribed_at (timestamp with time zone)"
+  },
+  {
+    "table_name": "partners",
+    "columns": "id (uuid), name (text), description (text), banner_image_url (text), logo_url (text), alt (text), link (text), order_index (integer), visible (boolean), created_at (timestamp with time zone)"
+  },
+  {
+    "table_name": "product_images",
+    "columns": "id (uuid), product_id (uuid), url (text), sort_order (integer)"
+  },
+  {
+    "table_name": "products",
+    "columns": "id (uuid), name (text), price (numeric), description (text), category_id (uuid), featured (boolean), stock_quantity (integer), created_at (timestamp with time zone), updated_at (timestamp with time zone), published (boolean), short_description (text), sale_price (numeric), subcategory_id (uuid), attribute_id (uuid), price_on_request (boolean)"
+  },
+  {
+    "table_name": "profiles",
+    "columns": "id (uuid), email (text)"
+  },
+  {
+    "table_name": "subcategories",
+    "columns": "id (uuid), category_id (uuid), name (text), type (text), created_at (timestamp with time zone)"
+  }
+]
+
+
+[
+  {
+    "schemaname": "public",
+    "tablename": "_user_email",
+    "policyname": "Usuário só pode atualizar o próprio email",
+    "permissive": "PERMISSIVE",
+    "roles": "{public}",
+    "cmd": "UPDATE",
+    "qual": "((email)::text = (( SELECT users.email\n   FROM auth.users\n  WHERE (users.id = auth.uid())))::text)",
+    "with_check": null
+  },
+  {
+    "schemaname": "public",
+    "tablename": "_user_email",
+    "policyname": "Usuário só pode deletar o próprio email",
+    "permissive": "PERMISSIVE",
+    "roles": "{public}",
+    "cmd": "DELETE",
+    "qual": "((email)::text = (( SELECT users.email\n   FROM auth.users\n  WHERE (users.id = auth.uid())))::text)",
+    "with_check": null
+  },
+  {
+    "schemaname": "public",
+    "tablename": "_user_email",
+    "policyname": "Usuário só pode inserir o próprio email",
+    "permissive": "PERMISSIVE",
+    "roles": "{public}",
+    "cmd": "INSERT",
+    "qual": null,
+    "with_check": "((email)::text = (( SELECT users.email\n   FROM auth.users\n  WHERE (users.id = auth.uid())))::text)"
+  },
+  {
+    "schemaname": "public",
+    "tablename": "_user_email",
+    "policyname": "Usuário só pode ler o próprio email",
+    "permissive": "PERMISSIVE",
+    "roles": "{public}",
+    "cmd": "SELECT",
+    "qual": "((email)::text = (( SELECT users.email\n   FROM auth.users\n  WHERE (users.id = auth.uid())))::text)",
+    "with_check": null
+  },
+  {
+    "schemaname": "public",
+    "tablename": "admin_permissions",
+    "policyname": "Admins can delete admin_permissions",
+    "permissive": "PERMISSIVE",
+    "roles": "{public}",
+    "cmd": "DELETE",
+    "qual": "current_user_is_admin()",
+    "with_check": null
+  },
+  {
+    "schemaname": "public",
+    "tablename": "admin_permissions",
+    "policyname": "Admins can do anything with admin_permissions",
+    "permissive": "PERMISSIVE",
+    "roles": "{public}",
+    "cmd": "ALL",
+    "qual": "is_current_user_admin()",
+    "with_check": "is_current_user_admin()"
+  },
+  {
+    "schemaname": "public",
+    "tablename": "admin_permissions",
+    "policyname": "Admins can insert admin_permissions",
+    "permissive": "PERMISSIVE",
+    "roles": "{public}",
+    "cmd": "INSERT",
+    "qual": null,
+    "with_check": "current_user_is_admin()"
+  },
+  {
+    "schemaname": "public",
+    "tablename": "admin_permissions",
+    "policyname": "Admins can select admin_permissions",
+    "permissive": "PERMISSIVE",
+    "roles": "{public}",
+    "cmd": "SELECT",
+    "qual": "current_user_is_admin()",
+    "with_check": null
+  },
+  {
+    "schemaname": "public",
+    "tablename": "admin_permissions",
+    "policyname": "Admins can update admin_permissions",
+    "permissive": "PERMISSIVE",
+    "roles": "{public}",
+    "cmd": "UPDATE",
+    "qual": "current_user_is_admin()",
+    "with_check": null
+  },
+  {
+    "schemaname": "public",
+    "tablename": "attributes",
+    "policyname": "Administradores podem gerenciar valores de subcategorias",
+    "permissive": "PERMISSIVE",
+    "roles": "{public}",
+    "cmd": "ALL",
+    "qual": "current_user_is_admin()",
+    "with_check": "current_user_is_admin()"
+  },
+  {
+    "schemaname": "public",
+    "tablename": "attributes",
+    "policyname": "Admins can delete subcategory_values",
+    "permissive": "PERMISSIVE",
+    "roles": "{public}",
+    "cmd": "DELETE",
+    "qual": "current_user_is_admin()",
+    "with_check": null
+  },
+  {
+    "schemaname": "public",
+    "tablename": "attributes",
+    "policyname": "Admins can do anything with subcategory values",
+    "permissive": "PERMISSIVE",
+    "roles": "{public}",
+    "cmd": "ALL",
+    "qual": "is_current_user_admin()",
+    "with_check": "is_current_user_admin()"
+  },
+  {
+    "schemaname": "public",
+    "tablename": "attributes",
+    "policyname": "Admins can insert subcategory_values",
+    "permissive": "PERMISSIVE",
+    "roles": "{public}",
+    "cmd": "INSERT",
+    "qual": null,
+    "with_check": "current_user_is_admin()"
+  },
+  {
+    "schemaname": "public",
+    "tablename": "attributes",
+    "policyname": "Admins can select subcategory_values",
+    "permissive": "PERMISSIVE",
+    "roles": "{public}",
+    "cmd": "SELECT",
+    "qual": "current_user_is_admin()",
+    "with_check": null
+  },
+  {
+    "schemaname": "public",
+    "tablename": "attributes",
+    "policyname": "Admins can update subcategory_values",
+    "permissive": "PERMISSIVE",
+    "roles": "{public}",
+    "cmd": "UPDATE",
+    "qual": "current_user_is_admin()",
+    "with_check": null
+  },
+  {
+    "schemaname": "public",
+    "tablename": "attributes",
+    "policyname": "Anyone can view subcategory values",
+    "permissive": "PERMISSIVE",
+    "roles": "{public}",
+    "cmd": "SELECT",
+    "qual": "true",
+    "with_check": null
+  },
+  {
+    "schemaname": "public",
+    "tablename": "attributes",
+    "policyname": "Modificável apenas por administradores",
+    "permissive": "PERMISSIVE",
+    "roles": "{public}",
+    "cmd": "ALL",
+    "qual": "is_current_user_admin()",
+    "with_check": null
+  },
+  {
+    "schemaname": "public",
+    "tablename": "attributes",
+    "policyname": "Subcategory values are viewable by everyone",
+    "permissive": "PERMISSIVE",
+    "roles": "{public}",
+    "cmd": "SELECT",
+    "qual": "true",
+    "with_check": null
+  },
+  {
+    "schemaname": "public",
+    "tablename": "attributes",
+    "policyname": "Usuários podem ver valores de subcategorias",
+    "permissive": "PERMISSIVE",
+    "roles": "{public}",
+    "cmd": "SELECT",
+    "qual": "true",
+    "with_check": null
+  },
+  {
+    "schemaname": "public",
+    "tablename": "categories",
+    "policyname": "Administradores podem gerenciar categorias",
+    "permissive": "PERMISSIVE",
+    "roles": "{public}",
+    "cmd": "ALL",
+    "qual": "current_user_is_admin()",
+    "with_check": "current_user_is_admin()"
+  },
+  {
+    "schemaname": "public",
+    "tablename": "categories",
+    "policyname": "Admins can delete categories",
+    "permissive": "PERMISSIVE",
+    "roles": "{public}",
+    "cmd": "DELETE",
+    "qual": "current_user_is_admin()",
+    "with_check": null
+  },
+  {
+    "schemaname": "public",
+    "tablename": "categories",
+    "policyname": "Admins can do anything with categories",
+    "permissive": "PERMISSIVE",
+    "roles": "{public}",
+    "cmd": "ALL",
+    "qual": "is_current_user_admin()",
+    "with_check": "is_current_user_admin()"
+  },
+  {
+    "schemaname": "public",
+    "tablename": "categories",
+    "policyname": "Admins can insert categories",
+    "permissive": "PERMISSIVE",
+    "roles": "{public}",
+    "cmd": "INSERT",
+    "qual": null,
+    "with_check": "current_user_is_admin()"
+  },
+  {
+    "schemaname": "public",
+    "tablename": "categories",
+    "policyname": "Admins can select categories",
+    "permissive": "PERMISSIVE",
+    "roles": "{public}",
+    "cmd": "SELECT",
+    "qual": "current_user_is_admin()",
+    "with_check": null
+  },
+  {
+    "schemaname": "public",
+    "tablename": "categories",
+    "policyname": "Admins can update categories",
+    "permissive": "PERMISSIVE",
+    "roles": "{public}",
+    "cmd": "UPDATE",
+    "qual": "current_user_is_admin()",
+    "with_check": null
+  },
+  {
+    "schemaname": "public",
+    "tablename": "categories",
+    "policyname": "Anyone can view categories",
+    "permissive": "PERMISSIVE",
+    "roles": "{public}",
+    "cmd": "SELECT",
+    "qual": "true",
+    "with_check": null
+  },
+  {
+    "schemaname": "public",
+    "tablename": "categories",
+    "policyname": "Categories are viewable by everyone",
+    "permissive": "PERMISSIVE",
+    "roles": "{public}",
+    "cmd": "SELECT",
+    "qual": "true",
+    "with_check": null
+  },
+  {
+    "schemaname": "public",
+    "tablename": "categories",
+    "policyname": "Modificável apenas por administradores",
+    "permissive": "PERMISSIVE",
+    "roles": "{public}",
+    "cmd": "ALL",
+    "qual": "is_current_user_admin()",
+    "with_check": null
+  },
+  {
+    "schemaname": "public",
+    "tablename": "categories",
+    "policyname": "Usuários podem ver categorias",
+    "permissive": "PERMISSIVE",
+    "roles": "{public}",
+    "cmd": "SELECT",
+    "qual": "true",
+    "with_check": null
+  },
+  {
+    "schemaname": "public",
+    "tablename": "leads",
+    "policyname": "Administradores podem gerenciar leads",
+    "permissive": "PERMISSIVE",
+    "roles": "{public}",
+    "cmd": "ALL",
+    "qual": "current_user_is_admin()",
+    "with_check": "current_user_is_admin()"
+  },
+  {
+    "schemaname": "public",
+    "tablename": "leads",
+    "policyname": "Admins can delete leads",
+    "permissive": "PERMISSIVE",
+    "roles": "{public}",
+    "cmd": "DELETE",
+    "qual": "current_user_is_admin()",
+    "with_check": null
+  },
+  {
+    "schemaname": "public",
+    "tablename": "leads",
+    "policyname": "Admins can insert leads",
+    "permissive": "PERMISSIVE",
+    "roles": "{public}",
+    "cmd": "INSERT",
+    "qual": null,
+    "with_check": "current_user_is_admin()"
+  },
+  {
+    "schemaname": "public",
+    "tablename": "leads",
+    "policyname": "Admins can select leads",
+    "permissive": "PERMISSIVE",
+    "roles": "{public}",
+    "cmd": "SELECT",
+    "qual": "current_user_is_admin()",
+    "with_check": null
+  },
+  {
+    "schemaname": "public",
+    "tablename": "leads",
+    "policyname": "Admins can update leads",
+    "permissive": "PERMISSIVE",
+    "roles": "{public}",
+    "cmd": "UPDATE",
+    "qual": "current_user_is_admin()",
+    "with_check": null
+  },
+  {
+    "schemaname": "public",
+    "tablename": "leads",
+    "policyname": "Apenas administradores podem ver leads",
+    "permissive": "PERMISSIVE",
+    "roles": "{public}",
+    "cmd": "SELECT",
+    "qual": "is_current_user_admin()",
+    "with_check": null
+  },
+  {
+    "schemaname": "public",
+    "tablename": "leads",
+    "policyname": "Leads can be created by anyone",
+    "permissive": "PERMISSIVE",
+    "roles": "{public}",
+    "cmd": "INSERT",
+    "qual": null,
+    "with_check": "true"
+  },
+  {
+    "schemaname": "public",
+    "tablename": "newsletter_subscribers",
+    "policyname": "Administradores podem gerenciar assinantes da newsletter",
+    "permissive": "PERMISSIVE",
+    "roles": "{public}",
+    "cmd": "ALL",
+    "qual": "current_user_is_admin()",
+    "with_check": "current_user_is_admin()"
+  },
+  {
+    "schemaname": "public",
+    "tablename": "newsletter_subscribers",
+    "policyname": "Admins can delete newsletter_subscribers",
+    "permissive": "PERMISSIVE",
+    "roles": "{public}",
+    "cmd": "DELETE",
+    "qual": "current_user_is_admin()",
+    "with_check": null
+  },
+  {
+    "schemaname": "public",
+    "tablename": "newsletter_subscribers",
+    "policyname": "Admins can insert newsletter_subscribers",
+    "permissive": "PERMISSIVE",
+    "roles": "{public}",
+    "cmd": "INSERT",
+    "qual": null,
+    "with_check": "current_user_is_admin()"
+  },
+  {
+    "schemaname": "public",
+    "tablename": "newsletter_subscribers",
+    "policyname": "Admins can select newsletter_subscribers",
+    "permissive": "PERMISSIVE",
+    "roles": "{public}",
+    "cmd": "SELECT",
+    "qual": "current_user_is_admin()",
+    "with_check": null
+  },
+  {
+    "schemaname": "public",
+    "tablename": "newsletter_subscribers",
+    "policyname": "Admins can update newsletter_subscribers",
+    "permissive": "PERMISSIVE",
+    "roles": "{public}",
+    "cmd": "UPDATE",
+    "qual": "current_user_is_admin()",
+    "with_check": null
+  },
+  {
+    "schemaname": "public",
+    "tablename": "newsletter_subscribers",
+    "policyname": "Anyone can subscribe to newsletter",
+    "permissive": "PERMISSIVE",
+    "roles": "{public}",
+    "cmd": "INSERT",
+    "qual": null,
+    "with_check": "true"
+  },
+  {
+    "schemaname": "public",
+    "tablename": "newsletter_subscribers",
+    "policyname": "Apenas administradores podem ver inscritos da newsletter",
+    "permissive": "PERMISSIVE",
+    "roles": "{public}",
+    "cmd": "SELECT",
+    "qual": "is_current_user_admin()",
+    "with_check": null
+  },
+  {
+    "schemaname": "public",
+    "tablename": "partners",
+    "policyname": "partners: admin full access",
+    "permissive": "PERMISSIVE",
+    "roles": "{authenticated}",
+    "cmd": "ALL",
+    "qual": "(EXISTS ( SELECT 1\n   FROM admin_permissions\n  WHERE (admin_permissions.email = get_current_user_email())))",
+    "with_check": "(EXISTS ( SELECT 1\n   FROM admin_permissions\n  WHERE (admin_permissions.email = get_current_user_email())))"
+  },
+  {
+    "schemaname": "public",
+    "tablename": "partners",
+    "policyname": "partners: public read",
+    "permissive": "PERMISSIVE",
+    "roles": "{public}",
+    "cmd": "SELECT",
+    "qual": "(visible IS TRUE)",
+    "with_check": null
+  },
+  {
+    "schemaname": "public",
+    "tablename": "product_images",
+    "policyname": "Acesso público para imagens de produtos",
+    "permissive": "PERMISSIVE",
+    "roles": "{public}",
+    "cmd": "SELECT",
+    "qual": "(EXISTS ( SELECT 1\n   FROM products\n  WHERE ((products.id = product_images.product_id) AND (products.published = true))))",
+    "with_check": null
+  },
+  {
+    "schemaname": "public",
+    "tablename": "product_images",
+    "policyname": "Administradores podem gerenciar imagens de produtos",
+    "permissive": "PERMISSIVE",
+    "roles": "{public}",
+    "cmd": "ALL",
+    "qual": "current_user_is_admin()",
+    "with_check": "current_user_is_admin()"
+  },
+  {
+    "schemaname": "public",
+    "tablename": "product_images",
+    "policyname": "Admins can delete images",
+    "permissive": "PERMISSIVE",
+    "roles": "{public}",
+    "cmd": "DELETE",
+    "qual": "current_user_is_admin()",
+    "with_check": null
+  },
+  {
+    "schemaname": "public",
+    "tablename": "product_images",
+    "policyname": "Admins can do anything with product images",
+    "permissive": "PERMISSIVE",
+    "roles": "{public}",
+    "cmd": "ALL",
+    "qual": "is_current_user_admin()",
+    "with_check": "is_current_user_admin()"
+  },
+  {
+    "schemaname": "public",
+    "tablename": "product_images",
+    "policyname": "Admins can insert images",
+    "permissive": "PERMISSIVE",
+    "roles": "{public}",
+    "cmd": "INSERT",
+    "qual": null,
+    "with_check": "current_user_is_admin()"
+  },
+  {
+    "schemaname": "public",
+    "tablename": "product_images",
+    "policyname": "Admins can manage all product images",
+    "permissive": "PERMISSIVE",
+    "roles": "{public}",
+    "cmd": "ALL",
+    "qual": "(is_current_user_admin() = true)",
+    "with_check": "(is_current_user_admin() = true)"
+  },
+  {
+    "schemaname": "public",
+    "tablename": "product_images",
+    "policyname": "Admins can perform all actions on product_images",
+    "permissive": "PERMISSIVE",
+    "roles": "{public}",
+    "cmd": "ALL",
+    "qual": "is_current_user_admin()",
+    "with_check": "is_current_user_admin()"
+  },
+  {
+    "schemaname": "public",
+    "tablename": "product_images",
+    "policyname": "Admins can select images",
+    "permissive": "PERMISSIVE",
+    "roles": "{public}",
+    "cmd": "SELECT",
+    "qual": "current_user_is_admin()",
+    "with_check": null
+  },
+  {
+    "schemaname": "public",
+    "tablename": "product_images",
+    "policyname": "Admins can update images",
+    "permissive": "PERMISSIVE",
+    "roles": "{public}",
+    "cmd": "UPDATE",
+    "qual": "current_user_is_admin()",
+    "with_check": null
+  },
+  {
+    "schemaname": "public",
+    "tablename": "product_images",
+    "policyname": "Anyone can view product images",
+    "permissive": "PERMISSIVE",
+    "roles": "{public}",
+    "cmd": "SELECT",
+    "qual": "true",
+    "with_check": null
+  },
+  {
+    "schemaname": "public",
+    "tablename": "product_images",
+    "policyname": "Modificável apenas por administradores",
+    "permissive": "PERMISSIVE",
+    "roles": "{public}",
+    "cmd": "ALL",
+    "qual": "is_current_user_admin()",
+    "with_check": null
+  },
+  {
+    "schemaname": "public",
+    "tablename": "product_images",
+    "policyname": "Product images are viewable by everyone",
+    "permissive": "PERMISSIVE",
+    "roles": "{public}",
+    "cmd": "SELECT",
+    "qual": "true",
+    "with_check": null
+  },
+  {
+    "schemaname": "public",
+    "tablename": "product_images",
+    "policyname": "Usuários podem ver imagens de produtos",
+    "permissive": "PERMISSIVE",
+    "roles": "{public}",
+    "cmd": "SELECT",
+    "qual": "(EXISTS ( SELECT 1\n   FROM products p\n  WHERE ((p.id = product_images.product_id) AND ((p.published = true) OR current_user_is_admin()))))",
+    "with_check": null
+  },
+  {
+    "schemaname": "public",
+    "tablename": "products",
+    "policyname": "Acesso público para visualização de produtos",
+    "permissive": "PERMISSIVE",
+    "roles": "{public}",
+    "cmd": "SELECT",
+    "qual": "(published = true)",
+    "with_check": null
+  },
+  {
+    "schemaname": "public",
+    "tablename": "products",
+    "policyname": "Admins can insert products",
+    "permissive": "PERMISSIVE",
+    "roles": "{public}",
+    "cmd": "INSERT",
+    "qual": null,
+    "with_check": "current_user_is_admin()"
+  },
+  {
+    "schemaname": "public",
+    "tablename": "products",
+    "policyname": "Admins can select products",
+    "permissive": "PERMISSIVE",
+    "roles": "{public}",
+    "cmd": "SELECT",
+    "qual": "current_user_is_admin()",
+    "with_check": null
+  },
+  {
+    "schemaname": "public",
+    "tablename": "products",
+    "policyname": "Admins can update products",
+    "permissive": "PERMISSIVE",
+    "roles": "{public}",
+    "cmd": "UPDATE",
+    "qual": "current_user_is_admin()",
+    "with_check": null
+  },
+  {
+    "schemaname": "public",
+    "tablename": "products",
+    "policyname": "Admins podem DELETAR produtos",
+    "permissive": "PERMISSIVE",
+    "roles": "{public}",
+    "cmd": "DELETE",
+    "qual": "is_current_user_admin()",
+    "with_check": null
+  },
+  {
+    "schemaname": "public",
+    "tablename": "products",
+    "policyname": "Anyone can view published products",
+    "permissive": "PERMISSIVE",
+    "roles": "{public}",
+    "cmd": "SELECT",
+    "qual": "((published = true) OR is_current_user_admin())",
+    "with_check": null
+  },
+  {
+    "schemaname": "public",
+    "tablename": "products",
+    "policyname": "Products are viewable by everyone",
+    "permissive": "PERMISSIVE",
+    "roles": "{public}",
+    "cmd": "SELECT",
+    "qual": "true",
+    "with_check": null
+  },
+  {
+    "schemaname": "public",
+    "tablename": "products",
+    "policyname": "Usuários podem ver produtos publicados",
+    "permissive": "PERMISSIVE",
+    "roles": "{public}",
+    "cmd": "SELECT",
+    "qual": "((published = true) OR current_user_is_admin())",
+    "with_check": null
+  },
+  {
+    "schemaname": "public",
+    "tablename": "profiles",
+    "policyname": "Atualização restrita ao próprio perfil",
+    "permissive": "PERMISSIVE",
+    "roles": "{public}",
+    "cmd": "UPDATE",
+    "qual": "(id = auth.uid())",
+    "with_check": null
+  },
+  {
+    "schemaname": "public",
+    "tablename": "profiles",
+    "policyname": "Inserção restrita ao próprio perfil",
+    "permissive": "PERMISSIVE",
+    "roles": "{public}",
+    "cmd": "INSERT",
+    "qual": null,
+    "with_check": "(id = auth.uid())"
+  },
+  {
+    "schemaname": "public",
+    "tablename": "profiles",
+    "policyname": "Seleção restrita ao próprio perfil",
+    "permissive": "PERMISSIVE",
+    "roles": "{public}",
+    "cmd": "SELECT",
+    "qual": "(id = auth.uid())",
+    "with_check": null
+  },
+  {
+    "schemaname": "public",
+    "tablename": "subcategories",
+    "policyname": "Administradores podem gerenciar subcategorias",
+    "permissive": "PERMISSIVE",
+    "roles": "{public}",
+    "cmd": "ALL",
+    "qual": "current_user_is_admin()",
+    "with_check": "current_user_is_admin()"
+  },
+  {
+    "schemaname": "public",
+    "tablename": "subcategories",
+    "policyname": "Admins can delete subcategories",
+    "permissive": "PERMISSIVE",
+    "roles": "{public}",
+    "cmd": "DELETE",
+    "qual": "current_user_is_admin()",
+    "with_check": null
+  },
+  {
+    "schemaname": "public",
+    "tablename": "subcategories",
+    "policyname": "Admins can do anything with subcategories",
+    "permissive": "PERMISSIVE",
+    "roles": "{public}",
+    "cmd": "ALL",
+    "qual": "is_current_user_admin()",
+    "with_check": "is_current_user_admin()"
+  },
+  {
+    "schemaname": "public",
+    "tablename": "subcategories",
+    "policyname": "Admins can insert subcategories",
+    "permissive": "PERMISSIVE",
+    "roles": "{public}",
+    "cmd": "INSERT",
+    "qual": null,
+    "with_check": "current_user_is_admin()"
+  },
+  {
+    "schemaname": "public",
+    "tablename": "subcategories",
+    "policyname": "Admins can select subcategories",
+    "permissive": "PERMISSIVE",
+    "roles": "{public}",
+    "cmd": "SELECT",
+    "qual": "current_user_is_admin()",
+    "with_check": null
+  },
+  {
+    "schemaname": "public",
+    "tablename": "subcategories",
+    "policyname": "Admins can update subcategories",
+    "permissive": "PERMISSIVE",
+    "roles": "{public}",
+    "cmd": "UPDATE",
+    "qual": "current_user_is_admin()",
+    "with_check": null
+  },
+  {
+    "schemaname": "public",
+    "tablename": "subcategories",
+    "policyname": "Anyone can view subcategories",
+    "permissive": "PERMISSIVE",
+    "roles": "{public}",
+    "cmd": "SELECT",
+    "qual": "true",
+    "with_check": null
+  },
+  {
+    "schemaname": "public",
+    "tablename": "subcategories",
+    "policyname": "Modificável apenas por administradores",
+    "permissive": "PERMISSIVE",
+    "roles": "{public}",
+    "cmd": "ALL",
+    "qual": "is_current_user_admin()",
+    "with_check": null
+  },
+  {
+    "schemaname": "public",
+    "tablename": "subcategories",
+    "policyname": "Subcategories are viewable by everyone",
+    "permissive": "PERMISSIVE",
+    "roles": "{public}",
+    "cmd": "SELECT",
+    "qual": "true",
+    "with_check": null
+  },
+  {
+    "schemaname": "public",
+    "tablename": "subcategories",
+    "policyname": "Usuários podem ver subcategorias",
+    "permissive": "PERMISSIVE",
+    "roles": "{public}",
+    "cmd": "SELECT",
+    "qual": "true",
+    "with_check": null
+  }
+]
+
+
+
+[
+  {
+    "routine_schema": "auth",
+    "routine_name": "email",
+    "routine_type": "FUNCTION",
+    "return_type": "text"
+  },
+  {
+    "routine_schema": "auth",
+    "routine_name": "jwt",
+    "routine_type": "FUNCTION",
+    "return_type": "jsonb"
+  },
+  {
+    "routine_schema": "auth",
+    "routine_name": "role",
+    "routine_type": "FUNCTION",
+    "return_type": "text"
+  },
+  {
+    "routine_schema": "auth",
+    "routine_name": "uid",
+    "routine_type": "FUNCTION",
+    "return_type": "uuid"
+  },
+  {
+    "routine_schema": "public",
+    "routine_name": "admin_create_category",
+    "routine_type": "FUNCTION",
+    "return_type": "uuid"
+  },
+  {
+    "routine_schema": "public",
+    "routine_name": "current_user_is_admin",
+    "routine_type": "FUNCTION",
+    "return_type": "boolean"
+  },
+  {
+    "routine_schema": "public",
+    "routine_name": "get_auth_email",
+    "routine_type": "FUNCTION",
+    "return_type": "text"
+  },
+  {
+    "routine_schema": "public",
+    "routine_name": "get_auth_user_email",
+    "routine_type": "FUNCTION",
+    "return_type": "text"
+  },
+  {
+    "routine_schema": "public",
+    "routine_name": "get_current_user_email",
+    "routine_type": "FUNCTION",
+    "return_type": "text"
+  },
+  {
+    "routine_schema": "public",
+    "routine_name": "is_admin",
+    "routine_type": "FUNCTION",
+    "return_type": "boolean"
+  },
+  {
+    "routine_schema": "public",
+    "routine_name": "is_current_user_admin",
+    "routine_type": "FUNCTION",
+    "return_type": "boolean"
+  }
+]
+
+
+[
+  {
+    "table_schema": "public",
+    "constraint_name": "fk_attribute_subcategory",
+    "table_name": "attributes",
+    "column_name": "subcategory_id",
+    "foreign_table_schema": "public",
+    "foreign_table_name": "subcategories",
+    "foreign_column_name": "id"
+  },
+  {
+    "table_schema": "public",
+    "constraint_name": "subcategory_attributes_subcategory_id_fkey",
+    "table_name": "attributes",
+    "column_name": "subcategory_id",
+    "foreign_table_schema": "public",
+    "foreign_table_name": "subcategories",
+    "foreign_column_name": "id"
+  },
+  {
+    "table_schema": "public",
+    "constraint_name": "leads_product_id_fkey",
+    "table_name": "leads",
+    "column_name": "product_id",
+    "foreign_table_schema": "public",
+    "foreign_table_name": "products",
+    "foreign_column_name": "id"
+  },
+  {
+    "table_schema": "public",
+    "constraint_name": "product_images_product_id_fkey",
+    "table_name": "product_images",
+    "column_name": "product_id",
+    "foreign_table_schema": "public",
+    "foreign_table_name": "products",
+    "foreign_column_name": "id"
+  },
+  {
+    "table_schema": "public",
+    "constraint_name": "fk_product_category",
+    "table_name": "products",
+    "column_name": "category_id",
+    "foreign_table_schema": "public",
+    "foreign_table_name": "categories",
+    "foreign_column_name": "id"
+  },
+  {
+    "table_schema": "public",
+    "constraint_name": "fk_products_attribute",
+    "table_name": "products",
+    "column_name": "attribute_id",
+    "foreign_table_schema": "public",
+    "foreign_table_name": "attributes",
+    "foreign_column_name": "id"
+  },
+  {
+    "table_schema": "public",
+    "constraint_name": "fk_products_subcategory",
+    "table_name": "products",
+    "column_name": "subcategory_id",
+    "foreign_table_schema": "public",
+    "foreign_table_name": "subcategories",
+    "foreign_column_name": "id"
+  },
+  {
+    "table_schema": "public",
+    "constraint_name": "fk_subcategory_category",
+    "table_name": "subcategories",
+    "column_name": "category_id",
+    "foreign_table_schema": "public",
+    "foreign_table_name": "categories",
+    "foreign_column_name": "id"
+  },
+  {
+    "table_schema": "public",
+    "constraint_name": "subcategories_category_id_fkey",
+    "table_name": "subcategories",
+    "column_name": "category_id",
+    "foreign_table_schema": "public",
+    "foreign_table_name": "categories",
+    "foreign_column_name": "id"
+  }
+]
+
+
+[
+  {
+    "schemaname": "public",
+    "tablename": "admin_permissions",
+    "indexname": "admin_permissions_email_key",
+    "indexdef": "CREATE UNIQUE INDEX admin_permissions_email_key ON public.admin_permissions USING btree (email)"
+  },
+  {
+    "schemaname": "public",
+    "tablename": "admin_permissions",
+    "indexname": "admin_permissions_pkey",
+    "indexdef": "CREATE UNIQUE INDEX admin_permissions_pkey ON public.admin_permissions USING btree (id)"
+  },
+  {
+    "schemaname": "public",
+    "tablename": "attributes",
+    "indexname": "subcategory_attributes_pkey",
+    "indexdef": "CREATE UNIQUE INDEX subcategory_attributes_pkey ON public.attributes USING btree (id)"
+  },
+  {
+    "schemaname": "public",
+    "tablename": "categories",
+    "indexname": "categories_pkey",
+    "indexdef": "CREATE UNIQUE INDEX categories_pkey ON public.categories USING btree (id)"
+  },
+  {
+    "schemaname": "public",
+    "tablename": "categories",
+    "indexname": "categories_value_key",
+    "indexdef": "CREATE UNIQUE INDEX categories_value_key ON public.categories USING btree (value)"
+  },
+  {
+    "schemaname": "public",
+    "tablename": "leads",
+    "indexname": "leads_pkey",
+    "indexdef": "CREATE UNIQUE INDEX leads_pkey ON public.leads USING btree (id)"
+  },
+  {
+    "schemaname": "public",
+    "tablename": "newsletter_subscribers",
+    "indexname": "newsletter_subscribers_email_key",
+    "indexdef": "CREATE UNIQUE INDEX newsletter_subscribers_email_key ON public.newsletter_subscribers USING btree (email)"
+  },
+  {
+    "schemaname": "public",
+    "tablename": "newsletter_subscribers",
+    "indexname": "newsletter_subscribers_pkey",
+    "indexdef": "CREATE UNIQUE INDEX newsletter_subscribers_pkey ON public.newsletter_subscribers USING btree (id)"
+  },
+  {
+    "schemaname": "public",
+    "tablename": "partners",
+    "indexname": "partners_pkey",
+    "indexdef": "CREATE UNIQUE INDEX partners_pkey ON public.partners USING btree (id)"
+  },
+  {
+    "schemaname": "public",
+    "tablename": "product_images",
+    "indexname": "product_images_pkey",
+    "indexdef": "CREATE UNIQUE INDEX product_images_pkey ON public.product_images USING btree (id)"
+  },
+  {
+    "schemaname": "public",
+    "tablename": "product_images",
+    "indexname": "unique_product_url",
+    "indexdef": "CREATE UNIQUE INDEX unique_product_url ON public.product_images USING btree (product_id, url)"
+  },
+  {
+    "schemaname": "public",
+    "tablename": "products",
+    "indexname": "products_pkey",
+    "indexdef": "CREATE UNIQUE INDEX products_pkey ON public.products USING btree (id)"
+  },
+  {
+    "schemaname": "public",
+    "tablename": "profiles",
+    "indexname": "profiles_pkey",
+    "indexdef": "CREATE UNIQUE INDEX profiles_pkey ON public.profiles USING btree (id)"
+  },
+  {
+    "schemaname": "public",
+    "tablename": "subcategories",
+    "indexname": "subcategories_category_id_type_key",
+    "indexdef": "CREATE UNIQUE INDEX subcategories_category_id_type_key ON public.subcategories USING btree (category_id, type)"
+  },
+  {
+    "schemaname": "public",
+    "tablename": "subcategories",
+    "indexname": "subcategories_pkey",
+    "indexdef": "CREATE UNIQUE INDEX subcategories_pkey ON public.subcategories USING btree (id)"
+  }
+]
+
+
+[
+  {
+    "id": "b4772733-d50e-4f60-ab56-51ce86c7cef1",
+    "email": "mar.medeiros2015@gmail.com",
+    "created_at": "2025-05-09 21:58:48.097428+00",
+    "confirmed_at": "2025-05-09 21:58:48.126978+00",
+    "last_sign_in_at": "2025-09-09 12:54:45.475996+00",
+    "raw_user_meta_data": {
+      "email_verified": true
+    }
+  }
+]
+
+
+
