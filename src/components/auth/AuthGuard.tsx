@@ -37,24 +37,6 @@ const AuthGuard: React.FC<AuthGuardProps> = ({
       navigate(redirectTo, { replace: true });
       return;
     }
-
-    // APP NATIVO: Requer login em TODAS as páginas (exceto /login)
-    if (isNativeApp && !user && !isLoginPage) {
-      console.log("[AuthGuard] App nativo sem autenticação, redirecionando para login");
-      navigate(`/login?redirect_to=${encodeURIComponent(currentPath)}`, {
-        replace: true,
-      });
-      return;
-    }
-
-    // WEB: Apenas requer login se requireAuth = true
-    if (!isNativeApp && requireAuth && !user && !isLoginPage) {
-      console.log("[AuthGuard] Rota protegida, redirecionando para login");
-      navigate(`/login?redirect_to=${encodeURIComponent(currentPath)}`, {
-        replace: true,
-      });
-      return;
-    }
   }, [user, loading, navigate, location, isNativeApp, requireAuth]);
 
   // Mostra loading enquanto verifica autenticação

@@ -4,7 +4,6 @@ import { Button } from "@/components/ui/button";
 import { MessageCircle, Share2, Heart } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useState } from "react";
-import { useProtectedAction } from "@/hooks/use-protected-action";
 
 interface MobileActionBarProps {
   product: Product;
@@ -45,14 +44,11 @@ const MobileActionBar = ({ product }: MobileActionBarProps) => {
     }
   };
 
-  const openWhatsAppAction = () => {
+  const openWhatsApp = () => {
     const message = `Olá, vim do site e quero saber mais sobre o produto "${product.name}"`;
     const whatsappUrl = `https://wa.me/5562982801810?text=${encodeURIComponent(message)}`;
     window.open(whatsappUrl, "_blank");
   };
-
-  // Protege a ação do WhatsApp - requer login
-  const openWhatsApp = useProtectedAction(openWhatsAppAction);
 
   return (
     <div className="fixed bottom-0 left-0 right-0 z-40 bg-white/95 dark:bg-zinc-950/95 shadow-t-lg flex items-center py-2 px-2 border-t glass-morphism animate-fade-in md:hidden">

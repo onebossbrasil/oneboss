@@ -23,3 +23,6 @@ dist-ssr
 *.sln
 *.sw?
 keystore.properties
+
+# Supabase migration scripts (contain service_role keys and DB passwords)
+migration/

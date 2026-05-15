@@ -64,7 +64,7 @@ export const fetchProductsFromSupabase = async (): Promise<{ products: Product[]
         if (
           typeof image.url === 'string' &&
           image.url.trim() !== '' &&
-          image.url.startsWith('https://gytzdhfbmmrsanrhquut.supabase.co/storage/v1/object/public/products/')
+          image.url.startsWith('https://wlocqbwyhhympjwpyzjc.supabase.co/storage/v1/object/public/products/')
         ) {
           imagesByProduct[image.product_id].push({
             id: image.id,
@@ -247,7 +247,7 @@ export const fetchProductsPageFromSupabase = async (
           if (
             typeof image.url === 'string' &&
             image.url.trim() !== '' &&
-            image.url.startsWith('https://gytzdhfbmmrsanrhquut.supabase.co/storage/v1/object/public/products/')
+            image.url.startsWith('https://wlocqbwyhhympjwpyzjc.supabase.co/storage/v1/object/public/products/')
           ) {
             imagesByProduct[image.product_id].push({
               id: image.id,
